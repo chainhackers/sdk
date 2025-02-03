@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "name": "@betswirl/sdk",
+  "packageManager": "pnpm@8.15.4",
+  "scripts": {
+    "build": "pnpm run --r build",
+    "dev": "pnpm run --r dev"
+  },
+  "type": "module"
+}
