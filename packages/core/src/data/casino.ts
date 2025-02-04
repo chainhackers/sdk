@@ -1,4 +1,4 @@
-import type { Chain, Hex } from "viem";
+import type { Abi, Chain, Hex } from "viem";
 import { chainByKey } from "./chains.ts";
 import { abi as diceAbi } from "../abis/v2/casino/dice.ts";
 import { abi as coinTossAbi } from "../abis/v2/casino/coinToss.ts";
@@ -18,7 +18,7 @@ export type CasinoChain = {
   contracts: {
     bank: Hex;
     games: {
-      [key in CASINO_GAME_TYPE]?: { address: Hex; abi: any };
+      [key in CASINO_GAME_TYPE]?: { address: Hex; abi: Abi };
     };
     leaderboard?: Hex;
     freebet?: Hex;
@@ -28,7 +28,6 @@ export type CasinoChain = {
   };
   defaultAffiliate: Hex;
 };
-
 
 export enum CASINO_GAME_TYPE {
   COINTOSS = "coin-toss",
@@ -51,8 +50,6 @@ export enum CASINO_GAME_LABEL_TYPE {
   KENO = "Keno",
 }
 
-
-
 export const casinoChainByKey = {
   // mainnets
   polygon: chainByKey.polygon,
@@ -67,11 +64,9 @@ export const casinoChainByKey = {
   baseSepolia: chainByKey.baseSepolia,
 } as const;
 
-export const casinoChains = Object.values(casinoChainByKey) as unknown as readonly [
-    Chain,
-    ...Chain[]
-  ];
-  
+export const casinoChains = Object.values(
+  casinoChainByKey
+) as unknown as readonly [Chain, ...Chain[]];
 
 const arbitrumSepoliaData: CasinoChain = {
   viemChain: chainByKey.arbitrumSepolia,

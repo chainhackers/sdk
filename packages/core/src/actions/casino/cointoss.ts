@@ -1,5 +1,5 @@
 import { type Config as WagmiConfig } from "@wagmi/core";
-import { playGame, type CasinoGameInputs, type CasinoOptions } from "./game.ts";
+import { placeBet, type CasinoGameInputs, type CasinoOptions } from "./game.ts";
 import { CASINO_GAME_TYPE } from "../../data/casino.ts";
 
 export enum COINTOSS_FACE {
@@ -7,18 +7,17 @@ export enum COINTOSS_FACE {
   HEADS = 0,
 }
 export interface CoinTossInputs extends CasinoGameInputs {
-  face?: COINTOSS_FACE;
+  face: COINTOSS_FACE;
 }
-const defaultFace = COINTOSS_FACE.HEADS;
-export async function playCoinToss(
+export async function placeCoinTossBet(
   coinTossInputs: CoinTossInputs,
   wagmiConfig: WagmiConfig,
   betSwirlOptions?: CasinoOptions
 ) {
   // Simulate tx
-  const face = Boolean(coinTossInputs.face || defaultFace);
+  const face = Boolean(coinTossInputs.face);
   // Exécution de la transaction
-  const hash = await playGame(
+  const hash = await placeBet(
     {
       game: CASINO_GAME_TYPE.COINTOSS,
       encodedInputs: [face],
