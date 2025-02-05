@@ -50,8 +50,31 @@ export enum CASINO_GAME_LABEL_TYPE {
   KENO = "Keno",
 }
 
+const COINTOSS_ROLL_ABI =
+  "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, bool face, bool[] rolled, uint256 payout)";
+const DICE_ROLL_ABI =
+  "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, uint8 cap, uint8[] rolled, uint256 payout)";
+const ROULETTE_ROLL_ABI =
+  "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, uint40 numbers, uint8[] rolled, uint256 payout)";
+const KENO_ROLL_ABI =
+  "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, uint40 numbers, uint40[] rolled, uint256 payout)";
+
+export const CASINO_GAME_ROLL_ABI: Record<
+  CASINO_GAME_TYPE,
+  | typeof COINTOSS_ROLL_ABI
+  | typeof DICE_ROLL_ABI
+  | typeof ROULETTE_ROLL_ABI
+  | typeof KENO_ROLL_ABI
+> = {
+  [CASINO_GAME_TYPE.COINTOSS]: COINTOSS_ROLL_ABI,
+  [CASINO_GAME_TYPE.DICE]: DICE_ROLL_ABI,
+  [CASINO_GAME_TYPE.ROULETTE]: ROULETTE_ROLL_ABI,
+  [CASINO_GAME_TYPE.KENO]: KENO_ROLL_ABI,
+};
+
 export const casinoChainByKey = {
   // mainnets
+
   polygon: chainByKey.polygon,
   avalanche: chainByKey.avalanche,
   arbitrum: chainByKey.arbitrum,
