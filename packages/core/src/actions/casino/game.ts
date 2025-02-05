@@ -1,6 +1,5 @@
 import {
   encodeFunctionData,
-  zeroAddress,
   type Hash,
   type Hex,
   type TransactionReceipt,
@@ -33,11 +32,14 @@ import { GAS_PRICE_TYPE, getGasPrices } from "../../read/gasPrice.ts";
 import { getChainlinkVrfCost } from "../../read/chainlinkVrfCost.ts";
 import { decodeEventLog } from "viem";
 import { abi as coinTossAbi } from "../../abis/v2/casino/coinToss.ts";
+import type { Token } from "../../interfaces.ts";
+import { chainNativeCurrencyToToken } from "../../utils/tokens.ts";
+import { getTokenMetadata } from "../common/tokenMetadata.ts";
 
 export interface CasinoBetParams {
   betAmount: bigint;
   betCount?: number;
-  tokenAddress?: Hex;
+  token?: Token;
   stopGain?: bigint;
   stopLoss?: bigint;
   vrfFees?: bigint;
@@ -47,7 +49,7 @@ export interface CasinoBetParams {
 
 export const defaultCasinoGameParams = {
   betCount: 1,
-  tokenAddress: zeroAddress,
+  //token: zeroAddress, => chain.nativeCurrency
   stopGain: 0n,
   stopLoss: 0n,
   vrfFees: 0n, // When 0, VRF fees are calculated on the fly
@@ -80,7 +82,7 @@ export interface CasinoPlacedBet {
   betCount: number;
   totalBetAmount: bigint;
   chargedVRFCost: bigint;
-  tokenAddress: Hex;
+  token: Token;
   affiliate: Hex;
   receiver: Hex;
   stopGain: bigint;
@@ -144,15 +146,16 @@ export async function placeBet(
     );
 
     // Approve if needed
-    const tokenAddress =
-      betParams.tokenAddress || defaultCasinoGameParams.tokenAddress;
+    const token =
+      betParams.token ||
+      chainNativeCurrencyToToken(casinoChain.viemChain.nativeCurrency);
     const allowanceType =
       options?.allowanceType || defaultCasinoPlaceBetOptions.allowanceType;
     const pollingInterval =
       options?.pollInterval || casinoChain.options.pollingInterval;
     const { receipt: approveReceipt, result: approveResult } = await approve(
       wagmiConfig,
-      tokenAddress,
+      token.address,
       accountAddress,
       game.address,
       functionData.totalBetAmount,
@@ -171,7 +174,7 @@ export async function placeBet(
       (await getChainlinkVrfCost(
         wagmiConfig,
         game.address,
-        tokenAddress,
+        token.address,
         functionData.betCount,
         chainId,
         gasPrice
@@ -196,14 +199,19 @@ export async function placeBet(
       pollingInterval,
     });
 
-    const placedBet = getPlacedBetFromReceipt(receipt, chainId, betParams.game);
+    const placedBet = await getPlacedBetFromReceipt(
+      wagmiConfig,
+      receipt,
+      chainId,
+      betParams.game
+    );
     if (!placedBet) {
       throw new TransactionError("PlaceBet event not found", {
         errorCode: ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
         gameAddress: game.address,
         gameType: betParams.game,
         chainId,
-        tokenAddress: betParams.tokenAddress,
+        token,
       });
     }
 
@@ -216,7 +224,7 @@ export async function placeBet(
         gameAddress: game.address,
         gameType: betParams.game,
         chainId,
-        tokenAddress: betParams.tokenAddress,
+        token: betParams.token,
         betAmount: betParams.betAmount,
         betCount: betParams.betCount,
         stopGain: betParams.stopGain,
@@ -247,8 +255,9 @@ export function generatePlayGameFunctionData(
   }
 
   const affiliate = gameParams.affiliate || casinoChain.defaultAffiliate;
-  const tokenAddress =
-    gameParams.tokenAddress || defaultCasinoGameParams.tokenAddress;
+  const token =
+    gameParams.token ||
+    chainNativeCurrencyToToken(casinoChain.viemChain.nativeCurrency);
   const betCount = gameParams.betCount || defaultCasinoGameParams.betCount;
   const stopGain = gameParams.stopGain || defaultCasinoGameParams.stopGain;
   const stopLoss = gameParams.stopLoss || defaultCasinoGameParams.stopLoss;
@@ -262,7 +271,7 @@ export function generatePlayGameFunctionData(
       gameParams.receiver,
       affiliate,
       {
-        token: tokenAddress,
+        token: token.address,
         betAmount: gameParams.betAmount,
         betCount,
         stopGain,
@@ -276,7 +285,7 @@ export function generatePlayGameFunctionData(
     data,
     encodedData: encodeFunctionData(data),
     totalBetAmount: gameParams.betAmount * BigInt(betCount),
-    tokenAddress,
+    token,
     betCount,
     stopGain,
     stopLoss,
@@ -285,11 +294,13 @@ export function generatePlayGameFunctionData(
   };
 }
 
-export function getPlacedBetFromReceipt(
+export async function getPlacedBetFromReceipt(
+  wagmiConfig: WagmiConfig,
   receipt: TransactionReceipt,
   chainId: CasinoChainId,
-  game: CASINO_GAME_TYPE
-): CasinoPlacedBet | null {
+  game: CASINO_GAME_TYPE,
+  usedToken?: Token // to avoid to fetch the token metadata from the chain if the token used is already known
+): Promise<CasinoPlacedBet | null> {
   // Read the Placedbet event from logs
   const decodedPlaceBetEvent = receipt.logs
     .map((log) => {
@@ -310,13 +321,18 @@ export function getPlacedBetFromReceipt(
   }
 
   const { args } = decodedPlaceBetEvent;
+
+  let token = usedToken;
+  if (!token) {
+    token = await getTokenMetadata(wagmiConfig, args.token!, chainId);
+  }
   return {
     id: args.id,
     betAmount: args.amount,
     betCount: args.betCount,
     totalBetAmount: args.amount * BigInt(args.betCount),
     chargedVRFCost: args.chargedVRFCost,
-    tokenAddress: args.token,
+    token,
     affiliate: args.affiliate,
     receiver: args.receiver,
     stopGain: args.stopGain,

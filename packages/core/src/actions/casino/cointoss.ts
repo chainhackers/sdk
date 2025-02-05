@@ -15,6 +15,7 @@ import {
   CoinToss,
   type COINTOSS_FACE,
 } from "../../entities/casino/coinToss.ts";
+import type { Token } from "../../interfaces.ts";
 
 export interface CoinTossParams extends CasinoBetParams {
   face: COINTOSS_FACE;
@@ -40,9 +41,11 @@ export async function placeCoinTossBet(
     },
     options
   );
-  const coinTossPlacedBet = getCoinTossPlacedBetFromReceipt(
+  const coinTossPlacedBet = await getCoinTossPlacedBetFromReceipt(
+    wagmiConfig,
     receipt,
-    placedBet.chainId
+    placedBet.chainId,
+    placedBet.token
   );
   if (!coinTossPlacedBet) {
     throw new TransactionError("CoinToss PlaceBet event not found", {
@@ -53,19 +56,24 @@ export async function placeCoinTossBet(
   }
   return { placedBet: coinTossPlacedBet, receipt };
 }
-// TODO I think its is not useful because encodedFace & face are getatble in placeCoinTossBet
-export function getCoinTossPlacedBetFromReceipt(
+
+export async function getCoinTossPlacedBetFromReceipt(
+  wagmiConfig: WagmiConfig,
   receipt: TransactionReceipt,
-  chainId: CasinoChainId
-): CoinTossPlacedBet | null {
-  const gamePlacedBet = getPlacedBetFromReceipt(
+  chainId: CasinoChainId,
+  usedToken?: Token
+): Promise<CoinTossPlacedBet | null> {
+  const gamePlacedBet = await getPlacedBetFromReceipt(
+    wagmiConfig,
     receipt,
     chainId,
-    CASINO_GAME_TYPE.COINTOSS
+    CASINO_GAME_TYPE.COINTOSS,
+    usedToken
   );
   if (!gamePlacedBet) {
     return null;
   }
+
   // Read the CoinToss PlaceBet event from logs
   const decodedCoinTossPlaceBetEvent = receipt.logs
     .map((log) => {

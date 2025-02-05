@@ -4,13 +4,14 @@ import { abi as gameAbi } from "../abis/v2/casino/game.ts";
 import { encodeFunctionData, type Hex } from "viem";
 import { TransactionError } from "../errors/types.ts";
 import { ERROR_CODES } from "../errors/codes.ts";
+import type { CasinoChainId } from "../data/casino.ts";
 
 export async function getChainlinkVrfCost(
   wagmiConfig: WagmiConfig,
   gameAddress: Hex,
   tokenAddress: Hex,
   betCount: number,
-  chainId?: number,
+  chainId?: CasinoChainId,
   gasPrice?: bigint
 ): Promise<bigint> {
   try {

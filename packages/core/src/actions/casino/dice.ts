@@ -12,6 +12,7 @@ import { abi as diceAbi } from "../../abis/v2/casino/dice.ts";
 import { TransactionError } from "../../errors/types.ts";
 import { ERROR_CODES } from "../../errors/codes.ts";
 import { Dice } from "../../entities/casino/dice.ts";
+import type { Token } from "../../interfaces.ts";
 
 export interface DiceParams extends CasinoBetParams {
   cap: number;
@@ -37,7 +38,12 @@ export async function placeDiceBet(
     },
     options
   );
-  const dicePlacedBet = getDicePlacedBetFromReceipt(receipt, placedBet.chainId);
+  const dicePlacedBet = await getDicePlacedBetFromReceipt(
+    wagmiConfig,
+    receipt,
+    placedBet.chainId,
+    placedBet.token
+  );
   if (!dicePlacedBet) {
     throw new TransactionError("Dice PlaceBet event not found", {
       errorCode: ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
@@ -45,18 +51,22 @@ export async function placeDiceBet(
       chainId: placedBet.chainId,
     });
   }
+
   return { placedBet: dicePlacedBet, receipt };
 }
 
-// TODO I think it is not useful because encodedCap & cap are getatble in placeDiceBet
-export function getDicePlacedBetFromReceipt(
+export async function getDicePlacedBetFromReceipt(
+  wagmiConfig: WagmiConfig,
   receipt: TransactionReceipt,
-  chainId: CasinoChainId
-): DicePlacedBet | null {
-  const gamePlacedBet = getPlacedBetFromReceipt(
+  chainId: CasinoChainId,
+  usedToken?: Token
+): Promise<DicePlacedBet | null> {
+  const gamePlacedBet = await getPlacedBetFromReceipt(
+    wagmiConfig,
     receipt,
     chainId,
-    CASINO_GAME_TYPE.DICE
+    CASINO_GAME_TYPE.DICE,
+    usedToken
   );
   if (!gamePlacedBet) {
     return null;
