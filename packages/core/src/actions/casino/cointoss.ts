@@ -2,7 +2,7 @@ import { type Config as WagmiConfig } from "@wagmi/core";
 import {
   getPlacedBetFromReceipt,
   placeBet,
-  type CasinoBetInputs,
+  type CasinoBetParams,
   type CasinoPlaceBetOptions,
   type CasinoPlacedBet,
 } from "./game.ts";
@@ -11,12 +11,12 @@ import { decodeEventLog, type TransactionReceipt } from "viem";
 import { abi as coinTossAbi } from "../../abis/v2/casino/coinToss.ts";
 import { TransactionError } from "../../errors/types.ts";
 import { ERROR_CODES } from "../../errors/codes.ts";
+import {
+  CoinToss,
+  type COINTOSS_FACE,
+} from "../../entities/casino/coinToss.ts";
 
-export enum COINTOSS_FACE {
-  TAILS = 1,
-  HEADS = 0,
-}
-export interface CoinTossInputs extends CasinoBetInputs {
+export interface CoinTossParams extends CasinoBetParams {
   face: COINTOSS_FACE;
 }
 
@@ -25,27 +25,18 @@ export interface CoinTossPlacedBet extends CasinoPlacedBet {
   encodedFace: boolean;
 }
 
-export function encodeCoinTossInput(face: COINTOSS_FACE): boolean {
-  return Boolean(face);
-}
-
-export function decodeCoinTossInput(encodedFace: boolean): COINTOSS_FACE {
-  return encodedFace ? COINTOSS_FACE.HEADS : COINTOSS_FACE.TAILS;
-}
-
 export async function placeCoinTossBet(
   wagmiConfig: WagmiConfig,
-  coinTossInputs: CoinTossInputs,
+  coinTossParams: CoinTossParams,
   options?: CasinoPlaceBetOptions
 ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
-  const face = Boolean(coinTossInputs.face);
   // Exécution de la transaction
   const { placedBet, receipt } = await placeBet(
     wagmiConfig,
     {
       game: CASINO_GAME_TYPE.COINTOSS,
-      encodedInputs: [face],
-      ...coinTossInputs,
+      gameEncodedExtraParams: [CoinToss.encodeInput(coinTossParams.face)],
+      ...coinTossParams,
     },
     options
   );
@@ -62,7 +53,7 @@ export async function placeCoinTossBet(
   }
   return { placedBet: coinTossPlacedBet, receipt };
 }
-
+// TODO I think its is not useful because encodedFace & face are getatble in placeCoinTossBet
 export function getCoinTossPlacedBetFromReceipt(
   receipt: TransactionReceipt,
   chainId: CasinoChainId
@@ -98,6 +89,6 @@ export function getCoinTossPlacedBetFromReceipt(
   return {
     ...gamePlacedBet,
     encodedFace: args.face,
-    face: decodeCoinTossInput(args.face),
+    face: CoinToss.decodeInput(args.face),
   };
 }

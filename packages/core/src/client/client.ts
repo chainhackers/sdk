@@ -3,9 +3,9 @@ import type { Hex, TransactionReceipt } from "viem";
 import { type ChainId } from "../data/chains.ts";
 import {
   placeCoinTossBet,
-  type CoinTossInputs,
+  type CoinTossParams,
   type CoinTossPlacedBet,
-} from "../actions/casino/cointoss.ts";
+} from "../actions/casino/coinToss.ts";
 import type { CasinoChainId } from "../data/casino.ts";
 import { casinoChainById } from "../data/casino.ts";
 import { ChainError } from "../errors/types.ts";
@@ -16,7 +16,13 @@ import type { CasinoWaitRollOptions } from "../read/casino/game.ts";
 import {
   waitCoinTossRolledBet,
   type CoinTossRolledBet,
-} from "../read/casino/cointoss.ts";
+} from "../read/casino/coinToss.ts";
+import {
+  placeDiceBet,
+  type DiceParams,
+  type DicePlacedBet,
+} from "../actions/casino/dice.ts";
+import { waitDiceRolledBet, type DiceRolledBet } from "../read/casino/dice.ts";
 
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;
@@ -40,12 +46,12 @@ export class BetSwirlClient {
   }
 
   async playCoinToss(
-    inputs: CoinTossInputs
+    params: CoinTossParams
   ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
     const chainId = this._getCasinoChainId();
     return placeCoinTossBet(
       this.wagmiConfig,
-      { ...inputs, affiliate: this.betSwirlDefaultOptions.affiliate },
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
       {
         ...this.betSwirlDefaultOptions,
         chainId: chainId as CasinoChainId | undefined,
@@ -58,6 +64,27 @@ export class BetSwirlClient {
     options: CasinoWaitRollOptions
   ): Promise<{ rolledBet: CoinTossRolledBet; receipt: TransactionReceipt }> {
     return waitCoinTossRolledBet(this.wagmiConfig, placedBet, options);
+  }
+
+  async playDice(
+    params: DiceParams
+  ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
+    const chainId = this._getCasinoChainId();
+    return placeDiceBet(
+      this.wagmiConfig,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        chainId: chainId as CasinoChainId | undefined,
+      }
+    );
+  }
+
+  async waitDice(
+    placedBet: DicePlacedBet,
+    options: CasinoWaitRollOptions
+  ): Promise<{ rolledBet: DiceRolledBet; receipt: TransactionReceipt }> {
+    return waitDiceRolledBet(this.wagmiConfig, placedBet, options);
   }
 
   _getCasinoChainId(): CasinoChainId | undefined {

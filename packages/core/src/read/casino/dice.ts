@@ -5,22 +5,19 @@ import {
   type CasinoRolledBet,
   type CasinoWaitRollOptions,
 } from "./game.ts";
-import { type CoinTossPlacedBet } from "../../actions/casino/coinToss.ts";
-import {
-  CoinToss,
-  type COINTOSS_FACE,
-} from "../../entities/casino/coinToss.ts";
+import { type DicePlacedBet } from "../../actions/casino/dice.ts";
+import { Dice } from "../../entities/casino/dice.ts";
 
-export interface CoinTossRolledBet extends CasinoRolledBet {
-  rolled: COINTOSS_FACE[];
+export interface DiceRolledBet extends CasinoRolledBet {
+  rolled: number[];
 }
 
-export async function waitCoinTossRolledBet(
+export async function waitDiceRolledBet(
   wagmiConfig: WagmiConfig,
-  placedBet: CoinTossPlacedBet,
+  placedBet: DicePlacedBet,
   options?: CasinoWaitRollOptions
 ): Promise<{
-  rolledBet: CoinTossRolledBet;
+  rolledBet: DiceRolledBet;
   receipt: TransactionReceipt;
 }> {
   const { rolledBet, receipt } = await waitRolledBet(
@@ -31,7 +28,7 @@ export async function waitCoinTossRolledBet(
   return {
     rolledBet: {
       ...rolledBet,
-      rolled: rolledBet.encodedRolled.map(CoinToss.decodeRolled),
+      rolled: rolledBet.encodedRolled.map(Dice.decodeRolled),
     },
     receipt,
   };

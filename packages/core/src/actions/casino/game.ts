@@ -34,7 +34,7 @@ import { getChainlinkVrfCost } from "../../read/chainlinkVrfCost.ts";
 import { decodeEventLog } from "viem";
 import { abi as coinTossAbi } from "../../abis/v2/casino/coinToss.ts";
 
-export interface CasinoBetInputs {
+export interface CasinoBetParams {
   betAmount: bigint;
   betCount?: number;
   tokenAddress?: Hex;
@@ -45,7 +45,7 @@ export interface CasinoBetInputs {
   affiliate?: Hex;
 }
 
-export const defaultCasinoGameInputs = {
+export const defaultCasinoGameParams = {
   betCount: 1,
   tokenAddress: zeroAddress,
   stopGain: 0n,
@@ -69,9 +69,9 @@ export const defaultCasinoPlaceBetOptions = {
   allowanceType: ALLOWANCE_TYPE.AUTO,
 };
 
-export interface GenericCasinoBetInputs extends CasinoBetInputs {
+export interface GenericCasinoBetParams extends CasinoBetParams {
   game: CASINO_GAME_TYPE;
-  encodedInputs: any[]; // CasinoGameInputs excluded
+  gameEncodedExtraParams: any[]; // CasinoGameParams excluded
 }
 
 export interface CasinoPlacedBet {
@@ -93,7 +93,7 @@ export interface CasinoPlacedBet {
 
 export async function placeBet(
   wagmiConfig: WagmiConfig,
-  betInputs: GenericCasinoBetInputs,
+  betParams: GenericCasinoBetParams,
   options?: CasinoPlaceBetOptions,
   onApprovePending?: (tx: Hash, result: ApproveResult) => void | Promise<void>,
   onApproved?: (
@@ -104,11 +104,11 @@ export async function placeBet(
 ): Promise<{ placedBet: CasinoPlacedBet; receipt: TransactionReceipt }> {
   const chainId = options?.chainId || defaultCasinoPlaceBetOptions.chainId;
   const casinoChain = casinoChainById[chainId];
-  const game = casinoChain.contracts.games[betInputs.game];
+  const game = casinoChain.contracts.games[betParams.game];
 
   if (!game) {
     throw new ChainError(
-      `${betInputs.game} is not available for chain ${casinoChain.viemChain.name} (${chainId})`,
+      `${betParams.game} is not available for chain ${casinoChain.viemChain.name} (${chainId})`,
       {
         chainId,
         supportedChains: Object.keys(casinoChainById),
@@ -118,7 +118,7 @@ export async function placeBet(
   }
 
   const accountAddress =
-    betInputs.receiver || wagmiConfig.getClient({ chainId }).account?.address;
+    betParams.receiver || wagmiConfig.getClient({ chainId }).account?.address;
   if (!accountAddress) {
     throw new ConfigurationError(
       `No configured account in wagmi config for chain ${casinoChain.viemChain.name} (${chainId})`,
@@ -137,15 +137,15 @@ export async function placeBet(
       ];
 
     // Generate function data
-    const receiver = betInputs.receiver || accountAddress;
+    const receiver = betParams.receiver || accountAddress;
     const functionData = generatePlayGameFunctionData(
-      { ...betInputs, receiver },
+      { ...betParams, receiver },
       chainId
     );
 
     // Approve if needed
     const tokenAddress =
-      betInputs.tokenAddress || defaultCasinoGameInputs.tokenAddress;
+      betParams.tokenAddress || defaultCasinoGameParams.tokenAddress;
     const allowanceType =
       options?.allowanceType || defaultCasinoPlaceBetOptions.allowanceType;
     const pollingInterval =
@@ -167,7 +167,7 @@ export async function placeBet(
 
     // Get VRF fees
     const vrfFees =
-      betInputs.vrfFees ||
+      betParams.vrfFees ||
       (await getChainlinkVrfCost(
         wagmiConfig,
         game.address,
@@ -196,14 +196,14 @@ export async function placeBet(
       pollingInterval,
     });
 
-    const placedBet = getPlacedBetFromReceipt(receipt, chainId, betInputs.game);
+    const placedBet = getPlacedBetFromReceipt(receipt, chainId, betParams.game);
     if (!placedBet) {
       throw new TransactionError("PlaceBet event not found", {
         errorCode: ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
         gameAddress: game.address,
-        gameType: betInputs.game,
+        gameType: betParams.game,
         chainId,
-        tokenAddress: betInputs.tokenAddress,
+        tokenAddress: betParams.tokenAddress,
       });
     }
 
@@ -214,30 +214,30 @@ export async function placeBet(
       {
         errorCode: ERROR_CODES.GAME.PLACE_BET_ERROR,
         gameAddress: game.address,
-        gameType: betInputs.game,
+        gameType: betParams.game,
         chainId,
-        tokenAddress: betInputs.tokenAddress,
-        betAmount: betInputs.betAmount,
-        betCount: betInputs.betCount,
-        stopGain: betInputs.stopGain,
-        stopLoss: betInputs.stopLoss,
+        tokenAddress: betParams.tokenAddress,
+        betAmount: betParams.betAmount,
+        betCount: betParams.betCount,
+        stopGain: betParams.stopGain,
+        stopLoss: betParams.stopLoss,
       }
     );
   }
 }
 
 export function generatePlayGameFunctionData(
-  gameInputs: Omit<GenericCasinoBetInputs, "receiver" | "vrfFees"> & {
+  gameParams: Omit<GenericCasinoBetParams, "receiver" | "vrfFees"> & {
     receiver: Hex;
   },
   chainId: CasinoChainId = defaultCasinoPlaceBetOptions.chainId
 ) {
   const casinoChain = casinoChainById[chainId];
-  const game = casinoChain.contracts.games[gameInputs.game];
+  const game = casinoChain.contracts.games[gameParams.game];
 
   if (!game) {
     throw new ChainError(
-      `${gameInputs.game} is not available for chain ${casinoChain.viemChain.name} (${chainId})`,
+      `${gameParams.game} is not available for chain ${casinoChain.viemChain.name} (${chainId})`,
       {
         chainId,
         supportedChains: Object.keys(casinoChainById),
@@ -246,24 +246,24 @@ export function generatePlayGameFunctionData(
     );
   }
 
-  const affiliate = gameInputs.affiliate || casinoChain.defaultAffiliate;
+  const affiliate = gameParams.affiliate || casinoChain.defaultAffiliate;
   const tokenAddress =
-    gameInputs.tokenAddress || defaultCasinoGameInputs.tokenAddress;
-  const betCount = gameInputs.betCount || defaultCasinoGameInputs.betCount;
-  const stopGain = gameInputs.stopGain || defaultCasinoGameInputs.stopGain;
-  const stopLoss = gameInputs.stopLoss || defaultCasinoGameInputs.stopLoss;
+    gameParams.tokenAddress || defaultCasinoGameParams.tokenAddress;
+  const betCount = gameParams.betCount || defaultCasinoGameParams.betCount;
+  const stopGain = gameParams.stopGain || defaultCasinoGameParams.stopGain;
+  const stopLoss = gameParams.stopLoss || defaultCasinoGameParams.stopLoss;
   const maxHouseEdge = MAX_SDK_HOUSE_EGDE;
 
   const data = {
     abi: game.abi,
     functionName: "wager",
     args: [
-      ...gameInputs.encodedInputs,
-      gameInputs.receiver,
+      ...gameParams.gameEncodedExtraParams,
+      gameParams.receiver,
       affiliate,
       {
         token: tokenAddress,
-        betAmount: gameInputs.betAmount,
+        betAmount: gameParams.betAmount,
         betCount,
         stopGain,
         stopLoss,
@@ -275,7 +275,7 @@ export function generatePlayGameFunctionData(
   return {
     data,
     encodedData: encodeFunctionData(data),
-    totalBetAmount: gameInputs.betAmount * BigInt(betCount),
+    totalBetAmount: gameParams.betAmount * BigInt(betCount),
     tokenAddress,
     betCount,
     stopGain,
