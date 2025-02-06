@@ -6,13 +6,15 @@ import {
   type CoinTossParams,
   type CoinTossPlacedBet,
 } from "../actions/casino/coinToss.ts";
-import type { CasinoChainId } from "../data/casino.ts";
+import type { CASINO_GAME_TYPE, CasinoChainId } from "../data/casino.ts";
 import { casinoChainById } from "../data/casino.ts";
-import { ChainError } from "../errors/types.ts";
-import { ERROR_CODES } from "../errors/codes.ts";
 import type { GAS_PRICE_TYPE } from "../read/gasPrice.ts";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve.ts";
-import type { CasinoWaitRollOptions } from "../read/casino/game.ts";
+import {
+  getCasinoGames,
+  getCasinoGameToken,
+  type CasinoWaitRollOptions,
+} from "../read/casino/game.ts";
 import {
   waitCoinTossRolledBet,
   type CoinTossRolledBet,
@@ -23,6 +25,14 @@ import {
   type DicePlacedBet,
 } from "../actions/casino/dice.ts";
 import { waitDiceRolledBet, type DiceRolledBet } from "../read/casino/dice.ts";
+import type {
+  BetRequirements,
+  CasinoGameToken,
+  CasinoToken,
+  Token,
+} from "../interfaces.ts";
+import { getBetRequirements, getCasinoTokens } from "../read/casino/bank.ts";
+import { getCasinoChainId } from "../utils/chains.ts";
 
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;
@@ -45,16 +55,18 @@ export class BetSwirlClient {
     this.betSwirlDefaultOptions = betSwirlDefaultOptions;
   }
 
+  /* Games */
   async playCoinToss(
-    params: CoinTossParams
+    params: CoinTossParams,
+    chainId?: CasinoChainId
   ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
-    const chainId = this._getCasinoChainId();
+    const casinoChainId = this._getCasinoChainId(chainId);
     return placeCoinTossBet(
       this.wagmiConfig,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
       {
         ...this.betSwirlDefaultOptions,
-        chainId: chainId as CasinoChainId | undefined,
+        chainId: casinoChainId,
       }
     );
   }
@@ -67,15 +79,16 @@ export class BetSwirlClient {
   }
 
   async playDice(
-    params: DiceParams
+    params: DiceParams,
+    chainId?: CasinoChainId
   ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
-    const chainId = this._getCasinoChainId();
+    const casinoChainId = this._getCasinoChainId(chainId);
     return placeDiceBet(
       this.wagmiConfig,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
       {
         ...this.betSwirlDefaultOptions,
-        chainId: chainId as CasinoChainId | undefined,
+        chainId: casinoChainId,
       }
     );
   }
@@ -87,19 +100,54 @@ export class BetSwirlClient {
     return waitDiceRolledBet(this.wagmiConfig, placedBet, options);
   }
 
-  _getCasinoChainId(): CasinoChainId | undefined {
-    const chainId = this.betSwirlDefaultOptions.chainId;
-    if (chainId && !(chainId in casinoChainById)) {
-      throw new ChainError(
-        `Chain ID ${chainId} is not compatible with casino games`,
-        {
-          chainId,
-          supportedChains: Object.keys(casinoChainById),
-          errorCode: ERROR_CODES.CHAIN.UNSUPPORTED_CHAIN,
-        }
-      );
-    }
-    return chainId as CasinoChainId | undefined;
+  /* Utilities */
+
+  async getCasinoGames(chainId?: CasinoChainId, onlyActive = false) {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return getCasinoGames(this.wagmiConfig, casinoChainId, onlyActive);
+  }
+
+  async getCasinoTokens(
+    chainId?: CasinoChainId,
+    onlyActive = false
+  ): Promise<CasinoToken[]> {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return getCasinoTokens(this.wagmiConfig, casinoChainId, onlyActive);
+  }
+
+  async getCasinoGameToken(
+    casinoToken: CasinoToken,
+    game: CASINO_GAME_TYPE,
+    affiliate?: Hex
+  ): Promise<CasinoGameToken> {
+    const casinoChain = casinoChainById[casinoToken.chainId];
+    return getCasinoGameToken(
+      this.wagmiConfig,
+      casinoToken,
+      game,
+      affiliate || casinoChain.defaultAffiliate
+    );
+  }
+
+  async getBetRequirements(
+    token: Token,
+    multiplier: number,
+    chainId?: CasinoChainId
+  ): Promise<BetRequirements> {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return getBetRequirements(
+      this.wagmiConfig,
+      token,
+      multiplier,
+      casinoChainId
+    );
+  }
+
+  /* Private */
+  _getCasinoChainId(
+    ...overridedChainIds: Array<number | undefined>
+  ): CasinoChainId {
+    return getCasinoChainId(this.wagmiConfig, ...overridedChainIds);
   }
 
   static init(

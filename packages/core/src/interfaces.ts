@@ -38,3 +38,11 @@ export interface CasinoGameToken extends CasinoToken {
   affiliateHouseEdge: number; // 1 to 3500 (3500 = 35%)
   chainlinkVrfSubscriptionId: bigint;
 }
+
+export interface BetRequirements {
+  token: Token;
+  multiplier: number;
+  maxBetAmount: bigint;
+  maxBetCount: number;
+  chainId: CasinoChainId;
+}

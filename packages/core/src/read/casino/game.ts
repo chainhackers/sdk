@@ -26,6 +26,7 @@ import type {
   CasinoGameToken,
   CasinoToken,
 } from "../../interfaces.ts";
+import { getCasinoChainId } from "../../utils/chains.ts";
 
 export interface CasinoRolledBet extends CasinoPlacedBet {
   isWin: boolean;
@@ -201,12 +202,14 @@ export async function waitRolledBet(
   });
 }
 
-export async function getCasinoGamesForChain(
+export async function getCasinoGames(
   wagmiConfig: WagmiConfig,
-  chainId: CasinoChainId,
+  chainId?: CasinoChainId,
   onlyActive = false
 ): Promise<CasinoGame[]> {
-  const casinoChain = casinoChainById[chainId];
+  const casinoChainId = getCasinoChainId(wagmiConfig, chainId);
+
+  const casinoChain = casinoChainById[casinoChainId];
 
   const games = casinoChain.contracts.games;
 
@@ -234,7 +237,7 @@ export async function getCasinoGamesForChain(
       gameAddress: game.address,
       abi: game.abi,
       paused: Boolean(pausedStates[index]?.result),
-      chainId,
+      chainId: casinoChainId,
       game: gameType as CASINO_GAME_TYPE,
       label: labelCasinoGameByType[gameType as CASINO_GAME_TYPE],
       bankAddress: casinoChain.contracts.bank,
