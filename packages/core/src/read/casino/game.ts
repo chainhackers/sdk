@@ -1,13 +1,31 @@
 import { getTransactionReceipt, type Config as WagmiConfig } from "@wagmi/core";
-import { CASINO_GAME_ROLL_ABI, casinoChainById } from "../../data/casino.ts";
+import {
+  CASINO_GAME_ROLL_ABI,
+  CASINO_GAME_TYPE,
+  casinoChainById,
+  labelCasinoGameByType,
+  type CasinoChainId,
+} from "../../data/casino.ts";
 import { ChainError } from "../../errors/types.ts";
 import type { CasinoPlacedBet } from "../../actions/casino/game.ts";
 import { watchContractEvent } from "@wagmi/core";
 import { TransactionError } from "../../errors/types.ts";
 import { abi as coinTossAbi } from "../../abis/v2/casino/coinToss.ts";
-import { parseAbiItem, type Hash, type TransactionReceipt } from "viem";
+import { abi as gameAbi } from "../../abis/v2/casino/game.ts";
+import {
+  parseAbiItem,
+  type Hash,
+  type Hex,
+  type TransactionReceipt,
+} from "viem";
 import { ERROR_CODES } from "../../errors/codes.ts";
 import { getLogs } from "viem/actions";
+import { readContracts } from "@wagmi/core";
+import type {
+  CasinoGame,
+  CasinoGameToken,
+  CasinoToken,
+} from "../../interfaces.ts";
 
 export interface CasinoRolledBet extends CasinoPlacedBet {
   isWin: boolean;
@@ -181,4 +199,106 @@ export async function waitRolledBet(
       }
     }, options?.timeout || defaultCasinoWaiRollOptions.timeout);
   });
+}
+
+export async function getCasinoGamesForChain(
+  wagmiConfig: WagmiConfig,
+  chainId: CasinoChainId,
+  onlyActive = false
+): Promise<CasinoGame[]> {
+  const casinoChain = casinoChainById[chainId];
+
+  const games = casinoChain.contracts.games;
+
+  const pausedStates = await readContracts(wagmiConfig, {
+    contracts: Object.values(games).map((game) => ({
+      address: game.address,
+      abi: gameAbi,
+      functionName: "paused",
+      chainId,
+    })),
+  });
+
+  if (
+    pausedStates.some((state) => state.status === "failure" || !state.result)
+  ) {
+    throw new TransactionError("Error getting paused states", {
+      errorCode: ERROR_CODES.GAME.GET_PAUSED_ERROR,
+      chainId,
+      cause: pausedStates.find((state) => state.status === "failure")?.error,
+    });
+  }
+
+  return Object.entries(games)
+    .map(([gameType, game], index) => ({
+      gameAddress: game.address,
+      abi: game.abi,
+      paused: Boolean(pausedStates[index]?.result),
+      chainId,
+      game: gameType as CASINO_GAME_TYPE,
+      label: labelCasinoGameByType[gameType as CASINO_GAME_TYPE],
+      bankAddress: casinoChain.contracts.bank,
+    }))
+    .filter((game) => !onlyActive || !game.paused);
+}
+
+export async function getCasinoGameToken(
+  wagmiConfig: WagmiConfig,
+  casinoToken: CasinoToken,
+  game: CASINO_GAME_TYPE,
+  affiliate: Hex
+): Promise<CasinoGameToken> {
+  const chainId = casinoToken.chainId;
+  const casinoChain = casinoChainById[chainId];
+  const casinoGame = casinoChain.contracts.games[game];
+  if (!casinoGame) {
+    throw new ChainError(`Game ${game} not found for chain ${chainId}`);
+  }
+  const [rawTokenData, rawAffiliateHouseEdge] = await readContracts(
+    wagmiConfig,
+    {
+      contracts: [
+        {
+          address: casinoGame.address,
+          abi: gameAbi,
+          functionName: "tokens",
+          chainId,
+          args: [casinoToken.address],
+        },
+        {
+          address: casinoGame.address,
+          abi: gameAbi,
+          functionName: "getAffiliateHouseEdge",
+          chainId,
+          args: [affiliate, casinoToken.address],
+        },
+      ],
+    }
+  );
+
+  if (rawTokenData.status === "failure" || !rawTokenData.result) {
+    throw new TransactionError("Error getting token data", {
+      errorCode: ERROR_CODES.GAME.GET_TOKEN_ERROR,
+      chainId,
+      cause: rawTokenData.error,
+    });
+  }
+
+  if (
+    rawAffiliateHouseEdge.status === "failure" ||
+    !rawAffiliateHouseEdge.result
+  ) {
+    throw new TransactionError("Error getting affiliate house edge", {
+      errorCode: ERROR_CODES.GAME.GET_AFFILIATE_HOUSE_EDGE_ERROR,
+      chainId,
+      cause: rawAffiliateHouseEdge.error,
+    });
+  }
+
+  return {
+    ...casinoToken,
+    defaultHouseEdge: rawTokenData.result?.[0],
+    chainlinkVrfSubscriptionId: rawTokenData.result?.[2],
+    affiliateHouseEdge: rawAffiliateHouseEdge.result,
+  };
 }

@@ -15,6 +15,10 @@ export class CoinToss extends AbstractCasinoGame<
     return 50;
   }
 
+  static getMultiplier(_face: COINTOSS_FACE | string): bigint {
+    return BigInt(20000);
+  }
+
   static encodeInput(face: COINTOSS_FACE | string): boolean {
     if (typeof face === "string") {
       return face.toLowerCase() === "true" || face === "1";

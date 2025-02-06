@@ -13,6 +13,9 @@ export abstract class AbstractCasinoGame<
   decodeInput(_encodedInput: TEncodedInput | string): TInput {
     throw new Error("Not implemented");
   }
+  getMultiplier(_input: TInput | string): bigint {
+    throw new Error("Not implemented");
+  }
   decodeRolled(
     _encodedRolledInput: TEncodedRolledInput | string
   ): TRolledInput {

@@ -6,10 +6,10 @@ import {
   type CasinoWaitRollOptions,
 } from "./game.ts";
 import { type DicePlacedBet } from "../../actions/casino/dice.ts";
-import { Dice } from "../../entities/casino/dice.ts";
+import { Dice, type DiceNumber } from "../../entities/casino/dice.ts";
 
 export interface DiceRolledBet extends CasinoRolledBet {
-  rolled: number[];
+  rolled: DiceNumber[];
 }
 
 export async function waitDiceRolledBet(

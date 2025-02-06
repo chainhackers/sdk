@@ -11,15 +11,15 @@ import { decodeEventLog, type TransactionReceipt } from "viem";
 import { abi as diceAbi } from "../../abis/v2/casino/dice.ts";
 import { TransactionError } from "../../errors/types.ts";
 import { ERROR_CODES } from "../../errors/codes.ts";
-import { Dice } from "../../entities/casino/dice.ts";
+import { Dice, type DiceNumber } from "../../entities/casino/dice.ts";
 import type { Token } from "../../interfaces.ts";
 
 export interface DiceParams extends CasinoBetParams {
-  cap: number;
+  cap: DiceNumber;
 }
 
 export interface DicePlacedBet extends CasinoPlacedBet {
-  cap: number;
+  cap: DiceNumber;
   encodedCap: number;
 }
 

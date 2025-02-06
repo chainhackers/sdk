@@ -419,3 +419,10 @@ export const casinoChainById = {
 } as const;
 
 export const chainIds = casinoChains.map((chain) => Number(chain.id));
+
+export const labelCasinoGameByType = {
+  [CASINO_GAME_TYPE.COINTOSS]: CASINO_GAME_LABEL_TYPE.COINTOSS,
+  [CASINO_GAME_TYPE.DICE]: CASINO_GAME_LABEL_TYPE.DICE,
+  [CASINO_GAME_TYPE.ROULETTE]: CASINO_GAME_LABEL_TYPE.ROULETTE,
+  [CASINO_GAME_TYPE.KENO]: CASINO_GAME_LABEL_TYPE.KENO,
+} as const;
