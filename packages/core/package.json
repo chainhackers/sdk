@@ -1,7 +1,7 @@
 {
   "name": "@betswirl/sdk-core",
   "description": "VanillaJS library for Betswirl protocol",
-  "version": "0.0.1",
+  "version": "0.0.1-beta-1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -9,8 +9,12 @@
     "directory": "packages/core"
   },
   "type": "module",
+  "main": "src/index.ts",
   "sideEffects": false,
-  "scripts": {},
+  "scripts": {
+    "build": "rimraf ./dist && tsup",
+    "prepublishOnly": "npm run build"
+  },
   "contributors": [
     "kinco_dev"
   ],
@@ -23,13 +27,20 @@
     "web3"
   ],
   "peerDependencies": {
-    "typescript": ">=5.0.4",
     "@wagmi/core": ">=2.16.3",
+    "typescript": ">=5.0.4",
     "viem": "2.x"
   },
   "peerDependenciesMeta": {
     "typescript": {
       "optional": true
     }
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "tsup": "^8.3.6"
   }
 }

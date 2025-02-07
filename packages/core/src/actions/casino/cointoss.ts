@@ -5,17 +5,14 @@ import {
   type CasinoBetParams,
   type CasinoPlaceBetOptions,
   type CasinoPlacedBet,
-} from "./game.ts";
-import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino.ts";
+} from "./game";
+import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
 import { decodeEventLog, type TransactionReceipt } from "viem";
-import { abi as coinTossAbi } from "../../abis/v2/casino/coinToss.ts";
-import { TransactionError } from "../../errors/types.ts";
-import { ERROR_CODES } from "../../errors/codes.ts";
-import {
-  CoinToss,
-  type COINTOSS_FACE,
-} from "../../entities/casino/coinToss.ts";
-import type { Token } from "../../interfaces.ts";
+import { coinTossAbi } from "../../abis/v2/casino/coinToss";
+import { TransactionError } from "../../errors/types";
+import { ERROR_CODES } from "../../errors/codes";
+import { CoinToss, type COINTOSS_FACE } from "../../entities/casino/coinToss";
+import type { Token } from "../../interfaces";
 
 export interface CoinTossParams extends CasinoBetParams {
   face: COINTOSS_FACE;

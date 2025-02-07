@@ -1,5 +1,5 @@
-import { BP_VALUE } from "../../constants.ts";
-import { AbstractCasinoGame } from "./game.ts";
+import { BP_VALUE } from "../../constants";
+import { AbstractCasinoGame } from "./game";
 
 export type DiceNumber =
   | 1

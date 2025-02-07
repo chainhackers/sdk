@@ -1,10 +1,10 @@
 import { type Config as WagmiConfig, call } from "@wagmi/core";
-import { abi as gameAbi } from "../abis/v2/casino/game.ts";
+import { casinoGameAbi } from "../../abis/v2/casino/game";
 
 import { encodeFunctionData, type Hex } from "viem";
-import { TransactionError } from "../errors/types.ts";
-import { ERROR_CODES } from "../errors/codes.ts";
-import type { CasinoChainId } from "../data/casino.ts";
+import { TransactionError } from "../../errors/types";
+import { ERROR_CODES } from "../../errors/codes";
+import type { CasinoChainId } from "../../data/casino";
 
 export async function getChainlinkVrfCost(
   wagmiConfig: WagmiConfig,
@@ -49,7 +49,7 @@ export function generateGetChainlinkVrfCostFunctionData(
   betCount: number
 ) {
   return encodeFunctionData({
-    abi: gameAbi,
+    abi: casinoGameAbi,
     functionName: "getChainlinkVRFCost",
     args: [tokenAddress, betCount],
   });

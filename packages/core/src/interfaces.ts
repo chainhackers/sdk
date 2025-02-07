@@ -1,5 +1,5 @@
 import type { Abi, Hex } from "viem";
-import type { CASINO_GAME_TYPE, CasinoChainId } from "./data/casino.ts";
+import type { CASINO_GAME_TYPE, CasinoChainId } from "./data/casino";
 
 export type Token = {
   symbol: string;

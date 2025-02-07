@@ -1,4 +1,4 @@
-import { AbstractCasinoGame } from "./game.ts";
+import { AbstractCasinoGame } from "./game";
 
 export enum COINTOSS_FACE {
   TAILS = 1,

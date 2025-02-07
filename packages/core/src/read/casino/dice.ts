@@ -4,9 +4,9 @@ import {
   waitRolledBet,
   type CasinoRolledBet,
   type CasinoWaitRollOptions,
-} from "./game.ts";
-import { type DicePlacedBet } from "../../actions/casino/dice.ts";
-import { Dice, type DiceNumber } from "../../entities/casino/dice.ts";
+} from "./game";
+import { type DicePlacedBet } from "../../actions/casino/dice";
+import { Dice, type DiceNumber } from "../../entities/casino/dice";
 
 export interface DiceRolledBet extends CasinoRolledBet {
   rolled: DiceNumber[];

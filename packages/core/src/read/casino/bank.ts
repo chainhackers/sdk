@@ -1,15 +1,15 @@
-import { casinoChainById } from "../../data/casino.ts";
+import { casinoChainById } from "../../data/casino";
 
 import { type Config as WagmiConfig } from "@wagmi/core";
-import { abi as bankAbi } from "../../abis/v2/casino/bank.ts";
+import { bankAbi } from "../../abis/v2/casino/bank";
 import { zeroAddress } from "viem";
 import { readContract } from "@wagmi/core";
-import type { CasinoToken, BetRequirements, Token } from "../../interfaces.ts";
-import type { CasinoChainId } from "../../data/casino.ts";
-import { TransactionError } from "../../errors/types.ts";
+import type { CasinoToken, BetRequirements, Token } from "../../interfaces";
+import type { CasinoChainId } from "../../data/casino";
+import { TransactionError } from "../../errors/types";
 
-import { ERROR_CODES } from "../../errors/codes.ts";
-import { getCasinoChainId } from "../../utils/chains.ts";
+import { ERROR_CODES } from "../../errors/codes";
+import { getCasinoChainId } from "../../utils/chains";
 
 export async function getCasinoTokens(
   wagmiConfig: WagmiConfig,

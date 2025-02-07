@@ -5,28 +5,28 @@ import {
   casinoChainById,
   labelCasinoGameByType,
   type CasinoChainId,
-} from "../../data/casino.ts";
-import { ChainError } from "../../errors/types.ts";
-import type { CasinoPlacedBet } from "../../actions/casino/game.ts";
+} from "../../data/casino";
+import { ChainError } from "../../errors/types";
+import type { CasinoPlacedBet } from "../../actions/casino/game";
 import { watchContractEvent } from "@wagmi/core";
-import { TransactionError } from "../../errors/types.ts";
-import { abi as coinTossAbi } from "../../abis/v2/casino/coinToss.ts";
-import { abi as gameAbi } from "../../abis/v2/casino/game.ts";
+import { TransactionError } from "../../errors/types";
+import { coinTossAbi } from "../../abis/v2/casino/coinToss";
+import { casinoGameAbi } from "../../abis/v2/casino/game";
 import {
   parseAbiItem,
   type Hash,
   type Hex,
   type TransactionReceipt,
 } from "viem";
-import { ERROR_CODES } from "../../errors/codes.ts";
+import { ERROR_CODES } from "../../errors/codes";
 import { getLogs } from "viem/actions";
 import { readContracts } from "@wagmi/core";
 import type {
   CasinoGame,
   CasinoGameToken,
   CasinoToken,
-} from "../../interfaces.ts";
-import { getCasinoChainId } from "../../utils/chains.ts";
+} from "../../interfaces";
+import { getCasinoChainId } from "../../utils/chains";
 
 export interface CasinoRolledBet extends CasinoPlacedBet {
   isWin: boolean;
@@ -216,7 +216,7 @@ export async function getCasinoGames(
   const pausedStates = await readContracts(wagmiConfig, {
     contracts: Object.values(games).map((game) => ({
       address: game.address,
-      abi: gameAbi,
+      abi: casinoGameAbi,
       functionName: "paused",
       chainId,
     })),
@@ -263,14 +263,14 @@ export async function getCasinoGameToken(
       contracts: [
         {
           address: casinoGame.address,
-          abi: gameAbi,
+          abi: casinoGameAbi,
           functionName: "tokens",
           chainId,
           args: [casinoToken.address],
         },
         {
           address: casinoGame.address,
-          abi: gameAbi,
+          abi: casinoGameAbi,
           functionName: "getAffiliateHouseEdge",
           chainId,
           args: [affiliate, casinoToken.address],

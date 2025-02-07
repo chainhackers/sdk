@@ -1,38 +1,38 @@
 import { type Config as WagmiConfig } from "@wagmi/core";
 import type { Hex, TransactionReceipt } from "viem";
-import { type ChainId } from "../data/chains.ts";
+import { type ChainId } from "../data/chains";
 import {
   placeCoinTossBet,
   type CoinTossParams,
   type CoinTossPlacedBet,
-} from "../actions/casino/coinToss.ts";
-import type { CASINO_GAME_TYPE, CasinoChainId } from "../data/casino.ts";
-import { casinoChainById } from "../data/casino.ts";
-import type { GAS_PRICE_TYPE } from "../read/gasPrice.ts";
-import type { ALLOWANCE_TYPE } from "../actions/common/approve.ts";
+} from "../actions/casino/coinToss";
+import type { CASINO_GAME_TYPE, CasinoChainId } from "../data/casino";
+import { casinoChainById } from "../data/casino";
+import type { GAS_PRICE_TYPE } from "../read/common/gasPrice";
+import type { ALLOWANCE_TYPE } from "../actions/common/approve";
 import {
   getCasinoGames,
   getCasinoGameToken,
   type CasinoWaitRollOptions,
-} from "../read/casino/game.ts";
+} from "../read/casino/game";
 import {
   waitCoinTossRolledBet,
   type CoinTossRolledBet,
-} from "../read/casino/coinToss.ts";
+} from "../read/casino/coinToss";
 import {
   placeDiceBet,
   type DiceParams,
   type DicePlacedBet,
-} from "../actions/casino/dice.ts";
-import { waitDiceRolledBet, type DiceRolledBet } from "../read/casino/dice.ts";
+} from "../actions/casino/dice";
+import { waitDiceRolledBet, type DiceRolledBet } from "../read/casino/dice";
 import type {
   BetRequirements,
   CasinoGameToken,
   CasinoToken,
   Token,
-} from "../interfaces.ts";
-import { getBetRequirements, getCasinoTokens } from "../read/casino/bank.ts";
-import { getCasinoChainId } from "../utils/chains.ts";
+} from "../interfaces";
+import { getBetRequirements, getCasinoTokens } from "../read/casino/bank";
+import { getCasinoChainId } from "../utils/chains";
 
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;

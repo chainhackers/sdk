@@ -1,10 +1,10 @@
 import { getToken, type Config as WagmiConfig } from "@wagmi/core";
 import { zeroAddress, type Hex } from "viem";
-import type { Token } from "../../interfaces.ts";
-import { chainNativeCurrencyToToken } from "../../utils/tokens.ts";
-import { chainById, type ChainId } from "../../data/chains.ts";
-import { TransactionError } from "../../errors/types.ts";
-import { ERROR_CODES } from "../../errors/codes.ts";
+import type { Token } from "../../interfaces";
+import { chainNativeCurrencyToToken } from "../../utils/tokens";
+import { chainById, type ChainId } from "../../data/chains";
+import { TransactionError } from "../../errors/types";
+import { ERROR_CODES } from "../../errors/codes";
 export async function getTokenMetadata(
   wagmiConfig: WagmiConfig,
   tokenAddress: Hex,

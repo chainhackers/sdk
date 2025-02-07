@@ -8,8 +8,8 @@ import {
 import type { Hash, Hex } from "viem";
 
 import { erc20Abi, zeroAddress } from "viem";
-import { TransactionError } from "../../errors/types.ts";
-import { ERROR_CODES } from "../../errors/codes.ts";
+import { TransactionError } from "../../errors/types";
+import { ERROR_CODES } from "../../errors/codes";
 
 export enum ALLOWANCE_TYPE {
   ALWAYS = "ALWAYS",

@@ -8,6 +8,12 @@ VanillaJS library for Betswirl protocol
 npm i @betswirl/sdk-core @wagmi/core viem
 ```
 
-## Documentation
+## Contribution
 
-TODO
+### Installation
+
+```bash
+pnpm install
+```
+
+

@@ -4,12 +4,9 @@ import {
   waitRolledBet,
   type CasinoRolledBet,
   type CasinoWaitRollOptions,
-} from "./game.ts";
-import { type CoinTossPlacedBet } from "../../actions/casino/coinToss.ts";
-import {
-  CoinToss,
-  type COINTOSS_FACE,
-} from "../../entities/casino/coinToss.ts";
+} from "./game";
+import { type CoinTossPlacedBet } from "../../actions/casino/coinToss";
+import { CoinToss, type COINTOSS_FACE } from "../../entities/casino/coinToss";
 
 export interface CoinTossRolledBet extends CasinoRolledBet {
   rolled: COINTOSS_FACE[];

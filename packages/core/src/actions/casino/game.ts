@@ -10,7 +10,7 @@ import {
   casinoChainByKey,
   MAX_SDK_HOUSE_EGDE,
   type CasinoChainId,
-} from "../../data/casino.ts";
+} from "../../data/casino";
 import {
   type Config as WagmiConfig,
   writeContract,
@@ -21,20 +21,16 @@ import {
   ChainError,
   ConfigurationError,
   TransactionError,
-} from "../../errors/types.ts";
-import { ERROR_CODES } from "../../errors/codes.ts";
-import {
-  ALLOWANCE_TYPE,
-  approve,
-  type ApproveResult,
-} from "../common/approve.ts";
-import { GAS_PRICE_TYPE, getGasPrices } from "../../read/gasPrice.ts";
-import { getChainlinkVrfCost } from "../../read/chainlinkVrfCost.ts";
+} from "../../errors/types";
+import { ERROR_CODES } from "../../errors/codes";
+import { ALLOWANCE_TYPE, approve, type ApproveResult } from "../common/approve";
+import { GAS_PRICE_TYPE, getGasPrices } from "../../read/common/gasPrice";
+import { getChainlinkVrfCost } from "../../read/common/chainlinkVrfCost";
 import { decodeEventLog } from "viem";
-import { abi as coinTossAbi } from "../../abis/v2/casino/coinToss.ts";
-import type { Token } from "../../interfaces.ts";
-import { chainNativeCurrencyToToken } from "../../utils/tokens.ts";
-import { getTokenMetadata } from "../common/tokenMetadata.ts";
+import { coinTossAbi } from "../../abis/v2/casino/coinToss";
+import type { Token } from "../../interfaces";
+import { chainNativeCurrencyToToken } from "../../utils/tokens";
+import { getTokenMetadata } from "../common/tokenMetadata";
 
 export interface CasinoBetParams {
   betAmount: bigint;

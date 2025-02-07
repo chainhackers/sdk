@@ -5,14 +5,14 @@ import {
   type CasinoBetParams,
   type CasinoPlaceBetOptions,
   type CasinoPlacedBet,
-} from "./game.ts";
-import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino.ts";
+} from "./game";
+import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
 import { decodeEventLog, type TransactionReceipt } from "viem";
-import { abi as diceAbi } from "../../abis/v2/casino/dice.ts";
-import { TransactionError } from "../../errors/types.ts";
-import { ERROR_CODES } from "../../errors/codes.ts";
-import { Dice, type DiceNumber } from "../../entities/casino/dice.ts";
-import type { Token } from "../../interfaces.ts";
+import { diceAbi } from "../../abis/v2/casino/dice";
+import { TransactionError } from "../../errors/types";
+import { ERROR_CODES } from "../../errors/codes";
+import { Dice, type DiceNumber } from "../../entities/casino/dice";
+import type { Token } from "../../interfaces";
 
 export interface DiceParams extends CasinoBetParams {
   cap: DiceNumber;

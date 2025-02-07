@@ -1,4 +1,4 @@
-import { BetSwirlError } from "./betSwirlError.ts";
+import { BetSwirlError } from "./betSwirlError";
 
 export class ChainError extends BetSwirlError {
   constructor(message: string, context?: Record<string, any>) {

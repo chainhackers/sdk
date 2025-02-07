@@ -1,9 +1,9 @@
 import type { Abi, Chain, Hex } from "viem";
-import { chainByKey } from "./chains.ts";
-import { abi as diceAbi } from "../abis/v2/casino/dice.ts";
-import { abi as coinTossAbi } from "../abis/v2/casino/coinToss.ts";
-import { abi as rouletteAbi } from "../abis/v2/casino/roulette.ts";
-import { abi as kenoAbi } from "../abis/v2/casino/keno.ts";
+import { chainByKey } from "./chains";
+import { diceAbi } from "../abis/v2/casino/dice";
+import { coinTossAbi } from "../abis/v2/casino/coinToss";
+import { rouletteAbi } from "../abis/v2/casino/roulette";
+import { kenoAbi } from "../abis/v2/casino/keno";
 
 export const MAX_HOUSE_EGDE = 3500;
 export const MAX_SDK_HOUSE_EGDE = 1000;

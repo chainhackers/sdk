@@ -1,5 +1,5 @@
 import { zeroAddress } from "viem";
-import type { Token } from "../interfaces.ts";
+import type { Token } from "../interfaces";
 
 type ChainNativeCurrency = {
   name: string;
