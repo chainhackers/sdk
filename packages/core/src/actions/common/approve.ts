@@ -80,13 +80,13 @@ export async function approve(
   } catch (error) {
     throw new TransactionError(
       `Error checking and approving token ${tokenAddress} on chain ${chainId}`,
+      ERROR_CODES.TRANSACTION.TOKEN_APPROVAL_ERROR,
       {
         chainId,
         tokenAddress,
         spender,
         amount,
         allower,
-        errorCode: ERROR_CODES.TRANSACTION.TOKEN_APPROVAL_ERROR,
       }
     );
   }

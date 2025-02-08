@@ -45,11 +45,14 @@ export async function placeDiceBet(
     placedBet.token
   );
   if (!dicePlacedBet) {
-    throw new TransactionError("Dice PlaceBet event not found", {
-      errorCode: ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
-      hash: receipt.transactionHash,
-      chainId: placedBet.chainId,
-    });
+    throw new TransactionError(
+      "Dice PlaceBet event not found",
+      ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
+      {
+        hash: receipt.transactionHash,
+        chainId: placedBet.chainId,
+      }
+    );
   }
 
   return { placedBet: dicePlacedBet, receipt };

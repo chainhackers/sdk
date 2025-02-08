@@ -45,11 +45,14 @@ export async function placeCoinTossBet(
     placedBet.token
   );
   if (!coinTossPlacedBet) {
-    throw new TransactionError("CoinToss PlaceBet event not found", {
-      errorCode: ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
-      hash: receipt.transactionHash,
-      chainId: placedBet.chainId,
-    });
+    throw new TransactionError(
+      "CoinToss PlaceBet event not found",
+      ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
+      {
+        hash: receipt.transactionHash,
+        chainId: placedBet.chainId,
+      }
+    );
   }
   return { placedBet: coinTossPlacedBet, receipt };
 }

@@ -7,7 +7,6 @@ import {
 import {
   CASINO_GAME_TYPE,
   casinoChainById,
-  casinoChainByKey,
   MAX_SDK_HOUSE_EGDE,
   type CasinoChainId,
 } from "../../data/casino";
@@ -31,6 +30,7 @@ import { coinTossAbi } from "../../abis/v2/casino/coinToss";
 import type { Token } from "../../interfaces";
 import { chainNativeCurrencyToToken } from "../../utils/tokens";
 import { getTokenMetadata } from "../common/tokenMetadata";
+import { chainByKey } from "../../data";
 
 export interface CasinoBetParams {
   betAmount: bigint;
@@ -63,7 +63,7 @@ export interface CasinoPlaceBetOptions {
 export const defaultCasinoPlaceBetOptions = {
   gasPriceType: GAS_PRICE_TYPE.NORMAL,
   gasPrice: 0n,
-  chainId: casinoChainByKey.avalanche.id,
+  chainId: chainByKey.avalanche.id,
   allowanceType: ALLOWANCE_TYPE.AUTO,
 };
 
@@ -107,10 +107,10 @@ export async function placeBet(
   if (!game) {
     throw new ChainError(
       `${betParams.game} is not available for chain ${casinoChain.viemChain.name} (${chainId})`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
       {
         chainId,
         supportedChains: Object.keys(casinoChainById),
-        errorCode: ERROR_CODES.CHAIN.GAME_NOT_AVAILABLE,
       }
     );
   }
@@ -120,9 +120,9 @@ export async function placeBet(
   if (!accountAddress) {
     throw new ConfigurationError(
       `No configured account in wagmi config for chain ${casinoChain.viemChain.name} (${chainId})`,
+      ERROR_CODES.WAGMI.ACCOUNT_MISSING,
       {
         chainId,
-        errorCode: ERROR_CODES.WAGMI.ACCOUNT_MISSING,
       }
     );
   }
@@ -202,21 +202,24 @@ export async function placeBet(
       betParams.game
     );
     if (!placedBet) {
-      throw new TransactionError("PlaceBet event not found", {
-        errorCode: ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
-        gameAddress: game.address,
-        gameType: betParams.game,
-        chainId,
-        token,
-      });
+      throw new TransactionError(
+        "PlaceBet event not found",
+        ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
+        {
+          gameAddress: game.address,
+          gameType: betParams.game,
+          chainId,
+          token,
+        }
+      );
     }
 
     return { placedBet, receipt };
   } catch (error) {
     throw new TransactionError(
       `An error occured while placing the bet: ${error}`,
+      ERROR_CODES.GAME.PLACE_BET_ERROR,
       {
-        errorCode: ERROR_CODES.GAME.PLACE_BET_ERROR,
         gameAddress: game.address,
         gameType: betParams.game,
         chainId,
@@ -242,10 +245,10 @@ export function generatePlayGameFunctionData(
   if (!game) {
     throw new ChainError(
       `${gameParams.game} is not available for chain ${casinoChain.viemChain.name} (${chainId})`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
       {
         chainId,
         supportedChains: Object.keys(casinoChainById),
-        errorCode: ERROR_CODES.CHAIN.GAME_NOT_AVAILABLE,
       }
     );
   }

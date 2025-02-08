@@ -1,0 +1,24 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx ./index.ts"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@inquirer/prompts": "^7.3.1",
+    "@wagmi/core": "^2.16.3",
+    "viem": "^2.22.23"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "chalk": "^5.4.1",
+    "dotenv": "^16.4.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.0.0"
+  }
+}

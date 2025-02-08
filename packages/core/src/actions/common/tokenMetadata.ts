@@ -27,10 +27,10 @@ export async function getTokenMetadata(
   } catch (error) {
     throw new TransactionError(
       `Error checking metdata of ${tokenAddress} on chain ${chainId}`,
+      ERROR_CODES.TRANSACTION.TOKEN_METADATA_ERROR,
       {
         chainId,
         tokenAddress,
-        errorCode: ERROR_CODES.TRANSACTION.TOKEN_METADATA_ERROR,
       }
     );
   }

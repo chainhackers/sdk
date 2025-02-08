@@ -75,7 +75,12 @@ export async function waitRolledBet(
   const game = casinoChain.contracts.games[placedBet.game];
   if (!game) {
     throw new ChainError(
-      `Game ${placedBet.game} not found for chain ${placedBet.chainId}`
+      `Game ${placedBet.game} not found for chain ${placedBet.chainId}`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
+      {
+        chainId: placedBet.chainId,
+        game: placedBet.game,
+      }
     );
   }
 
@@ -113,12 +118,15 @@ export async function waitRolledBet(
         });
       } catch (error) {
         reject(
-          new TransactionError("Error processing Roll event", {
-            errorCode: ERROR_CODES.GAME.ROLL_EVENT_ERROR,
-            betId: placedBet.id,
-            chainId: placedBet.chainId,
-            cause: error,
-          })
+          new TransactionError(
+            "Error processing Roll event",
+            ERROR_CODES.GAME.ROLL_EVENT_ERROR,
+            {
+              betId: placedBet.id,
+              chainId: placedBet.chainId,
+              cause: error,
+            }
+          )
         );
       }
     };
@@ -139,12 +147,15 @@ export async function waitRolledBet(
       },
       onError: (error) => {
         reject(
-          new TransactionError("Error watching Roll event", {
-            errorCode: ERROR_CODES.GAME.ROLL_EVENT_ERROR,
-            betId: placedBet.id,
-            chainId: placedBet.chainId,
-            cause: error,
-          })
+          new TransactionError(
+            "Error watching Roll event",
+            ERROR_CODES.GAME.ROLL_EVENT_ERROR,
+            {
+              betId: placedBet.id,
+              chainId: placedBet.chainId,
+              cause: error,
+            }
+          )
         );
       },
     });
@@ -177,12 +188,15 @@ export async function waitRolledBet(
       .catch((error) => {
         if (!isResolved) {
           reject(
-            new TransactionError("Error checking past Roll events", {
-              errorCode: ERROR_CODES.GAME.ROLL_EVENT_ERROR,
-              betId: placedBet.id,
-              chainId: placedBet.chainId,
-              cause: error,
-            })
+            new TransactionError(
+              "Error checking past Roll events",
+              ERROR_CODES.GAME.ROLL_EVENT_ERROR,
+              {
+                betId: placedBet.id,
+                chainId: placedBet.chainId,
+                cause: error,
+              }
+            )
           );
         }
       });
@@ -191,11 +205,14 @@ export async function waitRolledBet(
       if (!isResolved) {
         unwatch?.();
         reject(
-          new TransactionError("Timeout waiting for Roll event", {
-            errorCode: ERROR_CODES.GAME.ROLL_EVENT_TIMEOUT,
-            betId: placedBet.id,
-            chainId: placedBet.chainId,
-          })
+          new TransactionError(
+            "Timeout waiting for Roll event",
+            ERROR_CODES.GAME.ROLL_EVENT_TIMEOUT,
+            {
+              betId: placedBet.id,
+              chainId: placedBet.chainId,
+            }
+          )
         );
       }
     }, options?.timeout || defaultCasinoWaiRollOptions.timeout);
@@ -223,13 +240,18 @@ export async function getCasinoGames(
   });
 
   if (
-    pausedStates.some((state) => state.status === "failure" || !state.result)
+    pausedStates.some(
+      (state) => state.status === "failure" || state == undefined
+    )
   ) {
-    throw new TransactionError("Error getting paused states", {
-      errorCode: ERROR_CODES.GAME.GET_PAUSED_ERROR,
-      chainId,
-      cause: pausedStates.find((state) => state.status === "failure")?.error,
-    });
+    throw new TransactionError(
+      "Error getting paused states",
+      ERROR_CODES.GAME.GET_PAUSED_ERROR,
+      {
+        chainId,
+        cause: pausedStates.find((state) => state.status === "failure")?.error,
+      }
+    );
   }
 
   return Object.entries(games)
@@ -255,7 +277,14 @@ export async function getCasinoGameToken(
   const casinoChain = casinoChainById[chainId];
   const casinoGame = casinoChain.contracts.games[game];
   if (!casinoGame) {
-    throw new ChainError(`Game ${game} not found for chain ${chainId}`);
+    throw new ChainError(
+      `Game ${game} not found for chain ${chainId}`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
+      {
+        chainId,
+        game,
+      }
+    );
   }
   const [rawTokenData, rawAffiliateHouseEdge] = await readContracts(
     wagmiConfig,
@@ -280,28 +309,37 @@ export async function getCasinoGameToken(
   );
 
   if (rawTokenData.status === "failure" || !rawTokenData.result) {
-    throw new TransactionError("Error getting token data", {
-      errorCode: ERROR_CODES.GAME.GET_TOKEN_ERROR,
-      chainId,
-      cause: rawTokenData.error,
-    });
+    throw new TransactionError(
+      "Error getting token data",
+      ERROR_CODES.GAME.GET_TOKEN_ERROR,
+      {
+        chainId,
+        cause: rawTokenData.error,
+      }
+    );
   }
 
   if (
     rawAffiliateHouseEdge.status === "failure" ||
     !rawAffiliateHouseEdge.result
   ) {
-    throw new TransactionError("Error getting affiliate house edge", {
-      errorCode: ERROR_CODES.GAME.GET_AFFILIATE_HOUSE_EDGE_ERROR,
-      chainId,
-      cause: rawAffiliateHouseEdge.error,
-    });
+    throw new TransactionError(
+      "Error getting affiliate house edge",
+      ERROR_CODES.GAME.GET_AFFILIATE_HOUSE_EDGE_ERROR,
+      {
+        chainId,
+        cause: rawAffiliateHouseEdge.error,
+      }
+    );
   }
-
+  const defaultHouseEdge = rawTokenData.result?.[0];
   return {
     ...casinoToken,
-    defaultHouseEdge: rawTokenData.result?.[0],
+    game,
+    defaultHouseEdge: defaultHouseEdge,
+    defaultHouseEdgePercent: defaultHouseEdge / 100,
     chainlinkVrfSubscriptionId: rawTokenData.result?.[2],
     affiliateHouseEdge: rawAffiliateHouseEdge.result,
+    affiliateHouseEdgePercent: rawAffiliateHouseEdge.result / 100,
   };
 }

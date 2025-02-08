@@ -1,3 +1,15 @@
+import type { CASINO_GAME_TYPE } from "../../data/casino";
+
+export interface ChoiceInput {
+  game: CASINO_GAME_TYPE;
+  label: string;
+  winChancePercent: number;
+  multiplier: number;
+  formattedMultiplier: number;
+  netMultiplier?: number;
+  formattedNetMultiplier?: number;
+}
+
 export abstract class AbstractCasinoGame<
   TInput,
   TEncodedInput,
@@ -13,7 +25,10 @@ export abstract class AbstractCasinoGame<
   decodeInput(_encodedInput: TEncodedInput | string): TInput {
     throw new Error("Not implemented");
   }
-  getMultiplier(_input: TInput | string): bigint {
+  getMultiplier(_input: TInput | string): number {
+    throw new Error("Not implemented");
+  }
+  getFormattedMultiplier(_input: TInput | string): number {
     throw new Error("Not implemented");
   }
   decodeRolled(

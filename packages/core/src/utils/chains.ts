@@ -14,10 +14,10 @@ export function getCasinoChainId(
   if (chainId && !(chainId in casinoChainById)) {
     throw new ChainError(
       `Chain ID ${chainId} is not compatible with casino games`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_CHAIN,
       {
         chainId,
         supportedChains: Object.keys(casinoChainById),
-        errorCode: ERROR_CODES.CHAIN.UNSUPPORTED_CHAIN,
       }
     );
   }

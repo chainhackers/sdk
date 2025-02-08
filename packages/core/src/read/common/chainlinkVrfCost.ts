@@ -32,8 +32,8 @@ export async function getChainlinkVrfCost(
   } catch (error) {
     throw new TransactionError(
       `An error occured while getting the chainlink vrf cost: ${error}`,
+      ERROR_CODES.READ.CHAINLINK_VRF_COST_ERROR,
       {
-        errorCode: ERROR_CODES.READ.CHAINLINK_VRF_COST_ERROR,
         gameAddress,
         tokenAddress,
         betCount,

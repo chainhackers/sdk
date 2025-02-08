@@ -1,5 +1,7 @@
 import { BP_VALUE } from "../../constants";
-import { AbstractCasinoGame } from "./game";
+import { CASINO_GAME_TYPE } from "../../data/casino";
+import { getFormattedNetMultiplier, getNetMultiplier } from "../../utils/bet";
+import { AbstractCasinoGame, type ChoiceInput } from "./game";
 
 export type DiceNumber =
   | 1
@@ -102,6 +104,10 @@ export type DiceNumber =
   | 98
   | 99
   | 100;
+
+export interface DiceChoiceInput extends ChoiceInput {
+  id: DiceNumber;
+}
 export class Dice extends AbstractCasinoGame<
   DiceNumber,
   number,
@@ -112,8 +118,12 @@ export class Dice extends AbstractCasinoGame<
     return Math.max(100 - Number(cap), 1) as DiceNumber;
   }
 
-  static getMultiplier(cap: DiceNumber | string): bigint {
-    return BigInt(Math.round((BP_VALUE * 100) / (100 - Number(cap))));
+  static getMultiplier(cap: DiceNumber | string): number {
+    return Math.round((BP_VALUE * 100) / (100 - Number(cap)));
+  }
+
+  static getFormattedMultiplier(cap: DiceNumber | string): number {
+    return Number((this.getMultiplier(cap) / BP_VALUE).toFixed(3));
   }
 
   static encodeInput(cap: DiceNumber | string): DiceNumber {
@@ -126,5 +136,25 @@ export class Dice extends AbstractCasinoGame<
 
   static decodeRolled(encodedCap: number | string): DiceNumber {
     return this.decodeInput(encodedCap);
+  }
+
+  static getChoiceInputs(houseEdge?: number): DiceChoiceInput[] {
+    return Array.from({ length: 99 }, (_, i) => {
+      const diceNumber = (i + 1) as DiceNumber;
+      return {
+        id: diceNumber,
+        game: CASINO_GAME_TYPE.DICE,
+        label: `${diceNumber}`,
+        winChancePercent: this.getWinChancePercent(diceNumber),
+        multiplier: this.getMultiplier(diceNumber),
+        formattedMultiplier: this.getFormattedMultiplier(diceNumber),
+        netMultiplier: houseEdge
+          ? getNetMultiplier(this.getMultiplier(diceNumber), houseEdge)
+          : undefined,
+        formattedNetMultiplier: houseEdge
+          ? getFormattedNetMultiplier(this.getMultiplier(diceNumber), houseEdge)
+          : undefined,
+      };
+    });
   }
 }

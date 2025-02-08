@@ -44,8 +44,8 @@ export interface BetSwirlClientOptions {
 }
 
 export class BetSwirlClient {
-  private wagmiConfig: WagmiConfig;
-  private betSwirlDefaultOptions: BetSwirlClientOptions;
+  public wagmiConfig: WagmiConfig;
+  public betSwirlDefaultOptions: BetSwirlClientOptions;
 
   constructor(
     wagmiConfig: WagmiConfig,
@@ -132,6 +132,7 @@ export class BetSwirlClient {
   async getBetRequirements(
     token: Token,
     multiplier: number,
+    game: CASINO_GAME_TYPE,
     chainId?: CasinoChainId
   ): Promise<BetRequirements> {
     const casinoChainId = this._getCasinoChainId(chainId);
@@ -139,6 +140,7 @@ export class BetSwirlClient {
       this.wagmiConfig,
       token,
       multiplier,
+      game,
       casinoChainId
     );
   }
@@ -151,16 +153,16 @@ export class BetSwirlClient {
   }
 
   static init(
-    config: WagmiConfig,
+    wagmiConfig: WagmiConfig,
     options?: BetSwirlClientOptions
   ): BetSwirlClient {
-    return new BetSwirlClient(config, options);
+    return new BetSwirlClient(wagmiConfig, options);
   }
 }
 
 export function initBetSwirlClient(
-  config: WagmiConfig,
+  wagmiConfig: WagmiConfig,
   options?: BetSwirlClientOptions
 ): BetSwirlClient {
-  return BetSwirlClient.init(config, options);
+  return BetSwirlClient.init(wagmiConfig, options);
 }

@@ -11,6 +11,7 @@ export const MAX_SDK_HOUSE_EGDE = 1000;
 export type CasinoChainId = keyof typeof casinoChainById;
 
 export type CasinoChain = {
+  id: CasinoChainId;
   viemChain: Chain;
   options: {
     pollingInterval: number;
@@ -72,26 +73,8 @@ export const CASINO_GAME_ROLL_ABI: Record<
   [CASINO_GAME_TYPE.KENO]: KENO_ROLL_ABI,
 };
 
-export const casinoChainByKey = {
-  // mainnets
-
-  polygon: chainByKey.polygon,
-  avalanche: chainByKey.avalanche,
-  arbitrum: chainByKey.arbitrum,
-  bsc: chainByKey.bsc,
-  base: chainByKey.base,
-  // testnets
-  polygonAmoy: chainByKey.polygonAmoy,
-  arbitrumSepolia: chainByKey.arbitrumSepolia,
-  avalancheFuji: chainByKey.avalancheFuji,
-  baseSepolia: chainByKey.baseSepolia,
-} as const;
-
-export const casinoChains = Object.values(
-  casinoChainByKey
-) as unknown as readonly [Chain, ...Chain[]];
-
 const arbitrumSepoliaData: CasinoChain = {
+  id: chainByKey.arbitrumSepolia.id,
   viemChain: chainByKey.arbitrumSepolia,
   options: {
     pollingInterval: 200,
@@ -127,6 +110,7 @@ const arbitrumSepoliaData: CasinoChain = {
 };
 
 const avalancheFujiData: CasinoChain = {
+  id: chainByKey.avalancheFuji.id,
   viemChain: chainByKey.avalancheFuji,
   options: {
     pollingInterval: 500,
@@ -162,6 +146,7 @@ const avalancheFujiData: CasinoChain = {
 };
 
 const polygonAmoyData: CasinoChain = {
+  id: chainByKey.polygonAmoy.id,
   viemChain: chainByKey.polygonAmoy,
   options: {
     pollingInterval: 500,
@@ -197,6 +182,7 @@ const polygonAmoyData: CasinoChain = {
 };
 
 const baseSepoliaData: CasinoChain = {
+  id: chainByKey.baseSepolia.id,
   viemChain: chainByKey.baseSepolia,
   options: {
     pollingInterval: 200,
@@ -232,6 +218,7 @@ const baseSepoliaData: CasinoChain = {
 };
 
 const arbitrumData: CasinoChain = {
+  id: chainByKey.arbitrum.id,
   viemChain: chainByKey.arbitrum,
   options: {
     pollingInterval: 200,
@@ -267,6 +254,7 @@ const arbitrumData: CasinoChain = {
 };
 
 const avalancheData: CasinoChain = {
+  id: chainByKey.avalanche.id,
   viemChain: chainByKey.avalanche,
   options: {
     pollingInterval: 500,
@@ -302,6 +290,7 @@ const avalancheData: CasinoChain = {
 };
 
 const polygonData: CasinoChain = {
+  id: chainByKey.polygon.id,
   viemChain: chainByKey.polygon,
   options: {
     pollingInterval: 1000,
@@ -337,6 +326,7 @@ const polygonData: CasinoChain = {
 };
 
 const bscData: CasinoChain = {
+  id: chainByKey.bsc.id,
   viemChain: chainByKey.bsc,
   options: {
     pollingInterval: 500,
@@ -372,6 +362,7 @@ const bscData: CasinoChain = {
 };
 
 const baseData: CasinoChain = {
+  id: chainByKey.base.id,
   viemChain: chainByKey.base,
   options: {
     pollingInterval: 200,
@@ -418,11 +409,25 @@ export const casinoChainById = {
   [chainByKey.base.id]: baseData,
 } as const;
 
-export const chainIds = casinoChains.map((chain) => Number(chain.id));
+export const casinoChains = Object.values(
+  casinoChainById
+) as unknown as readonly [CasinoChain, ...CasinoChain[]];
+
+export const casinoChainIds: CasinoChainId[] = casinoChains.map(
+  (chain) => chain.viemChain.id as CasinoChainId
+);
 
 export const labelCasinoGameByType = {
   [CASINO_GAME_TYPE.COINTOSS]: CASINO_GAME_LABEL_TYPE.COINTOSS,
   [CASINO_GAME_TYPE.DICE]: CASINO_GAME_LABEL_TYPE.DICE,
   [CASINO_GAME_TYPE.ROULETTE]: CASINO_GAME_LABEL_TYPE.ROULETTE,
   [CASINO_GAME_TYPE.KENO]: CASINO_GAME_LABEL_TYPE.KENO,
+} as const;
+
+// Could be increased in the future if we increase vrfCallbackGasExtraBet value in smart contracts
+export const maxHarcodedBetCountByType = {
+  [CASINO_GAME_TYPE.COINTOSS]: 100,
+  [CASINO_GAME_TYPE.DICE]: 200,
+  [CASINO_GAME_TYPE.ROULETTE]: 200,
+  [CASINO_GAME_TYPE.KENO]: 150,
 } as const;
