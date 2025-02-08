@@ -1,4 +1,4 @@
-import { getTransactionReceipt, type Config as WagmiConfig } from "@wagmi/core";
+import { type Config as WagmiConfig } from "@wagmi/core";
 import {
   CASINO_GAME_ROLL_ABI,
   CASINO_GAME_TYPE,
@@ -10,7 +10,6 @@ import { ChainError } from "../../errors/types";
 import type { CasinoPlacedBet } from "../../actions/casino/game";
 import { watchContractEvent } from "@wagmi/core";
 import { TransactionError } from "../../errors/types";
-import { coinTossAbi } from "../../abis/v2/casino/coinToss";
 import { casinoGameAbi } from "../../abis/v2/casino/game";
 import {
   parseAbiItem,
@@ -27,6 +26,7 @@ import type {
   CasinoToken,
 } from "../../interfaces";
 import { getCasinoChainId } from "../../utils/chains";
+import { getTransactionReceiptWithRetry } from "../../utils/wagmi";
 
 export interface CasinoRolledBet extends CasinoPlacedBet {
   isWin: boolean;
@@ -96,10 +96,11 @@ export async function waitRolledBet(
         const args = log.args;
         const isWin = args.payout! >= args.totalBetAmount!;
         const isStopTriggered = args.rolled!.length != placedBet.betCount;
-        const receipt = await getTransactionReceipt(wagmiConfig, {
-          hash: log.transactionHash,
-          chainId: placedBet.chainId,
-        });
+        const receipt = await getTransactionReceiptWithRetry(
+          wagmiConfig,
+          log.transactionHash,
+          placedBet.chainId
+        );
 
         resolve({
           rolledBet: {
@@ -133,20 +134,23 @@ export async function waitRolledBet(
     // Subcribe to Roll event
     const unwatch = watchContractEvent(wagmiConfig, {
       address: game.address,
-      abi: coinTossAbi, // coinTossAbi is used because Roll event is the same for all games (expect rolled and input and params)
+      abi: game.abi,
       eventName: "Roll",
       args: { id: placedBet.id },
       chainId: placedBet.chainId,
       pollingInterval:
         options?.pollingInterval || casinoChain.options.pollingInterval,
       onLogs: async (logs) => {
-        const matchingLog = logs.find((log) => log.args.id === placedBet.id);
+        const matchingLog = (
+          logs as unknown as { args: { id: bigint } }[]
+        ).find((log) => log.args.id === placedBet.id);
         if (matchingLog) {
-          await onRollEvent(matchingLog as RollEvent);
+          await onRollEvent(matchingLog as unknown as RollEvent);
         }
       },
-      onError: (error) => {
-        reject(
+      onError: (_error) => {
+        // Nothing to do, the watching continues...
+        /*reject(
           new TransactionError(
             "Error watching Roll event",
             ERROR_CODES.GAME.ROLL_EVENT_ERROR,
@@ -156,25 +160,18 @@ export async function waitRolledBet(
               cause: error,
             }
           )
-        );
+        ); */
       },
     });
 
     const wagmiClient = wagmiConfig.getClient({ chainId: placedBet.chainId });
-    const currentBlock = BigInt(
-      await wagmiClient.request({
-        method: "eth_blockNumber",
-        chainId: placedBet.chainId,
-      })
-    );
-    const fromBlock = currentBlock - placedBet.placeBetBlock;
 
     // Check in the past blocks if the bet has been rolled
     getLogs(wagmiClient, {
       address: game.address,
       event: parseAbiItem(CASINO_GAME_ROLL_ABI[placedBet.game]),
       args: { id: placedBet.id },
-      fromBlock,
+      fromBlock: placedBet.placeBetBlock,
       toBlock: "latest",
     })
       .then((pastLogs) => {

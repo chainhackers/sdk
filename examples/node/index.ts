@@ -4,9 +4,13 @@ import {
   bigIntFormatter,
   CASINO_GAME_TYPE,
   casinoChains,
+  chainById,
   CoinToss,
   Dice,
+  GAS_PRICE_TYPE,
   initBetSwirlClient,
+  labelCasinoGameByType,
+  type ApproveResult,
   type BetRequirements,
   type CasinoChain,
   type CasinoGame,
@@ -14,11 +18,20 @@ import {
   type CasinoToken,
   type ChoiceInput,
   type CoinTossChoiceInput,
+  type CoinTossPlacedBet,
   type DiceChoiceInput,
+  type DicePlacedBet,
 } from "@betswirl/sdk-core";
 import { select, input } from "@inquirer/prompts";
 import { checkEnvVariables, getWagmiConfigFromCasinoChain } from "./utils";
-import { formatUnits, zeroAddress, type Hex } from "viem";
+import {
+  formatUnits,
+  parseUnits,
+  zeroAddress,
+  type Hash,
+  type Hex,
+  type TransactionReceipt,
+} from "viem";
 import chalk from "chalk";
 import * as dotenv from "dotenv";
 import { getBalance } from "@wagmi/core";
@@ -85,6 +98,24 @@ async function placeBet() {
     const betRequirements = await _getBetRequirements(selectedInput, gameToken);
     // 7. Get bet count
     const betCount = await _selectBetCount(betRequirements);
+    //8. Get bet amount
+    const betAmount = await _selectBetAmount(
+      betRequirements,
+      gameToken,
+      betCount,
+      userTokenBalance,
+      userGasBalance
+    );
+    // 9. Place bet
+    const placedBet = await _placeBet(
+      gameToken,
+      selectedInput,
+      betCount,
+      betAmount
+    );
+
+    // 10 Wait for the roll
+    await _waitRoll(placedBet);
   } catch (error) {
     if (error instanceof BetSwirlError) {
       console.error(
@@ -95,7 +126,7 @@ async function placeBet() {
         )
       );
     } else {
-      console.error(chalk.red("Unknown error occured:", error));
+      console.error(chalk.red("Node example error occured:", error));
     }
   }
 }
@@ -110,6 +141,7 @@ async function _selectChain(): Promise<CasinoChain> {
   betSwirlClient = initBetSwirlClient(wagmiConfig, {
     chainId: selectedChain.id,
     affiliate: process.env.AFFILIATE_ADDRESS as Hex,
+    gasPriceType: GAS_PRICE_TYPE.FAST,
   });
   return selectedChain;
 }
@@ -265,6 +297,197 @@ async function _selectBetCount(betRequirements: BetRequirements) {
     },
   });
   return Number(betCount);
+}
+
+async function _selectBetAmount(
+  betRequirements: BetRequirements,
+  casinoGameToken: CasinoGameToken,
+  betCount: number,
+  userTokenBalance: bigint,
+  userGasBalance: bigint
+) {
+  const chainlinkVrfCostEstimation = await betSwirlClient.getChainlinkVrfCost(
+    casinoGameToken.game,
+    casinoGameToken.address,
+    betCount,
+    casinoGameToken.chainId
+  );
+  const chain = chainById[casinoGameToken.chainId];
+  const gasDecimals = chain.nativeCurrency.decimals;
+  const gasSymbol = chain.nativeCurrency.symbol;
+  // TODO Add simulate gas fee (function does not yet exist in sdk)
+  const gasBalanceRemainingAfterFees =
+    userGasBalance - chainlinkVrfCostEstimation;
+  // User needs to have at least 1 gwei for each betCount after substracting gas fees. For production apps, it's better to keep a buffer because VRF and gas fee can change.
+  if (gasBalanceRemainingAfterFees < BigInt(betCount)) {
+    throw Error(
+      `You don't have enough gas to pay VRF and gas fees, please send at least ${formatUnits(
+        BigInt(betCount) - gasBalanceRemainingAfterFees,
+        gasDecimals
+      )} ${gasSymbol} to ${process.env.PUBLIC_ADDRESS}`
+    );
+  } else {
+    // If token is gas balance, substract the fees
+    const availableTokenBalance =
+      casinoGameToken.address == zeroAddress
+        ? gasBalanceRemainingAfterFees
+        : userTokenBalance;
+    // Take into consideration the max bet amount for the balance user but also max bet amount of the bet
+    const maxAmountPerBetFormatted = Math.min(
+      Number(
+        formatUnits(
+          availableTokenBalance / BigInt(betCount),
+          casinoGameToken.decimals
+        )
+      ),
+      Number(
+        formatUnits(betRequirements.maxBetAmount, casinoGameToken.decimals)
+      )
+    );
+    // User needs to have at least 1 gwei of token for each betCount.
+    if (maxAmountPerBetFormatted <= 0) {
+      throw Error(
+        `You don't have enough token to place the bet, please send at least ${formatUnits(
+          BigInt(betCount) - availableTokenBalance,
+          casinoGameToken.decimals
+        )} ${casinoGameToken.symbol} to ${process.env.PUBLIC_ADDRESS}`
+      );
+    }
+    console.log(
+      chalk.blue(
+        `VRF cost estimation: ${formatUnits(
+          chainlinkVrfCostEstimation,
+          gasDecimals
+        )} ${gasSymbol} \nYour token balance: ${formatUnits(
+          userTokenBalance,
+          casinoGameToken.decimals
+        )} ${casinoGameToken.symbol}\nYour gas balance: ${formatUnits(
+          userGasBalance,
+          gasDecimals
+        )} ${gasSymbol}\nBet count: ${betCount}`
+      )
+    );
+    const betAmountFormatted = await input({
+      message: `Enter a bet amount up to ${maxAmountPerBetFormatted} ${casinoGameToken.symbol}`,
+      validate: (_input) => {
+        const input = Number(_input);
+        if (input <= 0 || input > maxAmountPerBetFormatted) {
+          return `Not valid amount`;
+        }
+        return true;
+      },
+    });
+    return parseUnits(betAmountFormatted, casinoGameToken.decimals);
+  }
+}
+
+async function _placeBet(
+  casinoGameToken: CasinoGameToken,
+  inputChoice: DiceChoiceInput | CoinTossChoiceInput,
+  betCount: number,
+  betAmount: bigint
+): Promise<CoinTossPlacedBet | DicePlacedBet> {
+  const commonParams = {
+    betCount,
+    betAmount,
+    token: casinoGameToken,
+  };
+  const callbacks = {
+    onApprovePending: (_tx: Hash, _result: ApproveResult) => {
+      console.log(chalk.blue(`⌛ ${casinoGameToken.symbol} is approving...`));
+    },
+    onApproved: (receipt: TransactionReceipt, _result: ApproveResult) => {
+      console.log(
+        chalk.green(
+          `✅ ${casinoGameToken.symbol} has been approved successfully!\nHash: ${receipt.transactionHash}`
+        )
+      );
+    },
+    onBetPlacedPending: (_tx: Hash) => {
+      console.log(chalk.blue(`⌛ Waiting the bet to be placed...`));
+    },
+  };
+  let placedBetData;
+  if (inputChoice.game === CASINO_GAME_TYPE.DICE) {
+    const diceCap = (inputChoice as DiceChoiceInput).id;
+    placedBetData = await betSwirlClient.playDice(
+      { ...commonParams, cap: diceCap },
+      casinoGameToken.chainId,
+      callbacks
+    );
+  } else {
+    const coinTossFace = (inputChoice as CoinTossChoiceInput).id;
+    placedBetData = await betSwirlClient.playCoinToss(
+      { ...commonParams, face: coinTossFace },
+      casinoGameToken.chainId,
+      callbacks
+    );
+  }
+  console.log(
+    chalk.green(
+      `✅ Your ${
+        labelCasinoGameByType[casinoGameToken.game]
+      } bet has been placed successfully!\nHash: ${
+        placedBetData.receipt.transactionHash
+      }`
+    )
+  );
+  return placedBetData.placedBet;
+}
+
+async function _waitRoll(placedBet: CoinTossPlacedBet | DicePlacedBet) {
+  let rolledBetData;
+  console.log(chalk.blue(`⌛ Waiting the bet to be rolled...`))
+  const commonOptions = {
+    timeout: 300000, //5min
+    pollingInterval: process.env.RPC_URL ? 500 : 2500,
+  };
+
+  if (placedBet.game === CASINO_GAME_TYPE.DICE) {
+    rolledBetData = await betSwirlClient.waitDice(
+      placedBet as DicePlacedBet,
+      commonOptions
+    );
+  } else {
+    rolledBetData = await betSwirlClient.waitCoinToss(
+      placedBet as CoinTossPlacedBet,
+      commonOptions
+    );
+  }
+  const rolledBet = rolledBetData.rolledBet;
+  const chain = chainById[rolledBet.chainId];
+  const commonMessage = chalk.blue(
+    `Payout: ${formatUnits(rolledBet.payout, rolledBet.token.decimals)} ${
+      rolledBet.token.symbol
+    }\nTotal bet amount: ${formatUnits(
+      rolledBet.rolledTotalBetAmount,
+      rolledBet.token.decimals
+    )} ${rolledBet.token.symbol}\nBet count: ${
+      rolledBet.rolledBetCount
+    }\nCharged VRF cost: ${formatUnits(
+      rolledBet.chargedVRFCost,
+      chain.nativeCurrency.decimals
+    )} ${chain.nativeCurrency.symbol}\nRolled: ${JSON.stringify(
+      rolledBet.rolled
+    )}\nHash: ${rolledBet.rollTx}`
+  );
+  // Win
+  if (rolledBetData.rolledBet.isWin) {
+    console.log(
+      chalk.green(
+        `🥳 Congrats you won ${formatUnits(rolledBet.benefit,rolledBet.token.decimals)} ${rolledBet.token.symbol}\n`
+      ,commonMessage)
+    );
+  }
+  // Loss
+  else {
+    console.log(
+      chalk.red(
+        `😔 Arf, you lost ${formatUnits(-rolledBetData.rolledBet.benefit,rolledBet.token.decimals)} ${rolledBet.token.symbol}\n`,commonMessage
+      ),
+      
+    );
+  }
 }
 
 async function showPreviousBets() {

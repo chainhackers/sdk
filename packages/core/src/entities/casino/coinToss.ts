@@ -4,8 +4,8 @@ import { getFormattedNetMultiplier, getNetMultiplier } from "../../utils/bet";
 import { AbstractCasinoGame, type ChoiceInput } from "./game";
 
 export enum COINTOSS_FACE {
-  TAILS = 1,
-  HEADS = 0,
+  TAILS = "TAILS",
+  HEADS = "HEADS",
 }
 
 export interface CoinTossChoiceInput extends ChoiceInput {
@@ -27,7 +27,7 @@ export class CoinToss extends AbstractCasinoGame<
   }
 
   static getFormattedMultiplier(_face: COINTOSS_FACE | string): number {
-    return Number((this.getMultiplier(_face) / BP_VALUE).toFixed(3));
+    return Number((CoinToss.getMultiplier(_face) / BP_VALUE).toFixed(3));
   }
 
   static encodeInput(face: COINTOSS_FACE | string): boolean {
@@ -48,12 +48,12 @@ export class CoinToss extends AbstractCasinoGame<
   }
 
   static decodeRolled(encodedFace: boolean | string): COINTOSS_FACE {
-    return this.decodeInput(encodedFace);
+    return CoinToss.decodeInput(encodedFace);
   }
   // houseEdge is a number between 0 and 10000
   static getChoiceInputs(houseEdge?: number): CoinTossChoiceInput[] {
-    const multiplier = this.getMultiplier(COINTOSS_FACE.TAILS);
-    const formattedMultiplier = this.getFormattedMultiplier(
+    const multiplier = CoinToss.getMultiplier(COINTOSS_FACE.TAILS);
+    const formattedMultiplier = CoinToss.getFormattedMultiplier(
       COINTOSS_FACE.TAILS
     );
     const netMultiplier = houseEdge
@@ -68,8 +68,8 @@ export class CoinToss extends AbstractCasinoGame<
         id: COINTOSS_FACE.TAILS,
         game: CASINO_GAME_TYPE.COINTOSS,
         label: "Tails",
-        winChancePercent: this.getWinChancePercent(COINTOSS_FACE.TAILS),
-        multiplier: this.getMultiplier(COINTOSS_FACE.TAILS),
+        winChancePercent: CoinToss.getWinChancePercent(COINTOSS_FACE.TAILS),
+        multiplier: CoinToss.getMultiplier(COINTOSS_FACE.TAILS),
         formattedMultiplier,
         netMultiplier,
         formattedNetMultiplier,
@@ -78,7 +78,7 @@ export class CoinToss extends AbstractCasinoGame<
         id: COINTOSS_FACE.HEADS,
         game: CASINO_GAME_TYPE.COINTOSS,
         label: "Heads",
-        winChancePercent: this.getWinChancePercent(COINTOSS_FACE.HEADS),
+        winChancePercent: CoinToss.getWinChancePercent(COINTOSS_FACE.HEADS),
         multiplier: multiplier,
         formattedMultiplier,
         netMultiplier,

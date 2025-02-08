@@ -33,6 +33,8 @@ import type {
 } from "../interfaces";
 import { getBetRequirements, getCasinoTokens } from "../read/casino/bank";
 import { getCasinoChainId } from "../utils/chains";
+import { getChainlinkVrfCost } from "../read/common/chainlinkVrfCost";
+import type { PlaceBetCallbacks } from "../actions";
 
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;
@@ -58,7 +60,8 @@ export class BetSwirlClient {
   /* Games */
   async playCoinToss(
     params: CoinTossParams,
-    chainId?: CasinoChainId
+    chainId?: CasinoChainId,
+    callbacks?: PlaceBetCallbacks
   ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
     const casinoChainId = this._getCasinoChainId(chainId);
     return placeCoinTossBet(
@@ -67,7 +70,8 @@ export class BetSwirlClient {
       {
         ...this.betSwirlDefaultOptions,
         chainId: casinoChainId,
-      }
+      },
+      callbacks
     );
   }
 
@@ -80,7 +84,8 @@ export class BetSwirlClient {
 
   async playDice(
     params: DiceParams,
-    chainId?: CasinoChainId
+    chainId?: CasinoChainId,
+    callbacks?: PlaceBetCallbacks
   ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
     const casinoChainId = this._getCasinoChainId(chainId);
     return placeDiceBet(
@@ -89,7 +94,8 @@ export class BetSwirlClient {
       {
         ...this.betSwirlDefaultOptions,
         chainId: casinoChainId,
-      }
+      },
+      callbacks
     );
   }
 
@@ -142,6 +148,26 @@ export class BetSwirlClient {
       multiplier,
       game,
       casinoChainId
+    );
+  }
+
+  async getChainlinkVrfCost(
+    game: CASINO_GAME_TYPE,
+    tokenAddress: Hex,
+    betCount: number,
+    chainId?: CasinoChainId,
+    gasPrice?: bigint,
+    gasPriceType?: GAS_PRICE_TYPE
+  ) {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return getChainlinkVrfCost(
+      this.wagmiConfig,
+      game,
+      tokenAddress,
+      betCount,
+      casinoChainId,
+      gasPrice || this.betSwirlDefaultOptions.gasPrice,
+      gasPriceType || this.betSwirlDefaultOptions.gasPriceType
     );
   }
 

@@ -5,6 +5,7 @@ import {
   type CasinoBetParams,
   type CasinoPlaceBetOptions,
   type CasinoPlacedBet,
+  type PlaceBetCallbacks,
 } from "./game";
 import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
 import { decodeEventLog, type TransactionReceipt } from "viem";
@@ -26,7 +27,8 @@ export interface DicePlacedBet extends CasinoPlacedBet {
 export async function placeDiceBet(
   wagmiConfig: WagmiConfig,
   diceParams: DiceParams,
-  options?: CasinoPlaceBetOptions
+  options?: CasinoPlaceBetOptions,
+  callbacks?: PlaceBetCallbacks
 ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
   // Exécution de la transaction
   const { placedBet, receipt } = await placeBet(
@@ -36,7 +38,8 @@ export async function placeDiceBet(
       gameEncodedExtraParams: [Dice.encodeInput(diceParams.cap)],
       ...diceParams,
     },
-    options
+    options,
+    callbacks
   );
   const dicePlacedBet = await getDicePlacedBetFromReceipt(
     wagmiConfig,

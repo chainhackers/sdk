@@ -8,13 +8,16 @@ export function getWagmiConfigFromCasinoChain(casinoChain: CasinoChain) {
   const rpcUrl = process.env.RPC_URL;
 
   const account = privateKeyToAccount(privateKey as Hex);
-
+  const transport = rpcUrl?.startsWith("wss")
+    ? webSocket(rpcUrl)
+    : http(rpcUrl);
   return createConfig({
     chains: [casinoChain.viemChain],
+
     client: ({ chain }) => {
       return createWalletClient({
         chain,
-        transport: rpcUrl?.startsWith("wss") ? webSocket(rpcUrl) : http(rpcUrl),
+        transport,
         account,
       });
     },

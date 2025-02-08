@@ -123,7 +123,7 @@ export class Dice extends AbstractCasinoGame<
   }
 
   static getFormattedMultiplier(cap: DiceNumber | string): number {
-    return Number((this.getMultiplier(cap) / BP_VALUE).toFixed(3));
+    return Number((Dice.getMultiplier(cap) / BP_VALUE).toFixed(3));
   }
 
   static encodeInput(cap: DiceNumber | string): DiceNumber {
@@ -135,7 +135,7 @@ export class Dice extends AbstractCasinoGame<
   }
 
   static decodeRolled(encodedCap: number | string): DiceNumber {
-    return this.decodeInput(encodedCap);
+    return Dice.decodeInput(encodedCap);
   }
 
   static getChoiceInputs(houseEdge?: number): DiceChoiceInput[] {
@@ -145,14 +145,14 @@ export class Dice extends AbstractCasinoGame<
         id: diceNumber,
         game: CASINO_GAME_TYPE.DICE,
         label: `${diceNumber}`,
-        winChancePercent: this.getWinChancePercent(diceNumber),
-        multiplier: this.getMultiplier(diceNumber),
-        formattedMultiplier: this.getFormattedMultiplier(diceNumber),
+        winChancePercent: Dice.getWinChancePercent(diceNumber),
+        multiplier: Dice.getMultiplier(diceNumber),
+        formattedMultiplier: Dice.getFormattedMultiplier(diceNumber),
         netMultiplier: houseEdge
-          ? getNetMultiplier(this.getMultiplier(diceNumber), houseEdge)
+          ? getNetMultiplier(Dice.getMultiplier(diceNumber), houseEdge)
           : undefined,
         formattedNetMultiplier: houseEdge
-          ? getFormattedNetMultiplier(this.getMultiplier(diceNumber), houseEdge)
+          ? getFormattedNetMultiplier(Dice.getMultiplier(diceNumber), houseEdge)
           : undefined,
       };
     });

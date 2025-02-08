@@ -2,24 +2,52 @@ import { type Config as WagmiConfig, call } from "@wagmi/core";
 import { casinoGameAbi } from "../../abis/v2/casino/game";
 
 import { encodeFunctionData, type Hex } from "viem";
-import { TransactionError } from "../../errors/types";
+import { ChainError, TransactionError } from "../../errors/types";
 import { ERROR_CODES } from "../../errors/codes";
-import type { CasinoChainId } from "../../data/casino";
+import {
+  casinoChainById,
+  type CASINO_GAME_TYPE,
+  type CasinoChainId,
+} from "../../data/casino";
+import { getCasinoChainId } from "../../utils";
+import { GAS_PRICE_TYPE, getGasPrices } from "./gasPrice";
+import { defaultCasinoPlaceBetOptions } from "../../actions";
 
 export async function getChainlinkVrfCost(
   wagmiConfig: WagmiConfig,
-  gameAddress: Hex,
+  game: CASINO_GAME_TYPE, // TODO allow to pass PVP_GAME_TYPE
   tokenAddress: Hex,
   betCount: number,
   chainId?: CasinoChainId,
-  gasPrice?: bigint
+  gasPrice?: bigint,
+  gasPriceType?: GAS_PRICE_TYPE
 ): Promise<bigint> {
+  const casinoChainId = getCasinoChainId(wagmiConfig, chainId);
+  const casinoChain = casinoChainById[casinoChainId];
+  const gameAddress = casinoChain.contracts.games[game]?.address;
+
+  if (!gameAddress) {
+    throw new ChainError(
+      `${game} is not available for chain ${casinoChain.viemChain.name} (${casinoChainId})`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
+      {
+        chainId: casinoChainId,
+        supportedChains: Object.keys(casinoChainById),
+      }
+    );
+  }
+  // Get default gas price if gas price is not passed
+  const effectiveGasPrice =
+    gasPrice ||
+    (await getGasPrices(wagmiConfig, casinoChainId))[
+      gasPriceType || defaultCasinoPlaceBetOptions.gasPriceType
+    ];
   try {
     const { data: vrfCost } = await call(wagmiConfig, {
       to: gameAddress,
       data: generateGetChainlinkVrfCostFunctionData(tokenAddress, betCount),
       chainId,
-      gasPrice,
+      gasPrice: effectiveGasPrice,
     });
 
     if (!vrfCost) {
@@ -38,7 +66,7 @@ export async function getChainlinkVrfCost(
         tokenAddress,
         betCount,
         chainId,
-        gasPrice,
+        gasPrice: effectiveGasPrice,
       }
     );
   }

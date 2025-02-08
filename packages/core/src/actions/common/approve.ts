@@ -10,6 +10,7 @@ import type { Hash, Hex } from "viem";
 import { erc20Abi, zeroAddress } from "viem";
 import { TransactionError } from "../../errors/types";
 import { ERROR_CODES } from "../../errors/codes";
+import { getAccountFromWagmiConfig } from "../../utils/wagmi";
 
 export enum ALLOWANCE_TYPE {
   ALWAYS = "ALWAYS",
@@ -59,6 +60,7 @@ export async function approve(
         args: [spender, amountToApprove],
         chainId,
         gasPrice,
+        account: getAccountFromWagmiConfig(wagmiConfig),
       });
       const tx = await writeContract(wagmiConfig, approveRequest);
       const result: ApproveResult = {

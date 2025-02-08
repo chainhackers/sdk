@@ -1,5 +1,6 @@
 import {
   encodeFunctionData,
+  zeroAddress,
   type Hash,
   type Hex,
   type TransactionReceipt,
@@ -31,6 +32,7 @@ import type { Token } from "../../interfaces";
 import { chainNativeCurrencyToToken } from "../../utils/tokens";
 import { getTokenMetadata } from "../common/tokenMetadata";
 import { chainByKey } from "../../data";
+import { getAccountFromWagmiConfig } from "../../utils/wagmi";
 
 export interface CasinoBetParams {
   betAmount: bigint;
@@ -89,16 +91,20 @@ export interface CasinoPlacedBet {
   game: CASINO_GAME_TYPE;
 }
 
+export interface PlaceBetCallbacks {
+  onApprovePending?: (tx: Hash, result: ApproveResult) => void | Promise<void>;
+  onApproved?: (
+    receipt: TransactionReceipt,
+    result: ApproveResult
+  ) => void | Promise<void>;
+  onBetPlacedPending?: (tx: Hash) => void | Promise<void>;
+}
+
 export async function placeBet(
   wagmiConfig: WagmiConfig,
   betParams: GenericCasinoBetParams,
   options?: CasinoPlaceBetOptions,
-  onApprovePending?: (tx: Hash, result: ApproveResult) => void | Promise<void>,
-  onApproved?: (
-    receipt: TransactionReceipt,
-    result: ApproveResult
-  ) => void | Promise<void>,
-  onBetPlacedPending?: (tx: Hash) => void | Promise<void>
+  callbacks?: PlaceBetCallbacks
 ): Promise<{ placedBet: CasinoPlacedBet; receipt: TransactionReceipt }> {
   const chainId = options?.chainId || defaultCasinoPlaceBetOptions.chainId;
   const casinoChain = casinoChainById[chainId];
@@ -149,6 +155,7 @@ export async function placeBet(
       options?.allowanceType || defaultCasinoPlaceBetOptions.allowanceType;
     const pollingInterval =
       options?.pollInterval || casinoChain.options.pollingInterval;
+
     const { receipt: approveReceipt, result: approveResult } = await approve(
       wagmiConfig,
       token.address,
@@ -159,36 +166,42 @@ export async function placeBet(
       gasPrice,
       pollingInterval,
       allowanceType,
-      onApprovePending
+      callbacks?.onApprovePending
     );
 
-    if (approveReceipt) await onApproved?.(approveReceipt, approveResult);
+    if (approveReceipt)
+      await callbacks?.onApproved?.(approveReceipt, approveResult);
 
     // Get VRF fees
     const vrfFees =
       betParams.vrfFees ||
       (await getChainlinkVrfCost(
         wagmiConfig,
-        game.address,
+        betParams.game,
         token.address,
         functionData.betCount,
         chainId,
         gasPrice
       ));
+
     // Simulate place bet tx
+
     const { request } = await simulateContract(wagmiConfig, {
       address: game.address,
-      value: vrfFees,
+      value:
+        token.address == zeroAddress
+          ? functionData.totalBetAmount + vrfFees
+          : vrfFees,
       args: functionData.data.args,
       abi: functionData.data.abi,
       functionName: functionData.data.functionName,
       chainId: chainId,
       gasPrice: gasPrice,
+      account: getAccountFromWagmiConfig(wagmiConfig, chainId),
     });
-
     // Execute place bet tx
     const hash = await writeContract(wagmiConfig, request);
-    await onBetPlacedPending?.(hash);
+    await callbacks?.onBetPlacedPending?.(hash);
     const receipt = await waitForTransactionReceipt(wagmiConfig, {
       hash,
       chainId,
@@ -300,12 +313,15 @@ export async function getPlacedBetFromReceipt(
   game: CASINO_GAME_TYPE,
   usedToken?: Token // to avoid to fetch the token metadata from the chain if the token used is already known
 ): Promise<CasinoPlacedBet | null> {
+  const casinoChain = casinoChainById[chainId];
   // Read the Placedbet event from logs
   const decodedPlaceBetEvent = receipt.logs
     .map((log) => {
       try {
-        return decodeEventLog({
-          abi: coinTossAbi, // coinTossAbi is used because PlaceBet event is the same for all games (expect input param)
+        return decodeEventLog<typeof coinTossAbi>({
+          //@ts-ignore coinTossAbi is used because PlaceBet event is the same for all games (expect input param)
+          abi: casinoChain.contracts.games[game]?.abi!,
+          //@ts-ignore
           data: log.data,
           topics: log.topics,
         });
