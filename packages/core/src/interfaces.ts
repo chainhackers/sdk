@@ -1,4 +1,4 @@
-import type { Abi, Hex } from "viem";
+import type { Abi, Address, Hash, Hex } from "viem";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "./data/casino";
 
 export type Token = {
@@ -54,4 +54,47 @@ export interface BetRequirements {
   maxBetAmount: bigint;
   maxBetCount: number;
   chainId: CasinoChainId;
+}
+
+// Subgraph types
+export interface CasinoBet {
+  id: bigint;
+  chainId: CasinoChainId;
+  gameId: CASINO_GAME_TYPE;
+  gameAddress: Address;
+  bettor: Address;
+  betAmount?: bigint;
+  formattedBetAmount: number;
+  totalBetAmount: bigint;
+  formattedTotalBetAmount: number;
+  betCount: number;
+  stopLoss: bigint;
+  formattedStopLoss: number;
+  stopGain: bigint;
+  formattedStopGain: number;
+  houseEdge: number; // BP
+  betTimestamp: number; // secs
+  chargedVRFFees: bigint;
+  betTxnHash: Hash;
+  encodedInput: string;
+  decodedInput: any;
+  payout?: bigint;
+  formattedPayout?: number;
+  payoutMultiplier?: number;
+  benefit?: bigint;
+  formattedBenefit?: number;
+  rollTxnHash?: Hash;
+  rollTimestamp?: number; // secs
+  isResolved: boolean;
+  isRefunded: boolean;
+  rollTotalBetAmount?: bigint;
+  fomattedRollTotalBetAmount?: number;
+  rollBetCount?: number;
+  encodedRolled?: Array<string>;
+  decodedRolled?: Array<any>;
+  token: Token;
+  affiliate?: Address;
+  isWin?: boolean;
+  isStopLossTriggered?: boolean;
+  isStopGainTriggered?: boolean;
 }

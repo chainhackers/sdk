@@ -47,12 +47,12 @@ importers:
 
   packages/core:
     dependencies:
-      '@graphql-codegen/cli':
-        specifier: ^5.0.4
-        version: 5.0.4(@babel/core@7.26.8)(@types/node@22.13.1)(graphql@16.10.0)(typescript@5.7.3)
       '@wagmi/core':
         specifier: '>=2.16.3'
         version: 2.16.4(typescript@5.7.3)(viem@2.22.23(typescript@5.7.3))
+      graphql-tag:
+        specifier: '>=2.12.6'
+        version: 2.12.6(graphql@16.10.0)
       typescript:
         specifier: '>=5.0.4'
         version: 5.7.3
@@ -60,6 +60,9 @@ importers:
         specifier: '>=2.22.23'
         version: 2.22.23(typescript@5.7.3)
     devDependencies:
+      '@graphql-codegen/cli':
+        specifier: ^5.0.4
+        version: 5.0.4(@babel/core@7.26.8)(@types/node@22.13.1)(graphql@16.10.0)(typescript@5.7.3)
       '@graphql-codegen/client-preset':
         specifier: ^4.6.2
         version: 4.6.2(@babel/core@7.26.8)(graphql@16.10.0)

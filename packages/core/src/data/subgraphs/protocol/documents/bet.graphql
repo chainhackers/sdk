@@ -1,0 +1,5 @@
+query Bet($id: ID!) {
+  bet(id: $id, subgraphError: allow) {
+    ...Bet
+  }
+}

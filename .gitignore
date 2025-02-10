@@ -20,4 +20,4 @@ tsconfig.tsbuildinfo
 
 # subgraph type generation
 **/subgraphs/**/*.ts
-!**/subgraphs/index.ts
+!**/subgraphs/**/index.ts
