@@ -12,7 +12,9 @@
   "main": "dist/index.js",
   "sideEffects": false,
   "scripts": {
-    "build": "rimraf ./dist && tsup",
+    "gql:cleanup": "rimraf src/data/subgraphs/**/*.ts src/data/subgraphs/**/**/*.ts",
+    "gql": "npm run gql:cleanup & graphql-codegen",
+    "build": "rimraf ./dist && npm run gql && tsup",
     "prepublishOnly": "npm run build"
   },
   "contributors": [
@@ -40,7 +42,15 @@
     "dist"
   ],
   "devDependencies": {
+    "@graphql-codegen/client-preset": "^4.6.2",
+    "@graphql-codegen/near-operation-file-preset": "^3.0.0",
+    "@graphql-codegen/typescript": "^4.1.3",
+    "@graphql-codegen/typescript-document-nodes": "^4.0.13",
+    "@graphql-codegen/typescript-operations": "^4.4.1",
     "rimraf": "^6.0.1",
     "tsup": "^8.3.6"
+  },
+  "dependencies": {
+    "@graphql-codegen/cli": "^5.0.4"
   }
 }

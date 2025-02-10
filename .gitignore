@@ -17,3 +17,7 @@ tsconfig.tsbuildinfo
 .env.production.local
 .envrc
 **/test**
+
+# subgraph type generation
+**/subgraphs/**/*.ts
+!**/subgraphs/index.ts
