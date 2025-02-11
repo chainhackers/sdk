@@ -14,7 +14,7 @@
   "scripts": {
     "gql:cleanup": "rimraf --glob \"./src/data/subgraphs/protocol/documents/**/*.ts\"",
     "gql": "graphql-codegen",
-    "build": "rimraf ./dist && npm run gql && tsup",
+    "build": "rimraf ./dist && npm run gql && tsup --tsconfig tsconfig.build.json",
     "prepublishOnly": "npm run build"
   },
   "contributors": [
@@ -32,7 +32,8 @@
     "@wagmi/core": ">=2.16.3",
     "typescript": ">=5.0.4",
     "viem": ">=2.22.23",
-    "@apollo/client": ">=3.12.11"
+    "@apollo/client": ">=3.12.11",
+    "graphql-tag": ">=2.12.6"
   },
   "peerDependenciesMeta": {
     "typescript": {

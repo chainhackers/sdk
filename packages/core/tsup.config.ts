@@ -6,6 +6,7 @@ export default defineConfig({
   dts: {
     compilerOptions: {
       incremental: false,
+      noUnusedLocals: false,
     },
   },
   sourcemap: true,
