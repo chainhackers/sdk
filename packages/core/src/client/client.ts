@@ -1,5 +1,5 @@
 import { type Config as WagmiConfig } from "@wagmi/core";
-import type { Hex, TransactionReceipt } from "viem";
+import type { Address, Hex, TransactionReceipt } from "viem";
 import { type ChainId } from "../data/chains";
 import {
   placeCoinTossBet,
@@ -27,6 +27,7 @@ import {
 import { waitDiceRolledBet, type DiceRolledBet } from "../read/casino/dice";
 import type {
   BetRequirements,
+  CasinoBet,
   CasinoGameToken,
   CasinoToken,
   Token,
@@ -35,6 +36,15 @@ import { getBetRequirements, getCasinoTokens } from "../read/casino/bank";
 import { getCasinoChainId } from "../utils/chains";
 import { getChainlinkVrfCost } from "../read/common/chainlinkVrfCost";
 import type { PlaceBetCallbacks } from "../actions";
+import type { OrderDirection } from "../data/subgraphs/protocol/documents/types";
+import {
+  fetchBets,
+  type CasinoBetFilterStatus,
+} from "../data/subgraphs/protocol/clients/bet";
+import type { Bet_OrderBy } from "../data/subgraphs/protocol/documents/types";
+import type { SubgraphError } from "../errors";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../constants";
+import type { ApolloCache } from "@apollo/client";
 
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;
@@ -43,6 +53,10 @@ export interface BetSwirlClientOptions {
   affiliate?: Hex;
   allowanceType?: ALLOWANCE_TYPE;
   pollInterval?: number;
+  subgraphClient?: {
+    graphqlKey?: string;
+    cache?: ApolloCache<any>;
+  };
 }
 
 export class BetSwirlClient {
@@ -57,7 +71,7 @@ export class BetSwirlClient {
     this.betSwirlDefaultOptions = betSwirlDefaultOptions;
   }
 
-  /* Games */
+  /* Casino Games */
   async playCoinToss(
     params: CoinTossParams,
     chainId?: CasinoChainId,
@@ -106,7 +120,7 @@ export class BetSwirlClient {
     return waitDiceRolledBet(this.wagmiConfig, placedBet, options);
   }
 
-  /* Utilities */
+  /* Casino Utilities */
 
   async getCasinoGames(chainId?: CasinoChainId, onlyActive = false) {
     const casinoChainId = this._getCasinoChainId(chainId);
@@ -168,6 +182,30 @@ export class BetSwirlClient {
       casinoChainId,
       gasPrice || this.betSwirlDefaultOptions.gasPrice,
       gasPriceType || this.betSwirlDefaultOptions.gasPriceType
+    );
+  }
+
+  /* Casino Subgraphs */
+  async fetchBets(
+    chainId?: CasinoChainId,
+    filter?: {
+      bettor?: Address;
+      game?: CASINO_GAME_TYPE;
+      token?: Token;
+      status?: CasinoBetFilterStatus;
+      affiliates?: Address[];
+    },
+    page = DEFAULT_PAGE,
+    itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
+    sortBy?: { key: Bet_OrderBy; order: OrderDirection }
+  ): Promise<{ bets: CasinoBet[]; error: SubgraphError | undefined }> {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return fetchBets(
+      { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
+      filter,
+      page,
+      itemsPerPage,
+      sortBy
     );
   }
 

@@ -26,6 +26,7 @@ export type CasinoChain = {
   };
   graphql: {
     endpoint: string;
+    defaultEndpoint: string;
   };
   defaultAffiliate: Hex;
 };
@@ -105,6 +106,8 @@ const arbitrumSepoliaData: CasinoChain = {
   graphql: {
     endpoint:
       "https://api.studio.thegraph.com/query/80936/betswirl-arbitrum-sepolia-v2/version/latest",
+    defaultEndpoint:
+      "https://api.studio.thegraph.com/query/80936/betswirl-arbitrum-sepolia-v2/version/latest",
   },
   defaultAffiliate: "0x057BcBF736DADD774A8A45A185c1697F4cF7517D",
 };
@@ -140,6 +143,8 @@ const avalancheFujiData: CasinoChain = {
   },
   graphql: {
     endpoint:
+      "https://api.studio.thegraph.com/query/80936/betswirl-fuji-v2/version/latest",
+    defaultEndpoint:
       "https://api.studio.thegraph.com/query/80936/betswirl-fuji-v2/version/latest",
   },
   defaultAffiliate: "0x057BcBF736DADD774A8A45A185c1697F4cF7517D",
@@ -177,6 +182,8 @@ const polygonAmoyData: CasinoChain = {
   graphql: {
     endpoint:
       "https://api.studio.thegraph.com/query/80936/betswirl-amoy-v2/version/latest",
+    defaultEndpoint:
+      "https://api.studio.thegraph.com/query/80936/betswirl-amoy-v2/version/latest",
   },
   defaultAffiliate: "0x057BcBF736DADD774A8A45A185c1697F4cF7517D",
 };
@@ -213,6 +220,8 @@ const baseSepoliaData: CasinoChain = {
   graphql: {
     endpoint:
       "https://api.studio.thegraph.com/query/80936/betswirl-base-sepolia-v2/version/latest",
+    defaultEndpoint:
+      "https://api.studio.thegraph.com/query/80936/betswirl-base-sepolia-v2/version/latest",
   },
   defaultAffiliate: "0x057BcBF736DADD774A8A45A185c1697F4cF7517D",
 };
@@ -248,7 +257,9 @@ const arbitrumData: CasinoChain = {
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/subgraphs/id/AsPBS4ymrjoR61r1x2avNJJtMPvzZ3quMHxvQTgDJbU",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmT2RLyaMmxG1XkXZYDHMG1W9c65g3bQW8rdxpqhXPrdaD",
+    defaultEndpoint:
+      "https://api.studio.thegraph.com/query/1726/betswirl-arbitrum-one/v2.0.4",
   },
   defaultAffiliate: "0xf14C79a7fA22c1f97C779F573c9bF39b6b43381c",
 };
@@ -284,7 +295,9 @@ const avalancheData: CasinoChain = {
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/subgraphs/id/4nQJ4T5TXvTxgECqQ6ox6Nwf57d5BNt6SCn7CzzxjDZN",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmVKBpbVtJ5TpMRp4ueqC2kDFwia6J3mu83Z4pDTYYb3UR",
+    defaultEndpoint:
+      "https://api.studio.thegraph.com/query/1726/betswirl-avalanche/v2.0.3",
   },
   defaultAffiliate: "0x1a75280F832280Af93f588f715a5Fb4Ca7918430",
 };
@@ -320,7 +333,9 @@ const polygonData: CasinoChain = {
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/subgraphs/id/FL3ePDCBbShPvfRJTaSCNnehiqxsPHzpLud6CpbHoeKW",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmVj19dwwPmRkwdToMox912K895jRg9qZkWVcAmemNJqgJ",
+    defaultEndpoint:
+      "https://api.studio.thegraph.com/query/1726/betswirl-polygon/v2.0.4",
   },
   defaultAffiliate: "0xfA695010bF9e757a1abCd2703259F419217aa756",
 };
@@ -356,7 +371,9 @@ const bscData: CasinoChain = {
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/subgraphs/id/69xMkatN58qWXZS7FXqiVQmvkHhNrq3thTfdB6t85Wvk",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmPtqdTTdok43yjvXV2SFRSKwWnjmNs7FuYEKcYsMepsSY",
+    defaultEndpoint:
+      "https://api.studio.thegraph.com/query/1726/betswirl-bnb-chain/v2.0.3",
   },
   defaultAffiliate: "0xCD25325a6eF20BC5dF9bceAc0cC22a48d2e8f6eF",
 };
@@ -392,7 +409,9 @@ const baseData: CasinoChain = {
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/subgraphs/id/6rt22DL9aaAjJHDUZ25sSsPuvuKxp1Tnf8LBXhL8WdZi",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmNjt9TVwQ86zhfoY8nP5W8fEu6TG2J51kiw9djZiSysDJ",
+    defaultEndpoint:
+      "https://api.studio.thegraph.com/query/1726/betswirl-base/v2.0.3",
   },
   defaultAffiliate: "0xBf1998e1F1cD52fBfb63e7E646bb39c091A7B70A",
 };
@@ -422,6 +441,20 @@ export const labelCasinoGameByType = {
   [CASINO_GAME_TYPE.DICE]: CASINO_GAME_LABEL_TYPE.DICE,
   [CASINO_GAME_TYPE.ROULETTE]: CASINO_GAME_LABEL_TYPE.ROULETTE,
   [CASINO_GAME_TYPE.KENO]: CASINO_GAME_LABEL_TYPE.KENO,
+} as const;
+
+export const typeBySubgraphCasinoGame = {
+  [CASINO_GAME_SUBGRAPH_TYPE.COINTOSS]: CASINO_GAME_TYPE.COINTOSS,
+  [CASINO_GAME_SUBGRAPH_TYPE.DICE]: CASINO_GAME_TYPE.DICE,
+  [CASINO_GAME_SUBGRAPH_TYPE.ROULETTE]: CASINO_GAME_TYPE.ROULETTE,
+  [CASINO_GAME_SUBGRAPH_TYPE.KENO]: CASINO_GAME_TYPE.KENO,
+} as const;
+
+export const subgraphGameByType = {
+  [CASINO_GAME_TYPE.COINTOSS]: CASINO_GAME_SUBGRAPH_TYPE.COINTOSS,
+  [CASINO_GAME_TYPE.DICE]: CASINO_GAME_SUBGRAPH_TYPE.DICE,
+  [CASINO_GAME_TYPE.ROULETTE]: CASINO_GAME_SUBGRAPH_TYPE.ROULETTE,
+  [CASINO_GAME_TYPE.KENO]: CASINO_GAME_SUBGRAPH_TYPE.KENO,
 } as const;
 
 // Could be increased in the future if we increase vrfCallbackGasExtraBet value in smart contracts

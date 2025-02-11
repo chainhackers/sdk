@@ -437,7 +437,7 @@ async function _placeBet(
 
 async function _waitRoll(placedBet: CoinTossPlacedBet | DicePlacedBet) {
   let rolledBetData;
-  console.log(chalk.blue(`⌛ Waiting the bet to be rolled...`))
+  console.log(chalk.blue(`⌛ Waiting the bet to be rolled...`));
   const commonOptions = {
     timeout: 300000, //5min
     pollingInterval: process.env.RPC_URL ? 500 : 2500,
@@ -460,7 +460,7 @@ async function _waitRoll(placedBet: CoinTossPlacedBet | DicePlacedBet) {
     `Payout: ${formatUnits(rolledBet.payout, rolledBet.token.decimals)} ${
       rolledBet.token.symbol
     }\nTotal bet amount: ${formatUnits(
-      rolledBet.rolledTotalBetAmount,
+      rolledBet.rollTotalBetAmount,
       rolledBet.token.decimals
     )} ${rolledBet.token.symbol}\nBet count: ${
       rolledBet.rolledBetCount
@@ -475,17 +475,24 @@ async function _waitRoll(placedBet: CoinTossPlacedBet | DicePlacedBet) {
   if (rolledBetData.rolledBet.isWin) {
     console.log(
       chalk.green(
-        `🥳 Congrats you won ${formatUnits(rolledBet.benefit,rolledBet.token.decimals)} ${rolledBet.token.symbol}\n`
-      ,commonMessage)
+        `🥳 Congrats you won ${formatUnits(
+          rolledBet.benefit,
+          rolledBet.token.decimals
+        )} ${rolledBet.token.symbol}\n`,
+        commonMessage
+      )
     );
   }
   // Loss
   else {
     console.log(
       chalk.red(
-        `😔 Arf, you lost ${formatUnits(-rolledBetData.rolledBet.benefit,rolledBet.token.decimals)} ${rolledBet.token.symbol}\n`,commonMessage
-      ),
-      
+        `😔 Arf, you lost ${formatUnits(
+          -rolledBetData.rolledBet.benefit,
+          rolledBet.token.decimals
+        )} ${rolledBet.token.symbol}\n`,
+        commonMessage
+      )
     );
   }
 }

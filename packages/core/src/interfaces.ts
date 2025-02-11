@@ -59,11 +59,13 @@ export interface BetRequirements {
 // Subgraph types
 export interface CasinoBet {
   id: bigint;
+  token: Token;
+  nativeCurrency: Token;
   chainId: CasinoChainId;
-  gameId: CASINO_GAME_TYPE;
+  game: CASINO_GAME_TYPE;
   gameAddress: Address;
   bettor: Address;
-  betAmount?: bigint;
+  betAmount: bigint;
   formattedBetAmount: number;
   totalBetAmount: bigint;
   formattedTotalBetAmount: number;
@@ -75,6 +77,7 @@ export interface CasinoBet {
   houseEdge: number; // BP
   betTimestamp: number; // secs
   chargedVRFFees: bigint;
+  formattedChargedVRFFees: number;
   betTxnHash: Hash;
   encodedInput: string;
   decodedInput: any;
@@ -92,9 +95,9 @@ export interface CasinoBet {
   rollBetCount?: number;
   encodedRolled?: Array<string>;
   decodedRolled?: Array<any>;
-  token: Token;
   affiliate?: Address;
   isWin?: boolean;
+  isLost?: boolean;
   isStopLossTriggered?: boolean;
   isStopGainTriggered?: boolean;
 }

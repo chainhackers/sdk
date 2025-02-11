@@ -33,7 +33,7 @@ export interface CasinoRolledBet extends CasinoPlacedBet {
   isStopLossTriggered: boolean;
   isStopGainTriggered: boolean;
   rolledBetCount: number;
-  rolledTotalBetAmount: bigint;
+  rollTotalBetAmount: bigint;
   payout: bigint;
   benefit: bigint;
   rollTx: Hash;
@@ -107,7 +107,7 @@ export async function waitRolledBet(
             ...placedBet,
             isWin,
             rolledBetCount: args.rolled!.length,
-            rolledTotalBetAmount: args.totalBetAmount!,
+            rollTotalBetAmount: args.totalBetAmount!,
             payout: args.payout!,
             benefit: args.payout! - args.totalBetAmount!,
             rollTx: log.transactionHash,
