@@ -16,8 +16,6 @@ Create a `.env` file in the root of the project and add the following variables:
 
 ```bash
 PRIVATE_KEY="0x..."
-PUBLIC_ADDRESS="0x..."
-RPC_URL="https|wss://..."
 ```
 
 ### Commands

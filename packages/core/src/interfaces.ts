@@ -75,7 +75,8 @@ export interface CasinoBet {
   stopGain: bigint;
   formattedStopGain: number;
   houseEdge: number; // BP
-  betTimestamp: number; // secs
+  betTimestampSecs: number; // secs
+  betDate: Date;
   chargedVRFFees: bigint;
   formattedChargedVRFFees: number;
   betTxnHash: Hash;
@@ -87,7 +88,8 @@ export interface CasinoBet {
   benefit?: bigint;
   formattedBenefit?: number;
   rollTxnHash?: Hash;
-  rollTimestamp?: number; // secs
+  rollTimestampSecs?: number;
+  rollDate?: Date;
   isResolved: boolean;
   isRefunded: boolean;
   rollTotalBetAmount?: bigint;

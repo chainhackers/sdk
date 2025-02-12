@@ -1,4 +1,7 @@
 import { BP_VALUE } from "../constants";
+import { CASINO_GAME_TYPE } from "../data";
+import { CoinToss } from "../entities/casino/coinToss";
+import { Dice } from "../entities/casino/dice";
 
 //houseEdge is in BP_VALUE
 export function getBetSwirlFees(payout: bigint, houseEdge: number): bigint {
@@ -40,4 +43,27 @@ export function getFormattedNetMultiplier(
   return Number(
     (getNetMultiplier(multiplier, houseEdge) / BP_VALUE).toFixed(3)
   );
+}
+
+export function decodeCasinoInput(
+  encodedInput: string,
+  game: CASINO_GAME_TYPE
+): any {
+  switch (game) {
+    case CASINO_GAME_TYPE.DICE:
+      return Dice.decodeInput(encodedInput);
+    case CASINO_GAME_TYPE.COINTOSS:
+      return CoinToss.decodeInput(encodedInput);
+  }
+}
+export function decodeCasinoRolled(
+  encodedRolled: string,
+  game: CASINO_GAME_TYPE
+): any {
+  switch (game) {
+    case CASINO_GAME_TYPE.DICE:
+      return Dice.decodeRolled(encodedRolled);
+    case CASINO_GAME_TYPE.COINTOSS:
+      return CoinToss.decodeRolled(encodedRolled);
+  }
 }

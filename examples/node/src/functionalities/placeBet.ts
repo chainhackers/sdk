@@ -23,7 +23,11 @@ import {
   type DicePlacedBet,
 } from "@betswirl/sdk-core";
 import { select, input } from "@inquirer/prompts";
-import { checkEnvVariables, getWagmiConfigFromCasinoChain } from "./utils";
+import {
+  checkEnvVariables,
+  getPublicAddressFromWagmiConfig,
+  getWagmiConfigFromCasinoChain,
+} from "../../utils";
 import {
   formatUnits,
   parseUnits,
@@ -33,51 +37,10 @@ import {
   type TransactionReceipt,
 } from "viem";
 import chalk from "chalk";
-import * as dotenv from "dotenv";
 import { getBalance } from "@wagmi/core";
-dotenv.config();
 let betSwirlClient: BetSwirlClient;
 
-// Main Menu
-const showMenu = async () => {
-  const answer = await select({
-    message: "What do you want to do?",
-    loop: false,
-    choices: [
-      {
-        name: "Place a bet",
-        value: "place_bet",
-      },
-      {
-        name: "Show previous bets",
-        value: "previous_bets",
-        disabled: "(not yet implemented)",
-      },
-      {
-        name: "Quit",
-        value: "quit",
-      },
-    ],
-  });
-
-  switch (answer) {
-    case "place_bet":
-      await placeBet();
-      break;
-    case "previous_bets":
-      await showPreviousBets();
-      break;
-    case "quit":
-      console.log("Bye!");
-      process.exit(0);
-    default:
-      console.log("Invalid choice, please try again.");
-      await showMenu();
-  }
-  await showMenu();
-};
-
-async function placeBet() {
+export async function startPlaceBetProcess() {
   try {
     // 0. Check if env variables are set
     checkEnvVariables();
@@ -98,7 +61,7 @@ async function placeBet() {
     const betRequirements = await _getBetRequirements(selectedInput, gameToken);
     // 7. Get bet count
     const betCount = await _selectBetCount(betRequirements);
-    //8. Get bet amount
+    // 8. Get bet amount
     const betAmount = await _selectBetAmount(
       betRequirements,
       gameToken,
@@ -114,13 +77,13 @@ async function placeBet() {
       betAmount
     );
 
-    // 10 Wait for the roll
+    // 10. Wait for the roll
     await _waitRoll(placedBet);
   } catch (error) {
     if (error instanceof BetSwirlError) {
       console.error(
         chalk.red(
-          `[${error.code}] BetSwirl error occured: ${
+          `[${error.code}] BetSwirl error occured while placing bet: ${
             error.message
           } ${JSON.stringify(error.context, bigIntFormatter)}`
         )
@@ -190,12 +153,15 @@ async function _getTokenInfo(
   userTokenBalance: bigint;
   userGasBalance: bigint;
 }> {
+  const userAddress = getPublicAddressFromWagmiConfig(
+    betSwirlClient.wagmiConfig
+  )!;
   const tokenInfo = await betSwirlClient.getCasinoGameToken(
     token,
     casinoGame.game
   );
   const userGasBalanceData = await getBalance(betSwirlClient.wagmiConfig, {
-    address: process.env.PUBLIC_ADDRESS as Hex,
+    address: userAddress,
     chainId: tokenInfo.chainId,
   });
   let userTokenBalance = 0n;
@@ -204,7 +170,7 @@ async function _getTokenInfo(
   } else {
     userTokenBalance = (
       await getBalance(betSwirlClient.wagmiConfig, {
-        address: process.env.PUBLIC_ADDRESS as Hex,
+        address: userAddress,
         token: token.address,
         chainId: tokenInfo.chainId,
       })
@@ -312,6 +278,9 @@ async function _selectBetAmount(
     betCount,
     casinoGameToken.chainId
   );
+  const userAddress = getPublicAddressFromWagmiConfig(
+    betSwirlClient.wagmiConfig
+  )!;
   const chain = chainById[casinoGameToken.chainId];
   const gasDecimals = chain.nativeCurrency.decimals;
   const gasSymbol = chain.nativeCurrency.symbol;
@@ -324,7 +293,7 @@ async function _selectBetAmount(
       `You don't have enough gas to pay VRF and gas fees, please send at least ${formatUnits(
         BigInt(betCount) - gasBalanceRemainingAfterFees,
         gasDecimals
-      )} ${gasSymbol} to ${process.env.PUBLIC_ADDRESS}`
+      )} ${gasSymbol} to ${userAddress}`
     );
   } else {
     // If token is gas balance, substract the fees
@@ -350,7 +319,7 @@ async function _selectBetAmount(
         `You don't have enough token to place the bet, please send at least ${formatUnits(
           BigInt(betCount) - availableTokenBalance,
           casinoGameToken.decimals
-        )} ${casinoGameToken.symbol} to ${process.env.PUBLIC_ADDRESS}`
+        )} ${casinoGameToken.symbol} to ${userAddress}`
       );
     }
     console.log(
@@ -496,19 +465,3 @@ async function _waitRoll(placedBet: CoinTossPlacedBet | DicePlacedBet) {
     );
   }
 }
-
-async function showPreviousBets() {
-  console.log("Not yet implemented");
-}
-
-async function main() {
-  try {
-    console.log("🎲 Welcome to BetSwirl Node example! 🎲\n");
-    await showMenu();
-  } catch (error) {
-    console.error("An error occured:", error);
-    process.exit(1);
-  }
-}
-
-main();

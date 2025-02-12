@@ -38,6 +38,7 @@ import { getChainlinkVrfCost } from "../read/common/chainlinkVrfCost";
 import type { PlaceBetCallbacks } from "../actions";
 import type { OrderDirection } from "../data/subgraphs/protocol/documents/types";
 import {
+  fetchBet,
   fetchBets,
   type CasinoBetFilterStatus,
 } from "../data/subgraphs/protocol/clients/bet";
@@ -206,6 +207,17 @@ export class BetSwirlClient {
       page,
       itemsPerPage,
       sortBy
+    );
+  }
+
+  async fetchBet(
+    id: string | bigint,
+    chainId?: CasinoChainId
+  ): Promise<{ bet: CasinoBet | undefined; error: SubgraphError | undefined }> {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return fetchBet(
+      { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
+      id
     );
   }
 

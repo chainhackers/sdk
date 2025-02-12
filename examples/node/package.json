@@ -2,14 +2,15 @@
   "name": "node",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "tsx ./index.ts"
+    "start": "tsx ./src/index.ts"
   },
   "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@apollo/client": "^3.12.11",
     "@betswirl/sdk-core": "0.0.1-beta-3",
     "@inquirer/prompts": "^7.3.1",
     "@wagmi/core": "^2.16.3",

@@ -8,8 +8,11 @@ import {
   type CasinoChainId,
 } from "../../../casino";
 import type { BetFragment } from "../documents/fragments/bet";
-import { chainNativeCurrencyToToken } from "../../../../utils";
-import { decodeCasinoInput, decodeCasinoRolled } from "../../../../entities";
+import {
+  chainNativeCurrencyToToken,
+  decodeCasinoInput,
+  decodeCasinoRolled,
+} from "../../../../utils";
 import type { CasinoBet, Token } from "../../../../interfaces";
 import type { Bet_OrderBy, OrderDirection } from "../documents/types";
 import { ApolloClient } from "@apollo/client/core";
@@ -17,7 +20,7 @@ import {
   defaultSubgraphCasinoClient,
   getGraphqlEndpoint,
   type SubgraphCasinoClient,
-} from ".";
+} from "./common";
 import {
   BetsDocument,
   type BetsQuery,
@@ -89,7 +92,8 @@ export function formatCasinoBet(
       formatUnits(BigInt(bet.stopGain), token.decimals)
     ),
     houseEdge: bet.houseEdge, // BP
-    betTimestamp: Number(bet.betTimestamp), // secs
+    betTimestampSecs: Number(bet.betTimestamp), // secs
+    betDate: new Date(Math.round(Number(bet.betTimestamp) * 1000)),
     chargedVRFFees: BigInt(bet.chargedVRFFees),
     formattedChargedVRFFees: Number(
       formatUnits(BigInt(bet.chargedVRFFees), nativeCurrency.decimals)
@@ -109,7 +113,12 @@ export function formatCasinoBet(
       ? Number(formatUnits(benefit, token.decimals))
       : undefined,
     rollTxnHash: bet.rollTxnHash,
-    rollTimestamp: bet.rollTimestamp ? Number(bet.rollTimestamp) : undefined, // secs
+    rollTimestampSecs: bet.rollTimestamp
+      ? Number(bet.rollTimestamp)
+      : undefined, // secs
+    rollDate: bet.rollTimestamp
+      ? new Date(Math.round(Number(bet.rollTimestamp) * 1000))
+      : undefined,
     isResolved: bet.isResolved,
     isRefunded: bet.isRefunded,
     rollTotalBetAmount,
@@ -153,40 +162,33 @@ export async function fetchBets(
     uri: getGraphqlEndpoint(client),
     cache: client.cache ?? defaultSubgraphCasinoClient.cache,
   });
+
   const variables: BetsQueryVariables = {
     first: itemsPerPage,
     skip: itemsPerPage * (page - 1),
-    where: {},
+    where: {
+      ...(filter?.bettor && { user: filter.bettor.toLowerCase() }),
+      ...(filter?.game && { gameId: subgraphGameByType[filter.game] }),
+      ...(filter?.token && {
+        gameToken_: { token: filter.token.address.toLowerCase() },
+      }),
+      ...(filter?.status !== undefined && {
+        resolved: filter.status === CasinoBetFilterStatus.RESOLVED,
+      }),
+      ...(filter?.affiliates?.length && {
+        affiliate_in: filter.affiliates.map((a) => a.toLowerCase()),
+      }),
+    },
     orderBy: sortBy?.key,
     orderDirection: sortBy?.order,
   };
-
-  if (filter?.bettor) {
-    variables.where.user = filter.bettor.toLowerCase();
-  }
-
-  if (filter?.game) {
-    variables.where.gameId = subgraphGameByType[filter.game];
-  }
-
-  if (filter?.token) {
-    variables.where.gameToken_ = { token: filter.token.address.toLowerCase() };
-  }
-
-  if (filter?.status) {
-    variables.where.resolved = filter.status === CasinoBetFilterStatus.RESOLVED;
-  }
-  if (filter?.affiliates) {
-    variables.where.affiliate_in = filter.affiliates.map((affiliate) =>
-      affiliate.toLowerCase()
-    );
-  }
 
   const { data, error } = await apolloClient.query<
     BetsQuery,
     BetsQueryVariables
   >({
     query: BetsDocument,
+    variables,
   });
 
   return {
