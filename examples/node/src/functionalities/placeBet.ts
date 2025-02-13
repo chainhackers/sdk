@@ -7,6 +7,7 @@ import {
   chainById,
   CoinToss,
   Dice,
+  formatTxnUrl,
   GAS_PRICE_TYPE,
   initBetSwirlClient,
   labelCasinoGameByType,
@@ -248,7 +249,7 @@ async function _selectInput(
       if (inputChoices.length > 1) {
         console.log(
           chalk.blue(
-            `Selected numbers: ${input.label}\Multiplier: ${input.formattedNetMultiplier}x\nChance to win: ${input.winChancePercent}%`
+            `Selected numbers: ${input.label}\nMultiplier: ${input.formattedNetMultiplier}x\nChance to win: ${input.winChancePercent}%`
           )
         );
       }
@@ -392,7 +393,12 @@ async function _placeBet(
     onApproved: (receipt: TransactionReceipt, _result: ApproveResult) => {
       console.log(
         chalk.green(
-          `✅ ${casinoGameToken.symbol} has been approved successfully!\nHash: ${receipt.transactionHash}`
+          `✅ ${
+            casinoGameToken.symbol
+          } has been approved successfully!\nApproval txn: ${formatTxnUrl(
+            receipt.transactionHash,
+            casinoGameToken.chainId
+          )}`
         )
       );
     },
@@ -427,9 +433,10 @@ async function _placeBet(
     chalk.green(
       `✅ Your ${
         labelCasinoGameByType[casinoGameToken.game]
-      } bet has been placed successfully!\nHash: ${
-        placedBetData.receipt.transactionHash
-      }`
+      } bet has been placed successfully!\n Place bet txn: ${formatTxnUrl(
+        placedBetData.receipt.transactionHash,
+        casinoGameToken.chainId
+      )}`
     )
   );
   return placedBetData.placedBet;
@@ -476,7 +483,7 @@ async function _waitRoll(
       chain.nativeCurrency.decimals
     )} ${chain.nativeCurrency.symbol}\nRolled: ${JSON.stringify(
       rolledBet.rolled
-    )}\nHash: ${rolledBet.rollTx}`
+    )}\nRoll txn: ${formatTxnUrl(rolledBet.rollTx, rolledBet.chainId)}`
   );
   // Win
   if (rolledBetData.rolledBet.isWin) {

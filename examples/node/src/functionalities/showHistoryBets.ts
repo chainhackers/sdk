@@ -4,6 +4,7 @@ import {
   BetSwirlError,
   bigIntFormatter,
   casinoChains,
+  formatTxnUrl,
   initBetSwirlClient,
   labelCasinoGameByType,
   OrderDirection,
@@ -115,9 +116,10 @@ function _showBet(bet: CasinoBet) {
     bet.betCount > 1
       ? `Total bet amount ${bet.formattedTotalBetAmount} ${bet.token.symbol}\n`
       : ""
-  }Bet date: ${bet.betDate.toLocaleString()}\nBet txn hash: ${
-    bet.betTxnHash
-  }\n`;
+  }Bet date: ${bet.betDate.toLocaleString()}\nBet txn: ${formatTxnUrl(
+    bet.betTxnHash,
+    bet.chainId
+  )}\n`;
   // Pending state
   if (!bet.isResolved) {
     console.log("Status:", chalk.yellow(`Pending`));
@@ -135,9 +137,10 @@ function _showBet(bet: CasinoBet) {
         bet.isWin ? chalk.green("+" + benefitInfo) : chalk.red(benefitInfo)
       }\nRolled: ${
         bet.decodedRolled
-      }\nRoll date: ${bet.rollDate?.toLocaleString()}\nRoll txn hash: ${
-        bet.rollTxnHash
-      }\n${
+      }\nRoll date: ${bet.rollDate?.toLocaleString()}\nRoll txn: ${formatTxnUrl(
+        bet.rollTxnHash!,
+        bet.chainId
+      )}\n${
         bet.isStopGainTriggered || bet.isStopLossTriggered
           ? chalk.yellow(
               `\n=> Only ${bet.rollBetCount}/${

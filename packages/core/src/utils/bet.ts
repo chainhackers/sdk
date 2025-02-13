@@ -1,5 +1,5 @@
 import { BP_VALUE } from "../constants";
-import { CASINO_GAME_TYPE } from "../data";
+import { CASINO_GAME_TYPE, slugById, type ChainId } from "../data";
 import { CoinToss } from "../entities/casino/coinToss";
 import { Dice } from "../entities/casino/dice";
 import { Roulette } from "../entities/casino/roulette";
@@ -71,4 +71,15 @@ export function decodeCasinoRolled(
     case CASINO_GAME_TYPE.ROULETTE:
       return Roulette.decodeRolled(encodedRolled);
   }
+}
+
+export function formatChainlinkSubscriptionUrl(
+  subscriptionId: string | bigint,
+  chainId: ChainId
+) {
+  return `https://vrf.chain.link/${
+    slugById[chainId]
+  }#/side-drawer/subscription/${
+    slugById[chainId]
+  }/${subscriptionId.toString()}`;
 }

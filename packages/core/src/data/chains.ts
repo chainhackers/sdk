@@ -53,3 +53,19 @@ export const chainById = {
   [baseSepolia.id]: baseSepolia,
   [gnosis.id]: gnosis,
 } as const;
+
+export const slugById = {
+  [polygon.id as number]: "polygon",
+  [polygonAmoy.id as number]: "amoy",
+  [avalanche.id as number]: "avalanche",
+  [avalancheFuji.id as number]: "fuji",
+  [arbitrum.id as number]: "arbitrum",
+  [arbitrumSepolia.id as number]: "arbitrum-sepolia",
+  [bsc.id as number]: "bnb-chain",
+  [bscTestnet.id as number]: "bnb-chain-testnet",
+  [mainnet.id as number]: "ethereum",
+  [sepolia.id as number]: "sepolia",
+  [base.id as number]: "base",
+  [baseSepolia.id as number]: "base-sepolia",
+  [gnosis.id as number]: "gnosis",
+} as const;
