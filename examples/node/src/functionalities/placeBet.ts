@@ -10,6 +10,7 @@ import {
   GAS_PRICE_TYPE,
   initBetSwirlClient,
   labelCasinoGameByType,
+  Roulette,
   type ApproveResult,
   type BetRequirements,
   type CasinoChain,
@@ -21,8 +22,10 @@ import {
   type CoinTossPlacedBet,
   type DiceChoiceInput,
   type DicePlacedBet,
+  type RouletteChoiceInput,
+  type RoulettePlacedBet,
 } from "@betswirl/sdk-core";
-import { select, input } from "@inquirer/prompts";
+import { select, input, checkbox } from "@inquirer/prompts";
 import {
   checkEnvVariables,
   getPublicAddressFromWagmiConfig,
@@ -120,9 +123,7 @@ async function _selectGame(selectedChain: CasinoChain): Promise<CasinoGame> {
     choices: casinoGames.map((g) => ({
       name: g.label,
       value: g,
-      disabled:
-        g.paused ||
-        [CASINO_GAME_TYPE.KENO, CASINO_GAME_TYPE.ROULETTE].includes(g.game),
+      disabled: g.paused || [CASINO_GAME_TYPE.KENO].includes(g.game),
     })),
   });
   return selectedGame;
@@ -200,9 +201,21 @@ async function _getTokenInfo(
 
 async function _selectInput(
   gameToken: CasinoGameToken
-): Promise<CoinTossChoiceInput | DiceChoiceInput> {
-  let input;
+): Promise<CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput> {
+  let input: CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput;
   switch (gameToken.game) {
+    case CASINO_GAME_TYPE.DICE:
+      input = await select({
+        message: "Select a number",
+        loop: false,
+        choices: Dice.getChoiceInputs(gameToken.affiliateHouseEdge).map(
+          (i) => ({
+            name: `${i.label} (x${i.formattedNetMultiplier}) - ${i.winChancePercent}% chance to win`,
+            value: i,
+          })
+        ),
+      });
+      break;
     case CASINO_GAME_TYPE.COINTOSS:
       input = await select({
         message: "Select a face",
@@ -216,19 +229,30 @@ async function _selectInput(
       });
       break;
     default:
-      input = await select({
-        message: "Select a number",
+      const inputChoices = await checkbox({
+        message: "Select a number or a bundle of numbers (space bar to select)",
         loop: false,
-        choices: Dice.getChoiceInputs(gameToken.affiliateHouseEdge).map(
+        required: true,
+        choices: Roulette.getChoiceInputs(gameToken.affiliateHouseEdge).map(
           (i) => ({
             name: `${i.label} (x${i.formattedNetMultiplier}) - ${i.winChancePercent}% chance to win`,
             value: i,
           })
         ),
       });
-      break;
+      // Combine all the choices into one
+      input = Roulette.combineChoiceInputs(
+        inputChoices,
+        gameToken.affiliateHouseEdge
+      );
+      if (inputChoices.length > 1) {
+        console.log(
+          chalk.blue(
+            `Selected numbers: ${input.label}\Multiplier: ${input.formattedNetMultiplier}x\nChance to win: ${input.winChancePercent}%`
+          )
+        );
+      }
   }
-
   return input;
 }
 
@@ -352,10 +376,10 @@ async function _selectBetAmount(
 
 async function _placeBet(
   casinoGameToken: CasinoGameToken,
-  inputChoice: DiceChoiceInput | CoinTossChoiceInput,
+  inputChoice: DiceChoiceInput | CoinTossChoiceInput | RouletteChoiceInput,
   betCount: number,
   betAmount: bigint
-): Promise<CoinTossPlacedBet | DicePlacedBet> {
+): Promise<CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet> {
   const commonParams = {
     betCount,
     betAmount,
@@ -378,16 +402,23 @@ async function _placeBet(
   };
   let placedBetData;
   if (inputChoice.game === CASINO_GAME_TYPE.DICE) {
-    const diceCap = (inputChoice as DiceChoiceInput).id;
+    const diceCap = (inputChoice as DiceChoiceInput).value;
     placedBetData = await betSwirlClient.playDice(
       { ...commonParams, cap: diceCap },
       casinoGameToken.chainId,
       callbacks
     );
-  } else {
-    const coinTossFace = (inputChoice as CoinTossChoiceInput).id;
+  } else if (inputChoice.game === CASINO_GAME_TYPE.COINTOSS) {
+    const coinTossFace = (inputChoice as CoinTossChoiceInput).value;
     placedBetData = await betSwirlClient.playCoinToss(
       { ...commonParams, face: coinTossFace },
+      casinoGameToken.chainId,
+      callbacks
+    );
+  } else {
+    const rouletteNumbers = (inputChoice as RouletteChoiceInput).value;
+    placedBetData = await betSwirlClient.playRoulette(
+      { ...commonParams, numbers: rouletteNumbers },
       casinoGameToken.chainId,
       callbacks
     );
@@ -404,7 +435,9 @@ async function _placeBet(
   return placedBetData.placedBet;
 }
 
-async function _waitRoll(placedBet: CoinTossPlacedBet | DicePlacedBet) {
+async function _waitRoll(
+  placedBet: CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet
+) {
   let rolledBetData;
   console.log(chalk.blue(`⌛ Waiting the bet to be rolled...`));
   const commonOptions = {
@@ -417,9 +450,14 @@ async function _waitRoll(placedBet: CoinTossPlacedBet | DicePlacedBet) {
       placedBet as DicePlacedBet,
       commonOptions
     );
-  } else {
+  } else if (placedBet.game === CASINO_GAME_TYPE.COINTOSS) {
     rolledBetData = await betSwirlClient.waitCoinToss(
       placedBet as CoinTossPlacedBet,
+      commonOptions
+    );
+  } else {
+    rolledBetData = await betSwirlClient.waitRoulette(
+      placedBet as RoulettePlacedBet,
       commonOptions
     );
   }

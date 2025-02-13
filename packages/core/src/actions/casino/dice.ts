@@ -30,7 +30,6 @@ export async function placeDiceBet(
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks
 ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
-  // Exécution de la transaction
   const { placedBet, receipt } = await placeBet(
     wagmiConfig,
     {

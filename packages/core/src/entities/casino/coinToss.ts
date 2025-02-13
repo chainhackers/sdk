@@ -9,6 +9,7 @@ export enum COINTOSS_FACE {
 }
 
 export interface CoinTossChoiceInput extends ChoiceInput {
+  value: COINTOSS_FACE;
   id: COINTOSS_FACE;
 }
 
@@ -65,6 +66,7 @@ export class CoinToss extends AbstractCasinoGame<
 
     return [
       {
+        value: COINTOSS_FACE.TAILS,
         id: COINTOSS_FACE.TAILS,
         game: CASINO_GAME_TYPE.COINTOSS,
         label: "Tails",
@@ -75,6 +77,7 @@ export class CoinToss extends AbstractCasinoGame<
         formattedNetMultiplier,
       },
       {
+        value: COINTOSS_FACE.HEADS,
         id: COINTOSS_FACE.HEADS,
         game: CASINO_GAME_TYPE.COINTOSS,
         label: "Heads",

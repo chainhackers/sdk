@@ -2,6 +2,7 @@ import { BP_VALUE } from "../constants";
 import { CASINO_GAME_TYPE } from "../data";
 import { CoinToss } from "../entities/casino/coinToss";
 import { Dice } from "../entities/casino/dice";
+import { Roulette } from "../entities/casino/roulette";
 
 //houseEdge is in BP_VALUE
 export function getBetSwirlFees(payout: bigint, houseEdge: number): bigint {
@@ -54,6 +55,8 @@ export function decodeCasinoInput(
       return Dice.decodeInput(encodedInput);
     case CASINO_GAME_TYPE.COINTOSS:
       return CoinToss.decodeInput(encodedInput);
+    case CASINO_GAME_TYPE.ROULETTE:
+      return Roulette.decodeInput(encodedInput);
   }
 }
 export function decodeCasinoRolled(
@@ -65,5 +68,7 @@ export function decodeCasinoRolled(
       return Dice.decodeRolled(encodedRolled);
     case CASINO_GAME_TYPE.COINTOSS:
       return CoinToss.decodeRolled(encodedRolled);
+    case CASINO_GAME_TYPE.ROULETTE:
+      return Roulette.decodeRolled(encodedRolled);
   }
 }

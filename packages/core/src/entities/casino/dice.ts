@@ -106,6 +106,7 @@ export type DiceNumber =
   | 100;
 
 export interface DiceChoiceInput extends ChoiceInput {
+  value: DiceNumber;
   id: DiceNumber;
 }
 export class Dice extends AbstractCasinoGame<
@@ -114,8 +115,8 @@ export class Dice extends AbstractCasinoGame<
   DiceNumber,
   number
 > {
-  static getWinChancePercent(cap: DiceNumber | string): DiceNumber {
-    return Math.max(100 - Number(cap), 1) as DiceNumber;
+  static getWinChancePercent(cap: DiceNumber | string): number {
+    return Math.max(100 - Number(cap), 1);
   }
 
   static getMultiplier(cap: DiceNumber | string): number {
@@ -142,6 +143,7 @@ export class Dice extends AbstractCasinoGame<
     return Array.from({ length: 99 }, (_, i) => {
       const diceNumber = (i + 1) as DiceNumber;
       return {
+        value: diceNumber,
         id: diceNumber,
         game: CASINO_GAME_TYPE.DICE,
         label: `${diceNumber}`,

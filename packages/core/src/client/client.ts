@@ -46,6 +46,15 @@ import type { Bet_OrderBy } from "../data/subgraphs/protocol/documents/types";
 import type { SubgraphError } from "../errors";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../constants";
 import type { ApolloCache } from "@apollo/client";
+import {
+  placeRouletteBet,
+  type RouletteParams,
+  type RoulettePlacedBet,
+} from "../actions/casino/roulette";
+import {
+  waitRouletteRolledBet,
+  type RouletteRolledBet,
+} from "../read/casino/roulette";
 
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;
@@ -119,6 +128,30 @@ export class BetSwirlClient {
     options: CasinoWaitRollOptions
   ): Promise<{ rolledBet: DiceRolledBet; receipt: TransactionReceipt }> {
     return waitDiceRolledBet(this.wagmiConfig, placedBet, options);
+  }
+
+  async playRoulette(
+    params: RouletteParams,
+    chainId?: CasinoChainId,
+    callbacks?: PlaceBetCallbacks
+  ): Promise<{ placedBet: RoulettePlacedBet; receipt: TransactionReceipt }> {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return placeRouletteBet(
+      this.wagmiConfig,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        chainId: casinoChainId,
+      },
+      callbacks
+    );
+  }
+
+  async waitRoulette(
+    placedBet: RoulettePlacedBet,
+    options: CasinoWaitRollOptions
+  ): Promise<{ rolledBet: RouletteRolledBet; receipt: TransactionReceipt }> {
+    return waitRouletteRolledBet(this.wagmiConfig, placedBet, options);
   }
 
   /* Casino Utilities */

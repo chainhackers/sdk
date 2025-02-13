@@ -9,46 +9,46 @@ import {
 } from "./game";
 import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
 import { decodeEventLog, type TransactionReceipt } from "viem";
-import { coinTossAbi } from "../../abis/v2/casino/coinToss";
+import { rouletteAbi } from "../../abis/v2/casino/roulette";
 import { TransactionError } from "../../errors/types";
 import { ERROR_CODES } from "../../errors/codes";
-import { CoinToss, type COINTOSS_FACE } from "../../entities/casino/coinToss";
+import { Roulette, type RouletteNumber } from "../../entities/casino/roulette";
 import type { Token } from "../../interfaces";
 
-export interface CoinTossParams extends CasinoBetParams {
-  face: COINTOSS_FACE;
+export interface RouletteParams extends CasinoBetParams {
+  numbers: RouletteNumber[];
 }
 
-export interface CoinTossPlacedBet extends CasinoPlacedBet {
-  face: COINTOSS_FACE;
-  encodedFace: boolean;
+export interface RoulettePlacedBet extends CasinoPlacedBet {
+  numbers: RouletteNumber[];
+  encodedNumbers: number;
 }
 
-export async function placeCoinTossBet(
+export async function placeRouletteBet(
   wagmiConfig: WagmiConfig,
-  coinTossParams: CoinTossParams,
+  rouletteParams: RouletteParams,
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks
-): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
+): Promise<{ placedBet: RoulettePlacedBet; receipt: TransactionReceipt }> {
   const { placedBet, receipt } = await placeBet(
     wagmiConfig,
     {
-      game: CASINO_GAME_TYPE.COINTOSS,
-      gameEncodedExtraParams: [CoinToss.encodeInput(coinTossParams.face)],
-      ...coinTossParams,
+      game: CASINO_GAME_TYPE.ROULETTE,
+      gameEncodedExtraParams: [Roulette.encodeInput(rouletteParams.numbers)],
+      ...rouletteParams,
     },
     options,
     callbacks
   );
-  const coinTossPlacedBet = await getCoinTossPlacedBetFromReceipt(
+  const roulettePlacedBet = await getRoulettePlacedBetFromReceipt(
     wagmiConfig,
     receipt,
     placedBet.chainId,
     placedBet.token
   );
-  if (!coinTossPlacedBet) {
+  if (!roulettePlacedBet) {
     throw new TransactionError(
-      "CoinToss PlaceBet event not found",
+      "Roulette PlaceBet event not found",
       ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
       {
         hash: receipt.transactionHash,
@@ -56,32 +56,32 @@ export async function placeCoinTossBet(
       }
     );
   }
-  return { placedBet: coinTossPlacedBet, receipt };
+  return { placedBet: roulettePlacedBet, receipt };
 }
 
-export async function getCoinTossPlacedBetFromReceipt(
+export async function getRoulettePlacedBetFromReceipt(
   wagmiConfig: WagmiConfig,
   receipt: TransactionReceipt,
   chainId: CasinoChainId,
   usedToken?: Token
-): Promise<CoinTossPlacedBet | null> {
+): Promise<RoulettePlacedBet | null> {
   const gamePlacedBet = await getPlacedBetFromReceipt(
     wagmiConfig,
     receipt,
     chainId,
-    CASINO_GAME_TYPE.COINTOSS,
+    CASINO_GAME_TYPE.ROULETTE,
     usedToken
   );
   if (!gamePlacedBet) {
     return null;
   }
 
-  // Read the CoinToss PlaceBet event from logs
-  const decodedCoinTossPlaceBetEvent = receipt.logs
+  // Read the Roulette PlaceBet event from logs
+  const decodedRoulettePlaceBetEvent = receipt.logs
     .map((log) => {
       try {
         return decodeEventLog({
-          abi: coinTossAbi,
+          abi: rouletteAbi,
           data: log.data,
           topics: log.topics,
         });
@@ -91,14 +91,14 @@ export async function getCoinTossPlacedBetFromReceipt(
     })
     .find((log) => log?.eventName === "PlaceBet");
 
-  if (!decodedCoinTossPlaceBetEvent) {
+  if (!decodedRoulettePlaceBetEvent) {
     return null;
   }
 
-  const { args } = decodedCoinTossPlaceBetEvent;
+  const { args } = decodedRoulettePlaceBetEvent;
   return {
     ...gamePlacedBet,
-    encodedFace: args.face,
-    face: CoinToss.decodeInput(args.face),
+    encodedNumbers: args.numbers,
+    numbers: Roulette.decodeInput(args.numbers),
   };
 }
