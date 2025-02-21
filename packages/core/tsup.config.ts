@@ -11,4 +11,7 @@ export default defineConfig({
   },
   sourcemap: true,
   clean: true,
+  outExtension({ format }) {
+    return format === "cjs" ? { js: ".cjs" } : { js: ".js" };
+  }
 });

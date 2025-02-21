@@ -10,6 +10,10 @@
   },
   "type": "module",
   "main": "dist/index.js",
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "sideEffects": false,
   "scripts": {
     "gql:cleanup": "rimraf --glob \"./src/data/subgraphs/protocol/documents/**/*.ts\"",
