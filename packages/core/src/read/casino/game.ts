@@ -12,7 +12,9 @@ import { watchContractEvent } from "@wagmi/core";
 import { TransactionError } from "../../errors/types";
 import { casinoGameAbi } from "../../abis/v2/casino/game";
 import {
+  encodeFunctionData,
   parseAbiItem,
+  type Address,
   type Hash,
   type Hex,
   type TransactionReceipt,
@@ -184,7 +186,8 @@ export async function waitRolledBet(
       })
       .catch((error) => {
         if (!isResolved) {
-          reject(
+          console.warn("Error checking past Roll events", error);
+          /*reject(
             new TransactionError(
               "Error checking past Roll events",
               ERROR_CODES.GAME.ROLL_EVENT_ERROR,
@@ -194,7 +197,7 @@ export async function waitRolledBet(
                 cause: error,
               }
             )
-          );
+          ); */
         }
       });
 
@@ -228,12 +231,19 @@ export async function getCasinoGames(
   const games = casinoChain.contracts.games;
 
   const pausedStates = await readContracts(wagmiConfig, {
-    contracts: Object.values(games).map((game) => ({
-      address: game.address,
-      abi: casinoGameAbi,
-      functionName: "paused",
-      chainId,
-    })),
+    contracts: Object.keys(games).map((game) => {
+      const { data } = getGamePausedFunctionData(
+        game as CASINO_GAME_TYPE,
+        casinoChainId
+      );
+      return {
+        address: data.to,
+        abi: data.abi,
+        functionName: data.functionName,
+        chainId,
+        args: data.args,
+      };
+    }),
   });
 
   if (
@@ -264,6 +274,43 @@ export async function getCasinoGames(
     .filter((game) => !onlyActive || !game.paused);
 }
 
+export function getGamePausedFunctionData(
+  game: CASINO_GAME_TYPE,
+  casinoChainId: CasinoChainId
+) {
+  const casinoChain = casinoChainById[casinoChainId];
+
+  const gameAddress = casinoChain.contracts.games[game]?.address;
+  if (!gameAddress) {
+    throw new ChainError(
+      `Game ${game} not found for chain ${casinoChainId}`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME
+    );
+  }
+
+  const abi = casinoGameAbi;
+  const functionName = "paused" as const;
+  const args = [] as const;
+  return {
+    data: { to: gameAddress, abi, functionName, args },
+    encodedData: encodeFunctionData({
+      abi,
+      functionName,
+      args,
+    }),
+  };
+}
+
+/**
+ * Raw token info data returned by the smart contract
+ * [0] - houseEdge: House edge rate (BP_VALUE)
+ * [1] - pendingCount: Number of pending bets
+ * [2] - vrfSubId: Chainlink VRF v2.5 subscription ID
+ * [3] - VRFCallbackGasBase: How much gas is needed in the Chainlink VRF callback
+ * [4] - VRFFees: Chainlink's VRF collected fees amount.
+ */
+export type RawTokenInfo = [number, bigint, bigint, number, bigint];
+
 export async function getCasinoGameToken(
   wagmiConfig: WagmiConfig,
   casinoToken: CasinoToken,
@@ -271,35 +318,35 @@ export async function getCasinoGameToken(
   affiliate: Hex
 ): Promise<CasinoGameToken> {
   const chainId = casinoToken.chainId;
-  const casinoChain = casinoChainById[chainId];
-  const casinoGame = casinoChain.contracts.games[game];
-  if (!casinoGame) {
-    throw new ChainError(
-      `Game ${game} not found for chain ${chainId}`,
-      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
-      {
-        chainId,
-        game,
-      }
-    );
-  }
+
+  const { data: tokenInfoData } = getTokenInfoFunctionData(
+    game,
+    casinoToken.address,
+    chainId
+  );
+  const { data: affiliateHouseEdgeData } = getAffiliateHouseEdgeFunctionData(
+    game,
+    casinoToken.address,
+    affiliate,
+    chainId
+  );
   const [rawTokenData, rawAffiliateHouseEdge] = await readContracts(
     wagmiConfig,
     {
       contracts: [
         {
-          address: casinoGame.address,
-          abi: casinoGameAbi,
-          functionName: "tokens",
+          address: tokenInfoData.to,
+          abi: tokenInfoData.abi,
+          functionName: tokenInfoData.functionName,
           chainId,
-          args: [casinoToken.address],
+          args: tokenInfoData.args,
         },
         {
-          address: casinoGame.address,
-          abi: casinoGameAbi,
-          functionName: "getAffiliateHouseEdge",
+          address: affiliateHouseEdgeData.to,
+          abi: affiliateHouseEdgeData.abi,
+          functionName: affiliateHouseEdgeData.functionName,
           chainId,
-          args: [affiliate, casinoToken.address],
+          args: affiliateHouseEdgeData.args,
         },
       ],
     }
@@ -338,5 +385,62 @@ export async function getCasinoGameToken(
     chainlinkVrfSubscriptionId: rawTokenData.result?.[2],
     affiliateHouseEdge: rawAffiliateHouseEdge.result,
     affiliateHouseEdgePercent: rawAffiliateHouseEdge.result / 100,
+  };
+}
+
+export function getTokenInfoFunctionData(
+  game: CASINO_GAME_TYPE,
+  tokenAddress: Address,
+  casinoChainId: CasinoChainId
+) {
+  const casinoChain = casinoChainById[casinoChainId];
+
+  const gameAddress = casinoChain.contracts.games[game]?.address;
+  if (!gameAddress) {
+    throw new ChainError(
+      `Game ${game} not found for chain ${casinoChainId}`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME
+    );
+  }
+
+  const abi = casinoGameAbi;
+  const functionName = "tokens" as const;
+  const args = [tokenAddress] as const;
+  return {
+    data: { to: gameAddress, abi, functionName, args },
+    encodedData: encodeFunctionData({
+      abi,
+      functionName,
+      args,
+    }),
+  };
+}
+
+export function getAffiliateHouseEdgeFunctionData(
+  game: CASINO_GAME_TYPE,
+  tokenAddress: Address,
+  affiliate: Hex,
+  casinoChainId: CasinoChainId
+) {
+  const casinoChain = casinoChainById[casinoChainId];
+
+  const gameAddress = casinoChain.contracts.games[game]?.address;
+  if (!gameAddress) {
+    throw new ChainError(
+      `Game ${game} not found for chain ${casinoChainId}`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME
+    );
+  }
+
+  const abi = casinoGameAbi;
+  const functionName = "getAffiliateHouseEdge" as const;
+  const args = [affiliate, tokenAddress] as const;
+  return {
+    data: { to: gameAddress, abi, functionName, args },
+    encodedData: encodeFunctionData({
+      abi,
+      functionName,
+      args,
+    }),
   };
 }

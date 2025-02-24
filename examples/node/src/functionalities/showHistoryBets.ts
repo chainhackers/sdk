@@ -19,7 +19,7 @@ import {
 import chalk from "chalk";
 import { select } from "@inquirer/prompts";
 import type { Hex } from "viem/_types/types/misc";
-import { InMemoryCache } from "@apollo/client/core";
+import { InMemoryCache } from "@apollo/client/core/index.js";
 
 let betSwirlClient: BetSwirlClient;
 

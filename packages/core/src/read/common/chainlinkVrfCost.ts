@@ -23,29 +23,24 @@ export async function getChainlinkVrfCost(
   gasPriceType?: GAS_PRICE_TYPE
 ): Promise<bigint> {
   const casinoChainId = getCasinoChainId(wagmiConfig, chainId);
-  const casinoChain = casinoChainById[casinoChainId];
-  const gameAddress = casinoChain.contracts.games[game]?.address;
 
-  if (!gameAddress) {
-    throw new ChainError(
-      `${game} is not available for chain ${casinoChain.viemChain.name} (${casinoChainId})`,
-      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
-      {
-        chainId: casinoChainId,
-        supportedChains: Object.keys(casinoChainById),
-      }
-    );
-  }
   // Get default gas price if gas price is not passed
   const effectiveGasPrice =
     gasPrice ||
     (await getGasPrices(wagmiConfig, casinoChainId))[
       gasPriceType || defaultCasinoPlaceBetOptions.gasPriceType
     ];
+  const { data, encodedData } = getChainlinkVrfCostFunctionData(
+    game,
+    casinoChainId,
+    tokenAddress,
+    betCount
+  );
+  const gameAddress = data.to;
   try {
     const { data: vrfCost } = await call(wagmiConfig, {
-      to: gameAddress,
-      data: generateGetChainlinkVrfCostFunctionData(tokenAddress, betCount),
+      to: data.to,
+      data: encodedData,
       chainId,
       gasPrice: effectiveGasPrice,
     });
@@ -72,13 +67,34 @@ export async function getChainlinkVrfCost(
   }
 }
 
-export function generateGetChainlinkVrfCostFunctionData(
+export function getChainlinkVrfCostFunctionData(
+  game: CASINO_GAME_TYPE,
+  casinoChainId: CasinoChainId,
   tokenAddress: Hex,
   betCount: number
 ) {
-  return encodeFunctionData({
-    abi: casinoGameAbi,
-    functionName: "getChainlinkVRFCost",
-    args: [tokenAddress, betCount],
-  });
+  const casinoChain = casinoChainById[casinoChainId];
+  const gameAddress = casinoChain.contracts.games[game]?.address;
+
+  if (!gameAddress) {
+    throw new ChainError(
+      `${game} is not available for chain ${casinoChain.viemChain.name} (${casinoChainId})`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
+      {
+        chainId: casinoChainId,
+        supportedChains: Object.keys(casinoChainById),
+      }
+    );
+  }
+  const abi = casinoGameAbi;
+  const functionName = "getChainlinkVRFCost";
+  const args = [tokenAddress, betCount] as const;
+  return {
+    data: { to: gameAddress, abi, functionName, args },
+    encodedData: encodeFunctionData({
+      abi,
+      functionName,
+      args,
+    }),
+  };
 }

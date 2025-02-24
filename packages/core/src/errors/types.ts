@@ -1,4 +1,4 @@
-import type { ApolloError } from "@apollo/client";
+import type { ApolloError } from "@apollo/client/core/index.js";
 import { BetSwirlError } from "./betSwirlError";
 
 export class ChainError extends BetSwirlError {

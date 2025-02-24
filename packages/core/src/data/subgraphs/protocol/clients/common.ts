@@ -1,4 +1,4 @@
-import { InMemoryCache, type ApolloCache } from "@apollo/client/core";
+import { InMemoryCache, type ApolloCache } from "@apollo/client/core/index.js";
 import { casinoChainById, type CasinoChainId } from "../../../casino";
 import { replaceGraphQlKey } from "../../../../utils/subgraphs";
 

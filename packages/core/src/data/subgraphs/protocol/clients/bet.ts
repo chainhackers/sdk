@@ -15,7 +15,7 @@ import {
 } from "../../../../utils";
 import type { CasinoBet, Token } from "../../../../interfaces";
 import type { Bet_OrderBy, OrderDirection } from "../documents/types";
-import { ApolloClient } from "@apollo/client/core";
+import { ApolloClient } from "@apollo/client/core/index.js";
 import {
   defaultSubgraphCasinoClient,
   getGraphqlEndpoint,

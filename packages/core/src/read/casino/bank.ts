@@ -2,7 +2,7 @@ import { casinoChainById, maxHarcodedBetCountByType } from "../../data/casino";
 
 import { type Config as WagmiConfig } from "@wagmi/core";
 import { bankAbi } from "../../abis/v2/casino/bank";
-import { zeroAddress } from "viem";
+import { encodeFunctionData, zeroAddress, type Hex } from "viem";
 import { readContract } from "@wagmi/core";
 import type { CasinoToken, BetRequirements, Token } from "../../interfaces";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "../../data/casino";
@@ -10,6 +10,31 @@ import { TransactionError } from "../../errors/types";
 
 import { ERROR_CODES } from "../../errors/codes";
 import { getCasinoChainId } from "../../utils/chains";
+
+export type RawCasinoToken = {
+  decimals: number;
+  tokenAddress: `0x${string}`;
+  name: string;
+  symbol: string;
+  token: {
+    allowed: boolean;
+    paused: boolean;
+    balanceRisk: number;
+    bankrollProvider: `0x${string}`;
+    pendingBankrollProvider: `0x${string}`;
+    houseEdgeSplitAndAllocation: {
+      bank: number;
+      dividend: number;
+      affiliate: number;
+      treasury: number;
+      team: number;
+      dividendAmount: bigint;
+      affiliateAmount: bigint;
+      treasuryAmount: bigint;
+      teamAmount: bigint;
+    };
+  };
+};
 
 export async function getCasinoTokens(
   wagmiConfig: WagmiConfig,
@@ -19,12 +44,17 @@ export async function getCasinoTokens(
   const casinoChainId = getCasinoChainId(wagmiConfig, chainId);
   try {
     const casinoChain = casinoChainById[casinoChainId];
-    const rawTokens = await readContract(wagmiConfig, {
-      abi: bankAbi,
-      address: casinoChain.contracts.bank,
-      chainId: chainId,
-      functionName: "getTokens",
-    });
+    const { data } = getCasinoTokensFunctionData(casinoChainId);
+    const rawTokens: Readonly<RawCasinoToken[]> = await readContract(
+      wagmiConfig,
+      {
+        abi: data.abi,
+        address: data.to,
+        chainId: chainId,
+        functionName: data.functionName,
+        args: data.args,
+      }
+    );
 
     return rawTokens
       .map((rawToken) => ({
@@ -68,6 +98,30 @@ export async function getCasinoTokens(
   }
 }
 
+export function getCasinoTokensFunctionData(casinoChainId: CasinoChainId) {
+  const casinoChain = casinoChainById[casinoChainId];
+
+  const abi = bankAbi;
+  const functionName = "getTokens" as const;
+  const args = [] as const;
+  return {
+    data: { to: casinoChain.contracts.bank, abi, functionName, args },
+    encodedData: encodeFunctionData({
+      abi,
+      functionName,
+      args,
+    }),
+  };
+}
+
+/**
+ * Raw bet requirements data returned by the smart contract
+ * [0] - isAllowed: Indicates if the token is allowed for betting
+ * [1] - maxBetAmount: Maximum amount allowed per bet
+ * [2] - maxBetCount: Maximum number of simultaneous bets allowed
+ */
+export type RawBetRequirements = [boolean, bigint, bigint];
+
 export async function getBetRequirements(
   wagmiConfig: WagmiConfig,
   token: Token,
@@ -77,14 +131,21 @@ export async function getBetRequirements(
 ): Promise<BetRequirements> {
   const casinoChainId = getCasinoChainId(wagmiConfig, chainId);
   try {
-    const casinoChain = casinoChainById[casinoChainId];
-    const rawBetRequirements = await readContract(wagmiConfig, {
-      abi: bankAbi,
-      address: casinoChain.contracts.bank,
-      chainId,
-      functionName: "getBetRequirements",
-      args: [token.address, BigInt(multiplier)],
-    });
+    const { data } = getBetRequirementsFunctionData(
+      token.address,
+      multiplier,
+      casinoChainId
+    );
+    const rawBetRequirements: Readonly<RawBetRequirements> = await readContract(
+      wagmiConfig,
+      {
+        abi: data.abi,
+        address: data.to,
+        chainId,
+        functionName: data.functionName,
+        args: data.args,
+      }
+    );
 
     return {
       token,
@@ -106,4 +167,24 @@ export async function getBetRequirements(
       }
     );
   }
+}
+// multiplier = gross BP_VALUE
+export function getBetRequirementsFunctionData(
+  tokenAddress: Hex,
+  multiplier: number,
+  casinoChainId: CasinoChainId
+) {
+  const casinoChain = casinoChainById[casinoChainId];
+
+  const abi = bankAbi;
+  const functionName = "getBetRequirements" as const;
+  const args = [tokenAddress, BigInt(multiplier)] as const;
+  return {
+    data: { to: casinoChain.contracts.bank, abi, functionName, args },
+    encodedData: encodeFunctionData({
+      abi,
+      functionName,
+      args,
+    }),
+  };
 }

@@ -45,7 +45,7 @@ import {
 import type { Bet_OrderBy } from "../data/subgraphs/protocol/documents/types";
 import type { SubgraphError } from "../errors";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../constants";
-import type { ApolloCache } from "@apollo/client";
+import type { ApolloCache } from "@apollo/client/core/index.js";
 import {
   placeRouletteBet,
   type RouletteParams,
