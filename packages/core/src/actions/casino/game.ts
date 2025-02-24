@@ -33,6 +33,7 @@ import { chainNativeCurrencyToToken } from "../../utils/tokens";
 import { getTokenMetadata } from "../common/tokenMetadata";
 import { chainByKey } from "../../data";
 import { getAccountFromWagmiConfig } from "../../utils/wagmi";
+import { GAS_TOKEN_ADDRESS } from "../../constants";
 
 export interface CasinoBetParams {
   betAmount: bigint;
@@ -139,18 +140,19 @@ export async function placeBet(
       (await getGasPrices(wagmiConfig, chainId))[
         options?.gasPriceType || defaultCasinoPlaceBetOptions.gasPriceType
       ];
+    const token =
+      betParams.token ||
+      chainNativeCurrencyToToken(casinoChain.viemChain.nativeCurrency);
 
     // Generate function data
     const receiver = betParams.receiver || accountAddress;
-    const functionData = generatePlayGameFunctionData(
-      { ...betParams, receiver },
+    const functionData = getPlaceBetFunctionData(
+      { ...betParams, receiver, tokenAddress: token.address },
       chainId
     );
 
     // Approve if needed
-    const token =
-      betParams.token ||
-      chainNativeCurrencyToToken(casinoChain.viemChain.nativeCurrency);
+
     const allowanceType =
       options?.allowanceType || defaultCasinoPlaceBetOptions.allowanceType;
     const pollingInterval =
@@ -161,7 +163,7 @@ export async function placeBet(
       token.address,
       accountAddress,
       game.address,
-      functionData.totalBetAmount,
+      functionData.formattedData.totalBetAmount,
       chainId,
       gasPrice,
       pollingInterval,
@@ -179,7 +181,7 @@ export async function placeBet(
         wagmiConfig,
         betParams.game,
         token.address,
-        functionData.betCount,
+        functionData.formattedData.betCount,
         chainId,
         gasPrice
       ));
@@ -187,10 +189,10 @@ export async function placeBet(
     // Simulate place bet tx
 
     const { request } = await simulateContract(wagmiConfig, {
-      address: game.address,
+      address: functionData.data.to,
       value:
         token.address == zeroAddress
-          ? functionData.totalBetAmount + vrfFees
+          ? functionData.formattedData.totalBetAmount + vrfFees
           : vrfFees,
       args: functionData.data.args,
       abi: functionData.data.abi,
@@ -246,9 +248,10 @@ export async function placeBet(
   }
 }
 
-export function generatePlayGameFunctionData(
-  gameParams: Omit<GenericCasinoBetParams, "receiver" | "vrfFees"> & {
+export function getPlaceBetFunctionData(
+  gameParams: Omit<GenericCasinoBetParams, "receiver" | "vrfFees" | "token"> & {
     receiver: Hex;
+    tokenAddress?: Hex;
   },
   chainId: CasinoChainId = defaultCasinoPlaceBetOptions.chainId
 ) {
@@ -267,42 +270,40 @@ export function generatePlayGameFunctionData(
   }
 
   const affiliate = gameParams.affiliate || casinoChain.defaultAffiliate;
-  const token =
-    gameParams.token ||
-    chainNativeCurrencyToToken(casinoChain.viemChain.nativeCurrency);
+  const tokenAddress = gameParams.tokenAddress || GAS_TOKEN_ADDRESS;
   const betCount = gameParams.betCount || defaultCasinoGameParams.betCount;
   const stopGain = gameParams.stopGain || defaultCasinoGameParams.stopGain;
   const stopLoss = gameParams.stopLoss || defaultCasinoGameParams.stopLoss;
   const maxHouseEdge = MAX_SDK_HOUSE_EGDE;
 
-  const data = {
-    abi: game.abi,
-    functionName: "wager",
-    args: [
-      ...gameParams.gameEncodedExtraParams,
-      gameParams.receiver,
-      affiliate,
-      {
-        token: token.address,
-        betAmount: gameParams.betAmount,
-        betCount,
-        stopGain,
-        stopLoss,
-        maxHouseEdge,
-      },
-    ],
-  };
+  const abi = game.abi;
+  const functionName = "wager" as const;
+  const args = [
+    ...gameParams.gameEncodedExtraParams,
+    gameParams.receiver,
+    affiliate,
+    {
+      token: tokenAddress,
+      betAmount: gameParams.betAmount,
+      betCount,
+      stopGain,
+      stopLoss,
+      maxHouseEdge,
+    },
+  ] as const;
 
   return {
-    data,
-    encodedData: encodeFunctionData(data),
-    totalBetAmount: gameParams.betAmount * BigInt(betCount),
-    token,
-    betCount,
-    stopGain,
-    stopLoss,
-    maxHouseEdge,
-    affiliate,
+    data: { to: game.address, abi, functionName, args },
+    encodedData: encodeFunctionData({ abi, functionName, args }),
+    formattedData: {
+      totalBetAmount: gameParams.betAmount * BigInt(betCount),
+      tokenAddress,
+      betCount,
+      stopGain,
+      stopLoss,
+      maxHouseEdge,
+      affiliate,
+    },
   };
 }
 

@@ -32,9 +32,9 @@ export async function getChainlinkVrfCost(
     ];
   const { data, encodedData } = getChainlinkVrfCostFunctionData(
     game,
-    casinoChainId,
     tokenAddress,
-    betCount
+    betCount,
+    casinoChainId
   );
   const gameAddress = data.to;
   try {
@@ -69,9 +69,9 @@ export async function getChainlinkVrfCost(
 
 export function getChainlinkVrfCostFunctionData(
   game: CASINO_GAME_TYPE,
-  casinoChainId: CasinoChainId,
   tokenAddress: Hex,
-  betCount: number
+  betCount: number,
+  casinoChainId: CasinoChainId
 ) {
   const casinoChain = casinoChainById[casinoChainId];
   const gameAddress = casinoChain.contracts.games[game]?.address;

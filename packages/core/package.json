@@ -1,7 +1,7 @@
 {
   "name": "@betswirl/sdk-core",
   "description": "VanillaJS library for Betswirl protocol",
-  "version": "0.0.1-beta-8",
+  "version": "0.0.1-beta-9",
   "license": "MIT",
   "repository": {
     "type": "git",
