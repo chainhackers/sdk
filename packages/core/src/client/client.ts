@@ -1,5 +1,5 @@
 import { type Config as WagmiConfig } from "@wagmi/core";
-import type { Address, Hex, TransactionReceipt } from "viem";
+import type { Address, Hash, Hex, TransactionReceipt } from "viem";
 import { type ChainId } from "../data/chains";
 import {
   placeCoinTossBet,
@@ -39,6 +39,7 @@ import type { PlaceBetCallbacks } from "../actions";
 import type { OrderDirection } from "../data/subgraphs/protocol/documents/types";
 import {
   fetchBet,
+  fetchBetByHash,
   fetchBets,
   type CasinoBetFilterStatus,
 } from "../data/subgraphs/protocol/clients/bet";
@@ -251,6 +252,17 @@ export class BetSwirlClient {
     return fetchBet(
       { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
       id
+    );
+  }
+
+  async fetchBetByHash(
+    placeBetHash: Hash,
+    chainId?: CasinoChainId
+  ): Promise<{ bet: CasinoBet | undefined; error: SubgraphError | undefined }> {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return fetchBetByHash(
+      { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
+      placeBetHash
     );
   }
 

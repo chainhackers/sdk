@@ -1,4 +1,10 @@
-import { formatUnits, getAddress, zeroAddress, type Address } from "viem";
+import {
+  formatUnits,
+  getAddress,
+  zeroAddress,
+  type Address,
+  type Hash,
+} from "viem";
 import {
   CASINO_GAME_SUBGRAPH_TYPE,
   CASINO_GAME_TYPE,
@@ -223,6 +229,44 @@ export async function fetchBet(
 
   return {
     bet: data.bet ? formatCasinoBet(data.bet, client.chainId) : undefined,
+    error: error
+      ? new SubgraphError(
+          "Error fetching bet",
+          ERROR_CODES.SUBGRAPH.FETCH_BET_ERROR,
+          error
+        )
+      : undefined,
+  };
+}
+
+export async function fetchBetByHash(
+  client: SubgraphCasinoClient,
+  placeBetHash: Hash
+): Promise<{ bet: CasinoBet | undefined; error: SubgraphError | undefined }> {
+  const apolloClient = new ApolloClient({
+    uri: getGraphqlEndpoint(client),
+    cache: client.cache ?? defaultSubgraphCasinoClient.cache,
+  });
+
+  const variables: BetsQueryVariables = {
+    first: 1,
+    where: {
+      betTxnHash: placeBetHash,
+    },
+  };
+
+  const { data, error } = await apolloClient.query<
+    BetsQuery,
+    BetsQueryVariables
+  >({
+    query: BetsDocument,
+    variables,
+  });
+
+  return {
+    bet: data.bets[0]
+      ? formatCasinoBet(data.bets[0], client.chainId)
+      : undefined,
     error: error
       ? new SubgraphError(
           "Error fetching bet",
