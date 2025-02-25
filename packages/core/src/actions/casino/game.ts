@@ -34,6 +34,9 @@ import { getTokenMetadata } from "../common/tokenMetadata";
 import { chainByKey } from "../../data";
 import { getAccountFromWagmiConfig } from "../../utils/wagmi";
 import { GAS_TOKEN_ADDRESS } from "../../constants";
+import type { CoinTossEncodedInput } from "../../entities/casino/coinToss";
+import type { DiceEncodedInput } from "../../entities/casino/dice";
+import type { RouletteEncodedInput } from "../../entities/casino/roulette";
 
 export interface CasinoBetParams {
   betAmount: bigint;
@@ -69,10 +72,15 @@ export const defaultCasinoPlaceBetOptions = {
   chainId: chainByKey.avalanche.id,
   allowanceType: ALLOWANCE_TYPE.AUTO,
 };
+// Game should not know the game implementation details, but well..  it helps developers
+export type GameEncodedInput =
+  | CoinTossEncodedInput
+  | DiceEncodedInput
+  | RouletteEncodedInput;
 
 export interface GenericCasinoBetParams extends CasinoBetParams {
   game: CASINO_GAME_TYPE;
-  gameEncodedExtraParams: any[]; // CasinoGameParams excluded
+  gameEncodedInput: GameEncodedInput;
 }
 
 export interface CasinoPlacedBet {
@@ -279,7 +287,9 @@ export function getPlaceBetFunctionData(
   const abi = game.abi;
   const functionName = "wager" as const;
   const args = [
-    ...gameParams.gameEncodedExtraParams,
+    ...(Array.isArray(gameParams.gameEncodedInput)
+      ? gameParams.gameEncodedInput
+      : [gameParams.gameEncodedInput]),
     gameParams.receiver,
     affiliate,
     {

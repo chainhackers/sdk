@@ -34,7 +34,7 @@ export async function placeCoinTossBet(
     wagmiConfig,
     {
       game: CASINO_GAME_TYPE.COINTOSS,
-      gameEncodedExtraParams: [CoinToss.encodeInput(coinTossParams.face)],
+      gameEncodedInput: CoinToss.encodeInput(coinTossParams.face),
       ...coinTossParams,
     },
     options,

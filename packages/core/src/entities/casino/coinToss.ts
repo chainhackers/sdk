@@ -13,11 +13,14 @@ export interface CoinTossChoiceInput extends ChoiceInput {
   id: COINTOSS_FACE;
 }
 
+export type CoinTossEncodedInput = boolean;
+export type CoinTossEncodedRolled = boolean;
+
 export class CoinToss extends AbstractCasinoGame<
   COINTOSS_FACE,
-  boolean,
+  CoinTossEncodedInput,
   COINTOSS_FACE,
-  boolean
+  CoinTossEncodedRolled
 > {
   static getWinChancePercent(_face: COINTOSS_FACE | string): number {
     return 50;
@@ -31,14 +34,16 @@ export class CoinToss extends AbstractCasinoGame<
     return Number((CoinToss.getMultiplier(_face) / BP_VALUE).toFixed(3));
   }
 
-  static encodeInput(face: COINTOSS_FACE | string): boolean {
+  static encodeInput(face: COINTOSS_FACE | string): CoinTossEncodedInput {
     if (typeof face === "string") {
       return face.toLowerCase() === "true" || face === "1";
     }
     return Boolean(face);
   }
 
-  static decodeInput(encodedFace: boolean | string): COINTOSS_FACE {
+  static decodeInput(
+    encodedFace: CoinTossEncodedInput | string
+  ): COINTOSS_FACE {
     if (typeof encodedFace === "string") {
       const normalizedValue = encodedFace.toLowerCase();
       return normalizedValue === "true" || normalizedValue === "1"
@@ -48,7 +53,9 @@ export class CoinToss extends AbstractCasinoGame<
     return encodedFace ? COINTOSS_FACE.HEADS : COINTOSS_FACE.TAILS;
   }
 
-  static decodeRolled(encodedFace: boolean | string): COINTOSS_FACE {
+  static decodeRolled(
+    encodedFace: CoinTossEncodedRolled | string
+  ): COINTOSS_FACE {
     return CoinToss.decodeInput(encodedFace);
   }
   // houseEdge is a number between 0 and 10000

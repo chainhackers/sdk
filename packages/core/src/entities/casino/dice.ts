@@ -3,6 +3,9 @@ import { CASINO_GAME_TYPE } from "../../data/casino";
 import { getFormattedNetMultiplier, getNetMultiplier } from "../../utils/bet";
 import { AbstractCasinoGame, type ChoiceInput } from "./game";
 
+export const MIN_SELECTABLE_DICE_NUMBER = 1 as DiceNumber;
+export const MAX_SELECTABLE_DICE_NUMBER = 99 as DiceNumber;
+
 export type DiceNumber =
   | 1
   | 2
@@ -102,18 +105,23 @@ export type DiceNumber =
   | 96
   | 97
   | 98
-  | 99
-  | 100;
+  | 99;
+
+export type DiceRolledNumber = 100 & DiceNumber;
 
 export interface DiceChoiceInput extends ChoiceInput {
   value: DiceNumber;
   id: DiceNumber;
 }
+
+export type DiceEncodedInput = number;
+export type DiceEncodedRolled = number;
+
 export class Dice extends AbstractCasinoGame<
   DiceNumber,
-  number,
-  DiceNumber,
-  number
+  DiceEncodedInput,
+  DiceRolledNumber,
+  DiceEncodedRolled
 > {
   static getWinChancePercent(cap: DiceNumber | string): number {
     return Math.max(100 - Number(cap), 1);
@@ -127,16 +135,18 @@ export class Dice extends AbstractCasinoGame<
     return Number((Dice.getMultiplier(cap) / BP_VALUE).toFixed(3));
   }
 
-  static encodeInput(cap: DiceNumber | string): DiceNumber {
-    return Number(cap) as DiceNumber;
+  static encodeInput(cap: DiceNumber | string): DiceEncodedInput {
+    return Number(cap) as DiceEncodedInput;
   }
 
-  static decodeInput(encodedCap: number | string): DiceNumber {
+  static decodeInput(encodedCap: DiceEncodedInput | string): DiceNumber {
     return Number(encodedCap) as DiceNumber;
   }
 
-  static decodeRolled(encodedCap: number | string): DiceNumber {
-    return Dice.decodeInput(encodedCap);
+  static decodeRolled(
+    encodedCap: DiceEncodedRolled | string
+  ): DiceRolledNumber {
+    return Number(encodedCap) as DiceRolledNumber;
   }
 
   static getChoiceInputs(houseEdge?: number): DiceChoiceInput[] {

@@ -34,7 +34,7 @@ export async function placeDiceBet(
     wagmiConfig,
     {
       game: CASINO_GAME_TYPE.DICE,
-      gameEncodedExtraParams: [Dice.encodeInput(diceParams.cap)],
+      gameEncodedInput: Dice.encodeInput(diceParams.cap),
       ...diceParams,
     },
     options,

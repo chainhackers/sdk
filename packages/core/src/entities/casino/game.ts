@@ -13,8 +13,8 @@ export interface ChoiceInput {
 export abstract class AbstractCasinoGame<
   TInput,
   TEncodedInput,
-  TRolledInput,
-  TEncodedRolledInput
+  TRolled,
+  TEncodedRolled
 > {
   getWinChancePercent(_input: TInput | string): number {
     throw new Error("Not implemented");
@@ -31,9 +31,7 @@ export abstract class AbstractCasinoGame<
   getFormattedMultiplier(_input: TInput | string): number {
     throw new Error("Not implemented");
   }
-  decodeRolled(
-    _encodedRolledInput: TEncodedRolledInput | string
-  ): TRolledInput {
+  decodeRolled(_encodedRolledInput: TEncodedRolled | string): TRolled {
     throw new Error("Not implemented");
   }
 }

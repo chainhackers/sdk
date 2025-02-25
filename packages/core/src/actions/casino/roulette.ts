@@ -34,7 +34,7 @@ export async function placeRouletteBet(
     wagmiConfig,
     {
       game: CASINO_GAME_TYPE.ROULETTE,
-      gameEncodedExtraParams: [Roulette.encodeInput(rouletteParams.numbers)],
+      gameEncodedInput: Roulette.encodeInput(rouletteParams.numbers),
       ...rouletteParams,
     },
     options,

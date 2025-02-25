@@ -2,7 +2,8 @@ import { BP_VALUE } from "../../constants";
 import { CASINO_GAME_TYPE } from "../../data/casino";
 import { getFormattedNetMultiplier, getNetMultiplier } from "../../utils/bet";
 import { AbstractCasinoGame, type ChoiceInput } from "./game";
-export const MAX_ROULETTE_NUMBERS = 37;
+export const MIN_SELECTABLE_ROULETTE_NUMBER = 0 as RouletteNumber;
+export const MAX_SELECTABLE_ROULETTE_NUMBER = 36 as RouletteNumber;
 
 export type RouletteNumber =
   | 0
@@ -62,18 +63,22 @@ export interface RouletteChoiceInput extends ChoiceInput {
   id: RouletteNumber[] | ROULETTE_INPUT_BUNDLE;
 }
 
+export type RouletteEncodedInput = number;
+export type RouletteEncodedRolled = number;
+
 export class Roulette extends AbstractCasinoGame<
   RouletteNumber[],
-  number,
+  RouletteEncodedInput,
   RouletteNumber,
-  number
+  RouletteEncodedRolled
 > {
   static getWinChancePercent(numbers: RouletteNumber[]): number {
     const encodedNumbers = Roulette.encodeInput(numbers);
     return (
       Math.round(
         (Roulette.getSelectedNumbersCount(encodedNumbers) /
-          MAX_ROULETTE_NUMBERS) *
+          MAX_SELECTABLE_ROULETTE_NUMBER +
+          1) *
           1e3
       ) / 10
     );
@@ -83,7 +88,7 @@ export class Roulette extends AbstractCasinoGame<
     const encodedNumbers = Roulette.encodeInput(numbers);
     return encodedNumbers
       ? Number(
-          (BigInt(BP_VALUE) * BigInt(MAX_ROULETTE_NUMBERS)) /
+          (BigInt(BP_VALUE) * BigInt(MAX_SELECTABLE_ROULETTE_NUMBER + 1)) /
             BigInt(Roulette.getSelectedNumbersCount(encodedNumbers))
         )
       : 0;
@@ -93,7 +98,7 @@ export class Roulette extends AbstractCasinoGame<
     return Number((Roulette.getMultiplier(numbers) / BP_VALUE).toFixed(3));
   }
 
-  static encodeInput(numbers: RouletteNumber[]): number {
+  static encodeInput(numbers: RouletteNumber[]): RouletteEncodedInput {
     // 1. Make the array unique
     const uniqueNumbers = [...new Set(numbers)];
     // 2. Sort the array
@@ -114,7 +119,9 @@ export class Roulette extends AbstractCasinoGame<
     return parseInt(binaryNumbers, 2);
   }
 
-  static decodeInput(encodedNumbers: number | string): RouletteNumber[] {
+  static decodeInput(
+    encodedNumbers: RouletteEncodedInput | string
+  ): RouletteNumber[] {
     return Number(encodedNumbers)
       .toString(2)
       .split("")
@@ -123,9 +130,12 @@ export class Roulette extends AbstractCasinoGame<
       .filter((number, i) => number || (!number && !i)) as RouletteNumber[];
   }
 
-  static decodeRolled(encodedRolled: number | string): RouletteNumber {
+  static decodeRolled(
+    encodedRolled: RouletteEncodedRolled | string
+  ): RouletteNumber {
     return Number(encodedRolled) as RouletteNumber;
   }
+
   static getChoiceInputs(houseEdge?: number): RouletteChoiceInput[] {
     const createChoiceInput = (
       numbers: RouletteNumber[],
