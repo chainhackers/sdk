@@ -56,6 +56,10 @@ import {
   waitRouletteRolledBet,
   type RouletteRolledBet,
 } from "../read/casino/roulette";
+import {
+  getKenoConfiguration,
+  type KenoConfiguration,
+} from "../read/casino/keno";
 
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;
@@ -218,6 +222,14 @@ export class BetSwirlClient {
       gasPrice || this.betSwirlDefaultOptions.gasPrice,
       gasPriceType || this.betSwirlDefaultOptions.gasPriceType
     );
+  }
+
+  async getKenoConfiguration(
+    token: Token,
+    chainId?: CasinoChainId
+  ): Promise<KenoConfiguration> {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return getKenoConfiguration(this.wagmiConfig, token, casinoChainId);
   }
 
   /* Casino Subgraphs */
