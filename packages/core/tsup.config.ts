@@ -1,17 +1,29 @@
 import { defineConfig } from "tsup";
 
+declare const process: {
+  env: {
+    NODE_ENV: string;
+  };
+};
+
 export default defineConfig({
   entry: ["src/index.ts"],
-  format: ["esm","cjs"],
+  format: ["esm", "cjs"],
   dts: {
     compilerOptions: {
       incremental: false,
       noUnusedLocals: false,
     },
   },
-  sourcemap: true,
+  splitting: true,
   clean: true,
-  outExtension({ format }) {
-    return format === "cjs" ? { js: ".cjs" } : { js: ".js" };
-  }
+  shims: true,
+  outDir: "dist",
+  minify: process.env.NODE_ENV === "production",
+  sourcemap: true,
+  bundle: true,
+  outExtension: ({ format }) => ({
+    js: format === "esm" ? ".mjs" : ".cjs",
+  }),
+  treeshake: true,
 });
