@@ -1,7 +1,7 @@
 {
   "name": "@betswirl/sdk-core",
   "description": "VanillaJS library for Betswirl protocol",
-  "version": "0.0.1-beta-15",
+  "version": "0.0.1-beta-16",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -13,6 +13,7 @@
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
   "exports": {
+    "types": "./dist/index.d.ts",
     "import": "./dist/index.mjs",
     "require": "./dist/index.cjs"
   },

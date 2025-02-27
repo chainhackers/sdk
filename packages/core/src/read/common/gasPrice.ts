@@ -21,7 +21,7 @@ export async function getGasPrices(
 
   return {
     [GAS_PRICE_TYPE.NORMAL]: basePrice,
-    [GAS_PRICE_TYPE.FAST]: (basePrice * 120n) / 120n, // 20%
-    [GAS_PRICE_TYPE.INSTANT]: (basePrice * 150n) / 150n, // 50%
+    [GAS_PRICE_TYPE.FAST]: (basePrice * 120n) / 100n, // 20%
+    [GAS_PRICE_TYPE.INSTANT]: (basePrice * 150n) / 100n, // 50%
   };
 }
