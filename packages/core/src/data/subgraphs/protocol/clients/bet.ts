@@ -52,10 +52,10 @@ export function formatCasinoBet(
     bet.gameToken.token.address == zeroAddress
       ? chainNativeCurrencyToToken(nativeCurrency)
       : {
-          address: getAddress(bet.gameToken.token.address),
-          symbol: bet.gameToken.token.symbol,
-          decimals: bet.gameToken.token.decimals,
-        };
+        address: getAddress(bet.gameToken.token.address),
+        symbol: bet.gameToken.token.symbol,
+        decimals: bet.gameToken.token.decimals,
+      };
   const game =
     typeBySubgraphCasinoGame[bet.gameId as CASINO_GAME_SUBGRAPH_TYPE];
   const totalBetAmount = betAmount * BigInt(bet.betCount);
@@ -201,10 +201,10 @@ export async function fetchBets(
     bets: data?.bets.map((bet) => formatCasinoBet(bet, client.chainId)) ?? [],
     error: error
       ? new SubgraphError(
-          "Error fetching bets",
-          ERROR_CODES.SUBGRAPH.FETCH_BETS_ERROR,
-          error
-        )
+        "Error fetching bets",
+        ERROR_CODES.SUBGRAPH.FETCH_BETS_ERROR,
+        error
+      )
       : undefined,
   };
 }
@@ -231,10 +231,10 @@ export async function fetchBet(
     bet: data.bet ? formatCasinoBet(data.bet, client.chainId) : undefined,
     error: error
       ? new SubgraphError(
-          "Error fetching bet",
-          ERROR_CODES.SUBGRAPH.FETCH_BET_ERROR,
-          error
-        )
+        "Error fetching bet",
+        ERROR_CODES.SUBGRAPH.FETCH_BET_ERROR,
+        error
+      )
       : undefined,
   };
 }
@@ -246,12 +246,13 @@ export async function fetchBetByHash(
   const apolloClient = new ApolloClient({
     uri: getGraphqlEndpoint(client),
     cache: client.cache ?? defaultSubgraphCasinoClient.cache,
+    defaultOptions: client.defaultOptions ?? defaultSubgraphCasinoClient.defaultOptions
   });
 
   const variables: BetsQueryVariables = {
     first: 1,
     where: {
-      betTxnHash: placeBetHash,
+      betTxnHash: placeBetHash.toLowerCase(),
     },
   };
 
@@ -262,17 +263,16 @@ export async function fetchBetByHash(
     query: BetsDocument,
     variables,
   });
-
   return {
     bet: data.bets[0]
       ? formatCasinoBet(data.bets[0], client.chainId)
       : undefined,
     error: error
       ? new SubgraphError(
-          "Error fetching bet",
-          ERROR_CODES.SUBGRAPH.FETCH_BET_ERROR,
-          error
-        )
+        "Error fetching bet",
+        ERROR_CODES.SUBGRAPH.FETCH_BET_ERROR,
+        error
+      )
       : undefined,
   };
 }
