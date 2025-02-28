@@ -210,8 +210,8 @@ export async function fetchBets(
 }
 
 export async function fetchBet(
+  id: string | bigint,
   client: SubgraphCasinoClient,
-  id: string | bigint
 ): Promise<{ bet: CasinoBet | undefined; error: SubgraphError | undefined }> {
   const apolloClient = new ApolloClient({
     uri: getGraphqlEndpoint(client),
@@ -240,8 +240,8 @@ export async function fetchBet(
 }
 
 export async function fetchBetByHash(
+  placeBetHash: Hash,
   client: SubgraphCasinoClient,
-  placeBetHash: Hash
 ): Promise<{ bet: CasinoBet | undefined; error: SubgraphError | undefined }> {
   const apolloClient = new ApolloClient({
     uri: getGraphqlEndpoint(client),

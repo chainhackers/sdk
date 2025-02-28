@@ -1,6 +1,12 @@
 import type { Abi, Address, Hash, Hex } from "viem";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "./data/casino";
 
+export type RawToken = {
+  symbol: string;
+  tokenAddress: Hex;
+  decimals: number;
+};
+
 export type Token = {
   symbol: string;
   address: Hex;
@@ -102,4 +108,31 @@ export interface CasinoBet {
   isLost?: boolean;
   isStopLossTriggered?: boolean;
   isStopGainTriggered?: boolean;
+}
+
+export interface SubgraphToken {
+  id: Address;
+  address: Address;
+  chainId: CasinoChainId;
+  symbol: string
+  name: string
+  decimals: number
+  betTxnCount: number
+  betCount: number
+  winTxnCount: number
+  userCount: number
+  totalWagered: bigint
+  formattedTotalWagered: number
+  totalPayout: bigint
+  formattedTotalPayout: number
+  dividendAmount: bigint
+  formattedDividendAmount: number
+  bankAmount: bigint
+  formattedBankAmount: number
+  affiliateAmount: bigint
+  formattedAffiliateAmount: number
+  treasuryAmount: bigint
+  formattedTreasuryAmount: number
+  teamAmount: bigint
+  formattedTeamAmount: number
 }

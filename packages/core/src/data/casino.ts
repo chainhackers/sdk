@@ -458,9 +458,10 @@ export const subgraphGameByType = {
 } as const;
 
 // Could be increased in the future if we increase vrfCallbackGasExtraBet value in smart contracts
-export const maxHarcodedBetCountByType = {
+// This limit is a static limit, you need to Math.min(static limit, dynamic limit)
+export const maxGameBetCountByType = {
   [CASINO_GAME_TYPE.COINTOSS]: 100,
   [CASINO_GAME_TYPE.DICE]: 200,
   [CASINO_GAME_TYPE.ROULETTE]: 200,
-  [CASINO_GAME_TYPE.KENO]: 150,
+  [CASINO_GAME_TYPE.KENO]: 125,
 } as const;

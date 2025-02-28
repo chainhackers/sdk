@@ -1,0 +1,5 @@
+query Token($id: ID!) {
+  token(id: $id, subgraphError: allow) {
+    ...Token
+  }
+}

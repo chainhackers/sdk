@@ -1,8 +1,8 @@
-import { casinoChainById, maxHarcodedBetCountByType } from "../../data/casino";
+import { casinoChainById, maxGameBetCountByType } from "../../data/casino";
 
 import { type Config as WagmiConfig } from "@wagmi/core";
 import { bankAbi } from "../../abis/v2/casino/bank";
-import { encodeFunctionData, zeroAddress, type Hex } from "viem";
+import { encodeFunctionData, type Hex } from "viem";
 import { readContract } from "@wagmi/core";
 import type { CasinoToken, BetRequirements, Token } from "../../interfaces";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "../../data/casino";
@@ -10,6 +10,7 @@ import { TransactionError } from "../../errors/types";
 
 import { ERROR_CODES } from "../../errors/codes";
 import { getCasinoChainId } from "../../utils/chains";
+import { rawTokenToToken } from "../../utils/tokens";
 
 export type RawCasinoToken = {
   decimals: number;
@@ -58,12 +59,7 @@ export async function getCasinoTokens(
 
     return rawTokens
       .map((rawToken) => ({
-        address: rawToken.tokenAddress,
-        symbol:
-          rawToken.tokenAddress == zeroAddress
-            ? casinoChain.viemChain.nativeCurrency.symbol
-            : rawToken.symbol,
-        decimals: rawToken.decimals,
+        ...rawTokenToToken(rawToken, casinoChain.id),
         paused: !rawToken.token.allowed || rawToken.token.paused,
         balanceRisk: rawToken.token.balanceRisk,
         balanceRiskPercent: rawToken.token.balanceRisk / 100,
@@ -154,7 +150,7 @@ export async function getBetRequirements(
       maxBetAmount: rawBetRequirements[1],
       maxBetCount: Math.min(
         Number(rawBetRequirements[2]),
-        maxHarcodedBetCountByType[game]
+        maxGameBetCountByType[game]
       ),
     };
   } catch (error) {

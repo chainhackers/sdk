@@ -30,13 +30,14 @@ import type {
   CasinoBet,
   CasinoGameToken,
   CasinoToken,
+  SubgraphToken,
   Token,
 } from "../interfaces";
 import { getBetRequirements, getCasinoTokens } from "../read/casino/bank";
 import { getCasinoChainId } from "../utils/chains";
 import { getChainlinkVrfCost } from "../read/common/chainlinkVrfCost";
 import type { PlaceBetCallbacks } from "../actions";
-import type { OrderDirection } from "../data/subgraphs/protocol/documents/types";
+import type { OrderDirection, Token_OrderBy } from "../data/subgraphs/protocol/documents/types";
 import {
   fetchBet,
   fetchBetByHash,
@@ -60,6 +61,7 @@ import {
   getKenoConfiguration,
   type KenoConfiguration,
 } from "../read/casino/keno";
+import { fetchToken, fetchTokens } from "../data/subgraphs/protocol/clients/token";
 
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;
@@ -233,7 +235,8 @@ export class BetSwirlClient {
     return getKenoConfiguration(this.wagmiConfig, token, casinoChainId);
   }
 
-  /* Casino Subgraphs */
+  /* Subgraph queries */
+
   async fetchBets(
     chainId?: CasinoChainId,
     filter?: {
@@ -263,8 +266,9 @@ export class BetSwirlClient {
   ): Promise<{ bet: CasinoBet | undefined; error: SubgraphError | undefined }> {
     const casinoChainId = this._getCasinoChainId(chainId);
     return fetchBet(
-      { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
       id
+      ,
+      { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
     );
   }
 
@@ -274,8 +278,34 @@ export class BetSwirlClient {
   ): Promise<{ bet: CasinoBet | undefined; error: SubgraphError | undefined }> {
     const casinoChainId = this._getCasinoChainId(chainId);
     return fetchBetByHash(
+      placeBetHash,
+      { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId }
+    );
+  }
+
+  async fetchTokens(
+    chainId?: CasinoChainId,
+    page = DEFAULT_PAGE,
+    itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
+    sortBy?: { key: Token_OrderBy; order: OrderDirection }
+  ): Promise<{ tokens: SubgraphToken[]; error: SubgraphError | undefined }> {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return fetchTokens(
       { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
-      placeBetHash
+      page,
+      itemsPerPage,
+      sortBy
+    );
+  }
+
+  async fetchToken(
+    address: Address,
+    chainId?: CasinoChainId
+  ): Promise<{ token: SubgraphToken | undefined; error: SubgraphError | undefined }> {
+    const casinoChainId = this._getCasinoChainId(chainId);
+    return fetchToken(
+      address,
+      { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
     );
   }
 
