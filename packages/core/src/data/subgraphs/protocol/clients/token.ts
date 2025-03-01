@@ -9,7 +9,7 @@ import { DEFAULT_ITEMS_PER_PAGE, SubgraphError } from "../../../..";
 import type { SubgraphCasinoClient } from "./common";
 import { DEFAULT_PAGE } from "../../../../constants";
 import type { OrderDirection, Token_OrderBy } from "../documents/types";
-import { ApolloClient } from "@apollo/client";
+import { ApolloClient } from "@apollo/client/core/index.js";
 import { TokensDocument, type TokensQuery, type TokensQueryVariables } from "../documents/tokens";
 import { TokenDocument, type TokenQuery, type TokenQueryVariables } from "../documents/token";
 
