@@ -43,7 +43,7 @@ export async function approve(
     if (!allowance || allowance < amount) {
       const amountToApprove = amount - (allowance || 0n);
       const functionData = getApproveFunctionData(tokenAddress, spender, amountToApprove);
-      const tx = await wallet.writeContract(functionData, gasPrice);
+      const tx = await wallet.writeContract(functionData, undefined, gasPrice);
       const result: ApproveResult = {
         approvedAmount: amountToApprove,
         tokenAddress,

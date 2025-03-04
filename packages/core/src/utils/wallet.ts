@@ -6,7 +6,7 @@ import type { BetSwirlWallet } from "../provider";
 export async function getTransactionReceiptWithRetry(
   wallet: BetSwirlWallet,
   txHash: Hash,
-  retries: number[] = [250, 500, 750, 1000, 1250, 1500, 1750, 2000]
+  retries: number[] = [250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2500, 3000, 3500, 4000, 4500, 5000]
 ) {
   let lastError: Error | undefined;
 

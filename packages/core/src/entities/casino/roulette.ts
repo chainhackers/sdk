@@ -77,9 +77,9 @@ export class Roulette extends AbstractCasinoGame<
     return (
       Math.round(
         (Roulette.getSelectedNumbersCount(encodedNumbers) /
-          MAX_SELECTABLE_ROULETTE_NUMBER +
-          1) *
-          1e3
+          (MAX_SELECTABLE_ROULETTE_NUMBER +
+            1)) *
+        1e3
       ) / 10
     );
   }
@@ -88,9 +88,9 @@ export class Roulette extends AbstractCasinoGame<
     const encodedNumbers = Roulette.encodeInput(numbers);
     return encodedNumbers
       ? Number(
-          (BigInt(BP_VALUE) * BigInt(MAX_SELECTABLE_ROULETTE_NUMBER + 1)) /
-            BigInt(Roulette.getSelectedNumbersCount(encodedNumbers))
-        )
+        (BigInt(BP_VALUE) * BigInt(MAX_SELECTABLE_ROULETTE_NUMBER + 1)) /
+        BigInt(Roulette.getSelectedNumbersCount(encodedNumbers))
+      )
       : 0;
   }
 
@@ -181,8 +181,8 @@ export class Roulette extends AbstractCasinoGame<
           startNumber == 1
             ? ROULETTE_INPUT_BUNDLE.FIRST_ROW
             : startNumber == 2
-            ? ROULETTE_INPUT_BUNDLE.SECOND_ROW
-            : ROULETTE_INPUT_BUNDLE.THIRD_ROW;
+              ? ROULETTE_INPUT_BUNDLE.SECOND_ROW
+              : ROULETTE_INPUT_BUNDLE.THIRD_ROW;
         return createChoiceInput(
           rowNumbers,
           bundle,
@@ -309,9 +309,9 @@ export class Roulette extends AbstractCasinoGame<
         : undefined,
       formattedNetMultiplier: houseEdge
         ? getFormattedNetMultiplier(
-            Roulette.getMultiplier(combinedNumbers),
-            houseEdge
-          )
+          Roulette.getMultiplier(combinedNumbers),
+          houseEdge
+        )
         : undefined,
     };
   }

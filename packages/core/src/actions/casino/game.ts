@@ -184,14 +184,8 @@ export async function placeBet(
         functionData.extraData.betCount,
         gasPrice
       ));
-
-    // Simulate place bet tx
-    const value =
-      token.address == zeroAddress
-        ? functionData.extraData.totalBetAmount + vrfFees
-        : vrfFees
     // Execute place bet tx
-    const hash = await wallet.writeContract(functionData, value, gasPrice)
+    const hash = await wallet.writeContract(functionData, functionData.extraData.getValue(vrfFees), gasPrice)
     await callbacks?.onBetPlacedPending?.(hash);
     const receipt = await wallet.waitTransaction(hash, pollingInterval)
 
@@ -248,6 +242,7 @@ export function getPlaceBetFunctionData(
     stopLoss: bigint;
     maxHouseEdge: number;
     affiliate: Hex;
+    getValue: (vrfFees: bigint) => bigint;
   }
 } {
   const casinoChain = casinoChainById[chainId];
@@ -285,21 +280,23 @@ export function getPlaceBetFunctionData(
       betCount,
       stopGain,
       stopLoss,
-      maxHouseEdge,
+      maxHouseEdge
     },
   ] as const;
 
+  const totalBetAmount = gameParams.betAmount * BigInt(betCount);
   return {
     data: { to: game.address, abi, functionName, args },
     encodedData: encodeFunctionData({ abi, functionName, args }),
     extraData: {
-      totalBetAmount: gameParams.betAmount * BigInt(betCount),
+      totalBetAmount,
       tokenAddress,
       betCount,
       stopGain,
       stopLoss,
       maxHouseEdge,
       affiliate,
+      getValue: (vrfFees: bigint) => tokenAddress == GAS_TOKEN_ADDRESS ? totalBetAmount + vrfFees : vrfFees
     },
   };
 }
