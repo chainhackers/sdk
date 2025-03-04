@@ -1,5 +1,29 @@
-import type { Abi, Address, Hash, Hex } from "viem";
+import type { Abi, Address, ContractEventName, ContractFunctionName, Hash, Hex, Log } from "viem";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "./data/casino";
+
+export interface BetSwirlFunctionData<TAbi extends Abi, TFunctionName extends ContractFunctionName<TAbi>, TArgs extends readonly any[]> {
+  data: {
+    to: Address;
+    abi: TAbi;
+    functionName: TFunctionName;
+    args: TArgs;
+  };
+  encodedData: Hex;
+}
+
+export interface BetSwirlEventData<TAbi extends Abi, TEventName extends ContractEventName<TAbi>, TArgs extends Object> {
+  data: {
+    to: Address;
+    abi: TAbi;
+    eventName: TEventName;
+    args: TArgs;
+    pollingInterval: number;
+  };
+  callbacks: {
+    onLogs?: (logs: Log[]) => Promise<void> | void;
+    onError?: (error: Error) => Promise<void> | void;
+  };
+}
 
 export type RawToken = {
   symbol: string;

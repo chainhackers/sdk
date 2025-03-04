@@ -1,4 +1,3 @@
-import { type Config as WagmiConfig } from "@wagmi/core";
 import {
   getPlacedBetFromReceipt,
   placeBet,
@@ -14,6 +13,7 @@ import { TransactionError } from "../../errors/types";
 import { ERROR_CODES } from "../../errors/codes";
 import { Dice, type DiceNumber } from "../../entities/casino/dice";
 import type { Token } from "../../interfaces";
+import type { BetSwirlWallet } from "../../provider";
 
 export interface DiceParams extends CasinoBetParams {
   cap: DiceNumber;
@@ -25,13 +25,13 @@ export interface DicePlacedBet extends CasinoPlacedBet {
 }
 
 export async function placeDiceBet(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   diceParams: DiceParams,
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks
 ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
   const { placedBet, receipt } = await placeBet(
-    wagmiConfig,
+    wallet,
     {
       game: CASINO_GAME_TYPE.DICE,
       gameEncodedInput: Dice.encodeInput(diceParams.cap),
@@ -41,7 +41,7 @@ export async function placeDiceBet(
     callbacks
   );
   const dicePlacedBet = await getDicePlacedBetFromReceipt(
-    wagmiConfig,
+    wallet,
     receipt,
     placedBet.chainId,
     placedBet.token
@@ -61,16 +61,16 @@ export async function placeDiceBet(
 }
 
 export async function getDicePlacedBetFromReceipt(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   receipt: TransactionReceipt,
   chainId: CasinoChainId,
   usedToken?: Token
 ): Promise<DicePlacedBet | null> {
   const gamePlacedBet = await getPlacedBetFromReceipt(
-    wagmiConfig,
+    wallet,
     receipt,
-    chainId,
     CASINO_GAME_TYPE.DICE,
+    chainId,
     usedToken
   );
   if (!gamePlacedBet) {

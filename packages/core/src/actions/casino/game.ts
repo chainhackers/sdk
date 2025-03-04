@@ -9,14 +9,9 @@ import {
   CASINO_GAME_TYPE,
   casinoChainById,
   MAX_SDK_HOUSE_EGDE,
+  type CasinoChain,
   type CasinoChainId,
 } from "../../data/casino";
-import {
-  type Config as WagmiConfig,
-  writeContract,
-  simulateContract,
-  waitForTransactionReceipt,
-} from "@wagmi/core";
 import {
   ChainError,
   ConfigurationError,
@@ -28,15 +23,15 @@ import { GAS_PRICE_TYPE, getGasPrices } from "../../read/common/gasPrice";
 import { getChainlinkVrfCost } from "../../read/common/chainlinkVrfCost";
 import { decodeEventLog } from "viem";
 import { coinTossAbi } from "../../abis/v2/casino/coinToss";
-import type { Token } from "../../interfaces";
+import type { BetSwirlFunctionData, Token } from "../../interfaces";
 import { chainNativeCurrencyToToken } from "../../utils/tokens";
-import { getTokenMetadata } from "../common/tokenMetadata";
-import { chainByKey } from "../../data";
-import { getAccountFromWagmiConfig } from "../../utils/wagmi";
+import { getTokenMetadata } from "../../read/common/tokenMetadata";
 import { GAS_TOKEN_ADDRESS } from "../../constants";
 import type { CoinTossEncodedInput } from "../../entities/casino/coinToss";
 import type { DiceEncodedInput } from "../../entities/casino/dice";
 import type { RouletteEncodedInput } from "../../entities/casino/roulette";
+import type { BetSwirlWallet } from "../../provider";
+import { getCasinoChainId } from "../../utils";
 
 export interface CasinoBetParams {
   betAmount: bigint;
@@ -61,7 +56,6 @@ export const defaultCasinoGameParams = {
 export interface CasinoPlaceBetOptions {
   gasPriceType?: GAS_PRICE_TYPE;
   gasPrice?: bigint; // wei
-  chainId?: CasinoChainId;
   allowanceType?: ALLOWANCE_TYPE;
   pollInterval?: number;
 }
@@ -69,7 +63,6 @@ export interface CasinoPlaceBetOptions {
 export const defaultCasinoPlaceBetOptions = {
   gasPriceType: GAS_PRICE_TYPE.NORMAL,
   gasPrice: 0n,
-  chainId: chainByKey.avalanche.id,
   allowanceType: ALLOWANCE_TYPE.AUTO,
 };
 // Game should not know the game implementation details, but well..  it helps developers
@@ -110,34 +103,34 @@ export interface PlaceBetCallbacks {
 }
 
 export async function placeBet(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   betParams: GenericCasinoBetParams,
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks
 ): Promise<{ placedBet: CasinoPlacedBet; receipt: TransactionReceipt }> {
-  const chainId = options?.chainId || defaultCasinoPlaceBetOptions.chainId;
-  const casinoChain = casinoChainById[chainId];
+  const casinoChainId = getCasinoChainId(wallet);
+  const casinoChain = casinoChainById[casinoChainId];
   const game = casinoChain.contracts.games[betParams.game];
 
   if (!game) {
     throw new ChainError(
-      `${betParams.game} is not available for chain ${casinoChain.viemChain.name} (${chainId})`,
+      `${betParams.game} is not available for chain ${casinoChain.viemChain.name} (${casinoChainId})`,
       ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
       {
-        chainId,
+        chainId: casinoChainId,
         supportedChains: Object.keys(casinoChainById),
       }
     );
   }
 
   const accountAddress =
-    betParams.receiver || wagmiConfig.getClient({ chainId }).account?.address;
+    betParams.receiver || wallet.getAccount(casinoChainId)?.address
   if (!accountAddress) {
     throw new ConfigurationError(
-      `No configured account in wagmi config for chain ${casinoChain.viemChain.name} (${chainId})`,
-      ERROR_CODES.WAGMI.ACCOUNT_MISSING,
+      `No configured account in the wallet for chain ${casinoChain.viemChain.name} (${casinoChainId})`,
+      ERROR_CODES.WALLET.ACCOUNT_MISSING,
       {
-        chainId,
+        chainId: casinoChainId,
       }
     );
   }
@@ -145,8 +138,8 @@ export async function placeBet(
     // Get gas price if needed
     const gasPrice =
       options?.gasPrice ||
-      (await getGasPrices(wagmiConfig, chainId))[
-        options?.gasPriceType || defaultCasinoPlaceBetOptions.gasPriceType
+      (await getGasPrices(wallet, casinoChainId))[
+      options?.gasPriceType || defaultCasinoPlaceBetOptions.gasPriceType
       ];
     const token =
       betParams.token ||
@@ -156,7 +149,7 @@ export async function placeBet(
     const receiver = betParams.receiver || accountAddress;
     const functionData = getPlaceBetFunctionData(
       { ...betParams, receiver, tokenAddress: token.address },
-      chainId
+      casinoChainId
     );
 
     // Approve if needed
@@ -167,12 +160,11 @@ export async function placeBet(
       options?.pollInterval || casinoChain.options.pollingInterval;
 
     const { receipt: approveReceipt, result: approveResult } = await approve(
-      wagmiConfig,
+      wallet,
       token.address,
       accountAddress,
       game.address,
-      functionData.formattedData.totalBetAmount,
-      chainId,
+      functionData.extraData.totalBetAmount,
       gasPrice,
       pollingInterval,
       allowanceType,
@@ -186,42 +178,26 @@ export async function placeBet(
     const vrfFees =
       betParams.vrfFees ||
       (await getChainlinkVrfCost(
-        wagmiConfig,
+        wallet,
         betParams.game,
         token.address,
-        functionData.formattedData.betCount,
-        chainId,
+        functionData.extraData.betCount,
         gasPrice
       ));
 
     // Simulate place bet tx
-
-    const { request } = await simulateContract(wagmiConfig, {
-      address: functionData.data.to,
-      value:
-        token.address == zeroAddress
-          ? functionData.formattedData.totalBetAmount + vrfFees
-          : vrfFees,
-      args: functionData.data.args,
-      abi: functionData.data.abi,
-      functionName: functionData.data.functionName,
-      chainId: chainId,
-      gasPrice: gasPrice,
-      account: getAccountFromWagmiConfig(wagmiConfig, chainId),
-    });
+    const value =
+      token.address == zeroAddress
+        ? functionData.extraData.totalBetAmount + vrfFees
+        : vrfFees
     // Execute place bet tx
-    const hash = await writeContract(wagmiConfig, request);
+    const hash = await wallet.writeContract(functionData, value, gasPrice)
     await callbacks?.onBetPlacedPending?.(hash);
-    const receipt = await waitForTransactionReceipt(wagmiConfig, {
-      hash,
-      chainId,
-      pollingInterval,
-    });
+    const receipt = await wallet.waitTransaction(hash, pollingInterval)
 
     const placedBet = await getPlacedBetFromReceipt(
-      wagmiConfig,
+      wallet,
       receipt,
-      chainId,
       betParams.game
     );
     if (!placedBet) {
@@ -231,7 +207,7 @@ export async function placeBet(
         {
           gameAddress: game.address,
           gameType: betParams.game,
-          chainId,
+          chainId: casinoChainId,
           token,
         }
       );
@@ -245,7 +221,7 @@ export async function placeBet(
       {
         gameAddress: game.address,
         gameType: betParams.game,
-        chainId,
+        chainId: casinoChainId,
         token: betParams.token,
         betAmount: betParams.betAmount,
         betCount: betParams.betCount,
@@ -255,14 +231,25 @@ export async function placeBet(
     );
   }
 }
+type GameAbi<T extends CASINO_GAME_TYPE> = NonNullable<CasinoChain["contracts"]["games"][T]>["abi"];
 
 export function getPlaceBetFunctionData(
   gameParams: Omit<GenericCasinoBetParams, "receiver" | "vrfFees" | "token"> & {
     receiver: Hex;
     tokenAddress?: Hex;
   },
-  chainId: CasinoChainId = defaultCasinoPlaceBetOptions.chainId
-) {
+  chainId: CasinoChainId
+): BetSwirlFunctionData<GameAbi<typeof gameParams.game>, "wager", readonly [...GameEncodedInput[], Hex, Hex, { readonly token: Hex; readonly betAmount: bigint; readonly betCount: number; readonly stopGain: bigint; readonly stopLoss: bigint; readonly maxHouseEdge: number; }]> & {
+  extraData: {
+    totalBetAmount: bigint;
+    tokenAddress: Hex;
+    betCount: number;
+    stopGain: bigint;
+    stopLoss: bigint;
+    maxHouseEdge: number;
+    affiliate: Hex;
+  }
+} {
   const casinoChain = casinoChainById[chainId];
   const game = casinoChain.contracts.games[gameParams.game];
 
@@ -305,7 +292,7 @@ export function getPlaceBetFunctionData(
   return {
     data: { to: game.address, abi, functionName, args },
     encodedData: encodeFunctionData({ abi, functionName, args }),
-    formattedData: {
+    extraData: {
       totalBetAmount: gameParams.betAmount * BigInt(betCount),
       tokenAddress,
       betCount,
@@ -318,13 +305,14 @@ export function getPlaceBetFunctionData(
 }
 
 export async function getPlacedBetFromReceipt(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   receipt: TransactionReceipt,
-  chainId: CasinoChainId,
   game: CASINO_GAME_TYPE,
+  chainId?: CasinoChainId,
   usedToken?: Token // to avoid to fetch the token metadata from the chain if the token used is already known
 ): Promise<CasinoPlacedBet | null> {
-  const casinoChain = casinoChainById[chainId];
+  const casinoChainId = getCasinoChainId(wallet, chainId);
+  const casinoChain = casinoChainById[casinoChainId];
   // Read the Placedbet event from logs
   const decodedPlaceBetEvent = receipt.logs
     .map((log) => {
@@ -350,7 +338,7 @@ export async function getPlacedBetFromReceipt(
 
   let token = usedToken;
   if (!token) {
-    token = await getTokenMetadata(wagmiConfig, args.token!, chainId);
+    token = await getTokenMetadata(wallet, args.token!, casinoChainId);
   }
   return {
     id: args.id,
@@ -365,7 +353,7 @@ export async function getPlacedBetFromReceipt(
     stopLoss: args.stopLoss,
     placeBetHash: receipt.transactionHash,
     placeBetBlock: receipt.blockNumber,
-    chainId,
+    chainId: casinoChainId,
     game,
   };
 }

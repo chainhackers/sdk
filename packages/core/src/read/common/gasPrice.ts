@@ -1,4 +1,4 @@
-import { getGasPrice, type Config as WagmiConfig } from "@wagmi/core";
+import type { BetSwirlWallet } from "../../provider";
 
 export enum GAS_PRICE_TYPE {
   NORMAL = "NORMAL",
@@ -13,10 +13,8 @@ export interface RETURN_TYPE_GAS_PRICES {
 }
 
 export async function getGasPrices(
-  wagmiConfig: WagmiConfig,
-  chainId: number
-): Promise<RETURN_TYPE_GAS_PRICES> {
-  const gasPrice = await getGasPrice(wagmiConfig, { chainId });
+  wallet: BetSwirlWallet, chainId?: number): Promise<RETURN_TYPE_GAS_PRICES> {
+  const gasPrice = await wallet.getPublicClient(chainId).getGasPrice()
   const basePrice = gasPrice ? BigInt(gasPrice) : BigInt(1000000000);
 
   return {

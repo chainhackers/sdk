@@ -2,7 +2,6 @@ import { type CasinoChain } from "@betswirl/sdk-core";
 import { createConfig, webSocket } from "@wagmi/core";
 import { http, type Hex, createWalletClient } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import type { Config as WagmiConfig } from "@wagmi/core";
 
 export function getWagmiConfigFromCasinoChain(casinoChain: CasinoChain) {
   const privateKey = process.env.PRIVATE_KEY;
@@ -23,10 +22,6 @@ export function getWagmiConfigFromCasinoChain(casinoChain: CasinoChain) {
       });
     },
   });
-}
-
-export function getPublicAddressFromWagmiConfig(wagmiConfig: WagmiConfig) {
-  return wagmiConfig.getClient().account?.address;
 }
 
 export function checkEnvVariables() {

@@ -1,16 +1,15 @@
 import { casinoChainById, maxGameBetCountByType } from "../../data/casino";
 
-import { type Config as WagmiConfig } from "@wagmi/core";
 import { bankAbi } from "../../abis/v2/casino/bank";
 import { encodeFunctionData, type Hex } from "viem";
-import { readContract } from "@wagmi/core";
-import type { CasinoToken, BetRequirements, Token } from "../../interfaces";
+import type { CasinoToken, BetRequirements, Token, BetSwirlFunctionData } from "../../interfaces";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "../../data/casino";
 import { TransactionError } from "../../errors/types";
 
 import { ERROR_CODES } from "../../errors/codes";
 import { getCasinoChainId } from "../../utils/chains";
 import { rawTokenToToken } from "../../utils/tokens";
+import type { BetSwirlWallet } from "../../provider";
 
 export type RawCasinoToken = {
   decimals: number;
@@ -37,64 +36,59 @@ export type RawCasinoToken = {
   };
 };
 
+export function parseRawCasinoToken(rawToken: RawCasinoToken, casinoChainId: CasinoChainId): CasinoToken {
+  return {
+    ...rawTokenToToken(rawToken, casinoChainId),
+    paused: !rawToken.token.allowed || rawToken.token.paused,
+    balanceRisk: rawToken.token.balanceRisk,
+    balanceRiskPercent: rawToken.token.balanceRisk / 100,
+    bankrollProvider: rawToken.token.bankrollProvider,
+    chainId: casinoChainId,
+    houseEdgeSplit: {
+      bank: rawToken.token.houseEdgeSplitAndAllocation.bank,
+      bankPercent: rawToken.token.houseEdgeSplitAndAllocation.bank / 100,
+      dividend: rawToken.token.houseEdgeSplitAndAllocation.dividend,
+      dividendPercent:
+        rawToken.token.houseEdgeSplitAndAllocation.dividend / 100,
+      affiliate: rawToken.token.houseEdgeSplitAndAllocation.affiliate,
+      affiliatePercent:
+        rawToken.token.houseEdgeSplitAndAllocation.affiliate / 100,
+      treasury: rawToken.token.houseEdgeSplitAndAllocation.treasury,
+      treasuryPercent:
+        rawToken.token.houseEdgeSplitAndAllocation.treasury / 100,
+      team: rawToken.token.houseEdgeSplitAndAllocation.team,
+      teamPercent: rawToken.token.houseEdgeSplitAndAllocation.team / 100,
+    }
+  }
+}
+
 export async function getCasinoTokens(
-  wagmiConfig: WagmiConfig,
-  chainId?: CasinoChainId,
+  wallet: BetSwirlWallet,
   onlyActive = false
 ): Promise<CasinoToken[]> {
-  const casinoChainId = getCasinoChainId(wagmiConfig, chainId);
+  const casinoChainId = getCasinoChainId(wallet);
   try {
-    const casinoChain = casinoChainById[casinoChainId];
-    const { data } = getCasinoTokensFunctionData(casinoChainId);
-    const rawTokens: Readonly<RawCasinoToken[]> = await readContract(
-      wagmiConfig,
-      {
-        abi: data.abi,
-        address: data.to,
-        chainId: chainId,
-        functionName: data.functionName,
-        args: data.args,
-      }
-    );
+    const functionData = getCasinoTokensFunctionData(casinoChainId);
+    const rawTokens = await wallet.readContract<typeof functionData, RawCasinoToken[]>(functionData);
 
     return rawTokens
-      .map((rawToken) => ({
-        ...rawTokenToToken(rawToken, casinoChain.id),
-        paused: !rawToken.token.allowed || rawToken.token.paused,
-        balanceRisk: rawToken.token.balanceRisk,
-        balanceRiskPercent: rawToken.token.balanceRisk / 100,
-        bankrollProvider: rawToken.token.bankrollProvider,
-        chainId: casinoChainId,
-        houseEdgeSplit: {
-          bank: rawToken.token.houseEdgeSplitAndAllocation.bank,
-          bankPercent: rawToken.token.houseEdgeSplitAndAllocation.bank / 100,
-          dividend: rawToken.token.houseEdgeSplitAndAllocation.dividend,
-          dividendPercent:
-            rawToken.token.houseEdgeSplitAndAllocation.dividend / 100,
-          affiliate: rawToken.token.houseEdgeSplitAndAllocation.affiliate,
-          affiliatePercent:
-            rawToken.token.houseEdgeSplitAndAllocation.affiliate / 100,
-          treasury: rawToken.token.houseEdgeSplitAndAllocation.treasury,
-          treasuryPercent:
-            rawToken.token.houseEdgeSplitAndAllocation.treasury / 100,
-          team: rawToken.token.houseEdgeSplitAndAllocation.team,
-          teamPercent: rawToken.token.houseEdgeSplitAndAllocation.team / 100,
-        },
-      }))
+      .map((rawToken) =>
+        parseRawCasinoToken(rawToken, casinoChainId)
+      )
       .filter((token) => !onlyActive || !token.paused);
   } catch (error) {
     throw new TransactionError(
       "Error getting tokens",
       ERROR_CODES.BANK.GET_TOKENS_ERROR,
       {
-        chainId,
+        chainId: casinoChainId,
         cause: error,
       }
     );
   }
 }
 
-export function getCasinoTokensFunctionData(casinoChainId: CasinoChainId) {
+export function getCasinoTokensFunctionData(casinoChainId: CasinoChainId): BetSwirlFunctionData<typeof bankAbi, "getTokens", readonly []> {
   const casinoChain = casinoChainById[casinoChainId];
 
   const abi = bankAbi;
@@ -118,47 +112,40 @@ export function getCasinoTokensFunctionData(casinoChainId: CasinoChainId) {
  */
 export type RawBetRequirements = [boolean, bigint, bigint];
 
+export function parseRawBetRequirements(rawBetRequirements: RawBetRequirements, token: Token, multiplier: number, game: CASINO_GAME_TYPE, casinoChainId: CasinoChainId): BetRequirements {
+  return {
+    token,
+    multiplier,
+    chainId: casinoChainId,
+    maxBetAmount: rawBetRequirements[1],
+    maxBetCount: Math.min(
+      Number(rawBetRequirements[2]),
+      maxGameBetCountByType[game])
+  }
+}
+
 export async function getBetRequirements(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   token: Token,
   multiplier: number, // gross BP_VALUE
   game: CASINO_GAME_TYPE,
-  chainId?: CasinoChainId
 ): Promise<BetRequirements> {
-  const casinoChainId = getCasinoChainId(wagmiConfig, chainId);
+  const casinoChainId = getCasinoChainId(wallet);
   try {
-    const { data } = getBetRequirementsFunctionData(
+    const functionData = getBetRequirementsFunctionData(
       token.address,
       multiplier,
       casinoChainId
     );
-    const rawBetRequirements: Readonly<RawBetRequirements> = await readContract(
-      wagmiConfig,
-      {
-        abi: data.abi,
-        address: data.to,
-        chainId,
-        functionName: data.functionName,
-        args: data.args,
-      }
-    );
+    const rawBetRequirements = await wallet.readContract<typeof functionData, RawBetRequirements>(functionData);
 
-    return {
-      token,
-      multiplier,
-      chainId: casinoChainId,
-      maxBetAmount: rawBetRequirements[1],
-      maxBetCount: Math.min(
-        Number(rawBetRequirements[2]),
-        maxGameBetCountByType[game]
-      ),
-    };
+    return parseRawBetRequirements(rawBetRequirements, token, multiplier, game, casinoChainId);
   } catch (error) {
     throw new TransactionError(
       "Error getting bet requirements",
       ERROR_CODES.BANK.GET_BET_REQUIREMENTS_ERROR,
       {
-        chainId,
+        chainId: casinoChainId,
         cause: error,
       }
     );
@@ -169,7 +156,7 @@ export function getBetRequirementsFunctionData(
   tokenAddress: Hex,
   multiplier: number,
   casinoChainId: CasinoChainId
-) {
+): BetSwirlFunctionData<typeof bankAbi, "getBetRequirements", readonly [Hex, bigint]> {
   const casinoChain = casinoChainById[casinoChainId];
 
   const abi = bankAbi;

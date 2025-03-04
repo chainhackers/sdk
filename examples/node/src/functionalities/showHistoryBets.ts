@@ -1,19 +1,20 @@
 import {
   Bet_OrderBy,
-  BetSwirlClient,
   BetSwirlError,
   bigIntFormatter,
   casinoChains,
   formatTxnUrl,
-  initBetSwirlClient,
   labelCasinoGameByType,
   OrderDirection,
   type CasinoBet,
   type CasinoChain,
 } from "@betswirl/sdk-core";
 import {
+  BetSwirlWagmiClient,
+  initBetSwirlWagmiClient
+} from "@betswirl/wagmi-provider";
+import {
   checkEnvVariables,
-  getPublicAddressFromWagmiConfig,
   getWagmiConfigFromCasinoChain,
 } from "../../utils";
 import chalk from "chalk";
@@ -21,7 +22,7 @@ import { select } from "@inquirer/prompts";
 import type { Hex } from "viem/_types/types/misc";
 import { InMemoryCache } from "@apollo/client/core/index.js";
 
-let betSwirlClient: BetSwirlClient;
+let betSwirlWagmiClient: BetSwirlWagmiClient;
 
 export async function startShowHistoryBetsProcess() {
   try {
@@ -40,8 +41,7 @@ export async function startShowHistoryBetsProcess() {
     if (error instanceof BetSwirlError) {
       console.error(
         chalk.red(
-          `[${error.code}] BetSwirl error occured while showing bets history: ${
-            error.message
+          `[${error.code}] BetSwirl error occured while showing bets history: ${error.message
           } ${JSON.stringify(error.context, bigIntFormatter)}`
         )
       );
@@ -58,7 +58,7 @@ async function _selectChain(): Promise<CasinoChain> {
     choices: casinoChains.map((c) => ({ name: c.viemChain.name, value: c })),
   });
   const wagmiConfig = getWagmiConfigFromCasinoChain(selectedChain);
-  betSwirlClient = initBetSwirlClient(wagmiConfig, {
+  betSwirlWagmiClient = initBetSwirlWagmiClient(wagmiConfig, {
     chainId: selectedChain.id,
     affiliate: process.env.AFFILIATE_ADDRESS as Hex,
     subgraphClient: {
@@ -73,10 +73,10 @@ async function _getLastBets(
   count: number,
   casinoChain: CasinoChain
 ): Promise<CasinoBet[]> {
-  const { bets, error } = await betSwirlClient.fetchBets(
+  const { bets, error } = await betSwirlWagmiClient.fetchBets(
     casinoChain.id,
     {
-      bettor: getPublicAddressFromWagmiConfig(betSwirlClient.wagmiConfig)!,
+      bettor: betSwirlWagmiClient.betSwirlWallet.getAccount()!.address,
     },
     1,
     count,
@@ -108,18 +108,15 @@ function _showBet(bet: CasinoBet) {
   console.log(chalk.bold(`=== ID ${bet.id.toString()} ===`));
   // Common place bet info
   // TODO replace "Input" and "Rolled" by the game input/output labels
-  const placeBetInfo = `Game: ${labelCasinoGameByType[bet.game]}\nInput: ${
-    bet.decodedInput
-  }\nBet amount: ${bet.formattedBetAmount} ${bet.token.symbol}\nBet count: ${
-    bet.betCount
-  }\n${
-    bet.betCount > 1
+  const placeBetInfo = `Game: ${labelCasinoGameByType[bet.game]}\nInput: ${bet.decodedInput
+    }\nBet amount: ${bet.formattedBetAmount} ${bet.token.symbol}\nBet count: ${bet.betCount
+    }\n${bet.betCount > 1
       ? `Total bet amount ${bet.formattedTotalBetAmount} ${bet.token.symbol}\n`
       : ""
-  }Bet date: ${bet.betDate.toLocaleString()}\nBet txn: ${formatTxnUrl(
-    bet.betTxnHash,
-    bet.chainId
-  )}\n`;
+    }Bet date: ${bet.betDate.toLocaleString()}\nBet txn: ${formatTxnUrl(
+      bet.betTxnHash,
+      bet.chainId
+    )}\n`;
   // Pending state
   if (!bet.isResolved) {
     console.log("Status:", chalk.yellow(`Pending`));
@@ -131,26 +128,20 @@ function _showBet(bet: CasinoBet) {
       console.log(placeBetInfo);
     } else {
       const benefitInfo = `${bet.formattedBenefit} ${bet.token.symbol}`;
-      const rollBetInfo = `Payout: ${bet.formattedPayout} ${
-        bet.token.symbol
-      }\nMultiplier: ${bet.payoutMultiplier}x\nResult: ${
-        bet.isWin ? chalk.green("+" + benefitInfo) : chalk.red(benefitInfo)
-      }\nRolled: ${
-        bet.decodedRolled
-      }\nRoll date: ${bet.rollDate?.toLocaleString()}\nRoll txn: ${formatTxnUrl(
-        bet.rollTxnHash!,
-        bet.chainId
-      )}\n${
-        bet.isStopGainTriggered || bet.isStopLossTriggered
+      const rollBetInfo = `Payout: ${bet.formattedPayout} ${bet.token.symbol
+        }\nMultiplier: ${bet.payoutMultiplier}x\nResult: ${bet.isWin ? chalk.green("+" + benefitInfo) : chalk.red(benefitInfo)
+        }\nRolled: ${bet.decodedRolled
+        }\nRoll date: ${bet.rollDate?.toLocaleString()}\nRoll txn: ${formatTxnUrl(
+          bet.rollTxnHash!,
+          bet.chainId
+        )}\n${bet.isStopGainTriggered || bet.isStopLossTriggered
           ? chalk.yellow(
-              `\n=> Only ${bet.rollBetCount}/${
-                bet.betCount
-              } have been rolled because stop ${
-                bet.isStopGainTriggered ? "gain" : "loss"
-              } has been triggered`
-            )
+            `\n=> Only ${bet.rollBetCount}/${bet.betCount
+            } have been rolled because stop ${bet.isStopGainTriggered ? "gain" : "loss"
+            } has been triggered`
+          )
           : ""
-      }`;
+        }`;
       // Won state
       if (bet.isWin) {
         console.log("Status:", chalk.green(`Won`));

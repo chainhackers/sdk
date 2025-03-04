@@ -13,9 +13,14 @@
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
   "exports": {
-    "types": "./dist/index.d.ts",
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.cjs"
+    "import": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "require": "./dist/index.cjs"
+    }
   },
   "sideEffects": false,
   "scripts": {
@@ -37,7 +42,6 @@
   ],
   "peerDependencies": {
     "@apollo/client": ">=3.12.11",
-    "@wagmi/core": ">=2.16.3",
     "typescript": ">=5.0.4",
     "viem": ">=2.22.23"
   },

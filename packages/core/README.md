@@ -5,7 +5,7 @@ VanillaJS library for Betswirl protocol
 ## Installation
 
 ```bash
-npm i @betswirl/sdk-core @wagmi/core viem @apollo/client
+npm i @betswirl/sdk-core viem @apollo/client
 ```
 
 ## Contribution

@@ -6,4 +6,4 @@ export * from "./casino/game";
 
 /* Common */
 export * from "./common/approve";
-export * from "./common/tokenMetadata";
+export * from "../read/common/tokenMetadata";

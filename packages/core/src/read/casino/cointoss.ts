@@ -1,4 +1,3 @@
-import { type Config as WagmiConfig } from "@wagmi/core";
 import { type TransactionReceipt } from "viem";
 import {
   waitRolledBet,
@@ -7,13 +6,14 @@ import {
 } from "./game";
 import { type CoinTossPlacedBet } from "../../actions/casino/coinToss";
 import { CoinToss, type COINTOSS_FACE } from "../../entities/casino/coinToss";
+import type { BetSwirlWallet } from "../../provider";
 
 export interface CoinTossRolledBet extends CasinoRolledBet {
   rolled: COINTOSS_FACE[];
 }
 
 export async function waitCoinTossRolledBet(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   placedBet: CoinTossPlacedBet,
   options?: CasinoWaitRollOptions
 ): Promise<{
@@ -21,7 +21,7 @@ export async function waitCoinTossRolledBet(
   receipt: TransactionReceipt;
 }> {
   const { rolledBet, receipt } = await waitRolledBet(
-    wagmiConfig,
+    wallet,
     placedBet,
     options
   );

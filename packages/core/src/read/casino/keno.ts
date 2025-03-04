@@ -1,15 +1,15 @@
-import { readContract, type Config as WagmiConfig } from "@wagmi/core";
-import { encodeFunctionData, type Address } from "viem";
+import { encodeFunctionData, type Address, type Hex } from "viem";
 import {
   CASINO_GAME_TYPE,
   casinoChainById,
   type CasinoChainId,
 } from "../../data/casino";
 import { getCasinoChainId } from "../../utils";
-import type { Token } from "../../interfaces";
+import type { BetSwirlFunctionData, Token } from "../../interfaces";
 import { ERROR_CODES, TransactionError } from "../../errors";
 import { ChainError } from "../../errors";
 import { kenoAbi } from "../../abis";
+import type { BetSwirlWallet } from "../../provider";
 
 /**
  * Raw token info data returned by the smart contract
@@ -23,6 +23,18 @@ export type RawKenoConfiguration = [
   readonly (readonly bigint[])[]
 ];
 
+export function parseRawKenoConfiguration(rawConfiguration: RawKenoConfiguration, token: Token, casinoChainId: CasinoChainId): KenoConfiguration {
+  return {
+    token,
+    chainId: casinoChainId,
+    biggestSelectableNumber: Number(rawConfiguration[0]),
+    maxSelectableNumbers: Number(rawConfiguration[1]),
+    mutliplierTable: rawConfiguration[2].map((row) =>
+      row.map((multiplier) => Number(multiplier))
+    ),
+  };
+}
+
 export interface KenoConfiguration {
   token: Token;
   chainId: CasinoChainId;
@@ -32,43 +44,25 @@ export interface KenoConfiguration {
 }
 
 export async function getKenoConfiguration(
-  wagmiConfig: WagmiConfig,
-  token: Token,
-  chainId?: CasinoChainId
+  wallet: BetSwirlWallet,
+  token: Token
 ): Promise<KenoConfiguration> {
-  const casinoChainId = getCasinoChainId(wagmiConfig, chainId);
+  const casinoChainId = getCasinoChainId(wallet);
 
   try {
-    const { data } = getKenoConfigurationFunctionData(
+    const functionData = getKenoConfigurationFunctionData(
       token.address,
       casinoChainId
     );
-    const rawConfiguration: Readonly<RawKenoConfiguration> = await readContract(
-      wagmiConfig,
-      {
-        abi: data.abi,
-        address: data.to,
-        chainId: chainId,
-        functionName: data.functionName,
-        args: data.args,
-      }
-    );
+    const rawConfiguration = await wallet.readContract<typeof functionData, RawKenoConfiguration>(functionData)
 
-    return {
-      token,
-      chainId: casinoChainId,
-      biggestSelectableNumber: Number(rawConfiguration[0]),
-      maxSelectableNumbers: Number(rawConfiguration[1]),
-      mutliplierTable: rawConfiguration[2].map((row) =>
-        row.map((multiplier) => Number(multiplier))
-      ),
-    };
+    return parseRawKenoConfiguration(rawConfiguration, token, casinoChainId)
   } catch (error) {
     throw new TransactionError(
-      "Error getting tokens",
+      "Error getting keno configuration",
       ERROR_CODES.GAME.GET_KENO_CONFIGURATION_ERROR,
       {
-        chainId,
+        chainId: casinoChainId,
         token,
         cause: error,
       }
@@ -79,7 +73,7 @@ export async function getKenoConfiguration(
 export function getKenoConfigurationFunctionData(
   tokenAddress: Address,
   casinoChainId: CasinoChainId
-) {
+): BetSwirlFunctionData<typeof kenoAbi, "gains", readonly [Hex]> {
   const casinoChain = casinoChainById[casinoChainId];
 
   const gameAddress =
