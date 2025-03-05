@@ -6,6 +6,8 @@ import {
   chainById,
   CoinToss,
   Dice,
+  FORMAT_TYPE,
+  formatRawAmount,
   formatTxnUrl,
   GAS_PRICE_TYPE,
   labelCasinoGameByType,
@@ -34,7 +36,6 @@ import {
   getWagmiConfigFromCasinoChain,
 } from "../../utils";
 import {
-  formatUnits,
   parseUnits,
   zeroAddress,
   type Hash,
@@ -180,12 +181,14 @@ async function _getTokenInfo(
   console.log(
     chalk.blue(
       `House edge: ${tokenInfo.affiliateHouseEdgePercent
-      }%\nYour gas balance: ${formatUnits(
+      }%\nYour gas balance: ${formatRawAmount(
         userGasBalanceData.value,
-        userGasBalanceData.decimals
-      )} ${userGasBalanceData.symbol}\nYour token balance: ${formatUnits(
+        userGasBalanceData.decimals,
+        FORMAT_TYPE.PRECISE
+      )} ${userGasBalanceData.symbol}\nYour token balance: ${formatRawAmount(
         userTokenBalance,
-        tokenInfo.decimals
+        tokenInfo.decimals,
+        FORMAT_TYPE.PRECISE
       )} ${tokenInfo.symbol}`
     )
   );
@@ -312,9 +315,10 @@ async function _selectBetAmount(
   // User needs to have at least 1 gwei for each betCount after substracting gas fees. For production apps, it's better to keep a buffer because VRF and gas fee can change.
   if (gasBalanceRemainingAfterFees < BigInt(betCount)) {
     throw Error(
-      `You don't have enough gas to pay VRF and gas fees, please send at least ${formatUnits(
+      `You don't have enough gas to pay VRF and gas fees, please send at least ${formatRawAmount(
         BigInt(betCount) - gasBalanceRemainingAfterFees,
-        gasDecimals
+        gasDecimals,
+        FORMAT_TYPE.FULL_PRECISE
       )} ${gasSymbol} to ${userAddress}`
     );
   } else {
@@ -326,35 +330,40 @@ async function _selectBetAmount(
     // Take into consideration the max bet amount for the balance user but also max bet amount of the bet
     const maxAmountPerBetFormatted = Math.min(
       Number(
-        formatUnits(
+        formatRawAmount(
           availableTokenBalance / BigInt(betCount),
-          casinoGameToken.decimals
+          casinoGameToken.decimals,
+          FORMAT_TYPE.FULL_PRECISE
         )
       ),
       Number(
-        formatUnits(betRequirements.maxBetAmount, casinoGameToken.decimals)
+        formatRawAmount(betRequirements.maxBetAmount, casinoGameToken.decimals, FORMAT_TYPE.FULL_PRECISE)
       )
     );
     // User needs to have at least 1 gwei of token for each betCount.
     if (maxAmountPerBetFormatted <= 0) {
       throw Error(
-        `You don't have enough token to place the bet, please send at least ${formatUnits(
+        `You don't have enough token to place the bet, please send at least ${formatRawAmount(
           BigInt(betCount) - availableTokenBalance,
-          casinoGameToken.decimals
+          casinoGameToken.decimals,
+          FORMAT_TYPE.FULL_PRECISE
         )} ${casinoGameToken.symbol} to ${userAddress}`
       );
     }
     console.log(
       chalk.blue(
-        `VRF cost estimation: ${formatUnits(
+        `VRF cost estimation: ${formatRawAmount(
           chainlinkVrfCostEstimation,
-          gasDecimals
-        )} ${gasSymbol} \nYour token balance: ${formatUnits(
+          gasDecimals,
+          FORMAT_TYPE.PRECISE
+        )} ${gasSymbol} \nYour token balance: ${formatRawAmount(
           userTokenBalance,
-          casinoGameToken.decimals
-        )} ${casinoGameToken.symbol}\nYour gas balance: ${formatUnits(
+          casinoGameToken.decimals,
+          FORMAT_TYPE.PRECISE
+        )} ${casinoGameToken.symbol}\nYour gas balance: ${formatRawAmount(
           userGasBalance,
-          gasDecimals
+          gasDecimals,
+          FORMAT_TYPE.PRECISE
         )} ${gasSymbol}\nBet count: ${betCount}`
       )
     );
@@ -466,14 +475,16 @@ async function _waitRoll(
   const rolledBet = rolledBetData.rolledBet;
   const chain = chainById[rolledBet.chainId];
   const commonMessage = chalk.blue(
-    `Payout: ${formatUnits(rolledBet.payout, rolledBet.token.decimals)} ${rolledBet.token.symbol
-    }\nTotal bet amount: ${formatUnits(
+    `Payout: ${formatRawAmount(rolledBet.payout, rolledBet.token.decimals, FORMAT_TYPE.FULL_PRECISE)} ${rolledBet.token.symbol
+    }\nTotal bet amount: ${formatRawAmount(
       rolledBet.rollTotalBetAmount,
-      rolledBet.token.decimals
+      rolledBet.token.decimals,
+      FORMAT_TYPE.FULL_PRECISE
     )} ${rolledBet.token.symbol}\nBet count: ${rolledBet.rolledBetCount
-    }\nCharged VRF cost: ${formatUnits(
+    }\nCharged VRF cost: ${formatRawAmount(
       rolledBet.chargedVRFCost,
-      chain.nativeCurrency.decimals
+      chain.nativeCurrency.decimals,
+      FORMAT_TYPE.PRECISE
     )} ${chain.nativeCurrency.symbol}\nRolled: ${JSON.stringify(
       rolledBet.rolled
     )}\nRoll txn: ${formatTxnUrl(rolledBet.rollTx, rolledBet.chainId)}`
@@ -482,9 +493,10 @@ async function _waitRoll(
   if (rolledBetData.rolledBet.isWin) {
     console.log(
       chalk.green(
-        `🥳 Congrats you won ${formatUnits(
+        `🥳 Congrats you won ${formatRawAmount(
           rolledBet.benefit,
-          rolledBet.token.decimals
+          rolledBet.token.decimals,
+          FORMAT_TYPE.FULL_PRECISE
         )} ${rolledBet.token.symbol}\n`,
         commonMessage
       )
@@ -494,9 +506,10 @@ async function _waitRoll(
   else {
     console.log(
       chalk.red(
-        `😔 Arf, you lost ${formatUnits(
+        `😔 Arf, you lost ${formatRawAmount(
           -rolledBetData.rolledBet.benefit,
-          rolledBet.token.decimals
+          rolledBet.token.decimals,
+          FORMAT_TYPE.FULL_PRECISE
         )} ${rolledBet.token.symbol}\n`,
         commonMessage
       )

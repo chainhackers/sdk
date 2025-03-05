@@ -5,21 +5,20 @@ import type {
     SubgraphToken,
     Token,
 } from "../interfaces";
-import type { OrderDirection, Token_OrderBy } from "../data/subgraphs/protocol/documents/types";
+import { OrderDirection, Token_OrderBy, Bet_OrderBy } from "../data/subgraphs/protocol/documents/types";
 import {
     fetchBet,
     fetchBetByHash,
     fetchBets,
     type CasinoBetFilterStatus,
 } from "../data/subgraphs/protocol/clients/bet";
-import type { Bet_OrderBy } from "../data/subgraphs/protocol/documents/types";
 import type { SubgraphError } from "../errors";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../constants";
 
 import { fetchToken, fetchTokens } from "../data/subgraphs/protocol/clients/token";
 import type { BetSwirlWallet } from "./wallet";
 
-import { getCasinoChainId } from "../utils";
+import { FORMAT_TYPE, getCasinoChainId } from "../utils";
 import type { GAS_PRICE_TYPE } from "../read";
 import type { ChainId } from "../data";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
@@ -32,6 +31,7 @@ export interface BetSwirlClientOptions {
     affiliate?: Hex;
     allowanceType?: ALLOWANCE_TYPE;
     pollInterval?: number;
+    formatType?: FORMAT_TYPE;
     subgraphClient?: {
         graphqlKey?: string;
         cache?: ApolloCache<any>;
@@ -62,11 +62,11 @@ export abstract class BetSwirlClient {
         },
         page = DEFAULT_PAGE,
         itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
-        sortBy?: { key: Bet_OrderBy; order: OrderDirection }
+        sortBy: { key: Bet_OrderBy; order: OrderDirection } = { key: Bet_OrderBy.BetTimestamp, order: OrderDirection.Desc }
     ): Promise<{ bets: CasinoBet[]; error: SubgraphError | undefined }> {
         const casinoChainId = getCasinoChainId(this.betSwirlWallet, chainId);
         return fetchBets(
-            { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
+            { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId, formatType: this.betSwirlDefaultOptions.formatType },
             filter,
             page,
             itemsPerPage,
@@ -82,7 +82,7 @@ export abstract class BetSwirlClient {
         return fetchBet(
             id
             ,
-            { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
+            { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId, formatType: this.betSwirlDefaultOptions.formatType },
         );
     }
 
@@ -93,7 +93,7 @@ export abstract class BetSwirlClient {
         const casinoChainId = getCasinoChainId(this.betSwirlWallet, chainId);
         return fetchBetByHash(
             placeBetHash,
-            { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId }
+            { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId, formatType: this.betSwirlDefaultOptions.formatType }
         );
     }
 
@@ -101,11 +101,11 @@ export abstract class BetSwirlClient {
         chainId?: CasinoChainId,
         page = DEFAULT_PAGE,
         itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
-        sortBy?: { key: Token_OrderBy; order: OrderDirection }
+        sortBy: { key: Token_OrderBy; order: OrderDirection } = { key: Token_OrderBy.Symbol, order: OrderDirection.Asc }
     ): Promise<{ tokens: SubgraphToken[]; error: SubgraphError | undefined }> {
         const casinoChainId = getCasinoChainId(this.betSwirlWallet, chainId);
         return fetchTokens(
-            { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
+            { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId, formatType: this.betSwirlDefaultOptions.formatType },
             page,
             itemsPerPage,
             sortBy
@@ -119,7 +119,7 @@ export abstract class BetSwirlClient {
         const casinoChainId = getCasinoChainId(this.betSwirlWallet, chainId);
         return fetchToken(
             address,
-            { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId },
+            { ...this.betSwirlDefaultOptions.subgraphClient, chainId: casinoChainId, formatType: this.betSwirlDefaultOptions.formatType },
         );
     }
 

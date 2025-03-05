@@ -3,6 +3,7 @@ import {
   BetSwirlError,
   bigIntFormatter,
   casinoChains,
+  FORMAT_TYPE,
   formatTxnUrl,
   labelCasinoGameByType,
   OrderDirection,
@@ -61,6 +62,7 @@ async function _selectChain(): Promise<CasinoChain> {
   betSwirlWagmiClient = initBetSwirlWagmiClient(wagmiConfig, {
     chainId: selectedChain.id,
     affiliate: process.env.AFFILIATE_ADDRESS as Hex,
+    formatType: FORMAT_TYPE.PRECISE,
     subgraphClient: {
       graphqlKey: process.env.GRAPHQL_KEY as string,
       cache: new InMemoryCache(),

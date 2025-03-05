@@ -126,8 +126,8 @@ export class Roulette extends AbstractCasinoGame<
       .toString(2)
       .split("")
       .reverse()
-      .map((number, i) => (number === "1" ? i : 0))
-      .filter((number, i) => number || (!number && !i)) as RouletteNumber[];
+      .map((number, i) => (number === "1" ? i : -1))
+      .filter((number) => number >= 0) as RouletteNumber[];
   }
 
   static decodeRolled(

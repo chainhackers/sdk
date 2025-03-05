@@ -1,5 +1,4 @@
 import {
-  formatUnits,
   getAddress,
   zeroAddress,
   type Address,
@@ -20,7 +19,7 @@ import {
   decodeCasinoRolled,
 } from "../../../../utils";
 import type { CasinoBet, Token } from "../../../../interfaces";
-import type { Bet_OrderBy, OrderDirection } from "../documents/types";
+import { Bet_OrderBy, OrderDirection } from "../documents/types";
 import { ApolloClient } from "@apollo/client/core/index.js";
 import {
   defaultSubgraphCasinoClient,
@@ -40,10 +39,12 @@ import {
 import { SubgraphError } from "../../../../errors/types";
 import { ERROR_CODES } from "../../../../errors";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../../../../constants";
+import { FORMAT_TYPE, formatRawAmount } from "../../../../utils/format";
 
 export function formatCasinoBet(
   bet: BetFragment,
-  chainId: CasinoChainId
+  chainId: CasinoChainId,
+  formatType: FORMAT_TYPE = FORMAT_TYPE.STANDARD
 ): CasinoBet {
   const casinoChain = casinoChainById[chainId];
   const betAmount = bet.betAmount ? BigInt(bet.betAmount) : 0n;
@@ -83,40 +84,34 @@ export function formatCasinoBet(
     gameAddress: getAddress(bet.gameAddress),
     bettor: getAddress(bet.user.address),
     betAmount,
-    formattedBetAmount: Number(formatUnits(betAmount, token.decimals)),
+    formattedBetAmount: formatRawAmount(betAmount, token.decimals, formatType),
     betCount: Number(bet.betCount),
     totalBetAmount: totalBetAmount,
-    formattedTotalBetAmount: Number(
-      formatUnits(totalBetAmount, token.decimals)
-    ),
+    formattedTotalBetAmount: formatRawAmount(totalBetAmount, token.decimals, formatType),
     stopLoss: BigInt(bet.stopLoss),
-    formattedStopLoss: Number(
-      formatUnits(BigInt(bet.stopLoss), token.decimals)
-    ),
+    formattedStopLoss: formatRawAmount(BigInt(bet.stopLoss), token.decimals, formatType),
     stopGain: BigInt(bet.stopGain),
-    formattedStopGain: Number(
-      formatUnits(BigInt(bet.stopGain), token.decimals)
-    ),
+    formattedStopGain:
+      formatRawAmount(BigInt(bet.stopGain), token.decimals, formatType),
     houseEdge: bet.houseEdge, // BP
     betTimestampSecs: Number(bet.betTimestamp), // secs
     betDate: new Date(Math.round(Number(bet.betTimestamp) * 1000)),
     chargedVRFFees: BigInt(bet.chargedVRFFees),
-    formattedChargedVRFFees: Number(
-      formatUnits(BigInt(bet.chargedVRFFees), nativeCurrency.decimals)
-    ),
+    formattedChargedVRFFees:
+      formatRawAmount(BigInt(bet.chargedVRFFees), nativeCurrency.decimals, formatType),
     betTxnHash: bet.betTxnHash,
     encodedInput: bet.encodedInput,
     decodedInput: decodeCasinoInput(bet.encodedInput, game),
     payout: bet.payout ? BigInt(bet.payout) : undefined,
     formattedPayout: bet.payout
-      ? Number(formatUnits(BigInt(bet.payout), token.decimals))
+      ? formatRawAmount(BigInt(bet.payout), token.decimals, formatType)
       : undefined,
     payoutMultiplier: bet.payoutMultiplier
       ? Number(bet.payoutMultiplier)
       : undefined,
     benefit,
     formattedBenefit: benefit
-      ? Number(formatUnits(benefit, token.decimals))
+      ? formatRawAmount(benefit, token.decimals, formatType)
       : undefined,
     rollTxnHash: bet.rollTxnHash,
     rollTimestampSecs: bet.rollTimestamp
@@ -129,7 +124,7 @@ export function formatCasinoBet(
     isRefunded: bet.isRefunded,
     rollTotalBetAmount,
     fomattedRollTotalBetAmount: rollTotalBetAmount
-      ? Number(formatUnits(rollTotalBetAmount, token.decimals))
+      ? formatRawAmount(rollTotalBetAmount, token.decimals, formatType)
       : undefined,
     rollBetCount: encodedRolled?.length,
     encodedRolled,
@@ -162,7 +157,7 @@ export async function fetchBets(
   },
   page = DEFAULT_PAGE,
   itemsPerPage = DEFAULT_ITEMS_PER_PAGE,
-  sortBy?: { key: Bet_OrderBy; order: OrderDirection }
+  sortBy: { key: Bet_OrderBy; order: OrderDirection } = { key: Bet_OrderBy.BetTimestamp, order: OrderDirection.Desc }
 ): Promise<{ bets: CasinoBet[]; error: SubgraphError | undefined }> {
   const apolloClient = new ApolloClient({
     uri: getGraphqlEndpoint(client),
@@ -198,7 +193,7 @@ export async function fetchBets(
   });
 
   return {
-    bets: data?.bets.map((bet) => formatCasinoBet(bet, client.chainId)) ?? [],
+    bets: data?.bets.map((bet) => formatCasinoBet(bet, client.chainId, client.formatType ?? defaultSubgraphCasinoClient.formatType)) ?? [],
     error: error
       ? new SubgraphError(
         "Error fetching bets",
@@ -228,7 +223,7 @@ export async function fetchBet(
   );
 
   return {
-    bet: data.bet ? formatCasinoBet(data.bet, client.chainId) : undefined,
+    bet: data.bet ? formatCasinoBet(data.bet, client.chainId, client.formatType ?? defaultSubgraphCasinoClient.formatType) : undefined,
     error: error
       ? new SubgraphError(
         "Error fetching bet",
@@ -265,7 +260,7 @@ export async function fetchBetByHash(
   });
   return {
     bet: data.bets[0]
-      ? formatCasinoBet(data.bets[0], client.chainId)
+      ? formatCasinoBet(data.bets[0], client.chainId, client.formatType ?? defaultSubgraphCasinoClient.formatType)
       : undefined,
     error: error
       ? new SubgraphError(

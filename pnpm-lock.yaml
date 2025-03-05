@@ -12,7 +12,7 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: ^3.12.11
-        version: 3.13.1(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.0))(graphql@16.10.0)
+        version: 3.13.1(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)
       '@betswirl/sdk-core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -75,6 +75,9 @@ importers:
       '@apollo/client':
         specifier: '>=3.12.11'
         version: 3.13.1(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)
+      decimal.js:
+        specifier: ^10.5.0
+        version: 10.5.0
       graphql-tag:
         specifier: ^2.12.6
         version: 2.12.6(graphql@16.10.0)
@@ -1469,6 +1472,9 @@ packages:
     resolution: {integrity: sha512-z2S+W9X73hAUUki+N+9Za2lBlun89zigOyGrsax+KUQ6wKW4ZoWpEYBkGhQjwAjjDCkWxhY0VKEhk8wzY7F5cA==}
     engines: {node: '>=0.10.0'}
 
+  decimal.js@10.5.0:
+    resolution: {integrity: sha512-8vDa8Qxvr/+d94hSh5P3IJwI5t8/c0KsMp+g8bNw9cY2icONa5aPfvKeieW1WlG0WQYwwhJ7mjui2xtiePQSXw==}
+
   defaults@1.0.4:
     resolution: {integrity: sha512-eFuaLoy/Rxalv2kr+lqMlUnrDWV+3j4pljOIJgLIhI058IQfWJ7vXhyEIHu+HtC738klGALYxOKDO0bQP3tg8A==}
 
@@ -2619,27 +2625,6 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
-
-  '@apollo/client@3.13.1(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.0))(graphql@16.10.0)':
-    dependencies:
-      '@graphql-typed-document-node/core': 3.2.0(graphql@16.10.0)
-      '@wry/caches': 1.0.1
-      '@wry/equality': 0.5.7
-      '@wry/trie': 0.5.0
-      graphql: 16.10.0
-      graphql-tag: 2.12.6(graphql@16.10.0)
-      hoist-non-react-statics: 3.3.2
-      optimism: 0.18.1
-      prop-types: 15.8.1
-      rehackt: 0.1.0
-      symbol-observable: 4.0.0
-      ts-invariant: 0.10.3
-      tslib: 2.8.1
-      zen-observable-ts: 1.2.5
-    optionalDependencies:
-      graphql-ws: 6.0.4(graphql@16.10.0)(ws@8.18.0)
-    transitivePeerDependencies:
-      - '@types/react'
 
   '@apollo/client@3.13.1(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)':
     dependencies:
@@ -4224,6 +4209,8 @@ snapshots:
 
   decamelize@1.2.0: {}
 
+  decimal.js@10.5.0: {}
+
   defaults@1.0.4:
     dependencies:
       clone: 1.0.4
@@ -4449,13 +4436,6 @@ snapshots:
     dependencies:
       graphql: 16.10.0
       tslib: 2.8.1
-
-  graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.0):
-    dependencies:
-      graphql: 16.10.0
-    optionalDependencies:
-      ws: 8.18.0
-    optional: true
 
   graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1):
     dependencies:

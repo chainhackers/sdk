@@ -4,6 +4,8 @@ import { chainById, type ChainId } from "../data";
 export * from "./chains";
 export * from "./tokens";
 export * from "./bet";
+export * from "./format";
+export * from "./wallet";
 
 export function bigIntFormatter(_key: string | number, value: any) {
   if (typeof value === "bigint") {

@@ -96,34 +96,34 @@ export interface CasinoBet {
   gameAddress: Address;
   bettor: Address;
   betAmount: bigint;
-  formattedBetAmount: number;
+  formattedBetAmount: string;
   totalBetAmount: bigint;
-  formattedTotalBetAmount: number;
+  formattedTotalBetAmount: string;
   betCount: number;
   stopLoss: bigint;
-  formattedStopLoss: number;
+  formattedStopLoss: string;
   stopGain: bigint;
-  formattedStopGain: number;
+  formattedStopGain: string;
   houseEdge: number; // BP
   betTimestampSecs: number; // secs
   betDate: Date;
   chargedVRFFees: bigint;
-  formattedChargedVRFFees: number;
+  formattedChargedVRFFees: string;
   betTxnHash: Hash;
   encodedInput: string;
   decodedInput: any;
   payout?: bigint;
-  formattedPayout?: number;
+  formattedPayout?: string;
   payoutMultiplier?: number;
   benefit?: bigint;
-  formattedBenefit?: number;
+  formattedBenefit?: string;
   rollTxnHash?: Hash;
   rollTimestampSecs?: number;
   rollDate?: Date;
   isResolved: boolean;
   isRefunded: boolean;
   rollTotalBetAmount?: bigint;
-  fomattedRollTotalBetAmount?: number;
+  fomattedRollTotalBetAmount?: string;
   rollBetCount?: number;
   encodedRolled?: Array<string>;
   decodedRolled?: Array<any>;
@@ -146,17 +146,17 @@ export interface SubgraphToken {
   winTxnCount: number
   userCount: number
   totalWagered: bigint
-  formattedTotalWagered: number
+  formattedTotalWagered: string
   totalPayout: bigint
-  formattedTotalPayout: number
+  formattedTotalPayout: string
   dividendAmount: bigint
-  formattedDividendAmount: number
+  formattedDividendAmount: string
   bankAmount: bigint
-  formattedBankAmount: number
+  formattedBankAmount: string
   affiliateAmount: bigint
-  formattedAffiliateAmount: number
+  formattedAffiliateAmount: string
   treasuryAmount: bigint
-  formattedTreasuryAmount: number
+  formattedTreasuryAmount: string
   teamAmount: bigint
-  formattedTeamAmount: number
+  formattedTeamAmount: string
 }

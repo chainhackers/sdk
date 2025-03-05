@@ -1,12 +1,14 @@
 import { InMemoryCache, type ApolloCache, type DefaultOptions, type FetchPolicy } from "@apollo/client/core/index.js";
 import { casinoChainById, type CasinoChainId } from "../../../casino";
 import { replaceGraphQlKey } from "../../../../utils/subgraphs";
+import { FORMAT_TYPE } from "../../../../utils/format";
 
 export interface SubgraphCasinoClient {
   chainId: CasinoChainId;
   theGraphKey?: string;
   cache?: ApolloCache<any>;
   defaultOptions?: DefaultOptions;
+  formatType?: FORMAT_TYPE;
 }
 
 export const defaultSubgraphCasinoClient = {
@@ -15,7 +17,8 @@ export const defaultSubgraphCasinoClient = {
     query: {
       fetchPolicy: 'network-only' as FetchPolicy,
     }
-  }
+  },
+  formatType: FORMAT_TYPE.STANDARD
 };
 
 export function getGraphqlEndpoint(subgraphClient: SubgraphCasinoClient) {
