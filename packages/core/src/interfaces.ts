@@ -83,6 +83,7 @@ export interface BetRequirements {
   multiplier: number;
   maxBetAmount: bigint;
   maxBetCount: number;
+  isAllowed: boolean;
   chainId: CasinoChainId;
 }
 

@@ -120,7 +120,8 @@ export function parseRawBetRequirements(rawBetRequirements: RawBetRequirements, 
     maxBetAmount: rawBetRequirements[1],
     maxBetCount: Math.min(
       Number(rawBetRequirements[2]),
-      maxGameBetCountByType[game])
+      maxGameBetCountByType[game]),
+    isAllowed: rawBetRequirements[0]
   }
 }
 
