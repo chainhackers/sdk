@@ -1,7 +1,7 @@
 {
   "name": "@betswirl/sdk-core",
   "description": "VanillaJS library for Betswirl protocol",
-  "version": "0.0.1-beta-21",
+  "version": "0.0.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -43,7 +43,7 @@
   "peerDependencies": {
     "@apollo/client": ">=3.12.11",
     "typescript": ">=5.0.4",
-    "viem": ">=2.22.23"
+    "viem": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {

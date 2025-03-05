@@ -3,13 +3,29 @@
   "name": "@betswirl/sdk",
   "packageManager": "pnpm@8.15.4",
   "scripts": {
-    "build": "pnpm run --r build",
-    "dev": "pnpm run --r dev"
+    "build": "pnpm turbo build",
+    "build:libs": "pnpm turbo --filter \"./packages/**\" build",
+    "build:libs:prod": "cross-env NODE_ENV=production pnpm build:libs",
+    "change:add": "pnpm changeset add",
+    "change:version": "pnpm changeset version",
+    "change:publish": "pnpm build:libs:prod && pnpm changeset publish --no-git-tag"
   },
   "type": "module",
   "workspaces": [
     "packages/core",
     "packages/providers/*",
     "examples/*"
-  ]
+  ],
+  "engines": {
+    "node": ">=20.11.1 <23",
+    "npm": "please-use-pnpm",
+    "pnpm": ">=8",
+    "yarn": "please-use-pnpm"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.5.1",
+    "@changesets/cli": "^2.28.1",
+    "cross-env": "^7.0.3",
+    "turbo": "^2.4.4"
+  }
 }
