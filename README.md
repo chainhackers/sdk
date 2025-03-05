@@ -43,6 +43,15 @@ All our mainnets contracts have the same address on each network:
 
 => Consult the audit results [here](https://paladinsec.co/projects/betswirl/)
 
+### Randomness
+We use **[Chainlink VRF 2.5](https://docs.chain.link/vrf)** to manage randomness. This is why a small fee in native token is requested for each bet. Here is the list of our subscriptions:
+
+- **[Arbitrum](https://vrf.chain.link/arbitrum#/side-drawer/subscription/arbitrum/26510450093329368004237878416199508562205945994063563127634409219041040756566)**
+- **[Avalanche](https://vrf.chain.link/avalanche#/side-drawer/subscription/avalanche/87060360337790157170135218934045586905659360396458026876115663885747477615369)**
+- **[Base](https://vrf.chain.link/base#/side-drawer/subscription/base/93271074453882857048982544254580571499844752099945152824703671195862788259559)**
+- **[Binance Smart Chain](https://vrf.chain.link/bsc#/side-drawer/subscription/bsc/64778934296371996396369853439912130360272408155611603044356319460986888838555)**
+- **[Polygon](https://vrf.chain.link/polygon#/side-drawer/subscription/polygon/79838174144652451313763716789896498714546673967850869672884710820136443316484)**
+
 ## Contribution
 
 ### Installation
