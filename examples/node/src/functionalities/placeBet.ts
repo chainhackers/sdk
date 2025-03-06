@@ -27,8 +27,8 @@ import {
   type RoulettePlacedBet
 } from "@betswirl/sdk-core";
 import {
-  BetSwirlWagmiClient,
-  initBetSwirlWagmiClient
+  WagmiBetSwirlClient,
+  initWagmiBetSwirlClient
 } from "@betswirl/wagmi-provider";
 import { select, input, checkbox } from "@inquirer/prompts";
 import {
@@ -44,7 +44,7 @@ import {
 } from "viem";
 import chalk from "chalk";
 import { getBalance } from "@wagmi/core";
-let betSwirlWagmiClient: BetSwirlWagmiClient;
+let wagmiBetSwirlClient: WagmiBetSwirlClient;
 
 export async function startPlaceBetProcess() {
   try {
@@ -106,7 +106,7 @@ async function _selectChain(): Promise<CasinoChain> {
     choices: casinoChains.map((c) => ({ name: c.viemChain.name, value: c })),
   });
   const wagmiConfig = getWagmiConfigFromCasinoChain(selectedChain);
-  betSwirlWagmiClient = initBetSwirlWagmiClient(wagmiConfig, {
+  wagmiBetSwirlClient = initWagmiBetSwirlClient(wagmiConfig, {
     chainId: selectedChain.id,
     affiliate: process.env.AFFILIATE_ADDRESS as Hex,
     gasPriceType: GAS_PRICE_TYPE.FAST,
@@ -115,9 +115,9 @@ async function _selectChain(): Promise<CasinoChain> {
 }
 
 async function _selectGame(selectedChain: CasinoChain): Promise<CasinoGame> {
-  const casinoGames = await betSwirlWagmiClient.getCasinoGames(
+  const casinoGames = await wagmiBetSwirlClient.getCasinoGames(
+    false,
     selectedChain.id,
-    false
   );
   const selectedGame = await select({
     message: "Select a game",
@@ -132,9 +132,9 @@ async function _selectGame(selectedChain: CasinoChain): Promise<CasinoGame> {
 }
 
 async function _selectToken(selectedGame: CasinoGame): Promise<CasinoToken> {
-  const tokens = await betSwirlWagmiClient.getCasinoTokens(
+  const tokens = await wagmiBetSwirlClient.getCasinoTokens(
+    false,
     selectedGame.chainId,
-    false
   );
   const selectedToken = await select({
     message: "Select a token",
@@ -156,12 +156,12 @@ async function _getTokenInfo(
   userTokenBalance: bigint;
   userGasBalance: bigint;
 }> {
-  const userAddress = betSwirlWagmiClient.betSwirlWallet.getAccount()!.address;
-  const tokenInfo = await betSwirlWagmiClient.getCasinoGameToken(
+  const userAddress = wagmiBetSwirlClient.betSwirlWallet.getAccount()!.address;
+  const tokenInfo = await wagmiBetSwirlClient.getCasinoGameToken(
     token,
     casinoGame.game
   );
-  const userGasBalanceData = await getBalance(betSwirlWagmiClient.wagmiConfig, {
+  const userGasBalanceData = await getBalance(wagmiBetSwirlClient.wagmiConfig, {
     address: userAddress,
     chainId: tokenInfo.chainId,
   });
@@ -170,7 +170,7 @@ async function _getTokenInfo(
     userTokenBalance = userGasBalanceData.value;
   } else {
     userTokenBalance = (
-      await getBalance(betSwirlWagmiClient.wagmiConfig, {
+      await getBalance(wagmiBetSwirlClient.wagmiConfig, {
         address: userAddress,
         token: token.address,
         chainId: tokenInfo.chainId,
@@ -261,7 +261,7 @@ async function _getBetRequirements(
   choiceInput: ChoiceInput,
   gameToken: CasinoGameToken
 ) {
-  const betRequirements = await betSwirlWagmiClient.getBetRequirements(
+  const betRequirements = await wagmiBetSwirlClient.getBetRequirements(
     gameToken,
     choiceInput.multiplier,
     choiceInput.game
@@ -297,7 +297,7 @@ async function _selectBetAmount(
   userTokenBalance: bigint,
   userGasBalance: bigint
 ) {
-  const chainlinkVrfCostEstimation = await betSwirlWagmiClient.getChainlinkVrfCost(
+  const chainlinkVrfCostEstimation = await wagmiBetSwirlClient.getChainlinkVrfCost(
     casinoGameToken.game,
     casinoGameToken.address,
     betCount,
@@ -305,7 +305,7 @@ async function _selectBetAmount(
     undefined, // We already define the gas price type in the client options
     casinoGameToken.chainId
   );
-  const userAddress = betSwirlWagmiClient.betSwirlWallet.getAccount()!.address;
+  const userAddress = wagmiBetSwirlClient.betSwirlWallet.getAccount()!.address;
   const chain = chainById[casinoGameToken.chainId];
   const gasDecimals = chain.nativeCurrency.decimals;
   const gasSymbol = chain.nativeCurrency.symbol;
@@ -414,21 +414,21 @@ async function _placeBet(
   let placedBetData;
   if (inputChoice.game === CASINO_GAME_TYPE.DICE) {
     const diceCap = (inputChoice as DiceChoiceInput).value;
-    placedBetData = await betSwirlWagmiClient.playDice(
+    placedBetData = await wagmiBetSwirlClient.playDice(
       { ...commonParams, cap: diceCap },
       callbacks,
       casinoGameToken.chainId,
     );
   } else if (inputChoice.game === CASINO_GAME_TYPE.COINTOSS) {
     const coinTossFace = (inputChoice as CoinTossChoiceInput).value;
-    placedBetData = await betSwirlWagmiClient.playCoinToss(
+    placedBetData = await wagmiBetSwirlClient.playCoinToss(
       { ...commonParams, face: coinTossFace },
       callbacks,
       casinoGameToken.chainId,
     );
   } else {
     const rouletteNumbers = (inputChoice as RouletteChoiceInput).value;
-    placedBetData = await betSwirlWagmiClient.playRoulette(
+    placedBetData = await wagmiBetSwirlClient.playRoulette(
       { ...commonParams, numbers: rouletteNumbers },
       callbacks,
       casinoGameToken.chainId,
@@ -457,17 +457,17 @@ async function _waitRoll(
   };
 
   if (placedBet.game === CASINO_GAME_TYPE.DICE) {
-    rolledBetData = await betSwirlWagmiClient.waitDice(
+    rolledBetData = await wagmiBetSwirlClient.waitDice(
       placedBet as DicePlacedBet,
       commonOptions
     );
   } else if (placedBet.game === CASINO_GAME_TYPE.COINTOSS) {
-    rolledBetData = await betSwirlWagmiClient.waitCoinToss(
+    rolledBetData = await wagmiBetSwirlClient.waitCoinToss(
       placedBet as CoinTossPlacedBet,
       commonOptions
     );
   } else {
-    rolledBetData = await betSwirlWagmiClient.waitRoulette(
+    rolledBetData = await wagmiBetSwirlClient.waitRoulette(
       placedBet as RoulettePlacedBet,
       commonOptions
     );

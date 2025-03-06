@@ -1,7 +1,11 @@
-import type { Address, Hash, Hex } from "viem";
+import type { Address, Hash, Hex, TransactionReceipt } from "viem";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "../data/casino";
 import type {
+    BetRequirements,
     CasinoBet,
+    CasinoGame,
+    CasinoGameToken,
+    CasinoToken,
     SubgraphToken,
     Token,
 } from "../interfaces";
@@ -19,10 +23,15 @@ import { fetchToken, fetchTokens } from "../data/subgraphs/protocol/clients/toke
 import type { BetSwirlWallet } from "./wallet";
 
 import { FORMAT_TYPE, getCasinoChainId } from "../utils";
-import type { GAS_PRICE_TYPE } from "../read";
+import type { CasinoWaitRollOptions, CoinTossRolledBet, DiceRolledBet, GAS_PRICE_TYPE, KenoConfiguration, RouletteRolledBet } from "../read";
 import type { ChainId } from "../data";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
 import type { ApolloCache, DefaultOptions } from "@apollo/client/core/index.js";
+import type { RouletteParams, RoulettePlacedBet } from "../actions/casino/roulette";
+import type { DiceParams } from "../actions/casino/dice";
+import type { PlaceBetCallbacks } from "../actions/casino/game";
+import type { DicePlacedBet } from "../actions/casino/dice";
+import type { CoinTossParams, CoinTossPlacedBet } from "../actions/casino/coinToss";
 
 export interface BetSwirlClientOptions {
     gasPriceType?: GAS_PRICE_TYPE;
@@ -48,6 +57,72 @@ export abstract class BetSwirlClient {
         this.betSwirlWallet = betSwirlWallet;
         this.betSwirlDefaultOptions = betSwirlDefaultOptions;
     }
+
+    /* Casino games */
+
+    abstract playCoinToss(
+        params: CoinTossParams,
+        callbacks?: PlaceBetCallbacks,
+    ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }>;
+
+    abstract waitCoinToss(
+        placedBet: CoinTossPlacedBet,
+        options: CasinoWaitRollOptions
+    ): Promise<{ rolledBet: CoinTossRolledBet; receipt: TransactionReceipt }>;
+
+    abstract playDice(
+        params: DiceParams,
+        callbacks?: PlaceBetCallbacks,
+    ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }>;
+
+    abstract waitDice(
+        placedBet: DicePlacedBet,
+        options: CasinoWaitRollOptions
+    ): Promise<{ rolledBet: DiceRolledBet; receipt: TransactionReceipt }>;
+
+    abstract playRoulette(
+        params: RouletteParams,
+        callbacks?: PlaceBetCallbacks,
+    ): Promise<{ placedBet: RoulettePlacedBet; receipt: TransactionReceipt }>;
+
+    abstract waitRoulette(
+        placedBet: RoulettePlacedBet,
+        options: CasinoWaitRollOptions
+    ): Promise<{ rolledBet: RouletteRolledBet; receipt: TransactionReceipt }>;
+
+    /* Casino utilities */
+
+    abstract getCasinoGames(
+        onlyActive?: boolean,
+    ): Promise<CasinoGame[]>;
+
+    abstract getCasinoTokens(
+        onlyActive?: boolean
+    ): Promise<CasinoToken[]>;
+
+    abstract getCasinoGameToken(
+        casinoToken: CasinoToken,
+        game: CASINO_GAME_TYPE,
+        affiliate?: Hex
+    ): Promise<CasinoGameToken>;
+
+    abstract getBetRequirements(
+        token: Token,
+        multiplier: number,
+        game: CASINO_GAME_TYPE,
+    ): Promise<BetRequirements>;
+
+    abstract getChainlinkVrfCost(
+        game: CASINO_GAME_TYPE,
+        tokenAddress: Hex,
+        betCount: number,
+        gasPrice?: bigint,
+        gasPriceType?: GAS_PRICE_TYPE,
+    ): Promise<bigint>;
+
+    abstract getKenoConfiguration(
+        token: Token,
+    ): Promise<KenoConfiguration>;
 
     /* Subgraph queries */
 

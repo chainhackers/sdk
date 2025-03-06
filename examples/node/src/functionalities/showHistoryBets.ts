@@ -11,8 +11,8 @@ import {
   type CasinoChain,
 } from "@betswirl/sdk-core";
 import {
-  BetSwirlWagmiClient,
-  initBetSwirlWagmiClient
+  WagmiBetSwirlClient,
+  initWagmiBetSwirlClient
 } from "@betswirl/wagmi-provider";
 import {
   checkEnvVariables,
@@ -23,7 +23,7 @@ import { select } from "@inquirer/prompts";
 import type { Hex } from "viem/_types/types/misc";
 import { InMemoryCache } from "@apollo/client/core/index.js";
 
-let betSwirlWagmiClient: BetSwirlWagmiClient;
+let wagmiBetSwielClient: WagmiBetSwirlClient;
 
 export async function startShowHistoryBetsProcess() {
   try {
@@ -59,7 +59,7 @@ async function _selectChain(): Promise<CasinoChain> {
     choices: casinoChains.map((c) => ({ name: c.viemChain.name, value: c })),
   });
   const wagmiConfig = getWagmiConfigFromCasinoChain(selectedChain);
-  betSwirlWagmiClient = initBetSwirlWagmiClient(wagmiConfig, {
+  wagmiBetSwielClient = initWagmiBetSwirlClient(wagmiConfig, {
     chainId: selectedChain.id,
     affiliate: process.env.AFFILIATE_ADDRESS as Hex,
     formatType: FORMAT_TYPE.PRECISE,
@@ -75,10 +75,10 @@ async function _getLastBets(
   count: number,
   casinoChain: CasinoChain
 ): Promise<CasinoBet[]> {
-  const { bets, error } = await betSwirlWagmiClient.fetchBets(
+  const { bets, error } = await wagmiBetSwielClient.fetchBets(
     casinoChain.id,
     {
-      bettor: betSwirlWagmiClient.betSwirlWallet.getAccount()!.address,
+      bettor: wagmiBetSwielClient.betSwirlWallet.getAccount()!.address,
     },
     1,
     count,

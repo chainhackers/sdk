@@ -1,5 +1,14 @@
 # @betswirl/wagmi-provider
 
+## 0.0.3
+
+### Patch Changes
+
+- Rename Client
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes
