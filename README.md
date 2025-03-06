@@ -1,4 +1,11 @@
-# BetSwirl SDKs
+# 🌀BetSwirl SDKs
+
+**BetSwirl** is a decentralized protocol allowing to play casino games on multiple chains. 
+
+The goal of this repo is to give developers some tools to interact easily with the protocol. 
+
+Feel free to reach us via [Discord](https://discord.gg/4BxtJV7fbZ) or [Telegram](https://t.me/betswirl) if you need **support**!
+
 
 ## General
 ### Networks

@@ -7,7 +7,7 @@ VanillaJS library to use Betswirl protocol
 ```bash
 npm i @betswirl/sdk-core viem @apollo/client
 ```
-## Use
+## Usage
 
 ### 1. (optional) With a client
 

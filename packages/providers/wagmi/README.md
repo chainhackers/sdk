@@ -8,7 +8,7 @@ A provider allowing to use **@betswirl/sdk-core** through a Wagmi client.
 pnpm i @betswirl/wagmi-provider
 ```
 
-## Use
+## Usage
 ```typescript
 import { createConfig } from "@wagmi/core";
 import { initBetSwirlWagmiClient} from "@betswirl/wagmi-provider";
