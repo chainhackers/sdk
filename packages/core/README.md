@@ -18,7 +18,6 @@ Here is the list of available external clients:
 
 The example below uses the BetSwirl Wagmi client.
 
-## Usage
 ```typescript
 import { createConfig } from "@wagmi/core";
 import { initWagmiBetSwirlClient} from "@betswirl/wagmi-provider";
