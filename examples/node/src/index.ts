@@ -35,6 +35,7 @@ const showMenu = async () => {
     case "quit":
       console.log("Bye!");
       process.exit(0);
+      break;
     default:
       console.log("Invalid choice, please try again.");
       await showMenu();

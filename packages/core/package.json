@@ -29,17 +29,8 @@
     "build": "rimraf ./dist && npm run gql && tsup --tsconfig tsconfig.build.json",
     "prepublishOnly": "cross-env NODE_ENV=production npm run build"
   },
-  "contributors": [
-    "kinco_dev"
-  ],
-  "keywords": [
-    "betswirl",
-    "bet",
-    "ethereum",
-    "dapps",
-    "casino",
-    "web3"
-  ],
+  "contributors": ["kinco_dev"],
+  "keywords": ["betswirl", "bet", "ethereum", "dapps", "casino", "web3"],
   "peerDependencies": {
     "@apollo/client": ">=3.12.11",
     "typescript": ">=5.0.4",
@@ -50,9 +41,7 @@
       "optional": true
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "dependencies": {
     "decimal.js": "^10.5.0",
     "graphql-tag": "^2.12.6"

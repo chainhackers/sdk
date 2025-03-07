@@ -1,8 +1,8 @@
 {
-"extends": "../../tsconfig.base.json",
-"include": ["./**/*.ts"],
-"exclude": [],
-"compilerOptions": {
-    "types": ["node"],
+  "extends": "../../tsconfig.base.json",
+  "include": ["./**/*.ts"],
+  "exclude": [],
+  "compilerOptions": {
+    "types": ["node"]
   }
 }

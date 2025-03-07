@@ -1,49 +1,40 @@
 import {
-  BetSwirlError,
-  bigIntFormatter,
-  CASINO_GAME_TYPE,
-  casinoChains,
-  chainById,
-  CoinToss,
-  Dice,
-  FORMAT_TYPE,
-  formatRawAmount,
-  formatTxnUrl,
-  GAS_PRICE_TYPE,
-  labelCasinoGameByType,
-  Roulette,
   type ApproveResult,
   type BetRequirements,
+  BetSwirlError,
+  CASINO_GAME_TYPE,
   type CasinoChain,
   type CasinoGame,
   type CasinoGameToken,
   type CasinoToken,
   type ChoiceInput,
+  CoinToss,
   type CoinTossChoiceInput,
   type CoinTossPlacedBet,
+  type CoinTossRolledBet,
+  Dice,
   type DiceChoiceInput,
   type DicePlacedBet,
+  type DiceRolledBet,
+  FORMAT_TYPE,
+  GAS_PRICE_TYPE,
+  Roulette,
   type RouletteChoiceInput,
-  type RoulettePlacedBet
+  type RoulettePlacedBet,
+  type RouletteRolledBet,
+  bigIntFormatter,
+  casinoChains,
+  chainById,
+  formatRawAmount,
+  formatTxnUrl,
+  labelCasinoGameByType,
 } from "@betswirl/sdk-core";
-import {
-  WagmiBetSwirlClient,
-  initWagmiBetSwirlClient
-} from "@betswirl/wagmi-provider";
-import { select, input, checkbox } from "@inquirer/prompts";
-import {
-  checkEnvVariables,
-  getWagmiConfigFromCasinoChain,
-} from "../../utils";
-import {
-  parseUnits,
-  zeroAddress,
-  type Hash,
-  type Hex,
-  type TransactionReceipt,
-} from "viem";
-import chalk from "chalk";
+import { WagmiBetSwirlClient, initWagmiBetSwirlClient } from "@betswirl/wagmi-provider";
+import { checkbox, input, select } from "@inquirer/prompts";
 import { getBalance } from "@wagmi/core";
+import chalk from "chalk";
+import { type Hash, type Hex, type TransactionReceipt, parseUnits, zeroAddress } from "viem";
+import { checkEnvVariables, getWagmiConfigFromCasinoChain } from "../../utils";
 let wagmiBetSwirlClient: WagmiBetSwirlClient;
 
 export async function startPlaceBetProcess() {
@@ -59,7 +50,7 @@ export async function startPlaceBetProcess() {
     // 4. Get token info (user balance, house edge, etc)
     const { gameToken, userTokenBalance, userGasBalance } = await _getTokenInfo(
       selectedToken,
-      selectedGame
+      selectedGame,
     );
     // 5. Select input
     const selectedInput = await _selectInput(gameToken);
@@ -73,15 +64,10 @@ export async function startPlaceBetProcess() {
       gameToken,
       betCount,
       userTokenBalance,
-      userGasBalance
+      userGasBalance,
     );
     // 9. Place bet
-    const placedBet = await _placeBet(
-      gameToken,
-      selectedInput,
-      betCount,
-      betAmount
-    );
+    const placedBet = await _placeBet(gameToken, selectedInput, betCount, betAmount);
 
     // 10. Wait for the roll
     await _waitRoll(placedBet);
@@ -89,9 +75,10 @@ export async function startPlaceBetProcess() {
     if (error instanceof BetSwirlError) {
       console.error(
         chalk.red(
-          `[${error.code}] BetSwirl error occured while placing bet: ${error.message
-          } ${JSON.stringify(error.context, bigIntFormatter)}`
-        )
+          `[${error.code}] BetSwirl error occured while placing bet: ${
+            error.message
+          } ${JSON.stringify(error.context, bigIntFormatter)}`,
+        ),
       );
     } else {
       console.error(chalk.red("Node example error occured:", error));
@@ -115,10 +102,7 @@ async function _selectChain(): Promise<CasinoChain> {
 }
 
 async function _selectGame(selectedChain: CasinoChain): Promise<CasinoGame> {
-  const casinoGames = await wagmiBetSwirlClient.getCasinoGames(
-    false,
-    selectedChain.id,
-  );
+  const casinoGames = await wagmiBetSwirlClient.getCasinoGames(false, selectedChain.id);
   const selectedGame = await select({
     message: "Select a game",
     loop: false,
@@ -132,10 +116,7 @@ async function _selectGame(selectedChain: CasinoChain): Promise<CasinoGame> {
 }
 
 async function _selectToken(selectedGame: CasinoGame): Promise<CasinoToken> {
-  const tokens = await wagmiBetSwirlClient.getCasinoTokens(
-    false,
-    selectedGame.chainId,
-  );
+  const tokens = await wagmiBetSwirlClient.getCasinoTokens(false, selectedGame.chainId);
   const selectedToken = await select({
     message: "Select a token",
     loop: false,
@@ -150,23 +131,20 @@ async function _selectToken(selectedGame: CasinoGame): Promise<CasinoToken> {
 
 async function _getTokenInfo(
   token: CasinoToken,
-  casinoGame: CasinoGame
+  casinoGame: CasinoGame,
 ): Promise<{
   gameToken: CasinoGameToken;
   userTokenBalance: bigint;
   userGasBalance: bigint;
 }> {
   const userAddress = wagmiBetSwirlClient.betSwirlWallet.getAccount()!.address;
-  const tokenInfo = await wagmiBetSwirlClient.getCasinoGameToken(
-    token,
-    casinoGame.game
-  );
+  const tokenInfo = await wagmiBetSwirlClient.getCasinoGameToken(token, casinoGame.game);
   const userGasBalanceData = await getBalance(wagmiBetSwirlClient.wagmiConfig, {
     address: userAddress,
     chainId: tokenInfo.chainId,
   });
   let userTokenBalance = 0n;
-  if (token.address == zeroAddress) {
+  if (token.address === zeroAddress) {
     userTokenBalance = userGasBalanceData.value;
   } else {
     userTokenBalance = (
@@ -180,17 +158,16 @@ async function _getTokenInfo(
 
   console.log(
     chalk.blue(
-      `House edge: ${tokenInfo.affiliateHouseEdgePercent
-      }%\nYour gas balance: ${formatRawAmount(
+      `House edge: ${tokenInfo.affiliateHouseEdgePercent}%\nYour gas balance: ${formatRawAmount(
         userGasBalanceData.value,
         userGasBalanceData.decimals,
-        FORMAT_TYPE.PRECISE
+        FORMAT_TYPE.PRECISE,
       )} ${userGasBalanceData.symbol}\nYour token balance: ${formatRawAmount(
         userTokenBalance,
         tokenInfo.decimals,
-        FORMAT_TYPE.PRECISE
-      )} ${tokenInfo.symbol}`
-    )
+        FORMAT_TYPE.PRECISE,
+      )} ${tokenInfo.symbol}`,
+    ),
   );
 
   return {
@@ -201,7 +178,7 @@ async function _getTokenInfo(
 }
 
 async function _selectInput(
-  gameToken: CasinoGameToken
+  gameToken: CasinoGameToken,
 ): Promise<CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput> {
   let input: CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput;
   switch (gameToken.game) {
@@ -209,62 +186,51 @@ async function _selectInput(
       input = await select({
         message: "Select a number",
         loop: false,
-        choices: Dice.getChoiceInputs(gameToken.affiliateHouseEdge).map(
-          (i) => ({
-            name: `${i.label} (x${i.formattedNetMultiplier}) - ${i.winChancePercent}% chance to win`,
-            value: i,
-          })
-        ),
+        choices: Dice.getChoiceInputs(gameToken.affiliateHouseEdge).map((i) => ({
+          name: `${i.label} (x${i.formattedNetMultiplier}) - ${i.winChancePercent}% chance to win`,
+          value: i,
+        })),
       });
       break;
     case CASINO_GAME_TYPE.COINTOSS:
       input = await select({
         message: "Select a face",
         loop: false,
-        choices: CoinToss.getChoiceInputs(gameToken.affiliateHouseEdge).map(
-          (i) => ({
-            name: `${i.label} (x${i.formattedNetMultiplier}) - ${i.winChancePercent}% chance to win`,
-            value: i,
-          })
-        ),
+        choices: CoinToss.getChoiceInputs(gameToken.affiliateHouseEdge).map((i) => ({
+          name: `${i.label} (x${i.formattedNetMultiplier}) - ${i.winChancePercent}% chance to win`,
+          value: i,
+        })),
       });
       break;
-    default:
+    default: {
       const inputChoices = await checkbox({
         message: "Select a number or a bundle of numbers (space bar to select)",
         loop: false,
         required: true,
-        choices: Roulette.getChoiceInputs(gameToken.affiliateHouseEdge).map(
-          (i) => ({
-            name: `${i.label} (x${i.formattedNetMultiplier}) - ${i.winChancePercent}% chance to win`,
-            value: i,
-          })
-        ),
+        choices: Roulette.getChoiceInputs(gameToken.affiliateHouseEdge).map((i) => ({
+          name: `${i.label} (x${i.formattedNetMultiplier}) - ${i.winChancePercent}% chance to win`,
+          value: i,
+        })),
       });
       // Combine all the choices into one
-      input = Roulette.combineChoiceInputs(
-        inputChoices,
-        gameToken.affiliateHouseEdge
-      );
+      input = Roulette.combineChoiceInputs(inputChoices, gameToken.affiliateHouseEdge);
       if (inputChoices.length > 1) {
         console.log(
           chalk.blue(
-            `Selected numbers: ${input.label}\nMultiplier: ${input.formattedNetMultiplier}x\nChance to win: ${input.winChancePercent}%`
-          )
+            `Selected numbers: ${input.label}\nMultiplier: ${input.formattedNetMultiplier}x\nChance to win: ${input.winChancePercent}%`,
+          ),
         );
       }
+    }
   }
   return input;
 }
 
-async function _getBetRequirements(
-  choiceInput: ChoiceInput,
-  gameToken: CasinoGameToken
-) {
+async function _getBetRequirements(choiceInput: ChoiceInput, gameToken: CasinoGameToken) {
   const betRequirements = await wagmiBetSwirlClient.getBetRequirements(
     gameToken,
     choiceInput.multiplier,
-    choiceInput.game
+    choiceInput.game,
   );
   return betRequirements;
 }
@@ -275,10 +241,7 @@ async function _selectBetCount(betRequirements: BetRequirements) {
     default: "1",
     validate: (input) => {
       const roundedNumber = Math.round(Number(input));
-      if (
-        roundedNumber < 1 ||
-        Number(betRequirements.maxBetCount) < roundedNumber
-      ) {
+      if (roundedNumber < 1 || Number(betRequirements.maxBetCount) < roundedNumber) {
         return `Bet count must be between 1 and ${betRequirements.maxBetCount}`;
       }
       return true;
@@ -295,7 +258,7 @@ async function _selectBetAmount(
   casinoGameToken: CasinoGameToken,
   betCount: number,
   userTokenBalance: bigint,
-  userGasBalance: bigint
+  userGasBalance: bigint,
 ) {
   const chainlinkVrfCostEstimation = await wagmiBetSwirlClient.getChainlinkVrfCost(
     casinoGameToken.game,
@@ -303,89 +266,89 @@ async function _selectBetAmount(
     betCount,
     undefined, // We let the SDK manage the gas price itself
     undefined, // We already define the gas price type in the client options
-    casinoGameToken.chainId
+    casinoGameToken.chainId,
   );
   const userAddress = wagmiBetSwirlClient.betSwirlWallet.getAccount()!.address;
   const chain = chainById[casinoGameToken.chainId];
   const gasDecimals = chain.nativeCurrency.decimals;
   const gasSymbol = chain.nativeCurrency.symbol;
   // TODO Add simulate gas fee (function does not yet exist in sdk)
-  const gasBalanceRemainingAfterFees =
-    userGasBalance - chainlinkVrfCostEstimation;
+  const gasBalanceRemainingAfterFees = userGasBalance - chainlinkVrfCostEstimation;
   // User needs to have at least 1 gwei for each betCount after substracting gas fees. For production apps, it's better to keep a buffer because VRF and gas fee can change.
   if (gasBalanceRemainingAfterFees < BigInt(betCount)) {
     throw Error(
       `You don't have enough gas to pay VRF and gas fees, please send at least ${formatRawAmount(
         BigInt(betCount) - gasBalanceRemainingAfterFees,
         gasDecimals,
-        FORMAT_TYPE.FULL_PRECISE
-      )} ${gasSymbol} to ${userAddress}`
+        FORMAT_TYPE.FULL_PRECISE,
+      )} ${gasSymbol} to ${userAddress}`,
     );
-  } else {
-    // If token is gas balance, substract the fees
-    const availableTokenBalance =
-      casinoGameToken.address == zeroAddress
-        ? gasBalanceRemainingAfterFees
-        : userTokenBalance;
-    // Take into consideration the max bet amount for the balance user but also max bet amount of the bet
-    const maxAmountPerBetFormatted = Math.min(
-      Number(
-        formatRawAmount(
-          availableTokenBalance / BigInt(betCount),
-          casinoGameToken.decimals,
-          FORMAT_TYPE.FULL_PRECISE
-        )
-      ),
-      Number(
-        formatRawAmount(betRequirements.maxBetAmount, casinoGameToken.decimals, FORMAT_TYPE.FULL_PRECISE)
-      )
-    );
-    // User needs to have at least 1 gwei of token for each betCount.
-    if (maxAmountPerBetFormatted <= 0) {
-      throw Error(
-        `You don't have enough token to place the bet, please send at least ${formatRawAmount(
-          BigInt(betCount) - availableTokenBalance,
-          casinoGameToken.decimals,
-          FORMAT_TYPE.FULL_PRECISE
-        )} ${casinoGameToken.symbol} to ${userAddress}`
-      );
-    }
-    console.log(
-      chalk.blue(
-        `VRF cost estimation: ${formatRawAmount(
-          chainlinkVrfCostEstimation,
-          gasDecimals,
-          FORMAT_TYPE.PRECISE
-        )} ${gasSymbol} \nYour token balance: ${formatRawAmount(
-          userTokenBalance,
-          casinoGameToken.decimals,
-          FORMAT_TYPE.PRECISE
-        )} ${casinoGameToken.symbol}\nYour gas balance: ${formatRawAmount(
-          userGasBalance,
-          gasDecimals,
-          FORMAT_TYPE.PRECISE
-        )} ${gasSymbol}\nBet count: ${betCount}`
-      )
-    );
-    const betAmountFormatted = await input({
-      message: `Enter a bet amount up to ${maxAmountPerBetFormatted} ${casinoGameToken.symbol}`,
-      validate: (_input) => {
-        const input = Number(_input);
-        if (input <= 0 || input > maxAmountPerBetFormatted) {
-          return `Not valid amount`;
-        }
-        return true;
-      },
-    });
-    return parseUnits(betAmountFormatted, casinoGameToken.decimals);
   }
+  // If token is gas balance, substract the fees
+  const availableTokenBalance =
+    casinoGameToken.address === zeroAddress ? gasBalanceRemainingAfterFees : userTokenBalance;
+  // Take into consideration the max bet amount for the balance user but also max bet amount of the bet
+  const maxAmountPerBetFormatted = Math.min(
+    Number(
+      formatRawAmount(
+        availableTokenBalance / BigInt(betCount),
+        casinoGameToken.decimals,
+        FORMAT_TYPE.FULL_PRECISE,
+      ),
+    ),
+    Number(
+      formatRawAmount(
+        betRequirements.maxBetAmount,
+        casinoGameToken.decimals,
+        FORMAT_TYPE.FULL_PRECISE,
+      ),
+    ),
+  );
+  // User needs to have at least 1 gwei of token for each betCount.
+  if (maxAmountPerBetFormatted <= 0) {
+    throw Error(
+      `You don't have enough token to place the bet, please send at least ${formatRawAmount(
+        BigInt(betCount) - availableTokenBalance,
+        casinoGameToken.decimals,
+        FORMAT_TYPE.FULL_PRECISE,
+      )} ${casinoGameToken.symbol} to ${userAddress}`,
+    );
+  }
+  console.log(
+    chalk.blue(
+      `VRF cost estimation: ${formatRawAmount(
+        chainlinkVrfCostEstimation,
+        gasDecimals,
+        FORMAT_TYPE.PRECISE,
+      )} ${gasSymbol} \nYour token balance: ${formatRawAmount(
+        userTokenBalance,
+        casinoGameToken.decimals,
+        FORMAT_TYPE.PRECISE,
+      )} ${casinoGameToken.symbol}\nYour gas balance: ${formatRawAmount(
+        userGasBalance,
+        gasDecimals,
+        FORMAT_TYPE.PRECISE,
+      )} ${gasSymbol}\nBet count: ${betCount}`,
+    ),
+  );
+  const betAmountFormatted = await input({
+    message: `Enter a bet amount up to ${maxAmountPerBetFormatted} ${casinoGameToken.symbol}`,
+    validate: (_input) => {
+      const input = Number(_input);
+      if (input <= 0 || input > maxAmountPerBetFormatted) {
+        return "Not valid amount";
+      }
+      return true;
+    },
+  });
+  return parseUnits(betAmountFormatted, casinoGameToken.decimals);
 }
 
 async function _placeBet(
   casinoGameToken: CasinoGameToken,
   inputChoice: DiceChoiceInput | CoinTossChoiceInput | RouletteChoiceInput,
   betCount: number,
-  betAmount: bigint
+  betAmount: bigint,
 ): Promise<CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet> {
   const commonParams = {
     betCount,
@@ -399,19 +362,21 @@ async function _placeBet(
     onApproved: (receipt: TransactionReceipt, _result: ApproveResult) => {
       console.log(
         chalk.green(
-          `✅ ${casinoGameToken.symbol
-          } has been approved successfully!\nApproval txn: ${formatTxnUrl(
+          `✅ ${casinoGameToken.symbol} has been approved successfully!\nApproval txn: ${formatTxnUrl(
             receipt.transactionHash,
-            casinoGameToken.chainId
-          )}`
-        )
+            casinoGameToken.chainId,
+          )}`,
+        ),
       );
     },
     onBetPlacedPending: (_tx: Hash) => {
-      console.log(chalk.blue(`⌛ Waiting the bet to be placed...`));
+      console.log(chalk.blue("⌛ Waiting the bet to be placed..."));
     },
   };
-  let placedBetData;
+  let placedBetData: {
+    receipt: TransactionReceipt;
+    placedBet: CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet;
+  };
   if (inputChoice.game === CASINO_GAME_TYPE.DICE) {
     const diceCap = (inputChoice as DiceChoiceInput).value;
     placedBetData = await wagmiBetSwirlClient.playDice(
@@ -436,58 +401,57 @@ async function _placeBet(
   }
   console.log(
     chalk.green(
-      `✅ Your ${labelCasinoGameByType[casinoGameToken.game]
+      `✅ Your ${
+        labelCasinoGameByType[casinoGameToken.game]
       } bet has been placed successfully!\n Place bet txn: ${formatTxnUrl(
         placedBetData.receipt.transactionHash,
-        casinoGameToken.chainId
-      )}`
-    )
+        casinoGameToken.chainId,
+      )}`,
+    ),
   );
   return placedBetData.placedBet;
 }
 
-async function _waitRoll(
-  placedBet: CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet
-) {
-  let rolledBetData;
-  console.log(chalk.blue(`⌛ Waiting the bet to be rolled...`));
+async function _waitRoll(placedBet: CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet) {
+  let rolledBetData: {
+    receipt: TransactionReceipt;
+    rolledBet: CoinTossRolledBet | DiceRolledBet | RouletteRolledBet;
+  };
+  console.log(chalk.blue("⌛ Waiting the bet to be rolled..."));
   const commonOptions = {
     timeout: 300000, //5min
     pollingInterval: process.env.RPC_URL ? 500 : 2500,
   };
 
   if (placedBet.game === CASINO_GAME_TYPE.DICE) {
-    rolledBetData = await wagmiBetSwirlClient.waitDice(
-      placedBet as DicePlacedBet,
-      commonOptions
-    );
+    rolledBetData = await wagmiBetSwirlClient.waitDice(placedBet as DicePlacedBet, commonOptions);
   } else if (placedBet.game === CASINO_GAME_TYPE.COINTOSS) {
     rolledBetData = await wagmiBetSwirlClient.waitCoinToss(
       placedBet as CoinTossPlacedBet,
-      commonOptions
+      commonOptions,
     );
   } else {
     rolledBetData = await wagmiBetSwirlClient.waitRoulette(
       placedBet as RoulettePlacedBet,
-      commonOptions
+      commonOptions,
     );
   }
   const rolledBet = rolledBetData.rolledBet;
   const chain = chainById[rolledBet.chainId];
   const commonMessage = chalk.blue(
-    `Payout: ${formatRawAmount(rolledBet.payout, rolledBet.token.decimals, FORMAT_TYPE.FULL_PRECISE)} ${rolledBet.token.symbol
+    `Payout: ${formatRawAmount(rolledBet.payout, rolledBet.token.decimals, FORMAT_TYPE.FULL_PRECISE)} ${
+      rolledBet.token.symbol
     }\nTotal bet amount: ${formatRawAmount(
       rolledBet.rollTotalBetAmount,
       rolledBet.token.decimals,
-      FORMAT_TYPE.FULL_PRECISE
-    )} ${rolledBet.token.symbol}\nBet count: ${rolledBet.rolledBetCount
-    }\nCharged VRF cost: ${formatRawAmount(
+      FORMAT_TYPE.FULL_PRECISE,
+    )} ${rolledBet.token.symbol}\nBet count: ${rolledBet.rolledBetCount}\nCharged VRF cost: ${formatRawAmount(
       rolledBet.chargedVRFCost,
       chain.nativeCurrency.decimals,
-      FORMAT_TYPE.PRECISE
+      FORMAT_TYPE.PRECISE,
     )} ${chain.nativeCurrency.symbol}\nRolled: ${JSON.stringify(
-      rolledBet.rolled
-    )}\nRoll txn: ${formatTxnUrl(rolledBet.rollTx, rolledBet.chainId)}`
+      rolledBet.rolled,
+    )}\nRoll txn: ${formatTxnUrl(rolledBet.rollTx, rolledBet.chainId)}`,
   );
   // Win
   if (rolledBetData.rolledBet.isWin) {
@@ -496,10 +460,10 @@ async function _waitRoll(
         `🥳 Congrats you won ${formatRawAmount(
           rolledBet.benefit,
           rolledBet.token.decimals,
-          FORMAT_TYPE.FULL_PRECISE
+          FORMAT_TYPE.FULL_PRECISE,
         )} ${rolledBet.token.symbol}\n`,
-        commonMessage
-      )
+        commonMessage,
+      ),
     );
   }
   // Loss
@@ -509,10 +473,10 @@ async function _waitRoll(
         `😔 Arf, you lost ${formatRawAmount(
           -rolledBetData.rolledBet.benefit,
           rolledBet.token.decimals,
-          FORMAT_TYPE.FULL_PRECISE
+          FORMAT_TYPE.FULL_PRECISE,
         )} ${rolledBet.token.symbol}\n`,
-        commonMessage
-      )
+        commonMessage,
+      ),
     );
   }
 }

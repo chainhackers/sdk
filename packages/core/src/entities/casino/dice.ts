@@ -143,9 +143,7 @@ export class Dice extends AbstractCasinoGame<
     return Number(encodedCap) as DiceNumber;
   }
 
-  static decodeRolled(
-    encodedCap: DiceEncodedRolled | string
-  ): DiceRolledNumber {
+  static decodeRolled(encodedCap: DiceEncodedRolled | string): DiceRolledNumber {
     return Number(encodedCap) as DiceRolledNumber;
   }
 

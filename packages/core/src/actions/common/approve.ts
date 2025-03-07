@@ -1,9 +1,9 @@
 import type { Hash, Hex } from "viem";
 import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
-import { TransactionError } from "../../errors/types";
 import { ERROR_CODES } from "../../errors/codes";
-import type { BetSwirlWallet } from "../../provider";
+import { TransactionError } from "../../errors/types";
 import type { BetSwirlFunctionData } from "../../interfaces";
+import type { BetSwirlWallet } from "../../provider";
 
 export enum ALLOWANCE_TYPE {
   ALWAYS = "ALWAYS",
@@ -29,15 +29,15 @@ export async function approve(
   gasPrice?: bigint,
   pollingInterval?: number,
   allowanceType: ALLOWANCE_TYPE = ALLOWANCE_TYPE.AUTO,
-  onApprovePending?: (tx: Hash, result: ApproveResult) => void | Promise<void>
+  onApprovePending?: (tx: Hash, result: ApproveResult) => void | Promise<void>,
 ) {
   try {
-    if (tokenAddress == zeroAddress || allowanceType == ALLOWANCE_TYPE.NONE)
+    if (tokenAddress === zeroAddress || allowanceType === ALLOWANCE_TYPE.NONE)
       return { receipt: null, result: null };
     let allowance: null | bigint = null;
-    if (allowanceType == ALLOWANCE_TYPE.AUTO) {
+    if (allowanceType === ALLOWANCE_TYPE.AUTO) {
       const functionData = getAllowanceFunctionData(tokenAddress, allower, spender);
-      allowance = await wallet.readContract<typeof functionData, RawAllowance>(functionData)
+      allowance = await wallet.readContract<typeof functionData, RawAllowance>(functionData);
     }
 
     if (!allowance || allowance < amount) {
@@ -66,18 +66,17 @@ export async function approve(
         spender,
         amount,
         allower,
-      }
+      },
     );
   }
 }
 
-
-
 // multiplier = gross BP_VALUE
 export function getAllowanceFunctionData(
-  tokenAddress: Hex, allower: Hex, spender: Hex
+  tokenAddress: Hex,
+  allower: Hex,
+  spender: Hex,
 ): BetSwirlFunctionData<typeof erc20Abi, "allowance", readonly [Hex, Hex]> {
-
   const abi = erc20Abi;
   const functionName = "allowance" as const;
   const args = [allower, spender] as const;
@@ -92,9 +91,10 @@ export function getAllowanceFunctionData(
 }
 
 export function getApproveFunctionData(
-  tokenAddress: Hex, spender: Hex, amount: bigint
+  tokenAddress: Hex,
+  spender: Hex,
+  amount: bigint,
 ): BetSwirlFunctionData<typeof erc20Abi, "approve", readonly [Hex, bigint]> {
-
   const abi = erc20Abi;
   const functionName = "approve" as const;
   const args = [spender, amount] as const;

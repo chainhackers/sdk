@@ -66,6 +66,8 @@ We use **[Chainlink VRF 2.5](https://docs.chain.link/vrf)** to manage randomness
 ```bash
 pnpm install
 ```
+
+Install Biome extension 
 ### Local changes
 
 If you updated a package and you want to see the changes in the other packages, then run this command in the updated package:

@@ -1,12 +1,8 @@
 import { type TransactionReceipt } from "viem";
-import {
-  waitRolledBet,
-  type CasinoRolledBet,
-  type CasinoWaitRollOptions,
-} from "./game";
 import { type CoinTossPlacedBet } from "../../actions/casino/coinToss";
-import { CoinToss, type COINTOSS_FACE } from "../../entities/casino/coinToss";
+import { type COINTOSS_FACE, CoinToss } from "../../entities/casino/coinToss";
 import type { BetSwirlWallet } from "../../provider";
+import { type CasinoRolledBet, type CasinoWaitRollOptions, waitRolledBet } from "./game";
 
 export interface CoinTossRolledBet extends CasinoRolledBet {
   rolled: COINTOSS_FACE[];
@@ -15,16 +11,12 @@ export interface CoinTossRolledBet extends CasinoRolledBet {
 export async function waitCoinTossRolledBet(
   wallet: BetSwirlWallet,
   placedBet: CoinTossPlacedBet,
-  options?: CasinoWaitRollOptions
+  options?: CasinoWaitRollOptions,
 ): Promise<{
   rolledBet: CoinTossRolledBet;
   receipt: TransactionReceipt;
 }> {
-  const { rolledBet, receipt } = await waitRolledBet(
-    wallet,
-    placedBet,
-    options
-  );
+  const { rolledBet, receipt } = await waitRolledBet(wallet, placedBet, options);
   return {
     rolledBet: {
       ...rolledBet,

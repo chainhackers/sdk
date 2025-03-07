@@ -1,7 +1,11 @@
 import type { Abi, Address, ContractEventName, ContractFunctionName, Hash, Hex, Log } from "viem";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "./data/casino";
 
-export interface BetSwirlFunctionData<TAbi extends Abi, TFunctionName extends ContractFunctionName<TAbi>, TArgs extends readonly any[]> {
+export interface BetSwirlFunctionData<
+  TAbi extends Abi,
+  TFunctionName extends ContractFunctionName<TAbi>,
+  TArgs extends readonly any[],
+> {
   data: {
     to: Address;
     abi: TAbi;
@@ -10,8 +14,11 @@ export interface BetSwirlFunctionData<TAbi extends Abi, TFunctionName extends Co
   };
   encodedData: Hex;
 }
-
-export interface BetSwirlEventData<TAbi extends Abi, TEventName extends ContractEventName<TAbi>, TArgs extends Object> {
+export interface BetSwirlEventData<
+  TAbi extends Abi,
+  TEventName extends ContractEventName<TAbi>,
+  TArgs extends Record<string, any>,
+> {
   data: {
     to: Address;
     abi: TAbi;
@@ -139,25 +146,25 @@ export interface SubgraphToken {
   id: Address;
   address: Address;
   chainId: CasinoChainId;
-  symbol: string
-  name: string
-  decimals: number
-  betTxnCount: number
-  betCount: number
-  winTxnCount: number
-  userCount: number
-  totalWagered: bigint
-  formattedTotalWagered: string
-  totalPayout: bigint
-  formattedTotalPayout: string
-  dividendAmount: bigint
-  formattedDividendAmount: string
-  bankAmount: bigint
-  formattedBankAmount: string
-  affiliateAmount: bigint
-  formattedAffiliateAmount: string
-  treasuryAmount: bigint
-  formattedTreasuryAmount: string
-  teamAmount: bigint
-  formattedTeamAmount: string
+  symbol: string;
+  name: string;
+  decimals: number;
+  betTxnCount: number;
+  betCount: number;
+  winTxnCount: number;
+  userCount: number;
+  totalWagered: bigint;
+  formattedTotalWagered: string;
+  totalPayout: bigint;
+  formattedTotalPayout: string;
+  dividendAmount: bigint;
+  formattedDividendAmount: string;
+  bankAmount: bigint;
+  formattedBankAmount: string;
+  affiliateAmount: bigint;
+  formattedAffiliateAmount: string;
+  treasuryAmount: bigint;
+  formattedTreasuryAmount: string;
+  teamAmount: bigint;
+  formattedTeamAmount: string;
 }

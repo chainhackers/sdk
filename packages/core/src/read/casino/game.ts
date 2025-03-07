@@ -1,33 +1,33 @@
 import {
-  CASINO_GAME_ROLL_ABI,
-  CASINO_GAME_TYPE,
-  casinoChainById,
-  labelCasinoGameByType,
-  type CasinoChainId,
-} from "../../data/casino";
-import { ChainError } from "../../errors/types";
-import type { CasinoPlacedBet } from "../../actions/casino/game";
-import { TransactionError } from "../../errors/types";
-import { casinoGameAbi } from "../../abis/v2/casino/game";
-import {
-  encodeFunctionData,
-  parseAbiItem,
   type Address,
   type Hash,
   type Hex,
   type TransactionReceipt,
+  encodeFunctionData,
+  parseAbiItem,
 } from "viem";
-import { ERROR_CODES } from "../../errors/codes";
 import { getLogs } from "viem/actions";
+import { casinoGameAbi } from "../../abis/v2/casino/game";
+import type { CasinoPlacedBet } from "../../actions/casino/game";
+import {
+  CASINO_GAME_ROLL_ABI,
+  CASINO_GAME_TYPE,
+  type CasinoChainId,
+  casinoChainById,
+  labelCasinoGameByType,
+} from "../../data/casino";
+import { ERROR_CODES } from "../../errors/codes";
+import { ChainError } from "../../errors/types";
+import { TransactionError } from "../../errors/types";
 import type {
   BetSwirlFunctionData,
   CasinoGame,
   CasinoGameToken,
   CasinoToken,
 } from "../../interfaces";
+import type { BetSwirlWallet } from "../../provider";
 import { getCasinoChainId } from "../../utils/chains";
 import { getTransactionReceiptWithRetry } from "../../utils/wallet";
-import type { BetSwirlWallet } from "../../provider";
 
 export interface CasinoRolledBet extends CasinoPlacedBet {
   isWin: boolean;
@@ -67,7 +67,7 @@ interface RollEvent {
 export async function waitRolledBet(
   wallet: BetSwirlWallet,
   placedBet: CasinoPlacedBet,
-  options?: CasinoWaitRollOptions
+  options?: CasinoWaitRollOptions,
 ): Promise<{
   rolledBet: CasinoRolledBet;
   receipt: TransactionReceipt;
@@ -81,11 +81,11 @@ export async function waitRolledBet(
       {
         chainId: placedBet.chainId,
         game: placedBet.game,
-      }
+      },
     );
   }
 
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     let isResolved = false;
 
     const onRollEvent = async (log: RollEvent) => {
@@ -96,11 +96,8 @@ export async function waitRolledBet(
       try {
         const args = log.args;
         const isWin = args.payout! >= args.totalBetAmount!;
-        const isStopTriggered = args.rolled!.length != placedBet.betCount;
-        const receipt = await getTransactionReceiptWithRetry(
-          wallet,
-          log.transactionHash,
-        );
+        const isStopTriggered = args.rolled!.length !== placedBet.betCount;
+        const receipt = await getTransactionReceiptWithRetry(wallet, log.transactionHash);
 
         resolve({
           rolledBet: {
@@ -119,15 +116,11 @@ export async function waitRolledBet(
         });
       } catch (error) {
         reject(
-          new TransactionError(
-            "Error processing Roll event",
-            ERROR_CODES.GAME.ROLL_EVENT_ERROR,
-            {
-              betId: placedBet.id,
-              chainId: placedBet.chainId,
-              cause: error,
-            }
-          )
+          new TransactionError("Error processing Roll event", ERROR_CODES.GAME.ROLL_EVENT_ERROR, {
+            betId: placedBet.id,
+            chainId: placedBet.chainId,
+            cause: error,
+          }),
         );
       }
     };
@@ -138,14 +131,13 @@ export async function waitRolledBet(
         abi: game.abi,
         eventName: "Roll",
         args: { id: placedBet.id },
-        pollingInterval:
-          options?.pollingInterval || casinoChain.options.pollingInterval,
+        pollingInterval: options?.pollingInterval || casinoChain.options.pollingInterval,
       },
       callbacks: {
         onLogs: async (logs) => {
-          const matchingLog = (
-            logs as unknown as { args: { id: bigint } }[]
-          ).find((log) => log.args.id === placedBet.id);
+          const matchingLog = (logs as unknown as { args: { id: bigint } }[]).find(
+            (log) => log.args.id === placedBet.id,
+          );
           if (matchingLog) {
             await onRollEvent(matchingLog as unknown as RollEvent);
           }
@@ -164,8 +156,8 @@ export async function waitRolledBet(
             )
           ); */
         },
-      }
-    })
+      },
+    });
 
     const publicClient = wallet.getPublicClient(placedBet.chainId);
 
@@ -178,9 +170,7 @@ export async function waitRolledBet(
       toBlock: "latest",
     })
       .then((pastLogs) => {
-        const matchingPastLog = pastLogs.find(
-          (log) => log.args.id === placedBet.id
-        );
+        const matchingPastLog = pastLogs.find((log) => log.args.id === placedBet.id);
         if (matchingPastLog) {
           onRollEvent(matchingPastLog as RollEvent);
         }
@@ -212,8 +202,8 @@ export async function waitRolledBet(
             {
               betId: placedBet.id,
               chainId: placedBet.chainId,
-            }
-          )
+            },
+          ),
         );
       }
     }, options?.timeout || defaultCasinoWaiRollOptions.timeout);
@@ -222,10 +212,9 @@ export async function waitRolledBet(
 
 export type RawPaused = boolean;
 
-
 export async function getCasinoGames(
   wallet: BetSwirlWallet,
-  onlyActive = false
+  onlyActive = false,
 ): Promise<CasinoGame[]> {
   const casinoChainId = getCasinoChainId(wallet);
 
@@ -234,10 +223,8 @@ export async function getCasinoGames(
   const games = casinoChain.contracts.games;
 
   const functionDatas = Object.keys(games).map((game) =>
-    getGamePausedFunctionData(
-      game as CASINO_GAME_TYPE,
-      casinoChainId
-    ))
+    getGamePausedFunctionData(game as CASINO_GAME_TYPE, casinoChainId),
+  );
   const rawPauseds = await wallet.readContracts<typeof functionDatas, RawPaused[]>(functionDatas);
 
   return Object.entries(games)
@@ -255,7 +242,7 @@ export async function getCasinoGames(
 
 export function getGamePausedFunctionData(
   game: CASINO_GAME_TYPE,
-  casinoChainId: CasinoChainId
+  casinoChainId: CasinoChainId,
 ): BetSwirlFunctionData<typeof casinoGameAbi, "paused", readonly []> {
   const casinoChain = casinoChainById[casinoChainId];
 
@@ -263,7 +250,7 @@ export function getGamePausedFunctionData(
   if (!gameAddress) {
     throw new ChainError(
       `Game ${game} not found for chain ${casinoChainId}`,
-      ERROR_CODES.CHAIN.UNSUPPORTED_GAME
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
     );
   }
 
@@ -292,10 +279,13 @@ export type RawTokenInfo = [number, bigint, bigint, number, bigint];
 
 export type RawAffiliateHouseEdge = bigint;
 
-export function parseRawTokenInfoAndAffiliateHouseEdge(rawTokenInfo: RawTokenInfo, rawAffiliateHouseEdge: RawAffiliateHouseEdge, casinoToken: CasinoToken, game: CASINO_GAME_TYPE,
-
+export function parseRawTokenInfoAndAffiliateHouseEdge(
+  rawTokenInfo: RawTokenInfo,
+  rawAffiliateHouseEdge: RawAffiliateHouseEdge,
+  casinoToken: CasinoToken,
+  game: CASINO_GAME_TYPE,
 ): CasinoGameToken {
-  const defaultHouseEdge = rawTokenInfo[0]
+  const defaultHouseEdge = rawTokenInfo[0];
   return {
     ...casinoToken,
     game,
@@ -311,33 +301,36 @@ export async function getCasinoGameToken(
   wallet: BetSwirlWallet,
   casinoToken: CasinoToken,
   game: CASINO_GAME_TYPE,
-  affiliate: Hex
+  affiliate: Hex,
 ): Promise<CasinoGameToken> {
   const chainId = casinoToken.chainId;
 
-  const tokenInfoFunctionData = getTokenInfoFunctionData(
-    game,
-    casinoToken.address,
-    chainId
-  );
+  const tokenInfoFunctionData = getTokenInfoFunctionData(game, casinoToken.address, chainId);
   const affiliateHouseEdgeFunctionData = getAffiliateHouseEdgeFunctionData(
     game,
     casinoToken.address,
     affiliate,
-    chainId
+    chainId,
   );
 
   const functionDatas = [tokenInfoFunctionData, affiliateHouseEdgeFunctionData];
-  const [rawTokenData, rawAffiliateHouseEdge] = await wallet.readContracts<typeof functionDatas, [RawTokenInfo, RawAffiliateHouseEdge]>(functionDatas)
+  const [rawTokenData, rawAffiliateHouseEdge] = await wallet.readContracts<
+    typeof functionDatas,
+    [RawTokenInfo, RawAffiliateHouseEdge]
+  >(functionDatas);
 
-  return parseRawTokenInfoAndAffiliateHouseEdge(rawTokenData, rawAffiliateHouseEdge, casinoToken, game)
-
+  return parseRawTokenInfoAndAffiliateHouseEdge(
+    rawTokenData,
+    rawAffiliateHouseEdge,
+    casinoToken,
+    game,
+  );
 }
 
 export function getTokenInfoFunctionData(
   game: CASINO_GAME_TYPE,
   tokenAddress: Address,
-  casinoChainId: CasinoChainId
+  casinoChainId: CasinoChainId,
 ): BetSwirlFunctionData<typeof casinoGameAbi, "tokens", readonly [Hex]> {
   const casinoChain = casinoChainById[casinoChainId];
 
@@ -345,7 +338,7 @@ export function getTokenInfoFunctionData(
   if (!gameAddress) {
     throw new ChainError(
       `Game ${game} not found for chain ${casinoChainId}`,
-      ERROR_CODES.CHAIN.UNSUPPORTED_GAME
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
     );
   }
 
@@ -366,7 +359,7 @@ export function getAffiliateHouseEdgeFunctionData(
   game: CASINO_GAME_TYPE,
   tokenAddress: Address,
   affiliate: Hex,
-  casinoChainId: CasinoChainId
+  casinoChainId: CasinoChainId,
 ): BetSwirlFunctionData<typeof casinoGameAbi, "getAffiliateHouseEdge", readonly [Hex, Hex]> {
   const casinoChain = casinoChainById[casinoChainId];
 
@@ -374,7 +367,7 @@ export function getAffiliateHouseEdgeFunctionData(
   if (!gameAddress) {
     throw new ChainError(
       `Game ${game} not found for chain ${casinoChainId}`,
-      ERROR_CODES.CHAIN.UNSUPPORTED_GAME
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
     );
   }
 

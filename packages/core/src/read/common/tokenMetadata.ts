@@ -1,28 +1,38 @@
-import { encodeFunctionData, erc20Abi, getAddress, zeroAddress, type Address, type Hex } from "viem";
-import type { BetSwirlFunctionData, Token } from "../../interfaces";
-import { chainNativeCurrencyToToken } from "../../utils/tokens";
-import { chainById, type ChainId } from "../../data/chains";
-import { TransactionError } from "../../errors/types";
+import {
+  type Address,
+  type Hex,
+  encodeFunctionData,
+  erc20Abi,
+  getAddress,
+  zeroAddress,
+} from "viem";
+import { type ChainId, chainById } from "../../data/chains";
 import { ERROR_CODES } from "../../errors/codes";
+import { TransactionError } from "../../errors/types";
+import type { BetSwirlFunctionData, Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
+import { chainNativeCurrencyToToken } from "../../utils/tokens";
 
-export type RawTokenSymbol = string
-export type RawTokenDecimals = number
+export type RawTokenSymbol = string;
+export type RawTokenDecimals = number;
 export async function getTokenMetadata(
   wallet: BetSwirlWallet,
   tokenAddress: Hex,
-  chainId: ChainId
+  chainId: ChainId,
 ): Promise<Token> {
-  if (tokenAddress == zeroAddress) {
+  if (tokenAddress === zeroAddress) {
     return chainNativeCurrencyToToken(chainById[chainId].nativeCurrency);
   }
 
   try {
     const functionDatas = [
       getTokenDecimalsFunctionData(tokenAddress),
-      getTokenSymbolFunctionData(tokenAddress)
-    ]
-    const tokenMetadata = await wallet.readContracts<typeof functionDatas, [RawTokenDecimals, RawTokenSymbol]>(functionDatas)
+      getTokenSymbolFunctionData(tokenAddress),
+    ];
+    const tokenMetadata = await wallet.readContracts<
+      typeof functionDatas,
+      [RawTokenDecimals, RawTokenSymbol]
+    >(functionDatas);
 
     return {
       address: getAddress(tokenAddress),
@@ -36,7 +46,7 @@ export async function getTokenMetadata(
       {
         chainId,
         tokenAddress,
-      }
+      },
     );
   }
 }
@@ -44,7 +54,6 @@ export async function getTokenMetadata(
 export function getTokenDecimalsFunctionData(
   tokenAddress: Address,
 ): BetSwirlFunctionData<typeof erc20Abi, "decimals", readonly []> {
-
   const abi = erc20Abi;
   const functionName = "decimals" as const;
   const args = [] as const;
@@ -61,7 +70,6 @@ export function getTokenDecimalsFunctionData(
 export function getTokenSymbolFunctionData(
   tokenAddress: Address,
 ): BetSwirlFunctionData<typeof erc20Abi, "symbol", readonly []> {
-
   const abi = erc20Abi;
   const functionName = "symbol" as const;
   const args = [] as const;

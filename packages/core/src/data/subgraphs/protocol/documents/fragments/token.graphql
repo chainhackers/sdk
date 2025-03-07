@@ -1,4 +1,4 @@
-fragment Token on Token {  
+fragment Token on Token {
   id
   address: id
   symbol

@@ -1,5 +1,5 @@
 import type { Address, Hash } from "viem";
-import { chainById, type ChainId } from "../data";
+import { type ChainId, chainById } from "../data";
 
 export * from "./chains";
 export * from "./tokens";
@@ -10,9 +10,8 @@ export * from "./wallet";
 export function bigIntFormatter(_key: string | number, value: any) {
   if (typeof value === "bigint") {
     return value.toString();
-  } else {
-    return value;
   }
+  return value;
 }
 
 export function truncate(fullStr: string, strLen: number, separator = "...") {
@@ -21,11 +20,7 @@ export function truncate(fullStr: string, strLen: number, separator = "...") {
   const frontChars = Math.ceil(strLen / 2);
   const backChars = Math.floor(strLen / 2);
 
-  return (
-    fullStr.slice(0, frontChars) +
-    separator +
-    fullStr.slice(fullStr.length - backChars)
-  );
+  return fullStr.slice(0, frontChars) + separator + fullStr.slice(fullStr.length - backChars);
 }
 
 export function formatAccountUrl(account: Address, chainId: ChainId) {

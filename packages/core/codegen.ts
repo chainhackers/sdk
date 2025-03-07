@@ -5,15 +5,13 @@ const config: CodegenConfig = {
   generates: {
     // Protocol types.ts
     "src/data/subgraphs/protocol/documents/types.ts": {
-      schema:
-        "https://api.studio.thegraph.com/query/1726/betswirl-avalanche/v2.0.3",
+      schema: "https://api.studio.thegraph.com/query/1726/betswirl-avalanche/v2.0.3",
       plugins: ["typescript"],
     },
     // Protocol each query
     "src/data/subgraphs/protocol/documents": {
       preset: "near-operation-file",
-      schema:
-        "https://api.studio.thegraph.com/query/1726/betswirl-avalanche/v2.0.3",
+      schema: "https://api.studio.thegraph.com/query/1726/betswirl-avalanche/v2.0.3",
       documents: ["src/data/subgraphs/protocol/documents/**/*.graphql"],
       presetConfig: {
         extension: ".ts",

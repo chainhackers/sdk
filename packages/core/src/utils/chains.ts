@@ -1,16 +1,14 @@
 import { casinoChainById } from "../data/casino";
 import type { CasinoChainId } from "../data/casino";
-import { ChainError } from "../errors/types";
 import { ERROR_CODES } from "../errors/codes";
+import { ChainError } from "../errors/types";
 import type { BetSwirlWallet } from "../provider";
 
 export function getCasinoChainId(
   wallet: BetSwirlWallet,
   ...overridedChainIds: Array<number | undefined>
 ): CasinoChainId {
-  const chainId =
-    overridedChainIds?.find((id) => id !== undefined) ||
-    wallet.getChainId();
+  const chainId = overridedChainIds?.find((id) => id !== undefined) || wallet.getChainId();
   if (chainId && !(chainId in casinoChainById)) {
     throw new ChainError(
       `Chain ID ${chainId} is not compatible with casino games`,
@@ -18,7 +16,7 @@ export function getCasinoChainId(
       {
         chainId,
         supportedChains: Object.keys(casinoChainById),
-      }
+      },
     );
   }
   return chainId as CasinoChainId;

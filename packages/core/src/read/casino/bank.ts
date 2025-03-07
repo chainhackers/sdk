@@ -1,15 +1,15 @@
 import { casinoChainById, maxGameBetCountByType } from "../../data/casino";
 
+import { type Hex, encodeFunctionData } from "viem";
 import { bankAbi } from "../../abis/v2/casino/bank";
-import { encodeFunctionData, type Hex } from "viem";
-import type { CasinoToken, BetRequirements, Token, BetSwirlFunctionData } from "../../interfaces";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "../../data/casino";
 import { TransactionError } from "../../errors/types";
+import type { BetRequirements, BetSwirlFunctionData, CasinoToken, Token } from "../../interfaces";
 
 import { ERROR_CODES } from "../../errors/codes";
+import type { BetSwirlWallet } from "../../provider";
 import { getCasinoChainId } from "../../utils/chains";
 import { rawTokenToToken } from "../../utils/tokens";
-import type { BetSwirlWallet } from "../../provider";
 
 export type RawCasinoToken = {
   decimals: number;
@@ -36,7 +36,10 @@ export type RawCasinoToken = {
   };
 };
 
-export function parseRawCasinoToken(rawToken: RawCasinoToken, casinoChainId: CasinoChainId): CasinoToken {
+export function parseRawCasinoToken(
+  rawToken: RawCasinoToken,
+  casinoChainId: CasinoChainId,
+): CasinoToken {
   return {
     ...rawTokenToToken(rawToken, casinoChainId),
     paused: !rawToken.token.allowed || rawToken.token.paused,
@@ -48,47 +51,42 @@ export function parseRawCasinoToken(rawToken: RawCasinoToken, casinoChainId: Cas
       bank: rawToken.token.houseEdgeSplitAndAllocation.bank,
       bankPercent: rawToken.token.houseEdgeSplitAndAllocation.bank / 100,
       dividend: rawToken.token.houseEdgeSplitAndAllocation.dividend,
-      dividendPercent:
-        rawToken.token.houseEdgeSplitAndAllocation.dividend / 100,
+      dividendPercent: rawToken.token.houseEdgeSplitAndAllocation.dividend / 100,
       affiliate: rawToken.token.houseEdgeSplitAndAllocation.affiliate,
-      affiliatePercent:
-        rawToken.token.houseEdgeSplitAndAllocation.affiliate / 100,
+      affiliatePercent: rawToken.token.houseEdgeSplitAndAllocation.affiliate / 100,
       treasury: rawToken.token.houseEdgeSplitAndAllocation.treasury,
-      treasuryPercent:
-        rawToken.token.houseEdgeSplitAndAllocation.treasury / 100,
+      treasuryPercent: rawToken.token.houseEdgeSplitAndAllocation.treasury / 100,
       team: rawToken.token.houseEdgeSplitAndAllocation.team,
       teamPercent: rawToken.token.houseEdgeSplitAndAllocation.team / 100,
-    }
-  }
+    },
+  };
 }
 
 export async function getCasinoTokens(
   wallet: BetSwirlWallet,
-  onlyActive = false
+  onlyActive = false,
 ): Promise<CasinoToken[]> {
   const casinoChainId = getCasinoChainId(wallet);
   try {
     const functionData = getCasinoTokensFunctionData(casinoChainId);
-    const rawTokens = await wallet.readContract<typeof functionData, RawCasinoToken[]>(functionData);
+    const rawTokens = await wallet.readContract<typeof functionData, RawCasinoToken[]>(
+      functionData,
+    );
 
     return rawTokens
-      .map((rawToken) =>
-        parseRawCasinoToken(rawToken, casinoChainId)
-      )
+      .map((rawToken) => parseRawCasinoToken(rawToken, casinoChainId))
       .filter((token) => !onlyActive || !token.paused);
   } catch (error) {
-    throw new TransactionError(
-      "Error getting tokens",
-      ERROR_CODES.BANK.GET_TOKENS_ERROR,
-      {
-        chainId: casinoChainId,
-        cause: error,
-      }
-    );
+    throw new TransactionError("Error getting tokens", ERROR_CODES.BANK.GET_TOKENS_ERROR, {
+      chainId: casinoChainId,
+      cause: error,
+    });
   }
 }
 
-export function getCasinoTokensFunctionData(casinoChainId: CasinoChainId): BetSwirlFunctionData<typeof bankAbi, "getTokens", readonly []> {
+export function getCasinoTokensFunctionData(
+  casinoChainId: CasinoChainId,
+): BetSwirlFunctionData<typeof bankAbi, "getTokens", readonly []> {
   const casinoChain = casinoChainById[casinoChainId];
 
   const abi = bankAbi;
@@ -112,17 +110,21 @@ export function getCasinoTokensFunctionData(casinoChainId: CasinoChainId): BetSw
  */
 export type RawBetRequirements = [boolean, bigint, bigint];
 
-export function parseRawBetRequirements(rawBetRequirements: RawBetRequirements, token: Token, multiplier: number, game: CASINO_GAME_TYPE, casinoChainId: CasinoChainId): BetRequirements {
+export function parseRawBetRequirements(
+  rawBetRequirements: RawBetRequirements,
+  token: Token,
+  multiplier: number,
+  game: CASINO_GAME_TYPE,
+  casinoChainId: CasinoChainId,
+): BetRequirements {
   return {
     token,
     multiplier,
     chainId: casinoChainId,
     maxBetAmount: rawBetRequirements[1],
-    maxBetCount: Math.min(
-      Number(rawBetRequirements[2]),
-      maxGameBetCountByType[game]),
-    isAllowed: rawBetRequirements[0]
-  }
+    maxBetCount: Math.min(Number(rawBetRequirements[2]), maxGameBetCountByType[game]),
+    isAllowed: rawBetRequirements[0],
+  };
 }
 
 export async function getBetRequirements(
@@ -133,12 +135,10 @@ export async function getBetRequirements(
 ): Promise<BetRequirements> {
   const casinoChainId = getCasinoChainId(wallet);
   try {
-    const functionData = getBetRequirementsFunctionData(
-      token.address,
-      multiplier,
-      casinoChainId
+    const functionData = getBetRequirementsFunctionData(token.address, multiplier, casinoChainId);
+    const rawBetRequirements = await wallet.readContract<typeof functionData, RawBetRequirements>(
+      functionData,
     );
-    const rawBetRequirements = await wallet.readContract<typeof functionData, RawBetRequirements>(functionData);
 
     return parseRawBetRequirements(rawBetRequirements, token, multiplier, game, casinoChainId);
   } catch (error) {
@@ -148,7 +148,7 @@ export async function getBetRequirements(
       {
         chainId: casinoChainId,
         cause: error,
-      }
+      },
     );
   }
 }
@@ -156,7 +156,7 @@ export async function getBetRequirements(
 export function getBetRequirementsFunctionData(
   tokenAddress: Hex,
   multiplier: number,
-  casinoChainId: CasinoChainId
+  casinoChainId: CasinoChainId,
 ): BetSwirlFunctionData<typeof bankAbi, "getBetRequirements", readonly [Hex, bigint]> {
   const casinoChain = casinoChainById[casinoChainId];
 

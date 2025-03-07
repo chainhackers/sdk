@@ -1,5 +1,5 @@
-import { formatUnits } from "viem";
 import Decimal from "decimal.js";
+import { formatUnits } from "viem";
 
 /**
  * Formats a number or string representation of a number into a more readable string format,
@@ -38,11 +38,11 @@ import Decimal from "decimal.js";
  */
 function _formatAmount(
   input: string | number,
-  maxDecimals: number = 2, // Maximum decimals after the dot
-  minValue: number = 1e-5, // Minimum displayable value
-  trailingDecimals: number = 2 // Maximum decimals after the dot to keep even if they are trailing zero
+  maxDecimals = 2, // Maximum decimals after the dot
+  minValue = 1e-5, // Minimum displayable value
+  trailingDecimals = 2, // Maximum decimals after the dot to keep even if they are trailing zero
 ): string {
-  let amount = new Decimal(input);
+  const amount = new Decimal(input);
   // Check min value
   if (amount.gt(0) && amount.lt(minValue)) {
     return `<${minValue}`;
@@ -56,7 +56,7 @@ function _formatAmount(
     const thresholds = [1e6, 1e9, 1e12, 1e15, 1e18, 1e21, 1e24];
     // Find the most appropriate suffix
     const index = thresholds.findIndex((threshold) =>
-      amount.lt(new Decimal(threshold).times(1000))
+      amount.lt(new Decimal(threshold).times(1000)),
     );
     divisor = new Decimal(thresholds[index]!);
     suffix = suffixes[index]!;
@@ -67,16 +67,14 @@ function _formatAmount(
 
   // Remove some trailing zeros if needed
   if (trailingDecimals < maxDecimals) {
-    let [integerPart, decimalPart] = formattedNumber.split(".");
+    const [integerPart, decimalPart] = formattedNumber.split(".");
     if (decimalPart) {
       const significantPart = decimalPart.slice(0, trailingDecimals);
       // Remove all trailing zeros in the trailed part
-      const trailedPart = decimalPart
-        .slice(trailingDecimals)
-        .replace(/0+$/, "");
+      const trailedPart = decimalPart.slice(trailingDecimals).replace(/0+$/, "");
       formattedNumber = Number(decimalPart)
         ? `${integerPart}.${significantPart}${trailedPart}`
-        : integerPart ?? "0";
+        : (integerPart ?? "0");
     }
   }
   const finalFormattedNumber = formattedNumber + suffix;
@@ -86,20 +84,20 @@ function _formatAmount(
 
 export function formatAmount(
   amount: string | number | undefined,
-  formatType: FORMAT_TYPE = FORMAT_TYPE.STANDARD
+  formatType: FORMAT_TYPE = FORMAT_TYPE.STANDARD,
 ) {
-  if (!amount) amount = 0;
+  const value = amount || 0;
   const { maxDecimals, minValue, trailingDecimals } = formatTypes[formatType];
-  return _formatAmount(amount, maxDecimals, minValue, trailingDecimals);
+  return _formatAmount(value, maxDecimals, minValue, trailingDecimals);
 }
 
 export function formatRawAmount(
   rawAmount: bigint | undefined,
-  decimals: number = 18,
-  formatType: FORMAT_TYPE = FORMAT_TYPE.STANDARD
+  decimals = 18,
+  formatType: FORMAT_TYPE = FORMAT_TYPE.STANDARD,
 ) {
-  if (!rawAmount) rawAmount = 0n;
-  const amount = formatUnits(BigInt(rawAmount), decimals); // let BigInt to avoid "Big number" issue
+  const value = rawAmount || 0n;
+  const amount = formatUnits(BigInt(value), decimals);
   return formatAmount(amount, formatType);
 }
 interface FormatOptions {

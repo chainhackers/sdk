@@ -1,17 +1,15 @@
-import { zeroAddress, type Address } from "viem";
-import type { RawToken, Token } from "../interfaces";
+import { type Address, zeroAddress } from "viem";
+import { GAS_TOKEN_ADDRESS } from "../constants";
 import { casinoChainById, chainById } from "../data";
 import type { CasinoChainId, ChainId } from "../data";
-import { GAS_TOKEN_ADDRESS } from "../constants";
+import type { RawToken, Token } from "../interfaces";
 
 type ChainNativeCurrency = {
   name: string;
   symbol: string;
   decimals: number;
 };
-export function chainNativeCurrencyToToken(
-  nativeCurrency: ChainNativeCurrency
-): Token {
+export function chainNativeCurrencyToToken(nativeCurrency: ChainNativeCurrency): Token {
   return {
     symbol: nativeCurrency.symbol,
     address: zeroAddress,
@@ -28,9 +26,10 @@ export function rawTokenToToken(rawToken: RawToken, casinoChainId: CasinoChainId
   const casinoChain = casinoChainById[casinoChainId];
   return {
     address: rawToken.tokenAddress,
-    symbol: rawToken.tokenAddress === GAS_TOKEN_ADDRESS
-      ? casinoChain.viemChain.nativeCurrency.symbol
-      : rawToken.symbol,
+    symbol:
+      rawToken.tokenAddress === GAS_TOKEN_ADDRESS
+        ? casinoChain.viemChain.nativeCurrency.symbol
+        : rawToken.symbol,
     decimals: rawToken.decimals,
   };
 }

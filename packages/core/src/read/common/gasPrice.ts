@@ -13,8 +13,10 @@ export interface RETURN_TYPE_GAS_PRICES {
 }
 
 export async function getGasPrices(
-  wallet: BetSwirlWallet, chainId?: number): Promise<RETURN_TYPE_GAS_PRICES> {
-  const gasPrice = await wallet.getPublicClient(chainId).getGasPrice()
+  wallet: BetSwirlWallet,
+  chainId?: number,
+): Promise<RETURN_TYPE_GAS_PRICES> {
+  const gasPrice = await wallet.getPublicClient(chainId).getGasPrice();
   const basePrice = gasPrice ? BigInt(gasPrice) : BigInt(1000000000);
 
   return {

@@ -1,37 +1,27 @@
-import {
-  encodeFunctionData,
-  zeroAddress,
-  type Hash,
-  type Hex,
-  type TransactionReceipt,
-} from "viem";
-import {
-  CASINO_GAME_TYPE,
-  casinoChainById,
-  MAX_SDK_HOUSE_EGDE,
-  type CasinoChain,
-  type CasinoChainId,
-} from "../../data/casino";
-import {
-  ChainError,
-  ConfigurationError,
-  TransactionError,
-} from "../../errors/types";
-import { ERROR_CODES } from "../../errors/codes";
-import { ALLOWANCE_TYPE, approve, type ApproveResult } from "../common/approve";
-import { GAS_PRICE_TYPE, getGasPrices } from "../../read/common/gasPrice";
-import { getChainlinkVrfCost } from "../../read/common/chainlinkVrfCost";
+import { type Hash, type Hex, type TransactionReceipt, encodeFunctionData } from "viem";
 import { decodeEventLog } from "viem";
 import { coinTossAbi } from "../../abis/v2/casino/coinToss";
-import type { BetSwirlFunctionData, Token } from "../../interfaces";
-import { chainNativeCurrencyToToken } from "../../utils/tokens";
-import { getTokenMetadata } from "../../read/common/tokenMetadata";
 import { GAS_TOKEN_ADDRESS } from "../../constants";
+import {
+  CASINO_GAME_TYPE,
+  type CasinoChain,
+  type CasinoChainId,
+  MAX_SDK_HOUSE_EGDE,
+  casinoChainById,
+} from "../../data/casino";
 import type { CoinTossEncodedInput } from "../../entities/casino/coinToss";
 import type { DiceEncodedInput } from "../../entities/casino/dice";
 import type { RouletteEncodedInput } from "../../entities/casino/roulette";
+import { ERROR_CODES } from "../../errors/codes";
+import { ChainError, ConfigurationError, TransactionError } from "../../errors/types";
+import type { BetSwirlFunctionData, Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
+import { getChainlinkVrfCost } from "../../read/common/chainlinkVrfCost";
+import { GAS_PRICE_TYPE, getGasPrices } from "../../read/common/gasPrice";
+import { getTokenMetadata } from "../../read/common/tokenMetadata";
 import { getCasinoChainId } from "../../utils";
+import { chainNativeCurrencyToToken } from "../../utils/tokens";
+import { ALLOWANCE_TYPE, type ApproveResult, approve } from "../common/approve";
 
 export interface CasinoBetParams {
   betAmount: bigint;
@@ -66,10 +56,7 @@ export const defaultCasinoPlaceBetOptions = {
   allowanceType: ALLOWANCE_TYPE.AUTO,
 };
 // Game should not know the game implementation details, but well..  it helps developers
-export type GameEncodedInput =
-  | CoinTossEncodedInput
-  | DiceEncodedInput
-  | RouletteEncodedInput;
+export type GameEncodedInput = CoinTossEncodedInput | DiceEncodedInput | RouletteEncodedInput;
 
 export interface GenericCasinoBetParams extends CasinoBetParams {
   game: CASINO_GAME_TYPE;
@@ -95,10 +82,7 @@ export interface CasinoPlacedBet {
 
 export interface PlaceBetCallbacks {
   onApprovePending?: (tx: Hash, result: ApproveResult) => void | Promise<void>;
-  onApproved?: (
-    receipt: TransactionReceipt,
-    result: ApproveResult
-  ) => void | Promise<void>;
+  onApproved?: (receipt: TransactionReceipt, result: ApproveResult) => void | Promise<void>;
   onBetPlacedPending?: (tx: Hash) => void | Promise<void>;
 }
 
@@ -106,7 +90,7 @@ export async function placeBet(
   wallet: BetSwirlWallet,
   betParams: GenericCasinoBetParams,
   options?: CasinoPlaceBetOptions,
-  callbacks?: PlaceBetCallbacks
+  callbacks?: PlaceBetCallbacks,
 ): Promise<{ placedBet: CasinoPlacedBet; receipt: TransactionReceipt }> {
   const casinoChainId = getCasinoChainId(wallet);
   const casinoChain = casinoChainById[casinoChainId];
@@ -119,19 +103,18 @@ export async function placeBet(
       {
         chainId: casinoChainId,
         supportedChains: Object.keys(casinoChainById),
-      }
+      },
     );
   }
 
-  const accountAddress =
-    betParams.receiver || wallet.getAccount(casinoChainId)?.address
+  const accountAddress = betParams.receiver || wallet.getAccount(casinoChainId)?.address;
   if (!accountAddress) {
     throw new ConfigurationError(
       `No configured account in the wallet for chain ${casinoChain.viemChain.name} (${casinoChainId})`,
       ERROR_CODES.WALLET.ACCOUNT_MISSING,
       {
         chainId: casinoChainId,
-      }
+      },
     );
   }
   try {
@@ -139,25 +122,22 @@ export async function placeBet(
     const gasPrice =
       options?.gasPrice ||
       (await getGasPrices(wallet, casinoChainId))[
-      options?.gasPriceType || defaultCasinoPlaceBetOptions.gasPriceType
+        options?.gasPriceType || defaultCasinoPlaceBetOptions.gasPriceType
       ];
     const token =
-      betParams.token ||
-      chainNativeCurrencyToToken(casinoChain.viemChain.nativeCurrency);
+      betParams.token || chainNativeCurrencyToToken(casinoChain.viemChain.nativeCurrency);
 
     // Generate function data
     const receiver = betParams.receiver || accountAddress;
     const functionData = getPlaceBetFunctionData(
       { ...betParams, receiver, tokenAddress: token.address },
-      casinoChainId
+      casinoChainId,
     );
 
     // Approve if needed
 
-    const allowanceType =
-      options?.allowanceType || defaultCasinoPlaceBetOptions.allowanceType;
-    const pollingInterval =
-      options?.pollInterval || casinoChain.options.pollingInterval;
+    const allowanceType = options?.allowanceType || defaultCasinoPlaceBetOptions.allowanceType;
+    const pollingInterval = options?.pollInterval || casinoChain.options.pollingInterval;
 
     const { receipt: approveReceipt, result: approveResult } = await approve(
       wallet,
@@ -168,11 +148,10 @@ export async function placeBet(
       gasPrice,
       pollingInterval,
       allowanceType,
-      callbacks?.onApprovePending
+      callbacks?.onApprovePending,
     );
 
-    if (approveReceipt)
-      await callbacks?.onApproved?.(approveReceipt, approveResult);
+    if (approveReceipt) await callbacks?.onApproved?.(approveReceipt, approveResult);
 
     // Get VRF fees
     const vrfFees =
@@ -182,18 +161,18 @@ export async function placeBet(
         betParams.game,
         token.address,
         functionData.extraData.betCount,
-        gasPrice
+        gasPrice,
       ));
     // Execute place bet tx
-    const hash = await wallet.writeContract(functionData, functionData.extraData.getValue(vrfFees), gasPrice)
-    await callbacks?.onBetPlacedPending?.(hash);
-    const receipt = await wallet.waitTransaction(hash, pollingInterval)
-
-    const placedBet = await getPlacedBetFromReceipt(
-      wallet,
-      receipt,
-      betParams.game
+    const hash = await wallet.writeContract(
+      functionData,
+      functionData.extraData.getValue(vrfFees),
+      gasPrice,
     );
+    await callbacks?.onBetPlacedPending?.(hash);
+    const receipt = await wallet.waitTransaction(hash, pollingInterval);
+
+    const placedBet = await getPlacedBetFromReceipt(wallet, receipt, betParams.game);
     if (!placedBet) {
       throw new TransactionError(
         "PlaceBet event not found",
@@ -203,7 +182,7 @@ export async function placeBet(
           gameType: betParams.game,
           chainId: casinoChainId,
           token,
-        }
+        },
       );
     }
 
@@ -221,7 +200,7 @@ export async function placeBet(
         betCount: betParams.betCount,
         stopGain: betParams.stopGain,
         stopLoss: betParams.stopLoss,
-      }
+      },
     );
   }
 }
@@ -232,8 +211,24 @@ export function getPlaceBetFunctionData(
     receiver: Hex;
     tokenAddress?: Hex;
   },
-  chainId: CasinoChainId
-): BetSwirlFunctionData<GameAbi<typeof gameParams.game>, "wager", readonly [...GameEncodedInput[], Hex, Hex, { readonly token: Hex; readonly betAmount: bigint; readonly betCount: number; readonly stopGain: bigint; readonly stopLoss: bigint; readonly maxHouseEdge: number; }]> & {
+  chainId: CasinoChainId,
+): BetSwirlFunctionData<
+  GameAbi<typeof gameParams.game>,
+  "wager",
+  readonly [
+    ...GameEncodedInput[],
+    Hex,
+    Hex,
+    {
+      readonly token: Hex;
+      readonly betAmount: bigint;
+      readonly betCount: number;
+      readonly stopGain: bigint;
+      readonly stopLoss: bigint;
+      readonly maxHouseEdge: number;
+    },
+  ]
+> & {
   extraData: {
     totalBetAmount: bigint;
     tokenAddress: Hex;
@@ -243,7 +238,7 @@ export function getPlaceBetFunctionData(
     maxHouseEdge: number;
     affiliate: Hex;
     getValue: (vrfFees: bigint) => bigint;
-  }
+  };
 } {
   const casinoChain = casinoChainById[chainId];
   const game = casinoChain.contracts.games[gameParams.game];
@@ -255,7 +250,7 @@ export function getPlaceBetFunctionData(
       {
         chainId,
         supportedChains: Object.keys(casinoChainById),
-      }
+      },
     );
   }
 
@@ -280,7 +275,7 @@ export function getPlaceBetFunctionData(
       betCount,
       stopGain,
       stopLoss,
-      maxHouseEdge
+      maxHouseEdge,
     },
   ] as const;
 
@@ -296,7 +291,8 @@ export function getPlaceBetFunctionData(
       stopLoss,
       maxHouseEdge,
       affiliate,
-      getValue: (vrfFees: bigint) => tokenAddress == GAS_TOKEN_ADDRESS ? totalBetAmount + vrfFees : vrfFees
+      getValue: (vrfFees: bigint) =>
+        tokenAddress === GAS_TOKEN_ADDRESS ? totalBetAmount + vrfFees : vrfFees,
     },
   };
 }
@@ -306,7 +302,7 @@ export async function getPlacedBetFromReceipt(
   receipt: TransactionReceipt,
   game: CASINO_GAME_TYPE,
   chainId?: CasinoChainId,
-  usedToken?: Token // to avoid to fetch the token metadata from the chain if the token used is already known
+  usedToken?: Token, // to avoid to fetch the token metadata from the chain if the token used is already known
 ): Promise<CasinoPlacedBet | null> {
   const casinoChainId = getCasinoChainId(wallet, chainId);
   const casinoChain = casinoChainById[casinoChainId];

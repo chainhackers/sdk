@@ -10,12 +10,7 @@ export interface ChoiceInput {
   formattedNetMultiplier?: number;
 }
 
-export abstract class AbstractCasinoGame<
-  TInput,
-  TEncodedInput,
-  TRolled,
-  TEncodedRolled
-> {
+export abstract class AbstractCasinoGame<TInput, TEncodedInput, TRolled, TEncodedRolled> {
   getWinChancePercent(_input: TInput | string): number {
     throw new Error("Not implemented");
   }

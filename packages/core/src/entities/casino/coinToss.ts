@@ -41,9 +41,7 @@ export class CoinToss extends AbstractCasinoGame<
     return Boolean(face);
   }
 
-  static decodeInput(
-    encodedFace: CoinTossEncodedInput | string
-  ): COINTOSS_FACE {
+  static decodeInput(encodedFace: CoinTossEncodedInput | string): COINTOSS_FACE {
     if (typeof encodedFace === "string") {
       const normalizedValue = encodedFace.toLowerCase();
       return normalizedValue === "true" || normalizedValue === "1"
@@ -53,20 +51,14 @@ export class CoinToss extends AbstractCasinoGame<
     return encodedFace ? COINTOSS_FACE.HEADS : COINTOSS_FACE.TAILS;
   }
 
-  static decodeRolled(
-    encodedFace: CoinTossEncodedRolled | string
-  ): COINTOSS_FACE {
+  static decodeRolled(encodedFace: CoinTossEncodedRolled | string): COINTOSS_FACE {
     return CoinToss.decodeInput(encodedFace);
   }
   // houseEdge is a number between 0 and 10000
   static getChoiceInputs(houseEdge?: number): CoinTossChoiceInput[] {
     const multiplier = CoinToss.getMultiplier(COINTOSS_FACE.TAILS);
-    const formattedMultiplier = CoinToss.getFormattedMultiplier(
-      COINTOSS_FACE.TAILS
-    );
-    const netMultiplier = houseEdge
-      ? getNetMultiplier(multiplier, houseEdge)
-      : undefined;
+    const formattedMultiplier = CoinToss.getFormattedMultiplier(COINTOSS_FACE.TAILS);
+    const netMultiplier = houseEdge ? getNetMultiplier(multiplier, houseEdge) : undefined;
     const formattedNetMultiplier = houseEdge
       ? getFormattedNetMultiplier(multiplier, houseEdge)
       : undefined;

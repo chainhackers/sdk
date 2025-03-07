@@ -27,21 +27,12 @@
     "build": "rimraf ./dist && tsup --tsconfig tsconfig.build.json",
     "prepublishOnly": "cross-env NODE_ENV=production npm run build"
   },
-  "contributors": [
-    "kinco_dev"
-  ],
-  "keywords": [
-    "betswirl",
-    "wagmi",
-    "casino",
-    "web3"
-  ],
+  "contributors": ["kinco_dev"],
+  "keywords": ["betswirl", "wagmi", "casino", "web3"],
   "peerDependencies": {
     "@wagmi/core": ">=2.16.3"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "dependencies": {
     "@betswirl/sdk-core": "workspace:*",
     "viem": "catalog:"

@@ -2,17 +2,18 @@ import type { Hash } from "viem";
 import { ERROR_CODES, TransactionError } from "../errors";
 import type { BetSwirlWallet } from "../provider";
 
-
 export async function getTransactionReceiptWithRetry(
   wallet: BetSwirlWallet,
   txHash: Hash,
-  retries: number[] = [250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2500, 3000, 3500, 4000, 4500, 5000]
+  retries: number[] = [
+    250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2500, 3000, 3500, 4000, 4500, 5000,
+  ],
 ) {
   let lastError: Error | undefined;
 
   for (const delay of retries) {
     try {
-      const receipt = wallet.getTransactionReceipt(txHash)
+      const receipt = wallet.getTransactionReceipt(txHash);
       return receipt;
     } catch (error) {
       lastError = error as Error;
@@ -27,7 +28,6 @@ export async function getTransactionReceiptWithRetry(
       hash: txHash,
       chainId: wallet.getChainId(),
       retries,
-    }
+    },
   );
 }
-
