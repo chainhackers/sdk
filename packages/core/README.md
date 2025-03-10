@@ -44,6 +44,7 @@ import { initWagmiBetSwirlClient} from "@betswirl/wagmi-provider";
 ### 2. With the native BetSwirl client (Viem)
 
 Using the sdk with the native BetSwirl Viem client helps you to reduce your codebase.
+**walletClient** is optional if you only need to read data.
 
 ```typescript
 import { http, createWalletClient, createPublicClient } from "viem";
@@ -52,18 +53,20 @@ import { initViemBetSwirlClient } from "@betswirl/sdk-core";
   /* Create the Viem clients */
   const account = privateKeyToAccount("0x...");
   const transport = http("https://...")
-  const walletClient = createWalletClient({
-    chain: casinoChain.viemChain,
-    transport,
-    account,
-  })
+
   const publicClient = createPublicClient({
     chain: casinoChain.viemChain,
     transport,
   });
 
+  const walletClient = createWalletClient({
+    chain: casinoChain.viemChain,
+    transport,
+    account,
+  })
+
   /* Create the native BetSwirl client */
-  const viemBetSwirlClient = initViemBetSwirlClient(walletClient, publicClient, {
+  const viemBetSwirlClient = initViemBetSwirlClient(publicClient, walletClient, {
     chainId: 137,
     affiliate: "0x...",
     gasPriceType: GAS_PRICE_TYPE.FAST,
@@ -79,7 +82,7 @@ import { initViemBetSwirlClient } from "@betswirl/sdk-core";
 ```
 
 ### 3. Without a client (only a wallet)
-Using the sdk withtout a client doesn't let you to centralize all your options in one place. It's more appropriate for projects using only one or two sdk functions. The example below uses the BetSwirl viem wallet, which is native to the sdk.
+Using the sdk withtout a client doesn't let you to centralize all your options in one place. It's more appropriate for projects using only one or two sdk functions. The example below uses the BetSwirl viem wallet, which is native to the sdk. **walletClient** is optional if you only need to read data.
 
 
 ```typescript
@@ -89,18 +92,21 @@ import { initViemBetSwirlClient } from "@betswirl/sdk-core";
   /* Create the Viem clients */
   const account = privateKeyToAccount("0x...");
   const transport = http("https://...")
-  const walletClient = createWalletClient({
-    chain: casinoChain.viemChain,
-    transport,
-    account,
-  })
+
   const publicClient = createPublicClient({
     chain: casinoChain.viemChain,
     transport,
   });
 
+  const walletClient = createWalletClient({
+    chain: casinoChain.viemChain,
+    transport,
+    account,
+  })
+  
+
   /* Create the native BetSwirl wallet */
-  const viemBetSwirlWallet = new ViemBetSwirlWallet(walletClient,publicClient)
+  const viemBetSwirlWallet = new ViemBetSwirlWallet(publicClient, walletClient)
 
   /* Use functionalities with the wallet*/
   const casinoGames = await getCasinoGames(viemBetSwirlWallet, false);

@@ -6,6 +6,9 @@ echo "Running linter and fixing issues..."
 # Run linter and fix issues
 pnpm lint:fix 
 
+# Add files modified by the linter
+git add .
+
 echo "Building the project..."
 # Build the project
 pnpm build

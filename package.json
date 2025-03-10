@@ -14,11 +14,7 @@
     "prepare": "husky"
   },
   "type": "module",
-  "workspaces": [
-    "packages/core",
-    "packages/providers/*",
-    "examples/*"
-  ],
+  "workspaces": ["packages/core", "packages/providers/*", "examples/*"],
   "engines": {
     "node": ">=20.11.1 <23",
     "npm": "please-use-pnpm",

@@ -1,5 +1,12 @@
 # @betswirl/wagmi-provider
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes

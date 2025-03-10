@@ -39,11 +39,11 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   public publicClient: PublicClient;
 
   constructor(
-    walletClient: WalletClient,
     publicClient: PublicClient,
+    walletClient?: WalletClient,
     betSwirlDefaultOptions: BetSwirlClientOptions = {},
   ) {
-    super(new ViemBetSwirlWallet(walletClient, publicClient), betSwirlDefaultOptions);
+    super(new ViemBetSwirlWallet(publicClient, walletClient), betSwirlDefaultOptions);
     this.publicClient = publicClient;
   }
 
@@ -167,18 +167,18 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   /* Private */
 
   static init(
-    viemWalletClient: WalletClient,
     viemPublicClient: PublicClient,
+    viemWalletClient?: WalletClient,
     options?: BetSwirlClientOptions,
   ): ViemBetSwirlClient {
-    return new ViemBetSwirlClient(viemWalletClient, viemPublicClient, options);
+    return new ViemBetSwirlClient(viemPublicClient, viemWalletClient, options);
   }
 }
 
 export function initViemBetSwirlClient(
-  viemWalletClient: WalletClient,
   viemPublicClient: PublicClient,
+  viemWalletClient?: WalletClient,
   options?: BetSwirlClientOptions,
 ): ViemBetSwirlClient {
-  return ViemBetSwirlClient.init(viemWalletClient, viemPublicClient, options);
+  return ViemBetSwirlClient.init(viemPublicClient, viemWalletClient, options);
 }

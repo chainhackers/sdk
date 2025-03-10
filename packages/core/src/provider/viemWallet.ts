@@ -10,21 +10,21 @@ import type { BetSwirlEventData, BetSwirlFunctionData } from "../interfaces";
 import { BetSwirlWallet } from "./wallet";
 
 export class ViemBetSwirlWallet extends BetSwirlWallet {
-  private walletClient: WalletClient;
   public publicClient: PublicClient;
+  private walletClient?: WalletClient;
 
-  constructor(viemWalletClient: WalletClient, viemPublicClient: PublicClient) {
+  constructor(viemPublicClient: PublicClient, viemWalletClient?: WalletClient) {
     super();
     this.walletClient = viemWalletClient;
     this.publicClient = viemPublicClient;
   }
 
   getChainId() {
-    return this.walletClient.chain!.id;
+    return this.walletClient?.chain?.id ?? this.publicClient.chain!.id;
   }
 
   getAccount(_chainId?: number) {
-    return this.walletClient.account;
+    return this.walletClient?.account;
   }
 
   getPublicClient(_chainId?: number) {
@@ -91,6 +91,10 @@ export class ViemBetSwirlWallet extends BetSwirlWallet {
     value?: bigint,
     gasPrice?: bigint,
   ): Promise<Hash> {
+    if (!this.walletClient) {
+      throw new Error("[ViemBetSwirlWallet]Wallet client is not initialized");
+    }
+
     const { request } = await this.publicClient.simulateContract({
       address: functionData.data.to,
       abi: functionData.data.abi,
