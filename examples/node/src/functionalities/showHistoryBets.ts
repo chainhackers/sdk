@@ -9,6 +9,7 @@ import {
   bigIntFormatter,
   casinoChains,
   formatTxnUrl,
+  getBetSwirlBetUrl,
   labelCasinoGameByType,
 } from "@betswirl/sdk-core";
 import { WagmiBetSwirlClient, initWagmiBetSwirlClient } from "@betswirl/wagmi-provider";
@@ -118,12 +119,12 @@ function _showBet(bet: CasinoBet) {
       const benefitInfo = `${bet.formattedBenefit} ${bet.token.symbol}`;
       const rollBetInfo = `Payout: ${bet.formattedPayout} ${
         bet.token.symbol
-      }\nMultiplier: ${bet.payoutMultiplier}x\nResult: ${
+      }\nMultiplier: x${bet.formattedPayoutMultiplier}\nResult: ${
         bet.isWin ? chalk.green(`+${benefitInfo}`) : chalk.red(benefitInfo)
       }\nRolled: ${bet.decodedRolled}\nRoll date: ${bet.rollDate?.toLocaleString()}\nRoll txn: ${formatTxnUrl(
         bet.rollTxnHash!,
         bet.chainId,
-      )}\n${
+      )}\nBetSwirl url: ${getBetSwirlBetUrl(bet.id, bet.game, bet.chainId)}\n${
         bet.isStopGainTriggered || bet.isStopLossTriggered
           ? chalk.yellow(
               `\n=> Only ${bet.rollBetCount}/${bet.betCount} have been rolled because stop ${

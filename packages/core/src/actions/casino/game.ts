@@ -40,14 +40,14 @@ export const defaultCasinoGameParams = {
   stopGain: 0n,
   stopLoss: 0n,
   vrfFees: 0n, // When 0, VRF fees are calculated on the fly
-  //pollInterval: => data in casino.ts
+  //pollingInterval: => data in casino.ts
 };
 
 export interface CasinoPlaceBetOptions {
   gasPriceType?: GAS_PRICE_TYPE;
   gasPrice?: bigint; // wei
   allowanceType?: ALLOWANCE_TYPE;
-  pollInterval?: number;
+  pollingInterval?: number;
 }
 
 export const defaultCasinoPlaceBetOptions = {
@@ -74,8 +74,8 @@ export interface CasinoPlacedBet {
   receiver: Hex;
   stopGain: bigint;
   stopLoss: bigint;
-  placeBetHash: Hash;
-  placeBetBlock: bigint;
+  betTxnHash: Hash;
+  betBlock: bigint;
   chainId: CasinoChainId;
   game: CASINO_GAME_TYPE;
 }
@@ -137,7 +137,7 @@ export async function placeBet(
     // Approve if needed
 
     const allowanceType = options?.allowanceType || defaultCasinoPlaceBetOptions.allowanceType;
-    const pollingInterval = options?.pollInterval || casinoChain.options.pollingInterval;
+    const pollingInterval = options?.pollingInterval || casinoChain.options.pollingInterval;
 
     const { receipt: approveReceipt, result: approveResult } = await approve(
       wallet,
@@ -344,8 +344,8 @@ export async function getPlacedBetFromReceipt(
     receiver: args.receiver,
     stopGain: args.stopGain,
     stopLoss: args.stopLoss,
-    placeBetHash: receipt.transactionHash,
-    placeBetBlock: receipt.blockNumber,
+    betTxnHash: receipt.transactionHash,
+    betBlock: receipt.blockNumber,
     chainId: casinoChainId,
     game,
   };

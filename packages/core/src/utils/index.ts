@@ -1,5 +1,6 @@
 import type { Address, Hash } from "viem";
-import { type ChainId, chainById } from "../data";
+import { BETSWIRL_BASE_URL } from "../constants";
+import { CASINO_GAME_TYPE, type ChainId, chainById, slugById } from "../data";
 
 export * from "./chains";
 export * from "./tokens";
@@ -31,4 +32,12 @@ export function formatAccountUrl(account: Address, chainId: ChainId) {
 export function formatTxnUrl(tx: Hash, chainId: ChainId) {
   const chain = chainById[chainId];
   return `${chain.blockExplorers?.default.url}/tx/${tx}`;
+}
+
+export function getBetSwirlBetUrl(
+  betId: bigint | string,
+  game: CASINO_GAME_TYPE,
+  chainId: ChainId,
+) {
+  return `${BETSWIRL_BASE_URL}/${slugById[chainId]}/casino/${game}/${betId.toString()}`;
 }

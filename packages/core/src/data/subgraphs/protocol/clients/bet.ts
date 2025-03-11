@@ -86,7 +86,7 @@ export function formatCasinoBet(
     formattedPayout: bet.payout
       ? formatRawAmount(BigInt(bet.payout), token.decimals, formatType)
       : undefined,
-    payoutMultiplier: bet.payoutMultiplier ? Number(bet.payoutMultiplier) : undefined,
+    formattedPayoutMultiplier: bet.payoutMultiplier ? Number(bet.payoutMultiplier) : undefined,
     benefit,
     formattedBenefit: benefit ? formatRawAmount(benefit, token.decimals, formatType) : undefined,
     rollTxnHash: bet.rollTxnHash,

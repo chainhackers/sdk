@@ -122,7 +122,7 @@ export interface CasinoBet {
   decodedInput: any;
   payout?: bigint;
   formattedPayout?: string;
-  payoutMultiplier?: number;
+  formattedPayoutMultiplier?: number;
   benefit?: bigint;
   formattedBenefit?: string;
   rollTxnHash?: Hash;

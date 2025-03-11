@@ -4,7 +4,7 @@ import { Dice, type DiceNumber } from "../../entities/casino/dice";
 import type { BetSwirlWallet } from "../../provider";
 import { type CasinoRolledBet, type CasinoWaitRollOptions, waitRolledBet } from "./game";
 
-export interface DiceRolledBet extends CasinoRolledBet {
+export interface DiceRolledBet extends Omit<CasinoRolledBet, "decodedRoll"> {
   rolled: DiceNumber[];
 }
 

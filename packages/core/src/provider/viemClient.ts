@@ -3,6 +3,9 @@ import {
   type BetRequirements,
   type BetSwirlClientOptions,
   type CasinoGameToken,
+  type CasinoPlaceBetOptions,
+  type CasinoPlacedBet,
+  type CasinoRolledBet,
   type CasinoToken,
   type CasinoWaitRollOptions,
   type CoinTossRolledBet,
@@ -27,6 +30,7 @@ import {
   placeRouletteBet,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
+  waitRolledBet,
   waitRouletteRolledBet,
 } from "..";
 import { type CoinTossPlacedBet, placeCoinTossBet } from "../actions/casino/coinToss";
@@ -48,8 +52,20 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   }
 
   /* Casino Games */
+
+  async waitRolledBet(
+    placedBet: CasinoPlacedBet,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }> {
+    return waitRolledBet(this.betSwirlWallet, placedBet, {
+      ...this.betSwirlDefaultOptions,
+      ...options,
+    });
+  }
+
   async playCoinToss(
     params: CoinTossParams,
+    options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
     return placeCoinTossBet(
@@ -57,6 +73,7 @@ export class ViemBetSwirlClient extends BetSwirlClient {
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
       {
         ...this.betSwirlDefaultOptions,
+        ...options,
       },
       callbacks,
     );
@@ -64,13 +81,17 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   async waitCoinToss(
     placedBet: CoinTossPlacedBet,
-    options: CasinoWaitRollOptions,
+    options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: CoinTossRolledBet; receipt: TransactionReceipt }> {
-    return waitCoinTossRolledBet(this.betSwirlWallet, placedBet, options);
+    return waitCoinTossRolledBet(this.betSwirlWallet, placedBet, {
+      ...this.betSwirlDefaultOptions,
+      ...options,
+    });
   }
 
   async playDice(
     params: DiceParams,
+    options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
     return placeDiceBet(
@@ -78,6 +99,7 @@ export class ViemBetSwirlClient extends BetSwirlClient {
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
       {
         ...this.betSwirlDefaultOptions,
+        ...options,
       },
       callbacks,
     );
@@ -85,13 +107,17 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   async waitDice(
     placedBet: DicePlacedBet,
-    options: CasinoWaitRollOptions,
+    options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: DiceRolledBet; receipt: TransactionReceipt }> {
-    return waitDiceRolledBet(this.betSwirlWallet, placedBet, options);
+    return waitDiceRolledBet(this.betSwirlWallet, placedBet, {
+      ...this.betSwirlDefaultOptions,
+      ...options,
+    });
   }
 
   async playRoulette(
     params: RouletteParams,
+    options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: RoulettePlacedBet; receipt: TransactionReceipt }> {
     return placeRouletteBet(
@@ -99,6 +125,7 @@ export class ViemBetSwirlClient extends BetSwirlClient {
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
       {
         ...this.betSwirlDefaultOptions,
+        ...options,
       },
       callbacks,
     );
@@ -106,9 +133,12 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   async waitRoulette(
     placedBet: RoulettePlacedBet,
-    options: CasinoWaitRollOptions,
+    options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: RouletteRolledBet; receipt: TransactionReceipt }> {
-    return waitRouletteRolledBet(this.betSwirlWallet, placedBet, options);
+    return waitRouletteRolledBet(this.betSwirlWallet, placedBet, {
+      ...this.betSwirlDefaultOptions,
+      ...options,
+    });
   }
 
   /* Casino Utilities */

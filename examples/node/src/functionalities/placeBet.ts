@@ -6,27 +6,26 @@ import {
   type CasinoChain,
   type CasinoGame,
   type CasinoGameToken,
+  type CasinoPlacedBet,
   type CasinoToken,
   type ChoiceInput,
   CoinToss,
   type CoinTossChoiceInput,
   type CoinTossPlacedBet,
-  type CoinTossRolledBet,
   Dice,
   type DiceChoiceInput,
   type DicePlacedBet,
-  type DiceRolledBet,
   FORMAT_TYPE,
   GAS_PRICE_TYPE,
   Roulette,
   type RouletteChoiceInput,
   type RoulettePlacedBet,
-  type RouletteRolledBet,
   bigIntFormatter,
   casinoChains,
   chainById,
   formatRawAmount,
   formatTxnUrl,
+  getBetSwirlBetUrl,
   labelCasinoGameByType,
 } from "@betswirl/sdk-core";
 import { WagmiBetSwirlClient, initWagmiBetSwirlClient } from "@betswirl/wagmi-provider";
@@ -381,6 +380,7 @@ async function _placeBet(
     const diceCap = (inputChoice as DiceChoiceInput).value;
     placedBetData = await wagmiBetSwirlClient.playDice(
       { ...commonParams, cap: diceCap },
+      undefined,
       callbacks,
       casinoGameToken.chainId,
     );
@@ -388,6 +388,7 @@ async function _placeBet(
     const coinTossFace = (inputChoice as CoinTossChoiceInput).value;
     placedBetData = await wagmiBetSwirlClient.playCoinToss(
       { ...commonParams, face: coinTossFace },
+      undefined,
       callbacks,
       casinoGameToken.chainId,
     );
@@ -395,6 +396,7 @@ async function _placeBet(
     const rouletteNumbers = (inputChoice as RouletteChoiceInput).value;
     placedBetData = await wagmiBetSwirlClient.playRoulette(
       { ...commonParams, numbers: rouletteNumbers },
+      undefined,
       callbacks,
       casinoGameToken.chainId,
     );
@@ -412,56 +414,32 @@ async function _placeBet(
   return placedBetData.placedBet;
 }
 
-async function _waitRoll(placedBet: CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet) {
-  let rolledBetData: {
-    receipt: TransactionReceipt;
-    rolledBet: CoinTossRolledBet | DiceRolledBet | RouletteRolledBet;
-  };
+async function _waitRoll(placedBet: CasinoPlacedBet) {
   console.log(chalk.blue("⌛ Waiting the bet to be rolled..."));
-  const commonOptions = {
+  const rolledBetData = await wagmiBetSwirlClient.waitRolledBet(placedBet, {
     timeout: 300000, //5min
     pollingInterval: process.env.RPC_URL ? 500 : 2500,
-  };
+    formatType: FORMAT_TYPE.FULL_PRECISE,
+  });
 
-  if (placedBet.game === CASINO_GAME_TYPE.DICE) {
-    rolledBetData = await wagmiBetSwirlClient.waitDice(placedBet as DicePlacedBet, commonOptions);
-  } else if (placedBet.game === CASINO_GAME_TYPE.COINTOSS) {
-    rolledBetData = await wagmiBetSwirlClient.waitCoinToss(
-      placedBet as CoinTossPlacedBet,
-      commonOptions,
-    );
-  } else {
-    rolledBetData = await wagmiBetSwirlClient.waitRoulette(
-      placedBet as RoulettePlacedBet,
-      commonOptions,
-    );
-  }
   const rolledBet = rolledBetData.rolledBet;
   const chain = chainById[rolledBet.chainId];
   const commonMessage = chalk.blue(
-    `Payout: ${formatRawAmount(rolledBet.payout, rolledBet.token.decimals, FORMAT_TYPE.FULL_PRECISE)} ${
+    `Payout: ${rolledBet.formattedPayout} ${
       rolledBet.token.symbol
-    }\nTotal bet amount: ${formatRawAmount(
-      rolledBet.rollTotalBetAmount,
-      rolledBet.token.decimals,
-      FORMAT_TYPE.FULL_PRECISE,
-    )} ${rolledBet.token.symbol}\nBet count: ${rolledBet.rolledBetCount}\nCharged VRF cost: ${formatRawAmount(
+    }\nTotal bet amount: ${rolledBet.formattedRollTotalBetAmount} ${rolledBet.token.symbol}\nBet count: ${rolledBet.rollBetCount}\nCharged VRF cost: ${formatRawAmount(
       rolledBet.chargedVRFCost,
       chain.nativeCurrency.decimals,
       FORMAT_TYPE.PRECISE,
     )} ${chain.nativeCurrency.symbol}\nRolled: ${JSON.stringify(
-      rolledBet.rolled,
-    )}\nRoll txn: ${formatTxnUrl(rolledBet.rollTx, rolledBet.chainId)}`,
+      rolledBet.decodedRolled,
+    )}\nRoll txn: ${formatTxnUrl(rolledBet.rollTxnHash, rolledBet.chainId)}\nBetSwirl url: ${getBetSwirlBetUrl(rolledBet.id, rolledBet.game, rolledBet.chainId)}`,
   );
   // Win
   if (rolledBetData.rolledBet.isWin) {
     console.log(
       chalk.green(
-        `🥳 Congrats you won ${formatRawAmount(
-          rolledBet.benefit,
-          rolledBet.token.decimals,
-          FORMAT_TYPE.FULL_PRECISE,
-        )} ${rolledBet.token.symbol}\n`,
+        `🥳 Congrats you won ${rolledBet.formattedBenefit} ${rolledBet.token.symbol} (x${rolledBet.formattedPayoutMultiplier})\n`,
         commonMessage,
       ),
     );
@@ -470,11 +448,7 @@ async function _waitRoll(placedBet: CoinTossPlacedBet | DicePlacedBet | Roulette
   else {
     console.log(
       chalk.red(
-        `😔 Arf, you lost ${formatRawAmount(
-          -rolledBetData.rolledBet.benefit,
-          rolledBet.token.decimals,
-          FORMAT_TYPE.FULL_PRECISE,
-        )} ${rolledBet.token.symbol}\n`,
+        `😔 Arf, you lost ${rolledBet.formattedBenefit} ${rolledBet.token.symbol} (x${rolledBet.formattedPayoutMultiplier})\n`,
         commonMessage,
       ),
     );

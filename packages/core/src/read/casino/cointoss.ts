@@ -4,7 +4,7 @@ import { type COINTOSS_FACE, CoinToss } from "../../entities/casino/coinToss";
 import type { BetSwirlWallet } from "../../provider";
 import { type CasinoRolledBet, type CasinoWaitRollOptions, waitRolledBet } from "./game";
 
-export interface CoinTossRolledBet extends CasinoRolledBet {
+export interface CoinTossRolledBet extends Omit<CasinoRolledBet, "decodedRoll"> {
   rolled: COINTOSS_FACE[];
 }
 

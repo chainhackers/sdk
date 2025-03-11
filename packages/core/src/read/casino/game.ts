@@ -4,6 +4,7 @@ import {
   type Hex,
   type TransactionReceipt,
   encodeFunctionData,
+  formatUnits,
   parseAbiItem,
 } from "viem";
 import { getLogs } from "viem/actions";
@@ -24,31 +25,48 @@ import type {
   CasinoGame,
   CasinoGameToken,
   CasinoToken,
+  Token,
 } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
+import { chainNativeCurrencyToToken, decodeCasinoRolled } from "../../utils";
 import { getCasinoChainId } from "../../utils/chains";
+import { FORMAT_TYPE, formatRawAmount } from "../../utils/format";
 import { getTransactionReceiptWithRetry } from "../../utils/wallet";
 
 export interface CasinoRolledBet extends CasinoPlacedBet {
   isWin: boolean;
+  isLost: boolean;
   isStopLossTriggered: boolean;
   isStopGainTriggered: boolean;
-  rolledBetCount: number;
+  rollBetCount: number;
   rollTotalBetAmount: bigint;
+  formattedRollTotalBetAmount: string;
   payout: bigint;
+  formattedPayout: string;
   benefit: bigint;
-  rollTx: Hash;
+  formattedBenefit: string;
+  formattedPayoutMultiplier: string;
+  rollTxnHash: Hash;
   encodedRolled: any[];
+  decodedRolled: any[];
+  nativeCurrency: Token;
+  // Placed bet formatted properties
+  formattedBetAmount: string;
+  formattedTotalBetAmount: string;
+  formattedStopLoss: string;
+  formattedStopGain: string;
+  formattedChargedVRFFees: string;
 }
 
 export interface CasinoWaitRollOptions {
   pollingInterval?: number;
   timeout?: number;
+  formatType?: FORMAT_TYPE;
 }
 
 export const defaultCasinoWaiRollOptions = {
   timeout: 120000, // 2 mins
-  //pollInterval: => data in casino.ts
+  //pollingInterval: => data in casino.ts
 };
 
 interface RollEventArgs {
@@ -62,6 +80,60 @@ interface RollEventArgs {
 interface RollEvent {
   args: RollEventArgs;
   transactionHash: Hash;
+}
+
+export function formatCasinoRolledBet(
+  placedBet: CasinoPlacedBet,
+  rollEvent: RollEvent,
+  formatType: FORMAT_TYPE = FORMAT_TYPE.STANDARD,
+): CasinoRolledBet {
+  const args = rollEvent.args;
+  const isWin = args.payout! >= args.totalBetAmount!;
+  const isStopTriggered = args.rolled!.length !== placedBet.betCount;
+  const casinoChain = casinoChainById[placedBet.chainId];
+  const nativeCurrency = chainNativeCurrencyToToken(casinoChain.viemChain.nativeCurrency);
+  const tokenDecimals = placedBet.token.decimals;
+
+  return {
+    ...placedBet,
+    isWin,
+    isLost: !isWin,
+    isStopGainTriggered: isStopTriggered && isWin,
+    isStopLossTriggered: isStopTriggered && !isWin,
+    rollBetCount: args.rolled!.length,
+    rollTotalBetAmount: args.totalBetAmount!,
+    formattedRollTotalBetAmount: formatRawAmount(
+      args.totalBetAmount!,
+      placedBet.token.decimals,
+      formatType,
+    ),
+    payout: args.payout!,
+    formattedPayout: formatRawAmount(args.payout!, placedBet.token.decimals, formatType),
+    benefit: args.payout! - args.totalBetAmount!,
+    formattedBenefit: formatRawAmount(
+      args.payout! - args.totalBetAmount!,
+      placedBet.token.decimals,
+      formatType,
+    ),
+    formattedPayoutMultiplier: (
+      Number(formatUnits(args.payout!, tokenDecimals)) /
+      Number(formatUnits(args.totalBetAmount!, tokenDecimals))
+    ).toFixed(3),
+    rollTxnHash: rollEvent.transactionHash,
+    encodedRolled: args.rolled! as any[],
+    decodedRolled: args.rolled!.map((r) => decodeCasinoRolled(r, placedBet.game)),
+    nativeCurrency,
+    // Placed bet formatted properties
+    formattedBetAmount: formatRawAmount(placedBet.betAmount, tokenDecimals, formatType),
+    formattedTotalBetAmount: formatRawAmount(placedBet.totalBetAmount, tokenDecimals, formatType),
+    formattedStopLoss: formatRawAmount(placedBet.stopLoss, tokenDecimals, formatType),
+    formattedStopGain: formatRawAmount(placedBet.stopGain, tokenDecimals, formatType),
+    formattedChargedVRFFees: formatRawAmount(
+      placedBet.chargedVRFCost,
+      nativeCurrency.decimals,
+      formatType,
+    ),
+  };
 }
 
 export async function waitRolledBet(
@@ -94,24 +166,10 @@ export async function waitRolledBet(
       unwatch?.();
 
       try {
-        const args = log.args;
-        const isWin = args.payout! >= args.totalBetAmount!;
-        const isStopTriggered = args.rolled!.length !== placedBet.betCount;
         const receipt = await getTransactionReceiptWithRetry(wallet, log.transactionHash);
 
         resolve({
-          rolledBet: {
-            ...placedBet,
-            isWin,
-            rolledBetCount: args.rolled!.length,
-            rollTotalBetAmount: args.totalBetAmount!,
-            payout: args.payout!,
-            benefit: args.payout! - args.totalBetAmount!,
-            rollTx: log.transactionHash,
-            isStopGainTriggered: isStopTriggered && isWin,
-            isStopLossTriggered: isStopTriggered && !isWin,
-            encodedRolled: args.rolled! as any[],
-          },
+          rolledBet: formatCasinoRolledBet(placedBet, log, options?.formatType),
           receipt,
         });
       } catch (error) {
@@ -166,7 +224,7 @@ export async function waitRolledBet(
       address: game.address,
       event: parseAbiItem(CASINO_GAME_ROLL_ABI[placedBet.game]),
       args: { id: placedBet.id },
-      fromBlock: placedBet.placeBetBlock,
+      fromBlock: placedBet.betBlock,
       toBlock: "latest",
     })
       .then((pastLogs) => {
@@ -238,6 +296,21 @@ export async function getCasinoGames(
       bankAddress: casinoChain.contracts.bank,
     }))
     .filter((game) => !onlyActive || !game.paused);
+}
+
+export async function getCasinoGamePaused(wallet: BetSwirlWallet, game: CASINO_GAME_TYPE) {
+  const casinoChainId = getCasinoChainId(wallet);
+  const casinoChain = casinoChainById[casinoChainId];
+  const gameAddress = casinoChain.contracts.games[game]?.address;
+  if (!gameAddress) {
+    throw new ChainError(
+      `Game ${game} not found for chain ${casinoChainId}`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
+    );
+  }
+  const functionData = getGamePausedFunctionData(game, casinoChainId);
+  const rawPaused = await wallet.readContract<typeof functionData, RawPaused>(functionData);
+  return rawPaused;
 }
 
 export function getGamePausedFunctionData(

@@ -30,11 +30,16 @@ import type { ApolloCache, DefaultOptions } from "@apollo/client/core/index.js";
 import type { CoinTossParams, CoinTossPlacedBet } from "../actions/casino/coinToss";
 import type { DiceParams } from "../actions/casino/dice";
 import type { DicePlacedBet } from "../actions/casino/dice";
-import type { PlaceBetCallbacks } from "../actions/casino/game";
+import type {
+  CasinoPlaceBetOptions,
+  CasinoPlacedBet,
+  PlaceBetCallbacks,
+} from "../actions/casino/game";
 import type { RouletteParams, RoulettePlacedBet } from "../actions/casino/roulette";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
 import type { ChainId } from "../data";
 import type {
+  CasinoRolledBet,
   CasinoWaitRollOptions,
   CoinTossRolledBet,
   DiceRolledBet,
@@ -50,7 +55,7 @@ export interface BetSwirlClientOptions {
   chainId?: ChainId;
   affiliate?: Hex;
   allowanceType?: ALLOWANCE_TYPE;
-  pollInterval?: number;
+  pollingInterval?: number;
   formatType?: FORMAT_TYPE;
   subgraphClient?: {
     graphqlKey?: string;
@@ -70,34 +75,42 @@ export abstract class BetSwirlClient {
 
   /* Casino games */
 
+  abstract waitRolledBet(
+    placedBet: CasinoPlacedBet,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
+
   abstract playCoinToss(
     params: CoinTossParams,
+    options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }>;
 
   abstract waitCoinToss(
     placedBet: CoinTossPlacedBet,
-    options: CasinoWaitRollOptions,
+    options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: CoinTossRolledBet; receipt: TransactionReceipt }>;
 
   abstract playDice(
     params: DiceParams,
+    options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }>;
 
   abstract waitDice(
     placedBet: DicePlacedBet,
-    options: CasinoWaitRollOptions,
+    options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: DiceRolledBet; receipt: TransactionReceipt }>;
 
   abstract playRoulette(
     params: RouletteParams,
+    options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: RoulettePlacedBet; receipt: TransactionReceipt }>;
 
   abstract waitRoulette(
     placedBet: RoulettePlacedBet,
-    options: CasinoWaitRollOptions,
+    options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: RouletteRolledBet; receipt: TransactionReceipt }>;
 
   /* Casino utilities */

@@ -7,3 +7,4 @@ export const DEFAULT_ADMIN_ROLE =
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_ITEMS_PER_PAGE = 25;
 export const GAS_TOKEN_ADDRESS = zeroAddress;
+export const BETSWIRL_BASE_URL = "https://betswirl.com";

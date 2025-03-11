@@ -1,5 +1,16 @@
 # @betswirl/wagmi-provider
 
+## 0.0.5
+
+### Patch Changes
+
+- Make options in wait functions optional
+
+- Improve waitRoll return type
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes

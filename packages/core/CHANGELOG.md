@@ -1,5 +1,17 @@
 # @betswirl/sdk-core
 
+## 0.0.5
+
+### Patch Changes
+
+- Add getBetSwirlBetUrl util
+
+- Make options in wait functions optional
+
+- Improve waitRoll return type
+
+- Add getCasinoGamePaused
+
 ## 0.0.4
 
 ### Patch Changes
