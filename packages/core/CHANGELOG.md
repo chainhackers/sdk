@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.0.6
+
+### Patch Changes
+
+- Update subgraph urls
+
 ## 0.0.5
 
 ### Patch Changes

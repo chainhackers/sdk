@@ -249,8 +249,8 @@ const arbitrumData: CasinoChain = {
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/deployments/id/QmT2RLyaMmxG1XkXZYDHMG1W9c65g3bQW8rdxpqhXPrdaD",
-    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-arbitrum-one/v2.0.4",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmbF6TzA9MgJ1UFBpbVZ4CemFaw2kbwRQk877gmCSriF2L",
+    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-arbitrum-one/v2.1.1",
   },
   defaultAffiliate: "0xf14C79a7fA22c1f97C779F573c9bF39b6b43381c",
 };
@@ -286,8 +286,8 @@ const avalancheData: CasinoChain = {
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/deployments/id/QmVKBpbVtJ5TpMRp4ueqC2kDFwia6J3mu83Z4pDTYYb3UR",
-    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-avalanche/v2.0.3",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmSntNZDoeciB2V7dBgPDgQerJ8cW2DcVLDnu4cpKwbtac",
+    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-avalanche/v2.1.1",
   },
   defaultAffiliate: "0x1a75280F832280Af93f588f715a5Fb4Ca7918430",
 };
@@ -323,8 +323,8 @@ const polygonData: CasinoChain = {
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/deployments/id/QmVj19dwwPmRkwdToMox912K895jRg9qZkWVcAmemNJqgJ",
-    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-polygon/v2.0.4",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/Qmc6RFEfEJE3hzZMAKRUiqFJ1PmY1CyHsjounUKtcKDM5q",
+    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-polygon/v2.1.1",
   },
   defaultAffiliate: "0xfA695010bF9e757a1abCd2703259F419217aa756",
 };
@@ -360,8 +360,8 @@ const bscData: CasinoChain = {
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/deployments/id/QmPtqdTTdok43yjvXV2SFRSKwWnjmNs7FuYEKcYsMepsSY",
-    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-bnb-chain/v2.0.3",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmSYvThPZhMsKcBSCCxH9UiQn9on9PZTmHaPFFeeLYNegP",
+    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-bnb-chain/v2.1.1",
   },
   defaultAffiliate: "0xCD25325a6eF20BC5dF9bceAc0cC22a48d2e8f6eF",
 };
@@ -397,8 +397,8 @@ const baseData: CasinoChain = {
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/deployments/id/QmNjt9TVwQ86zhfoY8nP5W8fEu6TG2J51kiw9djZiSysDJ",
-    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-base/v2.0.3",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmW8bVxEXovu5QqdSpvch2xUGyqSPEb6qUY4s5i5kHhkVH",
+    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-base/v2.1.1",
   },
   defaultAffiliate: "0xBf1998e1F1cD52fBfb63e7E646bb39c091A7B70A",
 };
