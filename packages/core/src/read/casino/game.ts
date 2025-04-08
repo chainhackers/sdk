@@ -116,8 +116,8 @@ export function formatCasinoRolledBet(
       formatType,
     ),
     formattedPayoutMultiplier: (
-      Number(formatUnits(args.payout!, tokenDecimals)) /
-      Number(formatUnits(args.totalBetAmount!, tokenDecimals))
+      Number(formatUnits(BigInt(args.payout!), tokenDecimals)) /
+      Number(formatUnits(BigInt(args.totalBetAmount!), tokenDecimals))
     ).toFixed(3),
     rollTxnHash: rollEvent.transactionHash,
     encodedRolled: args.rolled! as any[],

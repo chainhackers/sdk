@@ -35,10 +35,7 @@ export class CoinToss extends AbstractCasinoGame<
   }
 
   static encodeInput(face: COINTOSS_FACE | string): CoinTossEncodedInput {
-    if (typeof face === "string") {
-      return face.toLowerCase() === "true" || face === "1";
-    }
-    return Boolean(face);
+    return face === COINTOSS_FACE.HEADS || face.toLowerCase() === "true" || face === "1";
   }
 
   static decodeInput(encodedFace: CoinTossEncodedInput | string): COINTOSS_FACE {
