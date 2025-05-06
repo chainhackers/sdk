@@ -8,9 +8,10 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card"
       className={cn(
         "bg-card text-card-foreground",
-        "flex flex-col rounded-lg",
-        "p-4 md:p-6",
-        "gap-4",
+        "flex flex-col rounded-[20px]",
+        "px-3 py-4",
+        "gap-3",
+        "w-[328px] h-[512px]",
         className
       )}
       {...props}
@@ -22,7 +23,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-header"
-      className={cn("flex flex-col space-y-1.5", className)}
+      className={cn("flex flex-col space-y-1.5 h-[44px] w-[304px]", className)}
       {...props}
     />
   )

@@ -46,8 +46,8 @@ export function CoinTossGame({
       {...props}
     >
       <Card className={cn(
-          "w-[328px] h-[512px] relative overflow-hidden",
-          "bg-card text-card-foreground rounded-lg border",
+          "relative overflow-hidden",
+          "bg-card text-card-foreground border",
           "shadow-md",
       )}>
         <CardHeader className="pt-4 pb-2">
