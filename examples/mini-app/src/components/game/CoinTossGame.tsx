@@ -2,7 +2,6 @@ import React, { useState, ChangeEvent } from 'react';
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '../ui/card';
@@ -48,7 +47,6 @@ export function CoinTossGame({
       <Card className={cn(
           "relative overflow-hidden",
           "bg-card text-card-foreground border",
-          "shadow-md",
       )}>
         <CardHeader className="pt-4 pb-2">
           <CardTitle className="text-left text-lg">CoinToss</CardTitle>
@@ -125,65 +123,65 @@ export function CoinTossGame({
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-             <div className="text-sm text-muted-foreground flex items-center">
-                Balance: 0
-                <Cog className="inline h-4 w-4 ml-1" />
-             </div>
+          <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
+               <div className="text-sm text-muted-foreground flex items-center">
+                  Balance: 0
+                  <Cog className="inline h-4 w-4 ml-1" />
+               </div>
 
-             <Label htmlFor="betAmount" className="text-sm font-medium -mb-1">Bet amount</Label>
-             <Input
-               id="betAmount"
-               type="number"
-               placeholder="0"
-               value={betAmount}
-               onChange={(e: ChangeEvent<HTMLInputElement>) => setBetAmount(e.target.value)}
-               token={{
-                 icon: <Cog className="h-4 w-4 text-orange-500" />,
-                 symbol: "POL"
-               }}
-             />
+                <Label htmlFor="betAmount" className="text-sm font-medium -mb-1">Bet amount</Label>
+                <Input
+                  id="betAmount"
+                  type="number"
+                  placeholder="0"
+                  value={betAmount}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setBetAmount(e.target.value)}
+                  token={{
+                    icon: <Cog className="h-4 w-4 text-orange-500" />,
+                    symbol: "POL"
+                  }}
+                />
 
-             <div className="grid grid-cols-3 gap-2">
-               <Button
-                 variant="secondary"
-                 onClick={() => setBetAmount(prev => (parseFloat(prev || '0') / 2).toString())}
-                 className="border-0 rounded-[8px]"
-               >
-                 1/2
-               </Button>
-               <Button
-                 variant="secondary"
-                 onClick={() => setBetAmount(prev => (parseFloat(prev || '0') * 2).toString())}
-                 className="border-0 rounded-[8px]"
-                >
-                 2x
-               </Button>
-               <Button
-                 variant="secondary"
-                 className="border-0 rounded-[8px]"
-                 onClick={() => alert('Max clicked!')}
-               >
-                 Max
-               </Button>
-             </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    variant="secondary"
+                    onClick={() => setBetAmount(prev => (parseFloat(prev || '0') / 2).toString())}
+                    className="border-0 rounded-[8px] h-[30px] w-[85.33px]"
+                  >
+                    1/2
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setBetAmount(prev => (parseFloat(prev || '0') * 2).toString())}
+                    className="border-0 rounded-[8px] h-[30px] w-[85.33px]"
+                    >
+                    2x
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="border-0 rounded-[8px] h-[30px] w-[85.33px]"
+                    onClick={() => alert('Max clicked!')}
+                  >
+                    Max
+                  </Button>
+                </div>
+            </div>
+
+            <Button
+              size="lg"
+              className={cn(
+                "w-full",
+                "border-0",
+                "bg-primary hover:bg-primary/90 text-primary-foreground font-bold",
+                "rounded-[16px]",
+              )}
+              onClick={() => alert(`Betting ${betAmount} POL on ${choice}`)}
+            >
+              Connect
+            </Button>
           </div>
         </CardContent>
-
-        <CardFooter>
-          <Button
-            size="lg"
-            className={cn(
-              "w-full",
-              "border-0",
-              "bg-primary hover:bg-primary/90 text-primary-foreground font-bold",
-              "rounded-[16px]"
-            )}
-            onClick={() => alert(`Betting ${betAmount} POL on ${choice}`)}
-          >
-            Connect
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );
