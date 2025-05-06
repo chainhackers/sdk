@@ -12,6 +12,7 @@ import { Label } from '../ui/label';
 import { Info, History, Cog } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import coinTossBackground from '../../assets/game/game-background.png';
+import coinIcon from '../../assets/game/coin-background-icon.png';
 
 export interface CoinTossGameProps extends React.HTMLAttributes<HTMLDivElement> {
   theme?: 'light' | 'dark' | 'system';
@@ -124,11 +125,7 @@ export function CoinTossGame({
             <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white dark:text-foreground">
               {multiplier.toFixed(2)} x
             </div>
-            <div
-              className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2 h-16 w-16 rounded-full flex items-center justify-center text-primary-foreground font-bold bg-primary"
-            >
-              {choice}
-            </div>
+            <img src={coinIcon} alt="Coin" className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2 h-16 w-16" />
           </div>
 
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
