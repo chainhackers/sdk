@@ -41,6 +41,8 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-control-panel-background: var(--control-panel-background);
+  --color-transparent-button-border: var(--transparent-button-border);
+  --color-button-neutral-background: var(--button-neutral-background);
 }
 
 @layer base {
@@ -87,6 +89,8 @@
     --chart-5: oklch(0.769 0.188 70.08);
 
     --control-panel-background: #E6E7E9;
+    --transparent-button-border: #e1e2e41d;
+    --button-neutral-background: #E1E2E4;
   }
 
   .dark {
@@ -117,6 +121,8 @@
     --chart-5: oklch(0.769 0.188 70.08);
 
     --control-panel-background: oklch(0.22 0.01 240);
+    --transparent-button-border: oklch(0.25 0 0);
+    --button-neutral-background: oklch(0.23 0 0);
   }
 
   /* Hide arrows for input[type=number] */

@@ -52,10 +52,12 @@ export function CoinTossGame({
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
           <CardTitle className="text-lg">CoinToss</CardTitle>
           <Button
+            variant="secondary"
             className={cn(
-              "border-0",
-              "bg-primary hover:bg-primary/90 text-primary-foreground font-bold",
+              "bg-button-neutral-background",
               "rounded-[12px]",
+              "border border-secondary-border",
+              "text-primary"
             )}
           >
             Connect
