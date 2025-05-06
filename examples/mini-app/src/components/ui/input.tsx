@@ -22,7 +22,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           data-slot="input"
           className={cn(
             "flex h-full w-full rounded-[12px] border-0",
-            "bg-input text-foreground",
+            "bg-input text-foreground font-semibold",
             "px-4 py-2",
             hasTokenInfo ? "pr-16 md:pr-20" : "",
             "text-base placeholder:text-muted-foreground",
@@ -33,7 +33,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {hasTokenInfo && (
-          <div className="absolute right-0 top-1/2 mr-3 flex -translate-y-1/2 transform items-center gap-1 text-sm text-muted-foreground pointer-events-none">
+          <div className="absolute right-0 top-1/2 mr-3 flex -translate-y-1/2 transform items-center gap-1 text-sm text-foreground pointer-events-none font-semibold">
             {token.icon}
             <span>{token.symbol}</span>
           </div>

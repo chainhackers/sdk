@@ -19,7 +19,7 @@ const buttonVariants = cva(
         iconTransparent: "bg-secondary/20 text-secondary-foreground hover:bg-secondary/30 rounded-full",
       },
       size: {
-        default: "h-10 px-4 py-2",
+        default: "h-[42px] w-[120px]",
         sm: "h-9 rounded-md px-3",
         lg: "h-12 rounded-md px-8 text-base",
         icon: "h-10 w-10",

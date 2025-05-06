@@ -48,11 +48,20 @@ export function CoinTossGame({
           "relative overflow-hidden",
           "bg-card text-card-foreground border",
       )}>
-        <CardHeader className="pt-4 pb-2">
-          <CardTitle className="text-left text-lg">CoinToss</CardTitle>
+        <CardHeader className="flex flex-row justify-between items-center h-[44px]">
+          <CardTitle className="text-lg">CoinToss</CardTitle>
+          <Button
+            className={cn(
+              "border-0",
+              "bg-primary hover:bg-primary/90 text-primary-foreground font-bold",
+              "rounded-[12px]",
+            )}
+          >
+            Connect
+          </Button>
         </CardHeader>
 
-        <CardContent className="flex flex-col gap-4 pt-2">
+        <CardContent className="flex flex-col gap-4">
           <div
             className={cn(
               "h-[160px] rounded-[16px] flex flex-col justify-end items-center relative bg-cover bg-center bg-no-repeat",
@@ -124,12 +133,12 @@ export function CoinTossGame({
 
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
             <div className="flex flex-col gap-3">
-               <div className="text-sm font-medium text-muted-foreground flex items-center">
-                  Balance: 0
-                  <Cog className="inline h-4 w-4 ml-1" />
+               <div className="text-sm font-medium flex items-center">
+                  <span className="text-muted-foreground">Balance:&nbsp;</span>0
+                  <Cog className="inline h-4 w-4 ml-1 text-orange-500" />
                </div>
 
-                <Label htmlFor="betAmount" className="text-sm font-medium -mb-1">Bet amount (0.24$)</Label>
+                <Label htmlFor="betAmount" className="text-sm font-medium -mb-1 text-muted-foreground">Bet amount (0.24$)</Label>
                 <Input
                   id="betAmount"
                   type="number"
@@ -146,20 +155,20 @@ export function CoinTossGame({
                   <Button
                     variant="secondary"
                     onClick={() => setBetAmount(prev => (parseFloat(prev || '0') / 2).toString())}
-                    className="border-0 rounded-[8px] h-[30px] w-[85.33px]"
+                    className="border border-secondary-border rounded-[8px] h-[30px] w-[85.33px]"
                   >
                     1/2
                   </Button>
                   <Button
                     variant="secondary"
                     onClick={() => setBetAmount(prev => (parseFloat(prev || '0') * 2).toString())}
-                    className="border-0 rounded-[8px] h-[30px] w-[85.33px]"
+                    className="border border-secondary-border rounded-[8px] h-[30px] w-[85.33px]"
                     >
                     2x
                   </Button>
                   <Button
                     variant="secondary"
-                    className="border-0 rounded-[8px] h-[30px] w-[85.33px]"
+                    className="border border-secondary-border rounded-[8px] h-[30px] w-[85.33px]"
                     onClick={() => alert('Max clicked!')}
                   >
                     Max
