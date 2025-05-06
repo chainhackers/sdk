@@ -55,7 +55,7 @@ export function CoinTossGame({
         <CardContent className="flex flex-col gap-4 pt-2">
           <div
             className={cn(
-              "h-[160px] rounded-[16px] flex flex-col justify-end items-center p-4 relative bg-cover bg-center bg-no-repeat",
+              "h-[160px] rounded-[16px] flex flex-col justify-end items-center relative bg-cover bg-center bg-no-repeat",
               "bg-muted"
             )}
             style={{
@@ -70,7 +70,7 @@ export function CoinTossGame({
                   variant="iconTransparent"
                   size="iconRound"
                   className={cn(
-                    "absolute top-3 left-3",
+                    "absolute top-2 left-2",
                     "text-white"
                   )}
                 >
@@ -104,7 +104,7 @@ export function CoinTossGame({
               variant="iconTransparent"
               size="iconRound"
               className={cn(
-                "absolute top-3 right-3",
+                "absolute top-2 right-2",
                 "text-white"
               )}
               onClick={() => alert('History clicked!')}
@@ -112,12 +112,11 @@ export function CoinTossGame({
               <History className="h-4 w-4" />
             </Button>
 
-            <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-bold text-white dark:text-foreground" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
-              {multiplier.toFixed(2)}x
+            <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white dark:text-foreground">
+              {multiplier.toFixed(2)} x
             </div>
             <div
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-2 h-16 w-16 rounded-full flex items-center justify-center text-primary-foreground font-bold bg-primary"
-              style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1), inset 0 -1px 2px rgba(0,0,0,0.1)' }}
+              className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2 h-16 w-16 rounded-full flex items-center justify-center text-primary-foreground font-bold bg-primary"
             >
               {choice}
             </div>
@@ -125,12 +124,12 @@ export function CoinTossGame({
 
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
             <div className="flex flex-col gap-3">
-               <div className="text-sm text-muted-foreground flex items-center">
+               <div className="text-sm font-medium text-muted-foreground flex items-center">
                   Balance: 0
                   <Cog className="inline h-4 w-4 ml-1" />
                </div>
 
-                <Label htmlFor="betAmount" className="text-sm font-medium -mb-1">Bet amount</Label>
+                <Label htmlFor="betAmount" className="text-sm font-medium -mb-1">Bet amount (0.24$)</Label>
                 <Input
                   id="betAmount"
                   type="number"
