@@ -16,9 +16,7 @@ module.exports = {
         "2xl": "1400px",
       },
     },
-    extend: {
-
-    },
+    extend: {},
   },
   plugins: [require("tw-animate-css")],
 }

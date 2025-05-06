@@ -1,66 +1,66 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { CoinTossGame } from './CoinTossGame';
+import type { Meta, StoryObj } from "@storybook/react"
+import { CoinTossGame } from "./CoinTossGame"
 
 const meta = {
-  title: 'Game/CoinTossGame',
+  title: "Game/CoinTossGame",
   component: CoinTossGame,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
     backgrounds: {
-      default: 'light',
+      default: "light",
       values: [
-        { name: 'light', value: '#FFFFFF' },
-        { name: 'dark', value: 'oklch(0.15 0 0)' },
+        { name: "light", value: "#FFFFFF" },
+        { name: "dark", value: "oklch(0.15 0 0)" },
       ],
     },
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     theme: {
-      control: 'radio',
-      options: ['light', 'dark', 'system'],
+      control: "radio",
+      options: ["light", "dark", "system"],
     },
-  }
-} satisfies Meta<typeof CoinTossGame>;
+  },
+} satisfies Meta<typeof CoinTossGame>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 const Template: Story = {
   render: (args) => <CoinTossGame {...args} />,
-};
+}
 
 export const LightTheme: Story = {
   ...Template,
   args: {
-    theme: 'light',
+    theme: "light",
   },
-};
+}
 
 export const DarkTheme: Story = {
   ...Template,
   args: {
-    theme: 'dark',
+    theme: "dark",
   },
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
-};
+}
 
 export const SystemTheme: Story = {
-   ...Template,
-   args: {
-     theme: 'system',
-   },
- };
+  ...Template,
+  args: {
+    theme: "system",
+  },
+}
 
 export const CustomTheme: Story = {
   ...Template,
   args: {
-     theme: 'light',
-     customTheme: {
-       '--primary': 'green',
-       '--card': '#e0f2fe',
-     } as React.CSSProperties,
+    theme: "light",
+    customTheme: {
+      "--primary": "green",
+      "--card": "#e0f2fe",
+    } as React.CSSProperties,
   },
-};
+}

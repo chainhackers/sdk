@@ -11,29 +11,25 @@ const Slider = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex w-full touch-none select-none items-center",
-      className
+      className,
     )}
     {...props}
   >
-    <SliderPrimitive.Track
-      className="relative h-2.5 w-full grow overflow-hidden rounded-full bg-green-500"
-    >
-      <SliderPrimitive.Range
-        className="absolute h-full bg-red-500"
-      />
+    <SliderPrimitive.Track className="relative h-2.5 w-full grow overflow-hidden rounded-full bg-green-500">
+      <SliderPrimitive.Range className="absolute h-full bg-red-500" />
     </SliderPrimitive.Track>
     {(props.value ?? props.defaultValue ?? []).map((_, index) => (
-        <SliderPrimitive.Thumb
-            key={index}
-            className={cn(
-                "block h-5 w-5 rounded-full border-0",
-                "bg-green-500",
-                "ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                "disabled:pointer-events-none disabled:opacity-50",
-                "shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
-            )}
-        />
-     ))}
+      <SliderPrimitive.Thumb
+        key={index}
+        className={cn(
+          "block h-5 w-5 rounded-full border-0",
+          "bg-green-500",
+          "ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "disabled:pointer-events-none disabled:opacity-50",
+          "shadow-[0_2px_4px_rgba(0,0,0,0.5)]",
+        )}
+      />
+    ))}
   </SliderPrimitive.Root>
 ))
 Slider.displayName = SliderPrimitive.Root.displayName

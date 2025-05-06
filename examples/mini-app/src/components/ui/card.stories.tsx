@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './button';
+import type { Meta, StoryObj } from "@storybook/react"
+import { Button } from "./button"
 import {
   Card,
   CardContent,
@@ -7,20 +7,20 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from './card';
-import { BellRing, Check } from 'lucide-react';
+} from "./card"
+import { BellRing, Check } from "lucide-react"
 
 const meta = {
-  title: 'UI/Card',
+  title: "UI/Card",
   component: Card,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
-} satisfies Meta<typeof Card>;
+  tags: ["autodocs"],
+} satisfies Meta<typeof Card>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   render: (args) => (
@@ -37,11 +37,11 @@ export const Default: Story = {
       </CardFooter>
     </Card>
   ),
-};
+}
 
 export const ExampleWithContent: Story = {
   render: (args) => (
-     <Card {...args} className="w-[380px]">
+    <Card {...args} className="w-[380px]">
       <CardHeader>
         <CardTitle>Notifications</CardTitle>
         <CardDescription>You have 3 unread messages.</CardDescription>
@@ -66,4 +66,4 @@ export const ExampleWithContent: Story = {
       </CardFooter>
     </Card>
   ),
-};
+}

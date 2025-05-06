@@ -53,34 +53,34 @@
     --radius-lg: 0.625rem;
     --radius-xl: 0.875rem;
 
-    --background: #FFFFFF;
+    --background: #ffffff;
     --foreground: oklch(0.1 0 0 / 0.87);
 
-    --card: #F9FAFB;
+    --card: #f9fafb;
     --card-foreground: oklch(0.1 0 0 / 0.87);
 
-    --popover: #F9FAFB;
+    --popover: #f9fafb;
     --popover-foreground: oklch(0.1 0 0 / 0.87);
 
-    --primary: #4D92EC;
-    --primary-foreground: #FFFFFF;
+    --primary: #4d92ec;
+    --primary-foreground: #ffffff;
 
-    --secondary: #D0D1D4;
+    --secondary: #d0d1d4;
     --secondary-foreground: oklch(0.1 0 0 / 0.8);
-    --secondary-border: #C0C1C5;
+    --secondary-border: #c0c1c5;
 
-    --muted: #F3F4F6;
+    --muted: #f3f4f6;
     --muted-foreground: oklch(0.4 0 0 / 0.7);
 
-    --accent: #F3F4F6;
+    --accent: #f3f4f6;
     --accent-foreground: oklch(0.1 0 0 / 0.87);
 
     --destructive: oklch(0.577 0.245 27.325 / 0.9);
-    --destructive-foreground: #FFFFFF;
+    --destructive-foreground: #ffffff;
 
-    --border: #E5E7EB;
-    --input: #D0D1D4;
-    --ring: #A5B4FC;
+    --border: #e5e7eb;
+    --input: #d0d1d4;
+    --ring: #a5b4fc;
 
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
@@ -88,9 +88,9 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
 
-    --control-panel-background: #E6E7E9;
+    --control-panel-background: #e6e7e9;
     --transparent-button-border: #e1e2e41d;
-    --button-neutral-background: #E1E2E4;
+    --button-neutral-background: #e1e2e4;
   }
 
   .dark {
@@ -127,14 +127,14 @@
 
   /* Hide arrows for input[type=number] */
   /* Chrome, Safari, Edge, Opera */
-  input[type=number]::-webkit-outer-spin-button,
-  input[type=number]::-webkit-inner-spin-button {
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
 
   /* Firefox */
-  input[type=number] {
+  input[type="number"] {
     -moz-appearance: textfield;
     appearance: textfield;
   }

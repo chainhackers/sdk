@@ -1,105 +1,114 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './button';
-import { Info } from 'lucide-react';
+import type { Meta, StoryObj } from "@storybook/react"
+import { Button } from "./button"
+import { Info } from "lucide-react"
 
 const meta = {
-  title: 'UI/Button',
+  title: "UI/Button",
   component: Button,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'iconRound', 'iconTransparent'],
+      control: "select",
+      options: [
+        "default",
+        "destructive",
+        "outline",
+        "secondary",
+        "ghost",
+        "link",
+        "iconRound",
+        "iconTransparent",
+      ],
     },
     size: {
-      control: 'select',
-      options: ['default', 'sm', 'lg', 'icon', 'iconRound'],
+      control: "select",
+      options: ["default", "sm", "lg", "icon", "iconRound"],
     },
-    disabled: { control: 'boolean' },
+    disabled: { control: "boolean" },
   },
   args: {
-     variant: 'default',
-     size: 'default',
-     disabled: false,
-     children: 'Button Text',
+    variant: "default",
+    size: "default",
+    disabled: false,
+    children: "Button Text",
   },
-} satisfies Meta<typeof Button>;
+} satisfies Meta<typeof Button>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
-    variant: 'default',
-    children: 'Default Button',
+    variant: "default",
+    children: "Default Button",
   },
-};
+}
 
 export const Secondary: Story = {
   args: {
-    variant: 'secondary',
-    children: 'Secondary Button',
+    variant: "secondary",
+    children: "Secondary Button",
   },
-};
+}
 
 export const Destructive: Story = {
   args: {
-    variant: 'destructive',
-    children: 'Destructive Button',
+    variant: "destructive",
+    children: "Destructive Button",
   },
-};
+}
 
 export const Outline: Story = {
   args: {
-    variant: 'outline',
-    children: 'Outline Button',
+    variant: "outline",
+    children: "Outline Button",
   },
-};
+}
 
 export const Ghost: Story = {
   args: {
-    variant: 'ghost',
-    children: 'Ghost Button',
+    variant: "ghost",
+    children: "Ghost Button",
   },
-};
+}
 
 export const Link: Story = {
   args: {
-    variant: 'link',
-    children: 'Link Button',
+    variant: "link",
+    children: "Link Button",
   },
-};
+}
 
 export const Icon: Story = {
   args: {
-    variant: 'outline',
-    size: 'icon',
+    variant: "outline",
+    size: "icon",
     children: <Info className="h-4 w-4" />,
   },
-};
+}
 
 export const IconRound: Story = {
   args: {
-    variant: 'iconRound',
-    size: 'iconRound',
+    variant: "iconRound",
+    size: "iconRound",
     children: <Info className="h-4 w-4" />,
   },
-};
+}
 
 export const IconTransparent: Story = {
   args: {
-    variant: 'iconTransparent',
-    size: 'iconRound',
+    variant: "iconTransparent",
+    size: "iconRound",
     children: <Info className="h-4 w-4" />,
   },
-};
+}
 
 export const Disabled: Story = {
   args: {
     disabled: true,
-    children: 'Disabled Button',
+    children: "Disabled Button",
   },
-};
+}

@@ -1,28 +1,28 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './button';
-import { Input } from './input';
-import { Label } from './label';
-import { Popover, PopoverContent, PopoverTrigger } from './popover';
-import { Info } from 'lucide-react';
+import type { Meta, StoryObj } from "@storybook/react"
+import { Button } from "./button"
+import { Input } from "./input"
+import { Label } from "./label"
+import { Popover, PopoverContent, PopoverTrigger } from "./popover"
+import { Info } from "lucide-react"
 
 const meta = {
-  title: 'UI/Popover',
+  title: "UI/Popover",
   component: Popover,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
-} satisfies Meta<typeof Popover>;
+  tags: ["autodocs"],
+} satisfies Meta<typeof Popover>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-   render: () => (
+  render: () => (
     <Popover>
       <PopoverTrigger asChild>
-         <Button variant="outline" size="icon">
-           <Info className="h-4 w-4" />
+        <Button variant="outline" size="icon">
+          <Info className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-4">
@@ -30,4 +30,4 @@ export const Default: Story = {
       </PopoverContent>
     </Popover>
   ),
-};
+}

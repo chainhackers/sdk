@@ -3,17 +3,18 @@ import * as React from "react"
 import { cn } from "../../lib/utils"
 
 export interface TokenInfo {
-  icon?: React.ReactNode;
-  symbol: string;
+  icon?: React.ReactNode
+  symbol: string
 }
 
-export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'prefix'> {
-  token?: TokenInfo;
+export interface InputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix"> {
+  token?: TokenInfo
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, token, ...props }, ref) => {
-    const hasTokenInfo = token && (token.icon || token.symbol);
+    const hasTokenInfo = token && (token.icon || token.symbol)
 
     return (
       <div className={cn("relative flex h-12 w-full items-center", className)}>
@@ -27,7 +28,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             hasTokenInfo ? "pr-16 md:pr-20" : "",
             "text-base placeholder:text-muted-foreground",
             "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-            "disabled:cursor-not-allowed disabled:opacity-50"
+            "disabled:cursor-not-allowed disabled:opacity-50",
           )}
           ref={ref}
           {...props}
@@ -40,7 +41,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
       </div>
     )
-  }
+  },
 )
 Input.displayName = "Input"
 
