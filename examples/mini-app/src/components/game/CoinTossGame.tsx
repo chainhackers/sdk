@@ -8,11 +8,11 @@ import {
 } from '../ui/card';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Label } from '../ui/label';
 import { Info, History, Cog } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import coinTossBackground from '../../assets/game/game-background.png';
+import { Menu } from '../menu/Menu';
 
 export interface CoinTossGameProps extends React.HTMLAttributes<HTMLDivElement> {
   theme?: 'light' | 'dark' | 'system';
@@ -27,6 +27,7 @@ export function CoinTossGame({
 }: CoinTossGameProps) {
   const [betAmount, setBetAmount] = useState('0');
   const [choice] = useState<'Heads' | 'Tails'>('Heads');
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   const multiplier = 1.94;
   const winChance = 50;
@@ -66,8 +67,6 @@ export function CoinTossGame({
           >
             <div className="absolute inset-0 bg-black/40 rounded-[16px]"></div>
 
-             <Popover>
-              <PopoverTrigger asChild>
                 <Button
                   variant="iconTransparent"
                   size="iconRound"
@@ -75,32 +74,10 @@ export function CoinTossGame({
                     "absolute top-3 left-3",
                     "text-white"
                   )}
+                  onClick={() => setMenuIsOpen(!menuIsOpen)}
                 >
                   <Info className="h-4 w-4" />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className={cn("w-60")}>
-                 <div className="grid gap-4">
-                   <div className="flex justify-between items-center">
-                     <h4 className="font-medium leading-none">Bet Details</h4>
-                   </div>
-                   <div className="grid gap-2 text-sm">
-                     <div className="flex justify-between">
-                       <span className="text-muted-foreground">Target Payout:</span>
-                       <span>{targetPayout} POL</span>
-                     </div>
-                     <div className="flex justify-between">
-                       <span className="text-muted-foreground">Win Chance:</span>
-                       <span>{winChance}%</span>
-                     </div>
-                     <div className="flex justify-between">
-                       <span className="text-muted-foreground">Fee:</span>
-                       <span>{fee} POL</span>
-                     </div>
-                   </div>
-                 </div>
-              </PopoverContent>
-            </Popover>
 
             <Button
               variant="iconTransparent"
@@ -184,6 +161,30 @@ export function CoinTossGame({
             Connect
           </Button>
         </CardFooter>
+        <Menu
+            isOpen={menuIsOpen}
+            onClickClose={setMenuIsOpen}
+          >
+            <div className="grid gap-4">
+              <div className="flex justify-between items-center">
+                <h4 className="font-medium leading-none">Bet Details</h4>
+              </div>
+              <div className="grid gap-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Target Payout:</span>
+                  <span>{targetPayout} POL</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Win Chance:</span>
+                  <span>{winChance}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Fee:</span>
+                  <span>{fee} POL</span>
+                </div>
+              </div>
+            </div>
+          </Menu>
       </Card>
     </div>
   );
