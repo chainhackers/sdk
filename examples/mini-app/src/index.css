@@ -43,6 +43,12 @@
   --color-control-panel-background: var(--control-panel-background);
   --color-transparent-button-border: var(--transparent-button-border);
   --color-button-neutral-background: var(--button-neutral-background);
+  --color-play-btn: var(--play-btn);
+  --color-btn-font: var(--btn-font);
+  --color-text-color: var(--text-color);
+  --color-text-on-surface-variant: var(--text-on-surface-variant);
+  --color-text-on-surface: var(--text-on-surface);
+  --color-border-stroke: var(--border-stroke);
 }
 
 @layer base {
@@ -63,7 +69,7 @@
     --popover-foreground: oklch(0.1 0 0 / 0.87);
 
     --primary: #4d92ec;
-    --primary-foreground: #ffffff;
+    --primary-foreground: oklch(0.15 0.0066 236.83);
 
     --secondary: #d0d1d4;
     --secondary-foreground: oklch(0.1 0 0 / 0.8);
@@ -90,19 +96,26 @@
 
     --control-panel-background: #e6e7e9;
     --transparent-button-border: #e1e2e41d;
-    --button-neutral-background: #e1e2e4;
+    --button-neutral-background: oklch(0.16 0.02 269.69 / 3%);
+
+    --play-btn: var(--primary);
+    --btn-font: oklch(1 0 0);
+    --text-color: oklch(0.15 0.0066 236.83);
+    --text-on-surface-variant: oklch(0.61 0.014 271.18);
+    --text-on-surface: oklch(0.34 0.0139 235.28);
+    --border-stroke: rgba(9, 12, 21, 0.08);
   }
 
   .dark {
     --background: oklch(0.15 0 0);
     --foreground: oklch(0.9 0 0);
-    --card: oklch(0.18 0 0);
+    --card: #090c0e;
     --card-foreground: oklch(0.9 0 0);
     --popover: oklch(0.18 0 0);
     --popover-foreground: oklch(0.9 0 0);
-    --primary: oklch(0.5 0.18 270);
+    --primary: oklch(0.66 0.1519 255.97);
     --primary-foreground: oklch(0.98 0 0);
-    --secondary: oklch(0.25 0 0);
+    --secondary: oklch(1 0 0 / 10%);
     --secondary-foreground: oklch(0.9 0 0);
     --secondary-border: oklch(0.25 0 0);
     --muted: oklch(0.25 0 0);
@@ -112,7 +125,7 @@
     --destructive: oklch(0.577 0.245 27.325);
     --destructive-foreground: oklch(0.9 0 0);
     --border: oklch(0.3 0 0 / 0.5);
-    --input: oklch(0.1 0 0);
+    --input: oklch(1 0 0 / 10%);
     --ring: oklch(0.5 0.18 270 / 0.5);
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
@@ -120,9 +133,13 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
 
-    --control-panel-background: oklch(0.22 0.01 240);
+    --control-panel-background: oklch(1 0 0 / 8%);
     --transparent-button-border: oklch(0.25 0 0);
-    --button-neutral-background: oklch(0.23 0 0);
+    --button-neutral-background: oklch(1 0 0 / 10%);
+    --text-color: oklch(1 0 0);
+    --text-on-surface-variant: oklch(0.78 0.0129 276.04);
+    --text-on-surface: oklch(0.93 0.0058 264.53);
+    --border-stroke: rgba(255, 255, 255, 0.08);
   }
 
   /* Hide arrows for input[type=number] */

@@ -60,7 +60,8 @@ export const CustomTheme: Story = {
     theme: "light",
     customTheme: {
       "--primary": "green",
-      "--card": "#e0f2fe",
+      "--play-btn": "#ff9305",
+      "--btn-font": "#ff4805",
     } as React.CSSProperties,
   },
 }
