@@ -1,13 +1,26 @@
-import React, { useState, ChangeEvent } from "react"
+import React, { useState, ChangeEvent, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Label } from "../ui/label"
-import { Info, History, Cog } from "lucide-react"
+import { Info, History, Cog, XIcon } from "lucide-react"
 import { cn } from "../../lib/utils"
 import coinTossBackground from "../../assets/game/game-background.png"
 import coinIcon from "../../assets/game/coin-background-icon.png"
+
+import {
+  Sheet,
+  SheetClose,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetPortal,
+  SheetOverlay,
+} from "../ui/sheet"
+import * as SheetPrimitive from "@radix-ui/react-dialog"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -31,6 +44,13 @@ export function CoinTossGame({
 
   const themeClass = theme === "system" ? undefined : theme
 
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   return (
     <div
       className={cn("cointoss-game-wrapper", themeClass, className)}
@@ -38,6 +58,7 @@ export function CoinTossGame({
       {...props}
     >
       <Card
+        ref={cardRef}
         className={cn(
           "relative overflow-hidden",
           "bg-card text-card-foreground border",
@@ -105,14 +126,58 @@ export function CoinTossGame({
               </PopoverContent>
             </Popover>
 
-            <Button
-              variant="iconTransparent"
-              size="iconRound"
-              className={cn("absolute top-2 right-2", "text-white")}
-              onClick={() => alert("History clicked!")}
-            >
-              <History className="h-4 w-4" />
-            </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="iconTransparent"
+                  size="iconRound"
+                  className={cn("absolute top-2 right-2", "text-white")}
+                >
+                  <History className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+
+              {isMounted && cardRef.current && (
+                <SheetPortal container={cardRef.current}>
+                  <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
+                  <SheetPrimitive.Content
+                    className={cn(
+                      "bg-card data-[state=open]:animate-in data-[state=closed]:animate-out !absolute z-50 flex flex-col gap-0 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+                      "!inset-x-0 !bottom-0 !w-full !h-[70%] !max-h-full !border-t",
+                      "data-[state=closed]:!slide-out-to-bottom data-[state=open]:!slide-in-from-bottom",
+                    )}
+                  >
+                    <SheetHeader className="!p-3 sm:!p-4 !text-left">
+                      <SheetTitle>Transaction History</SheetTitle>
+                      <SheetDescription>
+                        Your transaction history will be displayed here.
+                      </SheetDescription>
+                    </SheetHeader>
+                    <div className="flex-1 p-3 sm:p-4 overflow-y-auto">
+                      <p className="text-sm text-muted-foreground">
+                        (Transaction history will be displayed here...)
+                      </p>
+                      <ul>
+                        <li className="py-1">Bet 1: Win X POL</li>
+                        <li className="py-1">Bet 2: Loss Y POL</li>
+                        <li className="py-1">Bet 3: Win Z POL</li>
+                      </ul>
+                    </div>
+                    <SheetFooter className="!p-3 sm:!p-4 !mt-0">
+                      <SheetClose asChild>
+                        <Button variant="outline" className="w-full">
+                          Close
+                        </Button>
+                      </SheetClose>
+                    </SheetFooter>
+                    <SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-3 right-3 sm:top-4 sm:right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
+                      <XIcon className="h-4 w-4" />
+                      <span className="sr-only">Close</span>
+                    </SheetPrimitive.Close>
+                  </SheetPrimitive.Content>
+                </SheetPortal>
+              )}
+            </Sheet>
 
             <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white dark:text-foreground">
               {multiplier.toFixed(2)} x
