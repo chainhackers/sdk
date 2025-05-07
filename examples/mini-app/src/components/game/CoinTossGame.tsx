@@ -16,6 +16,7 @@ export interface CoinTossGameProps
     "--primary"?: string
     "--play-btn"?: string
     "--btn-font"?: string
+    "--game-window-overlay"?: string
   } & React.CSSProperties
 }
 
@@ -39,6 +40,10 @@ export function CoinTossGame({
     ? 'bg-[var(--play-btn)] hover:bg-[var(--play-btn)]/60'
     : 'bg-primary hover:bg-primary/90'
 
+  const gameWindowOverlay = customTheme && '--game-window-overlay' in customTheme 
+    ? 'bg-[var(--game-window-overlay)]'
+    : ''
+
   return (
     <div
       className={cn("cointoss-game-wrapper", themeClass, className)}
@@ -48,7 +53,7 @@ export function CoinTossGame({
       <Card
         className={cn(
           "relative overflow-hidden",
-          "bg-card text-card-foreground",
+          "bg-card text-card-foreground border",
         )}
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
@@ -76,7 +81,7 @@ export function CoinTossGame({
               backgroundImage: `url(${coinTossBackground})`,
             }}
           >
-            <div className="absolute inset-0 bg-black/40 rounded-[16px]"></div>
+            <div className={cn("absolute inset-0 rounded-[16px]", gameWindowOverlay)}></div>
 
             <Popover>
               <PopoverTrigger asChild>

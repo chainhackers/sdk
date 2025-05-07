@@ -49,6 +49,7 @@
   --color-text-on-surface-variant: var(--text-on-surface-variant);
   --color-text-on-surface: var(--text-on-surface);
   --color-border-stroke: var(--border-stroke);
+  --color-game-window-overlay: var(--game-window-overlay);
 }
 
 @layer base {
@@ -104,6 +105,7 @@
     --text-on-surface-variant: oklch(0.61 0.014 271.18);
     --text-on-surface: oklch(0.34 0.0139 235.28);
     --border-stroke: rgba(9, 12, 21, 0.08);
+    --game-window-overlay: rgba(0, 0, 0, 0);
   }
 
   .dark {

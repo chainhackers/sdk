@@ -62,6 +62,7 @@ export const CustomTheme: Story = {
       "--primary": "green",
       "--play-btn": "#ff9305",
       "--btn-font": "#ff4805",
+      "--game-window-overlay": 'rgba(0, 0, 0, 0.4)',
     } as React.CSSProperties,
   },
 }
