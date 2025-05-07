@@ -10,16 +10,15 @@ import coinTossBackground from "../../assets/game/game-background.png"
 import coinIcon from "../../assets/game/coin-background-icon.png"
 
 import {
-  Sheet,
-  SheetClose,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetPortal,
-  SheetOverlay,
-} from "../ui/sheet"
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "../ui/table"
+
+import { Sheet, SheetTrigger, SheetPortal, SheetOverlay } from "../ui/sheet"
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 
 export interface CoinTossGameProps
@@ -27,6 +26,88 @@ export interface CoinTossGameProps
   theme?: "light" | "dark" | "system"
   customTheme?: React.CSSProperties
 }
+
+interface HistoryEntry {
+  id: string
+  status: "Won bet" | "Busted"
+  multiplier: number | string
+  payoutAmount: number | string
+  payoutCurrencyIcon: React.ReactElement
+  timestamp: string
+}
+
+const mockHistoryData: HistoryEntry[] = [
+  {
+    id: "1",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: "1.94675",
+    payoutCurrencyIcon: (
+      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
+    ),
+    timestamp: "~24h ago",
+  },
+  {
+    id: "2",
+    status: "Won bet",
+    multiplier: 1.2,
+    payoutAmount: 0.2,
+    payoutCurrencyIcon: (
+      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
+    ),
+    timestamp: "~2h ago",
+  },
+  {
+    id: "3",
+    status: "Busted",
+    multiplier: 1.94,
+    payoutAmount: 1.94,
+    payoutCurrencyIcon: (
+      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
+    ),
+    timestamp: "~2h ago",
+  },
+  {
+    id: "4",
+    status: "Won bet",
+    multiplier: 1.946,
+    payoutAmount: 2.453,
+    payoutCurrencyIcon: (
+      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
+    ),
+    timestamp: "~2h ago",
+  },
+  {
+    id: "5",
+    status: "Busted",
+    multiplier: 1.94,
+    payoutAmount: 1.94,
+    payoutCurrencyIcon: (
+      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
+    ),
+    timestamp: "~2h ago",
+  },
+  {
+    id: "6",
+    status: "Won bet",
+    multiplier: 1.946,
+    payoutAmount: 2.453,
+    payoutCurrencyIcon: (
+      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
+    ),
+    timestamp: "~2h ago",
+  },
+  {
+    id: "7",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: 0.1,
+    payoutCurrencyIcon: (
+      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
+    ),
+    timestamp: "~2h ago",
+  },
+]
 
 export function CoinTossGame({
   theme = "system",
@@ -143,35 +224,71 @@ export function CoinTossGame({
                   <SheetPrimitive.Content
                     className={cn(
                       "bg-card data-[state=open]:animate-in data-[state=closed]:animate-out !absolute z-50 flex flex-col gap-0 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
-                      "!inset-x-0 !bottom-0 !w-full !h-[70%] !max-h-full !border-t",
+                      "!inset-x-0 !bottom-0 !w-full !h-[70%] !max-h-full",
                       "data-[state=closed]:!slide-out-to-bottom data-[state=open]:!slide-in-from-bottom",
+                      "rounded-t-[16px]",
+                      "overflow-hidden",
                     )}
                   >
-                    <SheetHeader className="!p-3 sm:!p-4 !text-left">
-                      <SheetTitle>Transaction History</SheetTitle>
-                      <SheetDescription>
-                        Your transaction history will be displayed here.
-                      </SheetDescription>
-                    </SheetHeader>
-                    <div className="flex-1 p-3 sm:p-4 overflow-y-auto">
-                      <p className="text-sm text-muted-foreground">
-                        (Transaction history will be displayed here...)
-                      </p>
-                      <ul>
-                        <li className="py-1">Bet 1: Win X POL</li>
-                        <li className="py-1">Bet 2: Loss Y POL</li>
-                        <li className="py-1">Bet 3: Win Z POL</li>
-                      </ul>
+                    <div className="flex-1 overflow-y-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="border-b border-border/50">
+                            <TableHead className="px-3 py-2.5 text-muted-foreground font-normal">
+                              Draw
+                            </TableHead>
+                            <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal">
+                              X
+                            </TableHead>
+                            <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal">
+                              Payout
+                            </TableHead>
+                            <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal">
+                              Time
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {mockHistoryData.map((entry) => (
+                            <TableRow
+                              key={entry.id}
+                              className="border-b border-border/50"
+                            >
+                              <TableCell
+                                className={cn(
+                                  "px-3 py-2.5 font-medium",
+                                  entry.status === "Won bet"
+                                    ? "text-green-500"
+                                    : "text-red-500",
+                                )}
+                              >
+                                {entry.status}
+                              </TableCell>
+                              <TableCell className="px-3 py-2.5 text-right text-foreground">
+                                {entry.multiplier}
+                              </TableCell>
+                              <TableCell className="px-3 py-2.5 text-right text-foreground">
+                                {entry.payoutAmount}
+                                {entry.payoutCurrencyIcon}
+                              </TableCell>
+                              <TableCell className="px-3 py-2.5 text-right text-muted-foreground">
+                                {entry.timestamp}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
                     </div>
-                    <SheetFooter className="!p-3 sm:!p-4 !mt-0">
-                      <SheetClose asChild>
-                        <Button variant="outline" className="w-full">
-                          Close
-                        </Button>
-                      </SheetClose>
-                    </SheetFooter>
-                    <SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-3 right-3 sm:top-4 sm:right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
-                      <XIcon className="h-4 w-4" />
+                    <SheetPrimitive.Close
+                      className={cn(
+                        "ring-offset-background focus:ring-ring data-[state=open]:bg-secondary",
+                        "absolute right-3 sm:right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100",
+                        "focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none",
+                        "z-[60]",
+                        "-top-8",
+                      )}
+                    >
+                      <XIcon className="h-5 w-5 text-primary-foreground" />
                       <span className="sr-only">Close</span>
                     </SheetPrimitive.Close>
                   </SheetPrimitive.Content>
