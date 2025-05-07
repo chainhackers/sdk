@@ -125,6 +125,42 @@ function SheetDescription({
   )
 }
 
+type SheetBottomPanelContentProps = React.ComponentPropsWithoutRef<
+  typeof SheetPrimitive.Content
+>
+
+const SheetBottomPanelContent = React.forwardRef<
+  React.ComponentRef<typeof SheetPrimitive.Content>,
+  SheetBottomPanelContentProps
+>(({ className, children, ...props }, ref) => (
+  <SheetPrimitive.Content
+    ref={ref}
+    className={cn(
+      "bg-card data-[state=open]:animate-in data-[state=closed]:animate-out !absolute z-50 flex flex-col gap-0 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+      "!inset-x-0 !bottom-0 !w-full",
+      "data-[state=closed]:!slide-out-to-bottom data-[state=open]:!slide-in-from-bottom",
+      "rounded-t-[16px]",
+      className,
+    )}
+    {...props}
+  >
+    {children}
+    <SheetPrimitive.Close
+      className={cn(
+        "ring-offset-background focus:ring-ring data-[state=open]:bg-secondary",
+        "absolute right-3 sm:right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100",
+        "focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none",
+        "z-[60]",
+        "-top-8",
+      )}
+    >
+      <XIcon className="h-5 w-5 text-primary-foreground" />
+      <span className="sr-only">Close</span>
+    </SheetPrimitive.Close>
+  </SheetPrimitive.Content>
+))
+SheetBottomPanelContent.displayName = "SheetBottomPanelContent"
+
 export {
   Sheet,
   SheetTrigger,
@@ -136,4 +172,5 @@ export {
   SheetDescription,
   SheetPortal,
   SheetOverlay,
+  SheetBottomPanelContent,
 }

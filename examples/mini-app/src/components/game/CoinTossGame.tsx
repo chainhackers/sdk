@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import { Label } from "../ui/label"
-import { Info, History, Cog, XIcon } from "lucide-react"
+import { Info, History, Cog } from "lucide-react"
 import { cn } from "../../lib/utils"
 import coinTossBackground from "../../assets/game/game-background.png"
 import coinIcon from "../../assets/game/coin-background-icon.png"
@@ -18,8 +18,13 @@ import {
   TableCell,
 } from "../ui/table"
 
-import { Sheet, SheetTrigger, SheetPortal, SheetOverlay } from "../ui/sheet"
-import * as SheetPrimitive from "@radix-ui/react-dialog"
+import {
+  Sheet,
+  SheetTrigger,
+  SheetPortal,
+  SheetOverlay,
+  SheetBottomPanelContent,
+} from "../ui/sheet"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -206,58 +211,36 @@ export function CoinTossGame({
               {isMounted && cardRef.current && (
                 <SheetPortal container={cardRef.current}>
                   <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
-                  <SheetPrimitive.Content
-                    className={cn(
-                      "bg-card data-[state=open]:animate-in data-[state=closed]:animate-out !absolute z-50 flex flex-col gap-0 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
-                      "!inset-x-0 !bottom-0 !w-full !h-auto !max-h-[70%]",
-                      "data-[state=closed]:!slide-out-to-bottom data-[state=open]:!slide-in-from-bottom",
-                      "rounded-t-[16px]",
-                    )}
+                  <SheetBottomPanelContent
+                    className={cn("!h-auto !max-h-[70%]", "p-5 sm:p-6")}
                   >
-                    <div className="p-5 sm:p-6 relative">
-                      <SheetPrimitive.Close
-                        className={cn(
-                          "ring-offset-background focus:ring-ring data-[state=open]:bg-secondary",
-                          "absolute right-3 sm:right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100",
-                          "focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none",
-                          "z-[60]",
-                          "-top-8",
-                        )}
-                      >
-                        <XIcon className="h-5 w-5 text-primary-foreground" />
-                        <span className="sr-only">Close</span>
-                      </SheetPrimitive.Close>
-
-                      <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm">
-                        <div>
-                          <p className="text-muted-foreground">Win chance:</p>
-                          <p className="font-semibold text-base text-card-foreground">
-                            {winChance}%
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">RNG fee:</p>
-                          <p className="font-semibold text-base text-card-foreground">
-                            {fee} POL
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">
-                            Target payout:
-                          </p>
-                          <p className="font-semibold text-base text-card-foreground">
-                            {targetPayout} POL
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Gas price:</p>
-                          <p className="font-semibold text-base text-card-foreground">
-                            34.2123 gwei
-                          </p>
-                        </div>
+                    <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">Win chance:</p>
+                        <p className="font-semibold text-base text-card-foreground">
+                          {winChance}%
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">RNG fee:</p>
+                        <p className="font-semibold text-base text-card-foreground">
+                          {fee} POL
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Target payout:</p>
+                        <p className="font-semibold text-base text-card-foreground">
+                          {targetPayout} POL
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Gas price:</p>
+                        <p className="font-semibold text-base text-card-foreground">
+                          34.2123 gwei
+                        </p>
                       </div>
                     </div>
-                  </SheetPrimitive.Content>
+                  </SheetBottomPanelContent>
                 </SheetPortal>
               )}
             </Sheet>
@@ -276,14 +259,8 @@ export function CoinTossGame({
               {isMounted && cardRef.current && (
                 <SheetPortal container={cardRef.current}>
                   <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
-                  <SheetPrimitive.Content
-                    className={cn(
-                      "bg-card data-[state=open]:animate-in data-[state=closed]:animate-out !absolute z-50 flex flex-col gap-0 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
-                      "!inset-x-0 !bottom-0 !w-full !h-[70%] !max-h-full",
-                      "data-[state=closed]:!slide-out-to-bottom data-[state=open]:!slide-in-from-bottom",
-                      "rounded-t-[16px]",
-                      "p-0",
-                    )}
+                  <SheetBottomPanelContent
+                    className={cn("!h-[70%] !max-h-full", "p-0")}
                   >
                     <ScrollArea className="h-full w-full rounded-t-[16px] overflow-hidden">
                       <div className="p-1 pt-0">
@@ -336,19 +313,7 @@ export function CoinTossGame({
                         </Table>
                       </div>
                     </ScrollArea>
-                    <SheetPrimitive.Close
-                      className={cn(
-                        "ring-offset-background focus:ring-ring data-[state=open]:bg-secondary",
-                        "absolute right-3 sm:right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100",
-                        "focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none",
-                        "z-[60]",
-                        "-top-8",
-                      )}
-                    >
-                      <XIcon className="h-5 w-5 text-primary-foreground" />
-                      <span className="sr-only">Close</span>
-                    </SheetPrimitive.Close>
-                  </SheetPrimitive.Content>
+                  </SheetBottomPanelContent>
                 </SheetPortal>
               )}
             </Sheet>
