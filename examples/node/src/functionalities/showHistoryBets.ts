@@ -1,27 +1,24 @@
+import { InMemoryCache } from "@apollo/client/core/index.js";
 import {
-  Bet_OrderBy,
-  BetSwirlClient,
   BetSwirlError,
+  Bet_OrderBy,
+  type CasinoBet,
+  type CasinoChain,
+  FORMAT_TYPE,
+  OrderDirection,
   bigIntFormatter,
   casinoChains,
   formatTxnUrl,
-  initBetSwirlClient,
+  getBetSwirlBetUrl,
   labelCasinoGameByType,
-  OrderDirection,
-  type CasinoBet,
-  type CasinoChain,
 } from "@betswirl/sdk-core";
-import {
-  checkEnvVariables,
-  getPublicAddressFromWagmiConfig,
-  getWagmiConfigFromCasinoChain,
-} from "../../utils";
-import chalk from "chalk";
+import { WagmiBetSwirlClient, initWagmiBetSwirlClient } from "@betswirl/wagmi-provider";
 import { select } from "@inquirer/prompts";
+import chalk from "chalk";
 import type { Hex } from "viem/_types/types/misc";
-import { InMemoryCache } from "@apollo/client/core/index.js";
+import { checkEnvVariables, getWagmiConfigFromCasinoChain } from "../../utils";
 
-let betSwirlClient: BetSwirlClient;
+let wagmiBetSwielClient: WagmiBetSwirlClient;
 
 export async function startShowHistoryBetsProcess() {
   try {
@@ -42,8 +39,8 @@ export async function startShowHistoryBetsProcess() {
         chalk.red(
           `[${error.code}] BetSwirl error occured while showing bets history: ${
             error.message
-          } ${JSON.stringify(error.context, bigIntFormatter)}`
-        )
+          } ${JSON.stringify(error.context, bigIntFormatter)}`,
+        ),
       );
     } else {
       console.error(chalk.red("Node example error occured:", error));
@@ -58,9 +55,10 @@ async function _selectChain(): Promise<CasinoChain> {
     choices: casinoChains.map((c) => ({ name: c.viemChain.name, value: c })),
   });
   const wagmiConfig = getWagmiConfigFromCasinoChain(selectedChain);
-  betSwirlClient = initBetSwirlClient(wagmiConfig, {
+  wagmiBetSwielClient = initWagmiBetSwirlClient(wagmiConfig, {
     chainId: selectedChain.id,
     affiliate: process.env.AFFILIATE_ADDRESS as Hex,
+    formatType: FORMAT_TYPE.PRECISE,
     subgraphClient: {
       graphqlKey: process.env.GRAPHQL_KEY as string,
       cache: new InMemoryCache(),
@@ -69,18 +67,15 @@ async function _selectChain(): Promise<CasinoChain> {
   return selectedChain;
 }
 
-async function _getLastBets(
-  count: number,
-  casinoChain: CasinoChain
-): Promise<CasinoBet[]> {
-  const { bets, error } = await betSwirlClient.fetchBets(
+async function _getLastBets(count: number, casinoChain: CasinoChain): Promise<CasinoBet[]> {
+  const { bets, error } = await wagmiBetSwielClient.fetchBets(
     casinoChain.id,
     {
-      bettor: getPublicAddressFromWagmiConfig(betSwirlClient.wagmiConfig)!,
+      bettor: wagmiBetSwielClient.betSwirlWallet.getAccount()?.address,
     },
     1,
     count,
-    { key: Bet_OrderBy.BetTimestamp, order: OrderDirection.Desc }
+    { key: Bet_OrderBy.BetTimestamp, order: OrderDirection.Desc },
   );
 
   if (error) throw error;
@@ -97,9 +92,7 @@ function _showBets(bets: CasinoBet[]) {
   }
   // User has never placed any bets
   else {
-    console.log(
-      chalk.yellow("You have never placed any bets with this account")
-    );
+    console.log(chalk.yellow("You have never placed any bets with this account"));
   }
 }
 
@@ -110,56 +103,45 @@ function _showBet(bet: CasinoBet) {
   // TODO replace "Input" and "Rolled" by the game input/output labels
   const placeBetInfo = `Game: ${labelCasinoGameByType[bet.game]}\nInput: ${
     bet.decodedInput
-  }\nBet amount: ${bet.formattedBetAmount} ${bet.token.symbol}\nBet count: ${
-    bet.betCount
-  }\n${
-    bet.betCount > 1
-      ? `Total bet amount ${bet.formattedTotalBetAmount} ${bet.token.symbol}\n`
-      : ""
-  }Bet date: ${bet.betDate.toLocaleString()}\nBet txn: ${formatTxnUrl(
-    bet.betTxnHash,
-    bet.chainId
-  )}\n`;
+  }\nBet amount: ${bet.formattedBetAmount} ${bet.token.symbol}\nBet count: ${bet.betCount}\n${
+    bet.betCount > 1 ? `Total bet amount ${bet.formattedTotalBetAmount} ${bet.token.symbol}\n` : ""
+  }Bet date: ${bet.betDate.toLocaleString()}\nBet txn: ${formatTxnUrl(bet.betTxnHash, bet.chainId)}\n`;
   // Pending state
   if (!bet.isResolved) {
-    console.log("Status:", chalk.yellow(`Pending`));
+    console.log("Status:", chalk.yellow("Pending"));
     console.log(placeBetInfo);
   } else {
     // Refunded state
     if (bet.isRefunded) {
-      console.log("Status:", chalk.gray(`Refunded`));
+      console.log("Status:", chalk.gray("Refunded"));
       console.log(placeBetInfo);
     } else {
       const benefitInfo = `${bet.formattedBenefit} ${bet.token.symbol}`;
       const rollBetInfo = `Payout: ${bet.formattedPayout} ${
         bet.token.symbol
-      }\nMultiplier: ${bet.payoutMultiplier}x\nResult: ${
-        bet.isWin ? chalk.green("+" + benefitInfo) : chalk.red(benefitInfo)
-      }\nRolled: ${
-        bet.decodedRolled
-      }\nRoll date: ${bet.rollDate?.toLocaleString()}\nRoll txn: ${formatTxnUrl(
+      }\nMultiplier: x${bet.formattedPayoutMultiplier}\nResult: ${
+        bet.isWin ? chalk.green(`+${benefitInfo}`) : chalk.red(benefitInfo)
+      }\nRolled: ${bet.decodedRolled}\nRoll date: ${bet.rollDate?.toLocaleString()}\nRoll txn: ${formatTxnUrl(
         bet.rollTxnHash!,
-        bet.chainId
-      )}\n${
+        bet.chainId,
+      )}\nBetSwirl url: ${getBetSwirlBetUrl(bet.id, bet.game, bet.chainId)}\n${
         bet.isStopGainTriggered || bet.isStopLossTriggered
           ? chalk.yellow(
-              `\n=> Only ${bet.rollBetCount}/${
-                bet.betCount
-              } have been rolled because stop ${
+              `\n=> Only ${bet.rollBetCount}/${bet.betCount} have been rolled because stop ${
                 bet.isStopGainTriggered ? "gain" : "loss"
-              } has been triggered`
+              } has been triggered`,
             )
           : ""
       }`;
       // Won state
       if (bet.isWin) {
-        console.log("Status:", chalk.green(`Won`));
+        console.log("Status:", chalk.green("Won"));
         console.log(placeBetInfo);
         console.log(rollBetInfo);
       }
       // Lost state
       else {
-        console.log("Status:", chalk.red(`Lost`));
+        console.log("Status:", chalk.red("Lost"));
         console.log(placeBetInfo);
         console.log(rollBetInfo);
       }

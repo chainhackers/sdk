@@ -1,15 +1,11 @@
-import { readContract, type Config as WagmiConfig } from "@wagmi/core";
-import { encodeFunctionData, type Address } from "viem";
-import {
-  CASINO_GAME_TYPE,
-  casinoChainById,
-  type CasinoChainId,
-} from "../../data/casino";
-import { getCasinoChainId } from "../../utils";
-import type { Token } from "../../interfaces";
+import { type Address, type Hex, encodeFunctionData } from "viem";
+import { kenoAbi } from "../../abis";
+import { CASINO_GAME_TYPE, type CasinoChainId, casinoChainById } from "../../data/casino";
 import { ERROR_CODES, TransactionError } from "../../errors";
 import { ChainError } from "../../errors";
-import { kenoAbi } from "../../abis";
+import type { BetSwirlFunctionData, Token } from "../../interfaces";
+import type { BetSwirlWallet } from "../../provider";
+import { getCasinoChainId } from "../../utils";
 
 /**
  * Raw token info data returned by the smart contract
@@ -17,11 +13,21 @@ import { kenoAbi } from "../../abis";
  * [1] - maxNumbersPlayed: Maximum selectable numbers
  * [2] - gainsTable: The gain multipliers (gain multiplier = gains[numbers played][numbers matched]) (BP)
  */
-export type RawKenoConfiguration = [
-  bigint,
-  bigint,
-  readonly (readonly bigint[])[]
-];
+export type RawKenoConfiguration = [bigint, bigint, readonly (readonly bigint[])[]];
+
+export function parseRawKenoConfiguration(
+  rawConfiguration: RawKenoConfiguration,
+  token: Token,
+  casinoChainId: CasinoChainId,
+): KenoConfiguration {
+  return {
+    token,
+    chainId: casinoChainId,
+    biggestSelectableBall: Number(rawConfiguration[0]),
+    maxSelectableBalls: Number(rawConfiguration[1]),
+    mutliplierTable: rawConfiguration[2].map((row) => row.map((multiplier) => Number(multiplier))),
+  };
+}
 
 export interface KenoConfiguration {
   token: Token;
@@ -32,62 +38,42 @@ export interface KenoConfiguration {
 }
 
 export async function getKenoConfiguration(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   token: Token,
-  chainId?: CasinoChainId
 ): Promise<KenoConfiguration> {
-  const casinoChainId = getCasinoChainId(wagmiConfig, chainId);
+  const casinoChainId = getCasinoChainId(wallet);
 
   try {
-    const { data } = getKenoConfigurationFunctionData(
-      token.address,
-      casinoChainId
-    );
-    const rawConfiguration: Readonly<RawKenoConfiguration> = await readContract(
-      wagmiConfig,
-      {
-        abi: data.abi,
-        address: data.to,
-        chainId: chainId,
-        functionName: data.functionName,
-        args: data.args,
-      }
+    const functionData = getKenoConfigurationFunctionData(token.address, casinoChainId);
+    const rawConfiguration = await wallet.readContract<typeof functionData, RawKenoConfiguration>(
+      functionData,
     );
 
-    return {
-      token,
-      chainId: casinoChainId,
-      biggestSelectableBall: Number(rawConfiguration[0]),
-      maxSelectableBalls: Number(rawConfiguration[1]),
-      mutliplierTable: rawConfiguration[2].map((row) =>
-        row.map((multiplier) => Number(multiplier))
-      ),
-    };
+    return parseRawKenoConfiguration(rawConfiguration, token, casinoChainId);
   } catch (error) {
     throw new TransactionError(
-      "Error getting tokens",
+      "Error getting keno configuration",
       ERROR_CODES.GAME.GET_KENO_CONFIGURATION_ERROR,
       {
-        chainId,
+        chainId: casinoChainId,
         token,
         cause: error,
-      }
+      },
     );
   }
 }
 
 export function getKenoConfigurationFunctionData(
   tokenAddress: Address,
-  casinoChainId: CasinoChainId
-) {
+  casinoChainId: CasinoChainId,
+): BetSwirlFunctionData<typeof kenoAbi, "gains", readonly [Hex]> {
   const casinoChain = casinoChainById[casinoChainId];
 
-  const gameAddress =
-    casinoChain.contracts.games[CASINO_GAME_TYPE.KENO]?.address;
+  const gameAddress = casinoChain.contracts.games[CASINO_GAME_TYPE.KENO]?.address;
   if (!gameAddress) {
     throw new ChainError(
       `Game ${CASINO_GAME_TYPE.KENO} not found for chain ${casinoChainId}`,
-      ERROR_CODES.CHAIN.UNSUPPORTED_GAME
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
     );
   }
 

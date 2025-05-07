@@ -1,0 +1,19 @@
+fragment Token on Token {
+  id
+  address: id
+  symbol
+  name
+  decimals
+  betTxnCount
+  betCount
+  winTxnCount
+  userCount
+  totalWagered
+  totalPayout
+  dividendAmount
+  bankAmount
+  partnerAmount
+  affiliateAmount
+  treasuryAmount
+  teamAmount
+}

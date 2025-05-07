@@ -1,0 +1,45 @@
+{
+  "name": "@betswirl/wagmi-provider",
+  "description": "Wagmi client & wallet for Betswirl core SDK",
+  "version": "0.0.8",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/betswirl/sdk.git",
+    "directory": "packages/providers/wagmi"
+  },
+  "type": "module",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "rimraf ./dist && tsup --tsconfig tsconfig.build.json",
+    "prepublishOnly": "cross-env NODE_ENV=production npm run build"
+  },
+  "contributors": ["kinco_dev"],
+  "keywords": ["betswirl", "wagmi", "casino", "web3"],
+  "peerDependencies": {
+    "@wagmi/core": ">=2.16.3"
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@betswirl/sdk-core": "workspace:*",
+    "viem": "catalog:"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.3.6"
+  }
+}

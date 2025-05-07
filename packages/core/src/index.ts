@@ -1,6 +1,6 @@
 export * from "./abis";
 export * from "./actions";
-export * from "./client";
+export * from "./provider";
 export * from "./data";
 export * from "./entities";
 export * from "./errors";

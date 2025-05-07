@@ -109,7 +109,7 @@ export type DiceNumber =
 
 export type DiceRolledNumber = 100 & DiceNumber;
 
-export interface DiceChoiceInput extends ChoiceInput {
+export interface DiceChoiceInput extends ChoiceInput<CASINO_GAME_TYPE.DICE> {
   value: DiceNumber;
   id: DiceNumber;
 }
@@ -143,9 +143,7 @@ export class Dice extends AbstractCasinoGame<
     return Number(encodedCap) as DiceNumber;
   }
 
-  static decodeRolled(
-    encodedCap: DiceEncodedRolled | string
-  ): DiceRolledNumber {
+  static decodeRolled(encodedCap: DiceEncodedRolled | string): DiceRolledNumber {
     return Number(encodedCap) as DiceRolledNumber;
   }
 

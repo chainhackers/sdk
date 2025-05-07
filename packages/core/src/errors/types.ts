@@ -28,10 +28,10 @@ export class SubgraphError extends BetSwirlError {
     message: string,
     code: string,
     apolloError: ApolloError,
-    context?: Record<string, any>
+    context?: Record<string, any>,
   ) {
-    context ? (context.apolloError = apolloError) : (context = { apolloError });
-    super(message, code, context);
+    const errorContext = context ? { ...context, apolloError } : { apolloError };
+    super(message, code, errorContext);
     this.name = "SubgraphError";
     this.apolloError = apolloError;
   }

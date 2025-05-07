@@ -1,7 +1,7 @@
 {
   "name": "@betswirl/sdk-core",
   "description": "VanillaJS library for Betswirl protocol",
-  "version": "0.0.1-beta-15",
+  "version": "0.0.8",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -13,8 +13,14 @@
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
   "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.cjs"
+    "import": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "require": "./dist/index.cjs"
+    }
   },
   "sideEffects": false,
   "scripts": {
@@ -23,32 +29,21 @@
     "build": "rimraf ./dist && npm run gql && tsup --tsconfig tsconfig.build.json",
     "prepublishOnly": "cross-env NODE_ENV=production npm run build"
   },
-  "contributors": [
-    "kinco_dev"
-  ],
-  "keywords": [
-    "betswirl",
-    "bet",
-    "ethereum",
-    "dapps",
-    "casino",
-    "web3"
-  ],
+  "contributors": ["kinco_dev"],
+  "keywords": ["betswirl", "bet", "ethereum", "dapps", "casino", "web3"],
   "peerDependencies": {
     "@apollo/client": ">=3.12.11",
-    "@wagmi/core": ">=2.16.3",
     "typescript": ">=5.0.4",
-    "viem": ">=2.22.23"
+    "viem": "catalog:"
   },
   "peerDependenciesMeta": {
     "typescript": {
       "optional": true
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "dependencies": {
+    "decimal.js": "^10.5.0",
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {

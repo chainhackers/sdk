@@ -1,4 +1,5 @@
 import {
+  type Chain,
   arbitrum,
   arbitrumSepolia,
   avalanche,
@@ -12,7 +13,6 @@ import {
   polygon,
   polygonAmoy,
   sepolia,
-  type Chain,
 } from "viem/chains";
 
 export type ChainId = keyof typeof chainById;
@@ -33,10 +33,7 @@ export const chainByKey = {
   gnosis,
 } as const;
 
-export const chains = Object.values(chainByKey) as unknown as readonly [
-  Chain,
-  ...Chain[]
-];
+export const chains = Object.values(chainByKey) as unknown as readonly [Chain, ...Chain[]];
 
 export const chainById = {
   [polygon.id]: polygon,

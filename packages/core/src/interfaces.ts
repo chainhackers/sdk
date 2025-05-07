@@ -1,5 +1,42 @@
-import type { Abi, Address, Hash, Hex } from "viem";
+import type { Abi, Address, ContractEventName, ContractFunctionName, Hash, Hex, Log } from "viem";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "./data/casino";
+
+export interface BetSwirlFunctionData<
+  TAbi extends Abi,
+  TFunctionName extends ContractFunctionName<TAbi>,
+  TArgs extends readonly any[],
+> {
+  data: {
+    to: Address;
+    abi: TAbi;
+    functionName: TFunctionName;
+    args: TArgs;
+  };
+  encodedData: Hex;
+}
+export interface BetSwirlEventData<
+  TAbi extends Abi,
+  TEventName extends ContractEventName<TAbi>,
+  TArgs extends Record<string, any>,
+> {
+  data: {
+    to: Address;
+    abi: TAbi;
+    eventName: TEventName;
+    args: TArgs;
+    pollingInterval: number;
+  };
+  callbacks: {
+    onLogs?: (logs: Log[]) => Promise<void> | void;
+    onError?: (error: Error) => Promise<void> | void;
+  };
+}
+
+export type RawToken = {
+  symbol: string;
+  tokenAddress: Hex;
+  decimals: number;
+};
 
 export type Token = {
   symbol: string;
@@ -53,6 +90,7 @@ export interface BetRequirements {
   multiplier: number;
   maxBetAmount: bigint;
   maxBetCount: number;
+  isAllowed: boolean;
   chainId: CasinoChainId;
 }
 
@@ -66,34 +104,34 @@ export interface CasinoBet {
   gameAddress: Address;
   bettor: Address;
   betAmount: bigint;
-  formattedBetAmount: number;
+  formattedBetAmount: string;
   totalBetAmount: bigint;
-  formattedTotalBetAmount: number;
+  formattedTotalBetAmount: string;
   betCount: number;
   stopLoss: bigint;
-  formattedStopLoss: number;
+  formattedStopLoss: string;
   stopGain: bigint;
-  formattedStopGain: number;
+  formattedStopGain: string;
   houseEdge: number; // BP
   betTimestampSecs: number; // secs
   betDate: Date;
   chargedVRFFees: bigint;
-  formattedChargedVRFFees: number;
+  formattedChargedVRFFees: string;
   betTxnHash: Hash;
   encodedInput: string;
   decodedInput: any;
   payout?: bigint;
-  formattedPayout?: number;
-  payoutMultiplier?: number;
+  formattedPayout?: string;
+  formattedPayoutMultiplier?: number;
   benefit?: bigint;
-  formattedBenefit?: number;
+  formattedBenefit?: string;
   rollTxnHash?: Hash;
   rollTimestampSecs?: number;
   rollDate?: Date;
   isResolved: boolean;
   isRefunded: boolean;
   rollTotalBetAmount?: bigint;
-  fomattedRollTotalBetAmount?: number;
+  fomattedRollTotalBetAmount?: string;
   rollBetCount?: number;
   encodedRolled?: Array<string>;
   decodedRolled?: Array<any>;
@@ -102,4 +140,31 @@ export interface CasinoBet {
   isLost?: boolean;
   isStopLossTriggered?: boolean;
   isStopGainTriggered?: boolean;
+}
+
+export interface SubgraphToken {
+  id: Address;
+  address: Address;
+  chainId: CasinoChainId;
+  symbol: string;
+  name: string;
+  decimals: number;
+  betTxnCount: number;
+  betCount: number;
+  winTxnCount: number;
+  userCount: number;
+  totalWagered: bigint;
+  formattedTotalWagered: string;
+  totalPayout: bigint;
+  formattedTotalPayout: string;
+  dividendAmount: bigint;
+  formattedDividendAmount: string;
+  bankAmount: bigint;
+  formattedBankAmount: string;
+  affiliateAmount: bigint;
+  formattedAffiliateAmount: string;
+  treasuryAmount: bigint;
+  formattedTreasuryAmount: string;
+  teamAmount: bigint;
+  formattedTeamAmount: string;
 }

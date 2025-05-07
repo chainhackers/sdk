@@ -1,53 +1,44 @@
-import { type Config as WagmiConfig, call } from "@wagmi/core";
 import { casinoGameAbi } from "../../abis/v2/casino/game";
 
-import { encodeFunctionData, type Hex } from "viem";
-import { ChainError, TransactionError } from "../../errors/types";
+import { type Hex, encodeFunctionData } from "viem";
+import { defaultCasinoPlaceBetOptions } from "../../actions";
+import { type CASINO_GAME_TYPE, type CasinoChainId, casinoChainById } from "../../data/casino";
 import { ERROR_CODES } from "../../errors/codes";
-import {
-  casinoChainById,
-  type CASINO_GAME_TYPE,
-  type CasinoChainId,
-} from "../../data/casino";
+import { ChainError, TransactionError } from "../../errors/types";
+import type { BetSwirlFunctionData } from "../../interfaces";
+import type { BetSwirlWallet } from "../../provider";
 import { getCasinoChainId } from "../../utils";
 import { GAS_PRICE_TYPE, getGasPrices } from "./gasPrice";
-import { defaultCasinoPlaceBetOptions } from "../../actions";
+
+export type RawChainlinkVrfCost = bigint;
 
 export async function getChainlinkVrfCost(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   game: CASINO_GAME_TYPE, // TODO allow to pass PVP_GAME_TYPE
   tokenAddress: Hex,
   betCount: number,
-  chainId?: CasinoChainId,
   gasPrice?: bigint,
-  gasPriceType?: GAS_PRICE_TYPE
+  gasPriceType?: GAS_PRICE_TYPE,
 ): Promise<bigint> {
-  const casinoChainId = getCasinoChainId(wagmiConfig, chainId);
+  const casinoChainId = getCasinoChainId(wallet);
 
   // Get default gas price if gas price is not passed
   const effectiveGasPrice =
     gasPrice ||
-    (await getGasPrices(wagmiConfig, casinoChainId))[
+    (await getGasPrices(wallet, casinoChainId))[
       gasPriceType || defaultCasinoPlaceBetOptions.gasPriceType
     ];
-  const { data, encodedData } = getChainlinkVrfCostFunctionData(
-    game,
-    tokenAddress,
-    betCount,
-    casinoChainId
-  );
-  const gameAddress = data.to;
+  const functionData = getChainlinkVrfCostFunctionData(game, tokenAddress, betCount, casinoChainId);
+  const gameAddress = functionData.data.to;
   try {
-    const { data: vrfCost } = await call(wagmiConfig, {
-      to: data.to,
-      data: encodedData,
-      chainId,
-      gasPrice: effectiveGasPrice,
-    });
+    const { data: vrfCost } = await wallet.readContract<typeof functionData>(
+      functionData,
+      effectiveGasPrice,
+    );
 
     if (!vrfCost) {
       console.warn(
-        `[getChainlinkVrfCost] vrfCost is 0 for tokenAddress: ${tokenAddress}, betCount: ${betCount}, gameAddress: ${gameAddress}, chainId: ${chainId}`
+        `[getChainlinkVrfCost] vrfCost is 0 for tokenAddress: ${tokenAddress}, betCount: ${betCount}, gameAddress: ${gameAddress}, chainId: ${casinoChainId}`,
       );
       return 0n;
     }
@@ -60,9 +51,9 @@ export async function getChainlinkVrfCost(
         gameAddress,
         tokenAddress,
         betCount,
-        chainId,
+        chainId: casinoChainId,
         gasPrice: effectiveGasPrice,
-      }
+      },
     );
   }
 }
@@ -71,8 +62,8 @@ export function getChainlinkVrfCostFunctionData(
   game: CASINO_GAME_TYPE,
   tokenAddress: Hex,
   betCount: number,
-  casinoChainId: CasinoChainId
-) {
+  casinoChainId: CasinoChainId,
+): BetSwirlFunctionData<typeof casinoGameAbi, "getChainlinkVRFCost", readonly [Hex, number]> {
   const casinoChain = casinoChainById[casinoChainId];
   const gameAddress = casinoChain.contracts.games[game]?.address;
 
@@ -83,7 +74,7 @@ export function getChainlinkVrfCostFunctionData(
       {
         chainId: casinoChainId,
         supportedChains: Object.keys(casinoChainById),
-      }
+      },
     );
   }
   const abi = casinoGameAbi;

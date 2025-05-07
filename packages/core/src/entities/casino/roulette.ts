@@ -58,7 +58,7 @@ export enum ROULETTE_INPUT_BUNDLE {
   BLACK = "Black",
 }
 
-export interface RouletteChoiceInput extends ChoiceInput {
+export interface RouletteChoiceInput extends ChoiceInput<CASINO_GAME_TYPE.ROULETTE> {
   value: RouletteNumber[];
   id: RouletteNumber[] | ROULETTE_INPUT_BUNDLE;
 }
@@ -76,10 +76,8 @@ export class Roulette extends AbstractCasinoGame<
     const encodedNumbers = Roulette.encodeInput(numbers);
     return (
       Math.round(
-        (Roulette.getSelectedNumbersCount(encodedNumbers) /
-          MAX_SELECTABLE_ROULETTE_NUMBER +
-          1) *
-          1e3
+        (Roulette.getSelectedNumbersCount(encodedNumbers) / (MAX_SELECTABLE_ROULETTE_NUMBER + 1)) *
+          1e3,
       ) / 10
     );
   }
@@ -89,7 +87,7 @@ export class Roulette extends AbstractCasinoGame<
     return encodedNumbers
       ? Number(
           (BigInt(BP_VALUE) * BigInt(MAX_SELECTABLE_ROULETTE_NUMBER + 1)) /
-            BigInt(Roulette.getSelectedNumbersCount(encodedNumbers))
+            BigInt(Roulette.getSelectedNumbersCount(encodedNumbers)),
         )
       : 0;
   }
@@ -105,9 +103,9 @@ export class Roulette extends AbstractCasinoGame<
     const sortedNumbers = uniqueNumbers.sort((a, b) => a - b);
     // 3. Create a boolean array
     const sortedBooleans: boolean[] = Array(37).fill(false);
-    sortedNumbers.forEach((num) => {
+    for (const num of sortedNumbers) {
       sortedBooleans[num] = true;
-    });
+    }
     // 4. Create a binary numbers
     const binaryNumbers = Object.values(sortedBooleans)
       .slice()
@@ -116,23 +114,19 @@ export class Roulette extends AbstractCasinoGame<
         return numbers + (isActive ? 1 : 0);
       }, "");
     // 5. Transform the binary numbers to a number
-    return parseInt(binaryNumbers, 2);
+    return Number.parseInt(binaryNumbers, 2);
   }
 
-  static decodeInput(
-    encodedNumbers: RouletteEncodedInput | string
-  ): RouletteNumber[] {
+  static decodeInput(encodedNumbers: RouletteEncodedInput | string): RouletteNumber[] {
     return Number(encodedNumbers)
       .toString(2)
       .split("")
       .reverse()
-      .map((number, i) => (number === "1" ? i : 0))
-      .filter((number, i) => number || (!number && !i)) as RouletteNumber[];
+      .map((number, i) => (number === "1" ? i : -1))
+      .filter((number) => number >= 0) as RouletteNumber[];
   }
 
-  static decodeRolled(
-    encodedRolled: RouletteEncodedRolled | string
-  ): RouletteNumber {
+  static decodeRolled(encodedRolled: RouletteEncodedRolled | string): RouletteNumber {
     return Number(encodedRolled) as RouletteNumber;
   }
 
@@ -140,7 +134,7 @@ export class Roulette extends AbstractCasinoGame<
     const createChoiceInput = (
       numbers: RouletteNumber[],
       id: RouletteNumber[] | ROULETTE_INPUT_BUNDLE,
-      label: string
+      label: string,
     ): RouletteChoiceInput => ({
       value: numbers,
       id,
@@ -158,37 +152,26 @@ export class Roulette extends AbstractCasinoGame<
     });
 
     // 1. Single numbers
-    const choiceInputs: RouletteChoiceInput[] = Array.from(
-      { length: 37 },
-      (_, i) => {
-        const rouletteNumber = i as RouletteNumber;
-        return createChoiceInput(
-          [rouletteNumber],
-          [rouletteNumber],
-          `${rouletteNumber}`
-        );
-      }
-    );
+    const choiceInputs: RouletteChoiceInput[] = Array.from({ length: 37 }, (_, i) => {
+      const rouletteNumber = i as RouletteNumber;
+      return createChoiceInput([rouletteNumber], [rouletteNumber], `${rouletteNumber}`);
+    });
 
     // 2. Rows
     choiceInputs.push(
       ...[1, 2, 3].map((startNumber) => {
         const rowNumbers = Array.from(
           { length: 12 },
-          (_, i) => startNumber + i * 3
+          (_, i) => startNumber + i * 3,
         ) as RouletteNumber[];
         const bundle =
-          startNumber == 1
+          startNumber === 1
             ? ROULETTE_INPUT_BUNDLE.FIRST_ROW
-            : startNumber == 2
-            ? ROULETTE_INPUT_BUNDLE.SECOND_ROW
-            : ROULETTE_INPUT_BUNDLE.THIRD_ROW;
-        return createChoiceInput(
-          rowNumbers,
-          bundle,
-          `${bundle} (${rowNumbers})`
-        );
-      })
+            : startNumber === 2
+              ? ROULETTE_INPUT_BUNDLE.SECOND_ROW
+              : ROULETTE_INPUT_BUNDLE.THIRD_ROW;
+        return createChoiceInput(rowNumbers, bundle, `${bundle} (${rowNumbers})`);
+      }),
     );
 
     // 3. From to
@@ -223,10 +206,10 @@ export class Roulette extends AbstractCasinoGame<
       ...fromToBundles.map((bundle) => {
         const numbers = Array.from(
           { length: bundle.to - bundle.from + 1 },
-          (_, i) => bundle.from + i
+          (_, i) => bundle.from + i,
         ) as RouletteNumber[];
         return createChoiceInput(numbers, bundle.id, `${bundle.id}`);
-      })
+      }),
     );
 
     // 4. Odd and even
@@ -234,18 +217,11 @@ export class Roulette extends AbstractCasinoGame<
       ...[1, 2].map((startNumber) => {
         const rowNumbers = Array.from(
           { length: 18 },
-          (_, i) => startNumber + i * 2
+          (_, i) => startNumber + i * 2,
         ) as RouletteNumber[];
-        const bundle =
-          startNumber == 1
-            ? ROULETTE_INPUT_BUNDLE.ODD
-            : ROULETTE_INPUT_BUNDLE.EVEN;
-        return createChoiceInput(
-          rowNumbers,
-          bundle,
-          `${bundle} (${rowNumbers})`
-        );
-      })
+        const bundle = startNumber === 1 ? ROULETTE_INPUT_BUNDLE.ODD : ROULETTE_INPUT_BUNDLE.EVEN;
+        return createChoiceInput(rowNumbers, bundle, `${bundle} (${rowNumbers})`);
+      }),
     );
 
     // 5. Colors
@@ -265,12 +241,8 @@ export class Roulette extends AbstractCasinoGame<
     ];
     choiceInputs.push(
       ...colorBundles.map((colorBundle) =>
-        createChoiceInput(
-          colorBundle.numbers,
-          colorBundle.id,
-          `${colorBundle.id}`
-        )
-      )
+        createChoiceInput(colorBundle.numbers, colorBundle.id, `${colorBundle.id}`),
+      ),
     );
     return choiceInputs;
   }
@@ -282,19 +254,15 @@ export class Roulette extends AbstractCasinoGame<
 
   static combineChoiceInputs(
     inputs: RouletteChoiceInput[],
-    houseEdge?: number
+    houseEdge?: number,
   ): RouletteChoiceInput {
     // 1. Combine all unique numbers from the inputs
-    const combinedNumbers = [
-      ...new Set(inputs.flatMap((input) => input.value)),
-    ];
+    const combinedNumbers = [...new Set(inputs.flatMap((input) => input.value))];
     // 2. Sort the numbers
     const sortedCombinedNumbers = combinedNumbers.sort((a, b) => a - b);
 
     // 3. Create a the custom label
-    const customLabel = sortedCombinedNumbers
-      .map((rouletteNumber) => rouletteNumber)
-      .join(" & ");
+    const customLabel = sortedCombinedNumbers.map((rouletteNumber) => rouletteNumber).join(" & ");
 
     return {
       value: sortedCombinedNumbers,
@@ -308,10 +276,7 @@ export class Roulette extends AbstractCasinoGame<
         ? getNetMultiplier(Roulette.getMultiplier(combinedNumbers), houseEdge)
         : undefined,
       formattedNetMultiplier: houseEdge
-        ? getFormattedNetMultiplier(
-            Roulette.getMultiplier(combinedNumbers),
-            houseEdge
-          )
+        ? getFormattedNetMultiplier(Roulette.getMultiplier(combinedNumbers), houseEdge)
         : undefined,
     };
   }

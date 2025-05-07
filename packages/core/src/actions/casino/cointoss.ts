@@ -1,19 +1,19 @@
-import { type Config as WagmiConfig } from "@wagmi/core";
+import { type TransactionReceipt, decodeEventLog } from "viem";
+import { coinTossAbi } from "../../abis/v2/casino/coinToss";
+import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
+import { type COINTOSS_FACE, CoinToss } from "../../entities/casino/coinToss";
+import { ERROR_CODES } from "../../errors/codes";
+import { TransactionError } from "../../errors/types";
+import type { Token } from "../../interfaces";
+import type { BetSwirlWallet } from "../../provider";
 import {
-  getPlacedBetFromReceipt,
-  placeBet,
   type CasinoBetParams,
   type CasinoPlaceBetOptions,
   type CasinoPlacedBet,
   type PlaceBetCallbacks,
+  getPlacedBetFromReceipt,
+  placeBet,
 } from "./game";
-import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
-import { decodeEventLog, type TransactionReceipt } from "viem";
-import { coinTossAbi } from "../../abis/v2/casino/coinToss";
-import { TransactionError } from "../../errors/types";
-import { ERROR_CODES } from "../../errors/codes";
-import { CoinToss, type COINTOSS_FACE } from "../../entities/casino/coinToss";
-import type { Token } from "../../interfaces";
 
 export interface CoinTossParams extends CasinoBetParams {
   face: COINTOSS_FACE;
@@ -25,26 +25,26 @@ export interface CoinTossPlacedBet extends CasinoPlacedBet {
 }
 
 export async function placeCoinTossBet(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   coinTossParams: CoinTossParams,
   options?: CasinoPlaceBetOptions,
-  callbacks?: PlaceBetCallbacks
+  callbacks?: PlaceBetCallbacks,
 ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
   const { placedBet, receipt } = await placeBet(
-    wagmiConfig,
+    wallet,
     {
       game: CASINO_GAME_TYPE.COINTOSS,
       gameEncodedInput: CoinToss.encodeInput(coinTossParams.face),
       ...coinTossParams,
     },
     options,
-    callbacks
+    callbacks,
   );
   const coinTossPlacedBet = await getCoinTossPlacedBetFromReceipt(
-    wagmiConfig,
+    wallet,
     receipt,
     placedBet.chainId,
-    placedBet.token
+    placedBet.token,
   );
   if (!coinTossPlacedBet) {
     throw new TransactionError(
@@ -53,24 +53,24 @@ export async function placeCoinTossBet(
       {
         hash: receipt.transactionHash,
         chainId: placedBet.chainId,
-      }
+      },
     );
   }
   return { placedBet: coinTossPlacedBet, receipt };
 }
 
 export async function getCoinTossPlacedBetFromReceipt(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   receipt: TransactionReceipt,
   chainId: CasinoChainId,
-  usedToken?: Token
+  usedToken?: Token,
 ): Promise<CoinTossPlacedBet | null> {
   const gamePlacedBet = await getPlacedBetFromReceipt(
-    wagmiConfig,
+    wallet,
     receipt,
-    chainId,
     CASINO_GAME_TYPE.COINTOSS,
-    usedToken
+    chainId,
+    usedToken,
   );
   if (!gamePlacedBet) {
     return null;

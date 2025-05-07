@@ -1,19 +1,19 @@
-import { type Config as WagmiConfig } from "@wagmi/core";
+import { type TransactionReceipt, decodeEventLog } from "viem";
+import { diceAbi } from "../../abis/v2/casino/dice";
+import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
+import { Dice, type DiceNumber } from "../../entities/casino/dice";
+import { ERROR_CODES } from "../../errors/codes";
+import { TransactionError } from "../../errors/types";
+import type { Token } from "../../interfaces";
+import type { BetSwirlWallet } from "../../provider";
 import {
-  getPlacedBetFromReceipt,
-  placeBet,
   type CasinoBetParams,
   type CasinoPlaceBetOptions,
   type CasinoPlacedBet,
   type PlaceBetCallbacks,
+  getPlacedBetFromReceipt,
+  placeBet,
 } from "./game";
-import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
-import { decodeEventLog, type TransactionReceipt } from "viem";
-import { diceAbi } from "../../abis/v2/casino/dice";
-import { TransactionError } from "../../errors/types";
-import { ERROR_CODES } from "../../errors/codes";
-import { Dice, type DiceNumber } from "../../entities/casino/dice";
-import type { Token } from "../../interfaces";
 
 export interface DiceParams extends CasinoBetParams {
   cap: DiceNumber;
@@ -25,26 +25,26 @@ export interface DicePlacedBet extends CasinoPlacedBet {
 }
 
 export async function placeDiceBet(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   diceParams: DiceParams,
   options?: CasinoPlaceBetOptions,
-  callbacks?: PlaceBetCallbacks
+  callbacks?: PlaceBetCallbacks,
 ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
   const { placedBet, receipt } = await placeBet(
-    wagmiConfig,
+    wallet,
     {
       game: CASINO_GAME_TYPE.DICE,
       gameEncodedInput: Dice.encodeInput(diceParams.cap),
       ...diceParams,
     },
     options,
-    callbacks
+    callbacks,
   );
   const dicePlacedBet = await getDicePlacedBetFromReceipt(
-    wagmiConfig,
+    wallet,
     receipt,
     placedBet.chainId,
-    placedBet.token
+    placedBet.token,
   );
   if (!dicePlacedBet) {
     throw new TransactionError(
@@ -53,7 +53,7 @@ export async function placeDiceBet(
       {
         hash: receipt.transactionHash,
         chainId: placedBet.chainId,
-      }
+      },
     );
   }
 
@@ -61,17 +61,17 @@ export async function placeDiceBet(
 }
 
 export async function getDicePlacedBetFromReceipt(
-  wagmiConfig: WagmiConfig,
+  wallet: BetSwirlWallet,
   receipt: TransactionReceipt,
   chainId: CasinoChainId,
-  usedToken?: Token
+  usedToken?: Token,
 ): Promise<DicePlacedBet | null> {
   const gamePlacedBet = await getPlacedBetFromReceipt(
-    wagmiConfig,
+    wallet,
     receipt,
-    chainId,
     CASINO_GAME_TYPE.DICE,
-    usedToken
+    chainId,
+    usedToken,
   );
   if (!gamePlacedBet) {
     return null;
