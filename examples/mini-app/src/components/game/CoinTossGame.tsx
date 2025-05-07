@@ -7,6 +7,7 @@ import { Info, History, Cog, XIcon } from "lucide-react"
 import { cn } from "../../lib/utils"
 import coinTossBackground from "../../assets/game/game-background.png"
 import coinIcon from "../../assets/game/coin-background-icon.png"
+import { ScrollArea } from "../ui/scroll-area"
 
 import {
   Table,
@@ -281,57 +282,60 @@ export function CoinTossGame({
                       "!inset-x-0 !bottom-0 !w-full !h-[70%] !max-h-full",
                       "data-[state=closed]:!slide-out-to-bottom data-[state=open]:!slide-in-from-bottom",
                       "rounded-t-[16px]",
+                      "p-0",
                     )}
                   >
-                    <div className="flex-1 overflow-y-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="border-b border-border/50">
-                            <TableHead className="px-3 py-2.5 text-muted-foreground font-normal">
-                              Draw
-                            </TableHead>
-                            <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal">
-                              X
-                            </TableHead>
-                            <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal">
-                              Payout
-                            </TableHead>
-                            <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal">
-                              Time
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {mockHistoryData.map((entry) => (
-                            <TableRow
-                              key={entry.id}
-                              className="border-b border-border/50"
-                            >
-                              <TableCell
-                                className={cn(
-                                  "px-3 py-2.5 font-medium",
-                                  entry.status === "Won bet"
-                                    ? "text-green-500"
-                                    : "text-red-500",
-                                )}
-                              >
-                                {entry.status}
-                              </TableCell>
-                              <TableCell className="px-3 py-2.5 text-right text-foreground">
-                                {entry.multiplier}
-                              </TableCell>
-                              <TableCell className="px-3 py-2.5 text-right text-foreground">
-                                {entry.payoutAmount}
-                                {entry.payoutCurrencyIcon}
-                              </TableCell>
-                              <TableCell className="px-3 py-2.5 text-right text-muted-foreground">
-                                {entry.timestamp}
-                              </TableCell>
+                    <ScrollArea className="h-full w-full rounded-t-[16px] overflow-hidden">
+                      <div className="p-1 pt-0">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="border-b border-border/50">
+                              <TableHead className="px-3 py-2.5 text-muted-foreground font-normal top-0 bg-card">
+                                Draw
+                              </TableHead>
+                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal top-0 bg-card">
+                                X
+                              </TableHead>
+                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal top-0 bg-card">
+                                Payout
+                              </TableHead>
+                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal top-0 bg-card">
+                                Time
+                              </TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+                          </TableHeader>
+                          <TableBody>
+                            {mockHistoryData.map((entry) => (
+                              <TableRow
+                                key={entry.id}
+                                className="border-b border-border/50"
+                              >
+                                <TableCell
+                                  className={cn(
+                                    "px-3 py-2.5 font-medium",
+                                    entry.status === "Won bet"
+                                      ? "text-green-500"
+                                      : "text-red-500",
+                                  )}
+                                >
+                                  {entry.status}
+                                </TableCell>
+                                <TableCell className="px-3 py-2.5 text-right text-foreground">
+                                  {entry.multiplier}
+                                </TableCell>
+                                <TableCell className="px-3 py-2.5 text-right text-foreground">
+                                  {entry.payoutAmount}
+                                  {entry.payoutCurrencyIcon}
+                                </TableCell>
+                                <TableCell className="px-3 py-2.5 text-right text-muted-foreground">
+                                  {entry.timestamp}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </ScrollArea>
                     <SheetPrimitive.Close
                       className={cn(
                         "ring-offset-background focus:ring-ring data-[state=open]:bg-secondary",
