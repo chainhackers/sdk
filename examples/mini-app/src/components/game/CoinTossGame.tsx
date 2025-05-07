@@ -2,7 +2,6 @@ import React, { useState, ChangeEvent, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Label } from "../ui/label"
 import { Info, History, Cog, XIcon } from "lucide-react"
 import { cn } from "../../lib/utils"
@@ -107,6 +106,26 @@ const mockHistoryData: HistoryEntry[] = [
     ),
     timestamp: "~2h ago",
   },
+  {
+    id: "8",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: 0.1,
+    payoutCurrencyIcon: (
+      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
+    ),
+    timestamp: "~2h ago",
+  },
+  {
+    id: "9",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: 0.1,
+    payoutCurrencyIcon: (
+      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
+    ),
+    timestamp: "~2h ago",
+  },
 ]
 
 export function CoinTossGame({
@@ -172,8 +191,8 @@ export function CoinTossGame({
           >
             <div className="absolute inset-0 bg-black/40 rounded-[16px]"></div>
 
-            <Popover>
-              <PopoverTrigger asChild>
+            <Sheet>
+              <SheetTrigger asChild>
                 <Button
                   variant="iconTransparent"
                   size="iconRound"
@@ -181,31 +200,66 @@ export function CoinTossGame({
                 >
                   <Info className="h-4 w-4" />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className={cn("w-60")}>
-                <div className="grid gap-4">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium leading-none">Bet Details</h4>
-                  </div>
-                  <div className="grid gap-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        Target Payout:
-                      </span>
-                      <span>{targetPayout} POL</span>
+              </SheetTrigger>
+
+              {isMounted && cardRef.current && (
+                <SheetPortal container={cardRef.current}>
+                  <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
+                  <SheetPrimitive.Content
+                    className={cn(
+                      "bg-card data-[state=open]:animate-in data-[state=closed]:animate-out !absolute z-50 flex flex-col gap-0 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+                      "!inset-x-0 !bottom-0 !w-full !h-auto !max-h-[70%]",
+                      "data-[state=closed]:!slide-out-to-bottom data-[state=open]:!slide-in-from-bottom",
+                      "rounded-t-[16px]",
+                    )}
+                  >
+                    <div className="p-5 sm:p-6 relative">
+                      <SheetPrimitive.Close
+                        className={cn(
+                          "ring-offset-background focus:ring-ring data-[state=open]:bg-secondary",
+                          "absolute right-3 sm:right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100",
+                          "focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none",
+                          "z-[60]",
+                          "-top-8",
+                        )}
+                      >
+                        <XIcon className="h-5 w-5 text-primary-foreground" />
+                        <span className="sr-only">Close</span>
+                      </SheetPrimitive.Close>
+
+                      <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Win chance:</p>
+                          <p className="font-semibold text-base text-card-foreground">
+                            {winChance}%
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">RNG fee:</p>
+                          <p className="font-semibold text-base text-card-foreground">
+                            {fee} POL
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">
+                            Target payout:
+                          </p>
+                          <p className="font-semibold text-base text-card-foreground">
+                            {targetPayout} POL
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Gas price:</p>
+                          <p className="font-semibold text-base text-card-foreground">
+                            34.2123 gwei
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Win Chance:</span>
-                      <span>{winChance}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Fee:</span>
-                      <span>{fee} POL</span>
-                    </div>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+                  </SheetPrimitive.Content>
+                </SheetPortal>
+              )}
+            </Sheet>
 
             <Sheet>
               <SheetTrigger asChild>
@@ -227,7 +281,6 @@ export function CoinTossGame({
                       "!inset-x-0 !bottom-0 !w-full !h-[70%] !max-h-full",
                       "data-[state=closed]:!slide-out-to-bottom data-[state=open]:!slide-in-from-bottom",
                       "rounded-t-[16px]",
-                      "overflow-hidden",
                     )}
                   >
                     <div className="flex-1 overflow-y-auto">
