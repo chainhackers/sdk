@@ -3,7 +3,7 @@
   tasks:
     - name: Copy dist files
       synchronize:
-        src: ../../examples/mini-app/storybook-static
+        src: ../../examples/mini-app/storybook-static/
         dest: /var/www/betswirl-sdk/storybook-static
         delete: yes
         archive: no
