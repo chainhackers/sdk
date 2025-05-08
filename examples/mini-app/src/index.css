@@ -53,6 +53,7 @@
   --color-game-window-overlay: var(--game-window-overlay);
   --color-menu-bg: var(--menu-bg);
   --color-table-separator: var(--table-separator);
+  --color-close-btn-color: var(--close-btn-color);
 }
 
 @layer base {
@@ -61,6 +62,7 @@
     --dark-surface: oklch(0.15 0.0066 236.83);
     --light-stroke: oklch(0.16 0.02 269.69 / 8%);
     --dark-stroke: oklch(1 0 0 / 8%);
+    --dark-on-surface-variant: oklch(0.78 0.0129 276.04);
     --white: oklch(1 0 0);
 
     --radius: 0.625rem;
@@ -120,6 +122,7 @@
 
     --menu-bg: var(--light-surface);
     --table-separator: var(--light-stroke);
+    --close-btn-color: var(--light-surface);
   }
 
   .dark {
@@ -153,7 +156,7 @@
     --transparent-button-border: oklch(0.25 0 0);
     --neutral-background: oklch(1 0 0 / 10%);
     --title-color: var(--white);
-    --text-on-surface-variant: oklch(0.78 0.0129 276.04);
+    --text-on-surface-variant: var(--dark-on-surface-variant);
     --text-on-surface: oklch(0.93 0.0058 264.53);
     --border-stroke: var(--dark-stroke);
     --play-btn-font: var(--white);
@@ -163,6 +166,7 @@
 
     --menu-bg: oklch(0.24 0.0059 236.8);
     --table-separator: var(--dark-stroke);
+    --close-btn-color: var(--dark-on-surface-variant);
   }
 
   /* Hide arrows for input[type=number] */

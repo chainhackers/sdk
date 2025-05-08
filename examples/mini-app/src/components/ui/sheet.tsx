@@ -154,7 +154,7 @@ const SheetBottomPanelContent = React.forwardRef<
         "-top-8",
       )}
     >
-      <XIcon className="h-5 w-5 text-primary-foreground" />
+      <XIcon className="h-5 w-5 text-close-btn-color" />
       <span className="sr-only">Close</span>
     </SheetPrimitive.Close>
   </SheetPrimitive.Content>
