@@ -43,7 +43,6 @@
   --color-control-panel-background: var(--control-panel-background);
   --color-transparent-button-border: var(--transparent-button-border);
   --color-button-neutral-background: var(--button-neutral-background);
-  --color-play-btn: var(--play-btn);
   --color-play-btn-font: var(--play-btn-font);
   --color-title-color: var(--title-color);
   --color-text-on-surface-variant: var(--text-on-surface-variant);
@@ -99,8 +98,6 @@
     --transparent-button-border: oklch(0.91 0.0029 264.54 / 11.37%);
     --button-neutral-background: oklch(0.16 0.02 269.69 / 3%);
 
-    --play-btn: var(--primary);
-    --play-btn-font: oklch(1 0 0);
     --title-color: oklch(0.15 0.0066 236.83);
     --text-on-surface-variant: oklch(0.61 0.014 271.18);
     --text-on-surface: oklch(0.34 0.0139 235.28);

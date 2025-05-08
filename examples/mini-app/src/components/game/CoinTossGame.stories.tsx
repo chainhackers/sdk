@@ -60,7 +60,6 @@ export const CustomTheme: Story = {
     theme: "light",
     customTheme: {
       "--primary": "green",
-      "--play-btn": "#ff9305",
       "--play-btn-font": "#ff4805",
       "--game-window-overlay": 'oklch(0 0 0 / 40%)',
     } as React.CSSProperties,

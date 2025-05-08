@@ -14,7 +14,6 @@ export interface CoinTossGameProps
   theme?: "light" | "dark" | "system"
   customTheme?: {
     "--primary"?: string
-    "--play-btn"?: string
     "--play-btn-font"?: string
     "--game-window-overlay"?: string
   } & React.CSSProperties
@@ -35,10 +34,6 @@ export function CoinTossGame({
   const fee = 0
 
   const themeClass = theme === "system" ? undefined : theme
-
-  const playBtnBgColor = customTheme && '--play-btn' in customTheme 
-    ? 'bg-[var(--play-btn)] hover:bg-[var(--play-btn)]/60'
-    : 'bg-primary hover:bg-primary/90'
 
   const gameWindowOverlay = customTheme && '--game-window-overlay' in customTheme 
     ? 'bg-[var(--game-window-overlay)]'
@@ -204,7 +199,6 @@ export function CoinTossGame({
               className={cn(
                 "w-full",
                 "border-0",
-                playBtnBgColor,
                 "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
