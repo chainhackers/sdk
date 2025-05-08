@@ -43,6 +43,8 @@
   --color-control-panel-background: var(--control-panel-background);
   --color-transparent-button-border: var(--transparent-button-border);
   --color-button-neutral-background: var(--button-neutral-background);
+  --color-game-win: var(--game-win);
+  --color-game-loss: var(--game-loss);
   --color-play-btn-font: var(--play-btn-font);
   --color-title-color: var(--title-color);
   --color-text-on-surface-variant: var(--text-on-surface-variant);
@@ -86,7 +88,7 @@
 
     --border: oklch(0.93 0.0058 264.53);
     --input: oklch(0.86 0.0043 271.36);
-    --ring: oklch(0.79 0.1041 274.71);
+    --ring: transparent;
 
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
@@ -104,6 +106,9 @@
     --border-stroke: oklch(0.16 0.02 269.69 / 8%);
     --game-window-overlay: oklch(0 0 0 / 0%);
     --play-btn-font: oklch(1 0 0);
+
+    --game-win: #36bc8f;
+    --game-loss: #e44b4e;
   }
 
   .dark {
@@ -126,7 +131,7 @@
     --destructive-foreground: oklch(0.9 0 0);
     --border: oklch(0.3 0 0 / 0.5);
     --input: oklch(1 0 0 / 10%);
-    --ring: oklch(0.5 0.18 270 / 0.5);
+    --ring: transparent;
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
@@ -141,6 +146,9 @@
     --text-on-surface: oklch(0.93 0.0058 264.53);
     --border-stroke: oklch(1 0 0 / 8%);
     --play-btn-font: oklch(1 0 0);
+
+    --game-win: #36bc8f;
+    --game-loss: #e44b4e;
   }
 
   /* Hide arrows for input[type=number] */
