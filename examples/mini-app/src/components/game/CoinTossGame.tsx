@@ -142,6 +142,8 @@ export function CoinTossGame({
 }: CoinTossGameProps) {
   const [betAmount, setBetAmount] = useState("0")
   const [choice] = useState<"Heads" | "Tails">("Heads")
+  const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
+  const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
 
   const multiplier = 1.94
   const winChance = 50
@@ -197,12 +199,16 @@ export function CoinTossGame({
           >
             <div className="absolute inset-0 bg-black/40 rounded-[16px]"></div>
 
-            <Sheet>
+            <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="iconTransparent"
                   size="iconRound"
-                  className={cn("absolute top-2 left-2", "text-white")}
+                  className={cn(
+                    "absolute top-2 left-2",
+                    "text-white",
+                    isInfoSheetOpen && "text-primary border-primary",
+                  )}
                 >
                   <Info className="h-4 w-4" />
                 </Button>
@@ -253,12 +259,19 @@ export function CoinTossGame({
               )}
             </Sheet>
 
-            <Sheet>
+            <Sheet
+              open={isHistorySheetOpen}
+              onOpenChange={setIsHistorySheetOpen}
+            >
               <SheetTrigger asChild>
                 <Button
                   variant="iconTransparent"
                   size="iconRound"
-                  className={cn("absolute top-2 right-2", "text-white")}
+                  className={cn(
+                    "absolute top-2 right-2",
+                    "text-white",
+                    isHistorySheetOpen && "text-primary border-primary",
+                  )}
                 >
                   <History className="h-4 w-4" />
                 </Button>
