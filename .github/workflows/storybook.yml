@@ -43,7 +43,6 @@ jobs:
         uses: dawidd6/action-ansible-playbook@v3
         with:
           playbook: .github/ansible/deploy.yml
-          directory: ./examples/mini-app
           configuration: |
             [defaults]
             callbacks_enabled = ansible.posix.profile_tasks, ansible.posix.timer
