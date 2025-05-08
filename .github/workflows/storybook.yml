@@ -22,7 +22,6 @@ jobs:
 
       - name: Install pnpm
         run: corepack use pnpm@latest-10
-        working-directory: /tmp
 
       - name: Install dependencies
         run: pnpm install --ignore-workspace
