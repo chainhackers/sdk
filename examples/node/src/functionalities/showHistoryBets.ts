@@ -18,7 +18,7 @@ import chalk from "chalk";
 import type { Hex } from "viem/_types/types/misc";
 import { checkEnvVariables, getWagmiConfigFromCasinoChain } from "../../utils";
 
-let wagmiBetSwielClient: WagmiBetSwirlClient;
+let wagmiBetSwirlClient: WagmiBetSwirlClient;
 
 export async function startShowHistoryBetsProcess() {
   try {
@@ -55,7 +55,7 @@ async function _selectChain(): Promise<CasinoChain> {
     choices: casinoChains.map((c) => ({ name: c.viemChain.name, value: c })),
   });
   const wagmiConfig = getWagmiConfigFromCasinoChain(selectedChain);
-  wagmiBetSwielClient = initWagmiBetSwirlClient(wagmiConfig, {
+  wagmiBetSwirlClient = initWagmiBetSwirlClient(wagmiConfig, {
     chainId: selectedChain.id,
     affiliate: process.env.AFFILIATE_ADDRESS as Hex,
     formatType: FORMAT_TYPE.PRECISE,
@@ -68,10 +68,10 @@ async function _selectChain(): Promise<CasinoChain> {
 }
 
 async function _getLastBets(count: number, casinoChain: CasinoChain): Promise<CasinoBet[]> {
-  const { bets, error } = await wagmiBetSwielClient.fetchBets(
+  const { bets, error } = await wagmiBetSwirlClient.fetchBets(
     casinoChain.id,
     {
-      bettor: wagmiBetSwielClient.betSwirlWallet.getAccount()?.address,
+      bettor: wagmiBetSwirlClient.betSwirlWallet.getAccount()?.address,
     },
     1,
     count,

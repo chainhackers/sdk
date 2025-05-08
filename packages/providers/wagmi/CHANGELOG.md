@@ -1,5 +1,14 @@
 # @betswirl/wagmi-provider
 
+## 0.0.9
+
+### Patch Changes
+
+- Add Keno Game
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.0.9
+
 ## 0.0.8
 
 ### Patch Changes

@@ -4,7 +4,7 @@ import { BP_VALUE } from "../../constants";
 import type { KenoConfiguration } from "../../read/casino/keno";
 import { AbstractCasinoGame, type ChoiceInput } from "./game";
 
-type KenoBall =
+export type KenoBall =
   | 1
   | 2
   | 3
@@ -53,6 +53,7 @@ export enum KENO_INPUT_BUNDLE {
 
 export interface KenoChoiceInput extends ChoiceInput<CASINO_GAME_TYPE.KENO> {
   value: KenoBall[];
+  config: KenoConfiguration;
   id: KenoBall[] | KENO_INPUT_BUNDLE;
 }
 
@@ -134,6 +135,7 @@ export class Keno extends AbstractCasinoGame<
       const possibleMatchedCounts = Array.from({ length: selectedBallsCount + 1 }, (_, i) => i);
       return {
         value: balls,
+        config: kenoConfig,
         id,
         game: CASINO_GAME_TYPE.KENO,
         label,

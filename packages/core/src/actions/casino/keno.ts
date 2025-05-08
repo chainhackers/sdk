@@ -1,15 +1,12 @@
 import { type TransactionReceipt, decodeEventLog } from "viem";
-import { rouletteAbi } from "../../abis/v2/casino/roulette";
+import { kenoAbi } from "../../abis/v2/casino/keno";
 import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
-import {
-  Roulette,
-  type RouletteEncodedInput,
-  type RouletteNumber,
-} from "../../entities/casino/roulette";
+import { Keno, type KenoBall, type KenoEncodedInput } from "../../entities/casino/keno";
 import { ERROR_CODES } from "../../errors/codes";
 import { TransactionError } from "../../errors/types";
 import type { Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
+import type { KenoConfiguration } from "../../read";
 import {
   type CasinoBetParams,
   type CasinoPlaceBetOptions,
@@ -19,40 +16,41 @@ import {
   placeBet,
 } from "./game";
 
-export interface RouletteParams extends CasinoBetParams {
-  numbers: RouletteNumber[];
+export interface KenoParams extends CasinoBetParams {
+  balls: KenoBall[];
+  kenoConfig: KenoConfiguration;
 }
 
-export interface RoulettePlacedBet extends CasinoPlacedBet {
-  numbers: RouletteNumber[];
-  encodedNumbers: RouletteEncodedInput;
+export interface KenoPlacedBet extends CasinoPlacedBet {
+  balls: KenoBall[];
+  encodedBalls: KenoEncodedInput;
 }
 
-export async function placeRouletteBet(
+export async function placeKenoBet(
   wallet: BetSwirlWallet,
-  rouletteParams: RouletteParams,
+  kenoParams: KenoParams,
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks,
-): Promise<{ placedBet: RoulettePlacedBet; receipt: TransactionReceipt }> {
+): Promise<{ placedBet: KenoPlacedBet; receipt: TransactionReceipt }> {
   const { placedBet, receipt } = await placeBet(
     wallet,
     {
-      game: CASINO_GAME_TYPE.ROULETTE,
-      gameEncodedInput: Roulette.encodeInput(rouletteParams.numbers),
-      ...rouletteParams,
+      game: CASINO_GAME_TYPE.KENO,
+      gameEncodedInput: Keno.encodeInput(kenoParams.balls, kenoParams.kenoConfig),
+      ...kenoParams,
     },
     options,
     callbacks,
   );
-  const roulettePlacedBet = await getRoulettePlacedBetFromReceipt(
+  const kenoPlacedBet = await getKenoPlacedBetFromReceipt(
     wallet,
     receipt,
     placedBet.chainId,
     placedBet.token,
   );
-  if (!roulettePlacedBet) {
+  if (!kenoPlacedBet) {
     throw new TransactionError(
-      "Roulette PlaceBet event not found",
+      "Keno PlaceBet event not found",
       ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
       {
         hash: receipt.transactionHash,
@@ -60,19 +58,19 @@ export async function placeRouletteBet(
       },
     );
   }
-  return { placedBet: roulettePlacedBet, receipt };
+  return { placedBet: kenoPlacedBet, receipt };
 }
 
-export async function getRoulettePlacedBetFromReceipt(
+export async function getKenoPlacedBetFromReceipt(
   wallet: BetSwirlWallet,
   receipt: TransactionReceipt,
   chainId: CasinoChainId,
   usedToken?: Token,
-): Promise<RoulettePlacedBet | null> {
+): Promise<KenoPlacedBet | null> {
   const gamePlacedBet = await getPlacedBetFromReceipt(
     wallet,
     receipt,
-    CASINO_GAME_TYPE.ROULETTE,
+    CASINO_GAME_TYPE.KENO,
     chainId,
     usedToken,
   );
@@ -80,12 +78,12 @@ export async function getRoulettePlacedBetFromReceipt(
     return null;
   }
 
-  // Read the Roulette PlaceBet event from logs
-  const decodedRoulettePlaceBetEvent = receipt.logs
+  // Read the Keno PlaceBet event from logs
+  const decodedKenoPlaceBetEvent = receipt.logs
     .map((log) => {
       try {
         return decodeEventLog({
-          abi: rouletteAbi,
+          abi: kenoAbi,
           data: log.data,
           topics: log.topics,
         });
@@ -95,14 +93,14 @@ export async function getRoulettePlacedBetFromReceipt(
     })
     .find((log) => log?.eventName === "PlaceBet");
 
-  if (!decodedRoulettePlaceBetEvent) {
+  if (!decodedKenoPlaceBetEvent) {
     return null;
   }
 
-  const { args } = decodedRoulettePlaceBetEvent;
+  const { args } = decodedKenoPlaceBetEvent;
   return {
     ...gamePlacedBet,
-    encodedNumbers: args.numbers,
-    numbers: Roulette.decodeInput(args.numbers),
+    encodedBalls: args.numbers,
+    balls: Keno.decodeInput(args.numbers),
   };
 }

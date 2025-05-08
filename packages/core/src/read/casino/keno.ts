@@ -1,11 +1,36 @@
-import { type Address, type Hex, encodeFunctionData } from "viem";
+import { type Address, type Hex, type TransactionReceipt, encodeFunctionData } from "viem";
 import { kenoAbi } from "../../abis";
+import type { KenoPlacedBet } from "../../actions/casino/keno";
 import { CASINO_GAME_TYPE, type CasinoChainId, casinoChainById } from "../../data/casino";
+import { Keno, type KenoBall } from "../../entities/casino/keno";
 import { ERROR_CODES, TransactionError } from "../../errors";
 import { ChainError } from "../../errors";
 import type { BetSwirlFunctionData, Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
 import { getCasinoChainId } from "../../utils";
+import type { CasinoRolledBet, CasinoWaitRollOptions } from "./game";
+
+export interface KenoRolledBet extends Omit<CasinoRolledBet, "decodedRoll"> {
+  rolled: KenoBall[][];
+}
+
+export async function waitKenoRolledBet(
+  wallet: BetSwirlWallet,
+  placedBet: KenoPlacedBet,
+  options?: CasinoWaitRollOptions,
+): Promise<{
+  rolledBet: KenoRolledBet;
+  receipt: TransactionReceipt;
+}> {
+  const { rolledBet, receipt } = await waitKenoRolledBet(wallet, placedBet, options);
+  return {
+    rolledBet: {
+      ...rolledBet,
+      rolled: rolledBet.encodedRolled.map(Keno.decodeRolled),
+    },
+    receipt,
+  };
+}
 
 /**
  * Raw token info data returned by the smart contract
@@ -25,7 +50,10 @@ export function parseRawKenoConfiguration(
     chainId: casinoChainId,
     biggestSelectableBall: Number(rawConfiguration[0]),
     maxSelectableBalls: Number(rawConfiguration[1]),
-    mutliplierTable: rawConfiguration[2].map((row) => row.map((multiplier) => Number(multiplier))),
+    mutliplierTable: [
+      [0],
+      ...rawConfiguration[2].map((row) => row.map((multiplier) => Number(multiplier))),
+    ],
   };
 }
 

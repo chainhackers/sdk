@@ -1,6 +1,6 @@
 import { type Hash, type Hex, type TransactionReceipt, encodeFunctionData } from "viem";
 import { decodeEventLog } from "viem";
-import { coinTossAbi } from "../../abis/v2/casino/coinToss";
+import { coinTossAbi } from "../../abis/v2/casino/cointoss";
 import { GAS_TOKEN_ADDRESS } from "../../constants";
 import {
   CASINO_GAME_TYPE,
@@ -9,7 +9,7 @@ import {
   MAX_SDK_HOUSE_EGDE,
   casinoChainById,
 } from "../../data/casino";
-import type { CoinTossEncodedInput } from "../../entities/casino/coinToss";
+import type { CoinTossEncodedInput } from "../../entities/casino/cointoss";
 import type { DiceEncodedInput } from "../../entities/casino/dice";
 import type { RouletteEncodedInput } from "../../entities/casino/roulette";
 import { ERROR_CODES } from "../../errors/codes";

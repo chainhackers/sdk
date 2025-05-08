@@ -27,7 +27,7 @@ import { fetchToken, fetchTokens } from "../data/subgraphs/protocol/clients/toke
 import type { BetSwirlWallet } from "./wallet";
 
 import type { ApolloCache, DefaultOptions } from "@apollo/client/core/index.js";
-import type { CoinTossParams, CoinTossPlacedBet } from "../actions/casino/coinToss";
+import type { CoinTossParams, CoinTossPlacedBet } from "../actions/casino/cointoss";
 import type { DiceParams } from "../actions/casino/dice";
 import type { DicePlacedBet } from "../actions/casino/dice";
 import type {
@@ -35,6 +35,7 @@ import type {
   CasinoPlacedBet,
   PlaceBetCallbacks,
 } from "../actions/casino/game";
+import type { KenoParams, KenoPlacedBet } from "../actions/casino/keno";
 import type { RouletteParams, RoulettePlacedBet } from "../actions/casino/roulette";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
 import type { ChainId } from "../data";
@@ -45,6 +46,7 @@ import type {
   DiceRolledBet,
   GAS_PRICE_TYPE,
   KenoConfiguration,
+  KenoRolledBet,
   RouletteRolledBet,
 } from "../read";
 import { FORMAT_TYPE, getCasinoChainId } from "../utils";
@@ -112,6 +114,17 @@ export abstract class BetSwirlClient {
     placedBet: RoulettePlacedBet,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: RouletteRolledBet; receipt: TransactionReceipt }>;
+
+  abstract playKeno(
+    params: KenoParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: KenoPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract waitKeno(
+    placedBet: KenoPlacedBet,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: KenoRolledBet; receipt: TransactionReceipt }>;
 
   /* Casino utilities */
 

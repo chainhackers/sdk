@@ -1,7 +1,8 @@
 import { BP_VALUE } from "../constants";
 import { CASINO_GAME_TYPE, type ChainId, slugById } from "../data";
-import { CoinToss } from "../entities/casino/coinToss";
+import { CoinToss } from "../entities/casino/cointoss";
 import { Dice } from "../entities/casino/dice";
+import { Keno } from "../entities/casino/keno";
 import { Roulette } from "../entities/casino/roulette";
 
 //houseEdge is in BP_VALUE
@@ -40,6 +41,8 @@ export function decodeCasinoInput(encodedInput: string, game: CASINO_GAME_TYPE):
       return CoinToss.decodeInput(encodedInput);
     case CASINO_GAME_TYPE.ROULETTE:
       return Roulette.decodeInput(encodedInput);
+    case CASINO_GAME_TYPE.KENO:
+      return Keno.decodeInput(encodedInput);
   }
 }
 export function decodeCasinoRolled(encodedRolled: string, game: CASINO_GAME_TYPE): any {
@@ -50,6 +53,8 @@ export function decodeCasinoRolled(encodedRolled: string, game: CASINO_GAME_TYPE
       return CoinToss.decodeRolled(encodedRolled);
     case CASINO_GAME_TYPE.ROULETTE:
       return Roulette.decodeRolled(encodedRolled);
+    case CASINO_GAME_TYPE.KENO:
+      return Keno.decodeRolled(encodedRolled);
   }
 }
 
