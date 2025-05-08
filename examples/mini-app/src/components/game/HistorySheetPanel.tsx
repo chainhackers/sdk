@@ -95,9 +95,11 @@ export function HistorySheetPanel({
                       <TableCell className="px-3 py-2.5 text-right text-foreground font-medium">
                         {entry.multiplier}
                       </TableCell>
-                      <TableCell className="px-3 py-2.5 text-right text-foreground font-medium">
-                        {entry.payoutAmount}
-                        {entry.payoutCurrencyIcon}
+                      <TableCell className="px-3 py-2.5 text-foreground font-medium">
+                        <div className="flex items-center justify-end gap-1">
+                          <span>{entry.payoutAmount}</span>
+                          {entry.payoutCurrencyIcon}
+                        </div>
                       </TableCell>
                       <TableCell className="px-3 py-2.5 text-right text-muted-foreground font-medium">
                         {entry.timestamp}

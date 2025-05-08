@@ -24,9 +24,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: "1.94675",
-    payoutCurrencyIcon: (
-      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
-    ),
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~24h ago",
   },
   {
@@ -34,9 +32,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.2,
     payoutAmount: 0.2,
-    payoutCurrencyIcon: (
-      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
-    ),
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~2h ago",
   },
   {
@@ -44,9 +40,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.94,
     payoutAmount: 1.94,
-    payoutCurrencyIcon: (
-      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
-    ),
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~2h ago",
   },
   {
@@ -54,9 +48,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.946,
     payoutAmount: 2.453,
-    payoutCurrencyIcon: (
-      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
-    ),
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~2h ago",
   },
   {
@@ -64,9 +56,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.94,
     payoutAmount: 1.94,
-    payoutCurrencyIcon: (
-      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
-    ),
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~2h ago",
   },
   {
@@ -74,9 +64,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.946,
     payoutAmount: 2.453,
-    payoutCurrencyIcon: (
-      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
-    ),
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~2h ago",
   },
   {
@@ -84,9 +72,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: (
-      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
-    ),
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~2h ago",
   },
   {
@@ -94,9 +80,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: (
-      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
-    ),
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~2h ago",
   },
   {
@@ -104,9 +88,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: (
-      <Cog className="h-3.5 w-3.5 text-orange-500 inline-block ml-1" />
-    ),
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~2h ago",
   },
 ]
