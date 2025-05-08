@@ -57,7 +57,7 @@ export function CoinTossGame({
         )}
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-          <CardTitle className="text-lg text-text-color">CoinToss</CardTitle>
+          <CardTitle className="text-lg text-title-color">CoinToss</CardTitle>
           <Button
             variant="secondary"
             className={cn(

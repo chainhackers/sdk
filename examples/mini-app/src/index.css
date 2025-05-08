@@ -45,7 +45,7 @@
   --color-button-neutral-background: var(--button-neutral-background);
   --color-play-btn: var(--play-btn);
   --color-play-btn-font: var(--play-btn-font);
-  --color-text-color: var(--text-color);
+  --color-title-color: var(--title-color);
   --color-text-on-surface-variant: var(--text-on-surface-variant);
   --color-text-on-surface: var(--text-on-surface);
   --color-border-stroke: var(--border-stroke);
@@ -101,7 +101,7 @@
 
     --play-btn: var(--primary);
     --play-btn-font: oklch(1 0 0);
-    --text-color: oklch(0.15 0.0066 236.83);
+    --title-color: oklch(0.15 0.0066 236.83);
     --text-on-surface-variant: oklch(0.61 0.014 271.18);
     --text-on-surface: oklch(0.34 0.0139 235.28);
     --border-stroke: oklch(0.16 0.02 269.69 / 8%);
@@ -138,7 +138,7 @@
     --control-panel-background: oklch(1 0 0 / 8%);
     --transparent-button-border: oklch(0.25 0 0);
     --button-neutral-background: oklch(1 0 0 / 10%);
-    --text-color: oklch(1 0 0);
+    --title-color: oklch(1 0 0);
     --text-on-surface-variant: oklch(0.78 0.0129 276.04);
     --text-on-surface: oklch(0.93 0.0058 264.53);
     --border-stroke: oklch(1 0 0 / 8%);
