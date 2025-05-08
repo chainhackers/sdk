@@ -103,6 +103,7 @@
     --text-on-surface: oklch(0.34 0.0139 235.28);
     --border-stroke: oklch(0.16 0.02 269.69 / 8%);
     --game-window-overlay: oklch(0 0 0 / 0%);
+    --play-btn-font: oklch(1 0 0);
   }
 
   .dark {
@@ -139,6 +140,7 @@
     --text-on-surface-variant: oklch(0.78 0.0129 276.04);
     --text-on-surface: oklch(0.93 0.0058 264.53);
     --border-stroke: oklch(1 0 0 / 8%);
+    --play-btn-font: oklch(1 0 0);
   }
 
   /* Hide arrows for input[type=number] */
