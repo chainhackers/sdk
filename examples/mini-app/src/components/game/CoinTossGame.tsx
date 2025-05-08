@@ -216,26 +216,34 @@ export function CoinTossGame({
                   >
                     <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Win chance:</p>
-                        <p className="font-semibold text-base text-card-foreground">
+                        <p className="text-muted-foreground font-medium">
+                          Win chance:
+                        </p>
+                        <p className="font-medium text-base text-card-foreground">
                           {winChance}%
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">RNG fee:</p>
-                        <p className="font-semibold text-base text-card-foreground">
+                        <p className="text-muted-foreground font-medium">
+                          RNG fee:
+                        </p>
+                        <p className="font-medium text-base text-card-foreground">
                           {fee} POL
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Target payout:</p>
-                        <p className="font-semibold text-base text-card-foreground">
+                        <p className="text-muted-foreground font-medium">
+                          Target payout:
+                        </p>
+                        <p className="font-medium text-base text-card-foreground">
                           {targetPayout} POL
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Gas price:</p>
-                        <p className="font-semibold text-base text-card-foreground">
+                        <p className="text-muted-foreground font-medium">
+                          Gas price:
+                        </p>
+                        <p className="font-medium text-base text-card-foreground">
                           34.2123 gwei
                         </p>
                       </div>
