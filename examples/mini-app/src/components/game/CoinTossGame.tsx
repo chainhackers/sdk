@@ -146,7 +146,7 @@ export function CoinTossGame({
             className={cn(
               "bg-neutral-background",
               "rounded-[12px]",
-              "border border-secondary-border",
+              "border border-border-stroke",
               "text-primary",
             )}
           >
