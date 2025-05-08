@@ -7,38 +7,15 @@ import { Info, History, Cog } from "lucide-react"
 import { cn } from "../../lib/utils"
 import coinTossBackground from "../../assets/game/game-background.png"
 import coinIcon from "../../assets/game/coin-background-icon.png"
-import { ScrollArea } from "../ui/scroll-area"
 
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "../ui/table"
-
-import {
-  Sheet,
-  SheetTrigger,
-  SheetPortal,
-  SheetOverlay,
-  SheetBottomPanelContent,
-} from "../ui/sheet"
+import { Sheet, SheetTrigger } from "../ui/sheet"
+import { InfoSheetPanel } from "./InfoSheetPanel"
+import { HistorySheetPanel, type HistoryEntry } from "./HistorySheetPanel"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
   theme?: "light" | "dark" | "system"
   customTheme?: React.CSSProperties
-}
-
-interface HistoryEntry {
-  id: string
-  status: "Won bet" | "Busted"
-  multiplier: number | string
-  payoutAmount: number | string
-  payoutCurrencyIcon: React.ReactElement
-  timestamp: string
 }
 
 const mockHistoryData: HistoryEntry[] = [
@@ -213,49 +190,14 @@ export function CoinTossGame({
                   <Info className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
-
               {isMounted && cardRef.current && (
-                <SheetPortal container={cardRef.current}>
-                  <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
-                  <SheetBottomPanelContent
-                    className={cn("!h-auto !max-h-[70%]", "p-5 sm:p-6")}
-                  >
-                    <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm">
-                      <div>
-                        <p className="text-muted-foreground font-medium">
-                          Win chance:
-                        </p>
-                        <p className="font-medium text-base text-card-foreground">
-                          {winChance}%
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground font-medium">
-                          RNG fee:
-                        </p>
-                        <p className="font-medium text-base text-card-foreground">
-                          {fee} POL
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground font-medium">
-                          Target payout:
-                        </p>
-                        <p className="font-medium text-base text-card-foreground">
-                          {targetPayout} POL
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground font-medium">
-                          Gas price:
-                        </p>
-                        <p className="font-medium text-base text-card-foreground">
-                          34.2123 gwei
-                        </p>
-                      </div>
-                    </div>
-                  </SheetBottomPanelContent>
-                </SheetPortal>
+                <InfoSheetPanel
+                  portalContainer={cardRef.current}
+                  winChance={winChance}
+                  rngFee={fee}
+                  targetPayout={targetPayout}
+                  gasPrice="34.2123 gwei"
+                />
               )}
             </Sheet>
 
@@ -276,66 +218,11 @@ export function CoinTossGame({
                   <History className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
-
               {isMounted && cardRef.current && (
-                <SheetPortal container={cardRef.current}>
-                  <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
-                  <SheetBottomPanelContent
-                    className={cn("!h-[70%] !max-h-full", "p-0")}
-                  >
-                    <ScrollArea className="h-full w-full rounded-t-[16px] overflow-hidden">
-                      <div className="p-1 pt-0">
-                        <Table>
-                          <TableHeader>
-                            <TableRow className="border-b border-border/50">
-                              <TableHead className="px-3 py-2.5 text-muted-foreground font-medium top-0 bg-card">
-                                Draw
-                              </TableHead>
-                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
-                                X
-                              </TableHead>
-                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
-                                Payout
-                              </TableHead>
-                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
-                                Time
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {mockHistoryData.map((entry) => (
-                              <TableRow
-                                key={entry.id}
-                                className="border-b border-border/50"
-                              >
-                                <TableCell
-                                  className={cn(
-                                    "px-3 py-2.5 font-medium",
-                                    entry.status === "Won bet"
-                                      ? "text-game-win"
-                                      : "text-game-loss",
-                                  )}
-                                >
-                                  {entry.status}
-                                </TableCell>
-                                <TableCell className="px-3 py-2.5 text-right text-foreground font-medium">
-                                  {entry.multiplier}
-                                </TableCell>
-                                <TableCell className="px-3 py-2.5 text-right text-foreground font-medium">
-                                  {entry.payoutAmount}
-                                  {entry.payoutCurrencyIcon}
-                                </TableCell>
-                                <TableCell className="px-3 py-2.5 text-right text-muted-foreground font-medium">
-                                  {entry.timestamp}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    </ScrollArea>
-                  </SheetBottomPanelContent>
-                </SheetPortal>
+                <HistorySheetPanel
+                  portalContainer={cardRef.current}
+                  historyData={mockHistoryData}
+                />
               )}
             </Sheet>
 
