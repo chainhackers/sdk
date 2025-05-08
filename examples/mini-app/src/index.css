@@ -43,6 +43,8 @@
   --color-control-panel-background: var(--control-panel-background);
   --color-transparent-button-border: var(--transparent-button-border);
   --color-button-neutral-background: var(--button-neutral-background);
+  --color-game-win: var(--game-win);
+  --color-game-loss: var(--game-loss);
 }
 
 @layer base {
@@ -80,7 +82,7 @@
 
     --border: #e5e7eb;
     --input: #d0d1d4;
-    --ring: #a5b4fc;
+    --ring: transparent;
 
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
@@ -91,6 +93,9 @@
     --control-panel-background: #e6e7e9;
     --transparent-button-border: #e1e2e41d;
     --button-neutral-background: #e1e2e4;
+
+    --game-win: #36bc8f;
+    --game-loss: #e44b4e;
   }
 
   .dark {
@@ -113,7 +118,7 @@
     --destructive-foreground: oklch(0.9 0 0);
     --border: oklch(0.3 0 0 / 0.5);
     --input: oklch(0.1 0 0);
-    --ring: oklch(0.5 0.18 270 / 0.5);
+    --ring: transparent;
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
@@ -123,6 +128,9 @@
     --control-panel-background: oklch(0.22 0.01 240);
     --transparent-button-border: oklch(0.25 0 0);
     --button-neutral-background: oklch(0.23 0 0);
+
+    --game-win: #36bc8f;
+    --game-loss: #e44b4e;
   }
 
   /* Hide arrows for input[type=number] */

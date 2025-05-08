@@ -1,19 +1,97 @@
-import React, { useState, ChangeEvent } from "react"
+import React, { useState, ChangeEvent, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Label } from "../ui/label"
 import { Info, History, Cog } from "lucide-react"
 import { cn } from "../../lib/utils"
 import coinTossBackground from "../../assets/game/game-background.png"
 import coinIcon from "../../assets/game/coin-background-icon.png"
 
+import { Sheet, SheetTrigger } from "../ui/sheet"
+import { InfoSheetPanel } from "./InfoSheetPanel"
+import { HistorySheetPanel, type HistoryEntry } from "./HistorySheetPanel"
+
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
   theme?: "light" | "dark" | "system"
   customTheme?: React.CSSProperties
 }
+
+const mockHistoryData: HistoryEntry[] = [
+  {
+    id: "1",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: "1.94675",
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    timestamp: "~24h ago",
+  },
+  {
+    id: "2",
+    status: "Won bet",
+    multiplier: 1.2,
+    payoutAmount: 0.2,
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "3",
+    status: "Busted",
+    multiplier: 1.94,
+    payoutAmount: 1.94,
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "4",
+    status: "Won bet",
+    multiplier: 1.946,
+    payoutAmount: 2.453,
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "5",
+    status: "Busted",
+    multiplier: 1.94,
+    payoutAmount: 1.94,
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "6",
+    status: "Won bet",
+    multiplier: 1.946,
+    payoutAmount: 2.453,
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "7",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: 0.1,
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "8",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: 0.1,
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "9",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: 0.1,
+    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    timestamp: "~2h ago",
+  },
+]
 
 export function CoinTossGame({
   theme = "system",
@@ -23,6 +101,8 @@ export function CoinTossGame({
 }: CoinTossGameProps) {
   const [betAmount, setBetAmount] = useState("0")
   const [choice] = useState<"Heads" | "Tails">("Heads")
+  const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
+  const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
 
   const multiplier = 1.94
   const winChance = 50
@@ -31,6 +111,13 @@ export function CoinTossGame({
 
   const themeClass = theme === "system" ? undefined : theme
 
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   return (
     <div
       className={cn("cointoss-game-wrapper", themeClass, className)}
@@ -38,6 +125,7 @@ export function CoinTossGame({
       {...props}
     >
       <Card
+        ref={cardRef}
         className={cn(
           "relative overflow-hidden",
           "bg-card text-card-foreground border",
@@ -70,49 +158,55 @@ export function CoinTossGame({
           >
             <div className="absolute inset-0 bg-black/40 rounded-[16px]"></div>
 
-            <Popover>
-              <PopoverTrigger asChild>
+            <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
+              <SheetTrigger asChild>
                 <Button
                   variant="iconTransparent"
                   size="iconRound"
-                  className={cn("absolute top-2 left-2", "text-white")}
+                  className={cn(
+                    "absolute top-2 left-2",
+                    "text-white",
+                    isInfoSheetOpen && "text-primary border-primary",
+                  )}
                 >
                   <Info className="h-4 w-4" />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className={cn("w-60")}>
-                <div className="grid gap-4">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium leading-none">Bet Details</h4>
-                  </div>
-                  <div className="grid gap-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        Target Payout:
-                      </span>
-                      <span>{targetPayout} POL</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Win Chance:</span>
-                      <span>{winChance}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Fee:</span>
-                      <span>{fee} POL</span>
-                    </div>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+              </SheetTrigger>
+              {isMounted && cardRef.current && (
+                <InfoSheetPanel
+                  portalContainer={cardRef.current}
+                  winChance={winChance}
+                  rngFee={fee}
+                  targetPayout={targetPayout}
+                  gasPrice="34.2123 gwei"
+                />
+              )}
+            </Sheet>
 
-            <Button
-              variant="iconTransparent"
-              size="iconRound"
-              className={cn("absolute top-2 right-2", "text-white")}
-              onClick={() => alert("History clicked!")}
+            <Sheet
+              open={isHistorySheetOpen}
+              onOpenChange={setIsHistorySheetOpen}
             >
-              <History className="h-4 w-4" />
-            </Button>
+              <SheetTrigger asChild>
+                <Button
+                  variant="iconTransparent"
+                  size="iconRound"
+                  className={cn(
+                    "absolute top-2 right-2",
+                    "text-white",
+                    isHistorySheetOpen && "text-primary border-primary",
+                  )}
+                >
+                  <History className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              {isMounted && cardRef.current && (
+                <HistorySheetPanel
+                  portalContainer={cardRef.current}
+                  historyData={mockHistoryData}
+                />
+              )}
+            </Sheet>
 
             <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white dark:text-foreground">
               {multiplier.toFixed(2)} x
@@ -136,7 +230,7 @@ export function CoinTossGame({
                 htmlFor="betAmount"
                 className="text-sm font-medium -mb-1 text-muted-foreground"
               >
-                Bet amount (0.24$)
+                Bet amount
               </Label>
               <Input
                 id="betAmount"
