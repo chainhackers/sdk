@@ -45,16 +45,16 @@ export function HistorySheetPanel({
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-border/50">
-                  <TableHead className="px-3 py-2.5 text-muted-foreground font-medium top-0 bg-card sticky z-10">
+                  <TableHead className="px-3 py-2.5 text-muted-foreground font-medium top-0 bg-card">
                     Draw
                   </TableHead>
-                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card sticky z-10">
+                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
                     X
                   </TableHead>
-                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card sticky z-10">
+                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
                     Payout
                   </TableHead>
-                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card sticky z-10">
+                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
                     Time
                   </TableHead>
                 </TableRow>
