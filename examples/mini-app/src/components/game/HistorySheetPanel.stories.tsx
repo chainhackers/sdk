@@ -143,7 +143,7 @@ export const Default: Story = {
     historyData: mockHistoryDataDefault,
     theme: "light",
   },
-  name: "Default History Panel",
+  name: "Light Theme",
 }
 
 export const DarkThemeHistoryPanel: Story = {
@@ -151,7 +151,7 @@ export const DarkThemeHistoryPanel: Story = {
     historyData: mockHistoryDataDefault,
     theme: "dark",
   },
-  name: "History Panel (Dark Theme)",
+  name: "Dark Theme",
   parameters: {
     backgrounds: { default: "dark" },
   },
@@ -162,7 +162,7 @@ export const ExtendedHistory: Story = {
     historyData: mockHistoryDataExtended,
     theme: "light",
   },
-  name: "History Panel (Extended List)",
+  name: "Extended List",
 }
 
 export const EmptyHistory: Story = {
@@ -170,5 +170,5 @@ export const EmptyHistory: Story = {
     historyData: [],
     theme: "light",
   },
-  name: "History Panel (Empty)",
+  name: "Empty",
 }

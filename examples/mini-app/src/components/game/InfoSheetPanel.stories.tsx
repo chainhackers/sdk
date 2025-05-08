@@ -124,7 +124,7 @@ export const Default: Story = {
     gasPrice: "34.2123 gwei",
     theme: "light",
   },
-  name: "Default Info Panel",
+  name: "Light Theme",
 }
 
 export const DarkThemeInfoPanel: Story = {
@@ -135,7 +135,7 @@ export const DarkThemeInfoPanel: Story = {
     gasPrice: "40 gwei",
     theme: "dark",
   },
-  name: "Info Panel (Dark Theme)",
+  name: "Dark Theme",
   parameters: {
     backgrounds: { default: "dark" },
   },
@@ -149,5 +149,5 @@ export const HighValues: Story = {
     gasPrice: "1000.00005 gwei",
     theme: "light",
   },
-  name: "Info Panel (High Values)",
+  name: "High Values",
 }
