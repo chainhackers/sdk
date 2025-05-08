@@ -43,6 +43,8 @@
   --color-control-panel-background: var(--control-panel-background);
   --color-transparent-button-border: var(--transparent-button-border);
   --color-button-neutral-background: var(--button-neutral-background);
+  --color-game-win: var(--game-win);
+  --color-game-loss: var(--game-loss);
 }
 
 @layer base {
@@ -91,6 +93,9 @@
     --control-panel-background: #e6e7e9;
     --transparent-button-border: #e1e2e41d;
     --button-neutral-background: #e1e2e4;
+
+    --game-win: #36bc8f;
+    --game-loss: #e44b4e;
   }
 
   .dark {
@@ -123,6 +128,9 @@
     --control-panel-background: oklch(0.22 0.01 240);
     --transparent-button-border: oklch(0.25 0 0);
     --button-neutral-background: oklch(0.23 0 0);
+
+    --game-win: #36bc8f;
+    --game-loss: #e44b4e;
   }
 
   /* Hide arrows for input[type=number] */

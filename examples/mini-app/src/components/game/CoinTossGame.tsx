@@ -299,8 +299,8 @@ export function CoinTossGame({
                                   className={cn(
                                     "px-3 py-2.5 font-medium",
                                     entry.status === "Won bet"
-                                      ? "text-green-500"
-                                      : "text-red-500",
+                                      ? "text-game-win"
+                                      : "text-game-loss",
                                   )}
                                 >
                                   {entry.status}
