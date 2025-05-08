@@ -15,7 +15,7 @@ export interface CoinTossGameProps
   customTheme?: {
     "--primary"?: string
     "--play-btn"?: string
-    "--btn-font"?: string
+    "--play-btn-font"?: string
     "--game-window-overlay"?: string
   } & React.CSSProperties
 }
@@ -205,7 +205,7 @@ export function CoinTossGame({
                 "w-full",
                 "border-0",
                 playBtnBgColor,
-                "text-btn-font font-bold",
+                "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
               onClick={() => alert(`Betting ${betAmount} POL on ${choice}`)}
