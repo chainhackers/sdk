@@ -144,7 +144,7 @@ export function CoinTossGame({
           <Button
             variant="secondary"
             className={cn(
-              "bg-button-neutral-background",
+              "bg-neutral-background",
               "rounded-[12px]",
               "border border-secondary-border",
               "text-primary",

@@ -42,7 +42,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-control-panel-background: var(--control-panel-background);
   --color-transparent-button-border: var(--transparent-button-border);
-  --color-button-neutral-background: var(--button-neutral-background);
+  --color-neutral-background: var(--neutral-background);
   --color-game-win: var(--game-win);
   --color-game-loss: var(--game-loss);
   --color-play-btn-font: var(--play-btn-font);
@@ -51,27 +51,35 @@
   --color-text-on-surface: var(--text-on-surface);
   --color-border-stroke: var(--border-stroke);
   --color-game-window-overlay: var(--game-window-overlay);
+  --color-menu-bg: var(--menu-bg);
+  --color-table-separator: var(--table-separator);
 }
 
 @layer base {
   :root {
+    --light-surface: oklch(0.98 0.0017 247.84);
+    --dark-surface: oklch(0.15 0.0066 236.83);
+    --light-stroke: oklch(0.16 0.02 269.69 / 8%);
+    --dark-stroke: oklch(1 0 0 / 8%);
+    --white: oklch(1 0 0);
+
     --radius: 0.625rem;
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.625rem;
     --radius-xl: 0.875rem;
 
-    --background: oklch(1 0 0);
+    --background: var(--white);
     --foreground: oklch(0.1 0 0 / 0.87);
 
-    --card: oklch(0.98 0.0017 247.84);
+    --card: var(--light-surface);
     --card-foreground: oklch(0.1 0 0 / 0.87);
 
-    --popover: oklch(0.98 0.0017 247.84);
+    --popover: var(--light-surface);
     --popover-foreground: oklch(0.1 0 0 / 0.87);
 
     --primary: oklch(0.66 0.1519 255.97);
-    --primary-foreground: oklch(0.15 0.0066 236.83);
+    --primary-foreground: var(--dark-surface);
 
     --secondary: oklch(0.86 0.0043 271.36);
     --secondary-foreground: oklch(0.1 0 0 / 0.8);
@@ -84,10 +92,10 @@
     --accent-foreground: oklch(0.1 0 0 / 0.87);
 
     --destructive: oklch(0.577 0.245 27.325 / 0.9);
-    --destructive-foreground: oklch(1 0 0);
+    --destructive-foreground: var(--white);
 
     --border: oklch(0.93 0.0058 264.53);
-    --input: oklch(0.86 0.0043 271.36);
+    --input: oklch(0.16 0.02 269.69 / 10%);
     --ring: transparent;
 
     --chart-1: oklch(0.646 0.222 41.116);
@@ -96,25 +104,28 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
 
-    --control-panel-background: oklch(0.93 0.0029 264.54);
+    --control-panel-background: var(--light-stroke);
     --transparent-button-border: oklch(0.91 0.0029 264.54 / 11.37%);
-    --button-neutral-background: oklch(0.16 0.02 269.69 / 3%);
+    --neutral-background: oklch(0.16 0.02 269.69 / 10%);
 
-    --title-color: oklch(0.15 0.0066 236.83);
+    --title-color: var(--dark-surface);
     --text-on-surface-variant: oklch(0.61 0.014 271.18);
     --text-on-surface: oklch(0.34 0.0139 235.28);
-    --border-stroke: oklch(0.16 0.02 269.69 / 8%);
+    --border-stroke: var(--light-stroke);
     --game-window-overlay: oklch(0 0 0 / 0%);
-    --play-btn-font: oklch(1 0 0);
+    --play-btn-font: var(--white);
 
-    --game-win: #36bc8f;
-    --game-loss: #e44b4e;
+    --game-win: oklch(0.71 0.1322 165.92);
+    --game-loss: oklch(0.63 0.1893 23.38);
+
+    --menu-bg: var(--light-surface);
+    --table-separator: var(--light-stroke);
   }
 
   .dark {
     --background: oklch(0.15 0 0);
     --foreground: oklch(0.9 0 0);
-    --card: oklch(0.15 0.0066 236.83);
+    --card: var(--dark-surface);
     --card-foreground: oklch(0.9 0 0);
     --popover: oklch(0.18 0 0);
     --popover-foreground: oklch(0.9 0 0);
@@ -138,17 +149,20 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
 
-    --control-panel-background: oklch(1 0 0 / 8%);
+    --control-panel-background: var(--dark-stroke);
     --transparent-button-border: oklch(0.25 0 0);
-    --button-neutral-background: oklch(1 0 0 / 10%);
-    --title-color: oklch(1 0 0);
+    --neutral-background: oklch(1 0 0 / 10%);
+    --title-color: var(--white);
     --text-on-surface-variant: oklch(0.78 0.0129 276.04);
     --text-on-surface: oklch(0.93 0.0058 264.53);
-    --border-stroke: oklch(1 0 0 / 8%);
-    --play-btn-font: oklch(1 0 0);
+    --border-stroke: var(--dark-stroke);
+    --play-btn-font: var(--white);
 
     --game-win: #36bc8f;
     --game-loss: #e44b4e;
+
+    --menu-bg: oklch(0.24 0.0059 236.8);
+    --table-separator: var(--dark-stroke);
   }
 
   /* Hide arrows for input[type=number] */

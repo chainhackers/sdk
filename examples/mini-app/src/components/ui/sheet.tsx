@@ -136,7 +136,7 @@ const SheetBottomPanelContent = React.forwardRef<
   <SheetPrimitive.Content
     ref={ref}
     className={cn(
-      "bg-card data-[state=open]:animate-in data-[state=closed]:animate-out !absolute z-50 flex flex-col gap-0 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+      "bg-menu-bg data-[state=open]:animate-in data-[state=closed]:animate-out !absolute z-50 flex flex-col gap-0 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
       "!inset-x-0 !bottom-0 !w-full",
       "data-[state=closed]:!slide-out-to-bottom data-[state=open]:!slide-in-from-bottom",
       "rounded-t-[16px]",
