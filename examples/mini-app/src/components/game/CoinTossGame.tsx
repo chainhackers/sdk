@@ -230,7 +230,7 @@ export function CoinTossGame({
                 htmlFor="betAmount"
                 className="text-sm font-medium -mb-1 text-muted-foreground"
               >
-                Bet amount (0.24$)
+                Bet amount
               </Label>
               <Input
                 id="betAmount"
