@@ -275,16 +275,16 @@ export function CoinTossGame({
                         <Table>
                           <TableHeader>
                             <TableRow className="border-b border-border/50">
-                              <TableHead className="px-3 py-2.5 text-muted-foreground font-normal top-0 bg-card">
+                              <TableHead className="px-3 py-2.5 text-muted-foreground font-medium top-0 bg-card">
                                 Draw
                               </TableHead>
-                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal top-0 bg-card">
+                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
                                 X
                               </TableHead>
-                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal top-0 bg-card">
+                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
                                 Payout
                               </TableHead>
-                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-normal top-0 bg-card">
+                              <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
                                 Time
                               </TableHead>
                             </TableRow>
@@ -305,14 +305,14 @@ export function CoinTossGame({
                                 >
                                   {entry.status}
                                 </TableCell>
-                                <TableCell className="px-3 py-2.5 text-right text-foreground">
+                                <TableCell className="px-3 py-2.5 text-right text-foreground font-medium">
                                   {entry.multiplier}
                                 </TableCell>
-                                <TableCell className="px-3 py-2.5 text-right text-foreground">
+                                <TableCell className="px-3 py-2.5 text-right text-foreground font-medium">
                                   {entry.payoutAmount}
                                   {entry.payoutCurrencyIcon}
                                 </TableCell>
-                                <TableCell className="px-3 py-2.5 text-right text-muted-foreground">
+                                <TableCell className="px-3 py-2.5 text-right text-muted-foreground font-medium">
                                   {entry.timestamp}
                                 </TableCell>
                               </TableRow>
