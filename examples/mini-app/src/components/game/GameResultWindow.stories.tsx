@@ -121,4 +121,4 @@ export const LossDark: Story = {
       </div>
     </div>
   ),
-} 
+}
