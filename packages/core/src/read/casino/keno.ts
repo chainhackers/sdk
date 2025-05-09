@@ -33,7 +33,7 @@ export async function waitKenoRolledBet(
 }
 
 /**
- * Raw token info data returned by the smart contract
+ * Raw Keno configuration data returned by the smart contract
  * [0] - biggestNumber: The biggest selectable number
  * [1] - maxNumbersPlayed: Maximum selectable numbers
  * [2] - gainsTable: The gain multipliers (gain multiplier = gains[numbers played][numbers matched]) (BP)

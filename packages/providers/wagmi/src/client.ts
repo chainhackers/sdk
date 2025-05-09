@@ -26,6 +26,7 @@ import type {
   RoulettePlacedBet,
   RouletteRolledBet,
   Token,
+  WeightedGameConfiguration,
 } from "@betswirl/sdk-core";
 import {
   BetSwirlClient,
@@ -36,6 +37,7 @@ import {
   getCasinoTokens,
   getChainlinkVrfCost,
   getKenoConfiguration,
+  getWeightedGameConfiguration,
   placeCoinTossBet,
   placeDiceBet,
   placeKenoBet,
@@ -246,6 +248,14 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   async getKenoConfiguration(token: Token, chainId?: CasinoChainId): Promise<KenoConfiguration> {
     this._switchChain(chainId);
     return getKenoConfiguration(this.betSwirlWallet, token);
+  }
+
+  async getWeighedGameConfiguration(
+    configId: number | string,
+    chainId?: CasinoChainId,
+  ): Promise<WeightedGameConfiguration> {
+    this._switchChain(chainId);
+    return getWeightedGameConfiguration(this.betSwirlWallet, configId);
   }
 
   /* Private */

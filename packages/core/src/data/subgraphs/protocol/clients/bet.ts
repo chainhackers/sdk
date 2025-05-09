@@ -53,6 +53,12 @@ export function formatCasinoBet(
   const isWin =
     rollTotalBetAmount && bet.payout ? BigInt(bet.payout) >= rollTotalBetAmount : undefined;
   const isStopTriggered = encodedRolled ? encodedRolled.length !== Number(bet.betCount) : undefined;
+
+  /*const weightedGameConfiguration: WeightedGameConfiguration | undefined = rawBet.weightedGameBet ? {
+    configId: Number(rawBet.weightedGameBet.config.id),
+    multipliers: rawBet.weightedGameBet.config.multipliers.map(multiplier => BigInt(multiplier)),
+    weights: rawBet.weightedGameBet.config.weights.map(weight => BigInt(weight)),
+  } : undefined;*/
   return {
     id: BigInt(bet.id),
     token,

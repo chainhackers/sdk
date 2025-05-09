@@ -3,6 +3,7 @@ import { coinTossAbi } from "../abis/v2/casino/cointoss";
 import { diceAbi } from "../abis/v2/casino/dice";
 import { kenoAbi } from "../abis/v2/casino/keno";
 import { rouletteAbi } from "../abis/v2/casino/roulette";
+import { weightedGameAbi } from "../abis/v2/casino/weightedGame";
 import { chainByKey } from "./chains";
 
 export const MAX_HOUSE_EGDE = 3500;
@@ -36,6 +37,8 @@ export enum CASINO_GAME_TYPE {
   DICE = "dice",
   ROULETTE = "roulette",
   KENO = "keno",
+  WHEEL = "wheel",
+  CUSTOM_WEIGHTED_GAME = "custom-weighted-game",
 }
 
 export enum CASINO_GAME_SUBGRAPH_TYPE {
@@ -43,6 +46,8 @@ export enum CASINO_GAME_SUBGRAPH_TYPE {
   DICE = "Dice",
   ROULETTE = "Roulette",
   KENO = "Keno",
+  WHEEL = "Wheel",
+  CUSTOM_WEIGHTED_GAME = "CUSTOM_WEIGHTED_GAME",
 }
 
 export enum CASINO_GAME_LABEL_TYPE {
@@ -50,6 +55,8 @@ export enum CASINO_GAME_LABEL_TYPE {
   DICE = "Dice",
   ROULETTE = "Roulette",
   KENO = "Keno",
+  WHEEL = "Wheel",
+  CUSTOM_WEIGHTED_GAME = "Custom game",
 }
 
 const COINTOSS_ROLL_ABI =
@@ -60,15 +67,23 @@ const ROULETTE_ROLL_ABI =
   "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, uint40 numbers, uint8[] rolled, uint256 payout)";
 const KENO_ROLL_ABI =
   "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, uint40 numbers, uint40[] rolled, uint256 payout)";
+const WEIGHTED_GAME_ROLL_ABI =
+  "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, uint32 configId, uint8[] rolled, uint256 payout)";
 
 export const CASINO_GAME_ROLL_ABI: Record<
   CASINO_GAME_TYPE,
-  typeof COINTOSS_ROLL_ABI | typeof DICE_ROLL_ABI | typeof ROULETTE_ROLL_ABI | typeof KENO_ROLL_ABI
+  | typeof COINTOSS_ROLL_ABI
+  | typeof DICE_ROLL_ABI
+  | typeof ROULETTE_ROLL_ABI
+  | typeof KENO_ROLL_ABI
+  | typeof WEIGHTED_GAME_ROLL_ABI
 > = {
   [CASINO_GAME_TYPE.COINTOSS]: COINTOSS_ROLL_ABI,
   [CASINO_GAME_TYPE.DICE]: DICE_ROLL_ABI,
   [CASINO_GAME_TYPE.ROULETTE]: ROULETTE_ROLL_ABI,
   [CASINO_GAME_TYPE.KENO]: KENO_ROLL_ABI,
+  [CASINO_GAME_TYPE.WHEEL]: WEIGHTED_GAME_ROLL_ABI,
+  [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: WEIGHTED_GAME_ROLL_ABI,
 };
 
 const arbitrumSepoliaData: CasinoChain = {
@@ -95,6 +110,14 @@ const arbitrumSepoliaData: CasinoChain = {
       [CASINO_GAME_TYPE.KENO]: {
         address: "0xA78465DE64F302568cbb869698413a60681d2Fe8",
         abi: kenoAbi,
+      },
+      [CASINO_GAME_TYPE.WHEEL]: {
+        address: "0xd021018E82eE105Feb7f50a0534DC0a3e6776F32",
+        abi: weightedGameAbi,
+      },
+      [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: {
+        address: "0xd021018E82eE105Feb7f50a0534DC0a3e6776F32",
+        abi: weightedGameAbi,
       },
     },
     leaderboard: "0xf8e7EE248BE53C8b428542E9bc498D78fea09Ee4",
@@ -134,6 +157,14 @@ const avalancheFujiData: CasinoChain = {
         address: "0xEC5800455EeFE3A193778747EeAfF38221bFdFe4",
         abi: kenoAbi,
       },
+      [CASINO_GAME_TYPE.WHEEL]: {
+        address: "0xEaFBA4d8a062b4C41775FED9Ced52633c89DFca0",
+        abi: weightedGameAbi,
+      },
+      [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: {
+        address: "0xEaFBA4d8a062b4C41775FED9Ced52633c89DFca0",
+        abi: weightedGameAbi,
+      },
     },
     leaderboard: "0xbB613c35D539eE86AB600e376117887A006d028f",
     freebet: "0xf341aa5e54E9536BDac0928d4Dbba3E09A8f774E",
@@ -170,6 +201,14 @@ const polygonAmoyData: CasinoChain = {
         address: "0x77A654D0895baF09c42314FBb4b18822Ec3c1DD0",
         abi: kenoAbi,
       },
+      [CASINO_GAME_TYPE.WHEEL]: {
+        address: "0xd300a3757dDBb3Eafb8fb3e401a5eb60e4a571b1",
+        abi: weightedGameAbi,
+      },
+      [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: {
+        address: "0xd300a3757dDBb3Eafb8fb3e401a5eb60e4a571b1",
+        abi: weightedGameAbi,
+      },
     },
     leaderboard: "0x143DB52C913143345B6a24D8f22f1a8BEaC19e16",
     freebet: "0xfBE92f62bd32B3b6c2335D757049f190752f5292",
@@ -205,6 +244,14 @@ const baseSepoliaData: CasinoChain = {
       [CASINO_GAME_TYPE.KENO]: {
         address: "0xb5C9f183C1E5D2e9d0CA0679D7149ea075E0e82F",
         abi: kenoAbi,
+      },
+      [CASINO_GAME_TYPE.WHEEL]: {
+        address: "0x011e537eB2313fc0096a87AA4ACC3750f712Ce2D",
+        abi: weightedGameAbi,
+      },
+      [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: {
+        address: "0x011e537eB2313fc0096a87AA4ACC3750f712Ce2D",
+        abi: weightedGameAbi,
       },
     },
     leaderboard: "0xd60Fac02E78e2a4E37501053ab3E822E330dd970",
@@ -243,14 +290,22 @@ const arbitrumData: CasinoChain = {
         address: "0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89",
         abi: kenoAbi,
       },
+      [CASINO_GAME_TYPE.WHEEL]: {
+        address: "0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b",
+        abi: weightedGameAbi,
+      },
+      [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: {
+        address: "0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b",
+        abi: weightedGameAbi,
+      },
     },
     freebet: "0x7a1EFD33f41150E3247F14209b2a733bc6B1cb7a",
     leaderboard: "0x0E5C8EA20a1EB26e5dDE5AFab5279F546dB92a79",
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/deployments/id/QmbF6TzA9MgJ1UFBpbVZ4CemFaw2kbwRQk877gmCSriF2L",
-    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-arbitrum-one/v2.1.1",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmWFXojReSDay6LBfkvgqqsfu11QCrNwQnSa1j3DgZT17i",
+    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-arbitrum-one/v2.2.0",
   },
   defaultAffiliate: "0xf14C79a7fA22c1f97C779F573c9bF39b6b43381c",
 };
@@ -280,14 +335,22 @@ const avalancheData: CasinoChain = {
         address: "0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89",
         abi: kenoAbi,
       },
+      [CASINO_GAME_TYPE.WHEEL]: {
+        address: "0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b",
+        abi: weightedGameAbi,
+      },
+      [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: {
+        address: "0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b",
+        abi: weightedGameAbi,
+      },
     },
     freebet: "0x7a1EFD33f41150E3247F14209b2a733bc6B1cb7a",
     leaderboard: "0x0E5C8EA20a1EB26e5dDE5AFab5279F546dB92a79",
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/deployments/id/QmSntNZDoeciB2V7dBgPDgQerJ8cW2DcVLDnu4cpKwbtac",
-    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-avalanche/v2.1.1",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmYDbKdk8cnYn6jkCgVagLvER73N9DcNc12dttyUKB6CGy",
+    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-avalanche/v2.2.0",
   },
   defaultAffiliate: "0x1a75280F832280Af93f588f715a5Fb4Ca7918430",
 };
@@ -317,14 +380,22 @@ const polygonData: CasinoChain = {
         address: "0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89",
         abi: kenoAbi,
       },
+      [CASINO_GAME_TYPE.WHEEL]: {
+        address: "0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b",
+        abi: weightedGameAbi,
+      },
+      [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: {
+        address: "0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b",
+        abi: weightedGameAbi,
+      },
     },
     freebet: "0x7a1EFD33f41150E3247F14209b2a733bc6B1cb7a",
     leaderboard: "0x0E5C8EA20a1EB26e5dDE5AFab5279F546dB92a79",
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/deployments/id/Qmc6RFEfEJE3hzZMAKRUiqFJ1PmY1CyHsjounUKtcKDM5q",
-    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-polygon/v2.1.1",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmemAqAdjsbNQUtaMmJX54yS6Zg1uGx1bohWMYd3MV3Gmn",
+    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-polygon/v2.2.0",
   },
   defaultAffiliate: "0xfA695010bF9e757a1abCd2703259F419217aa756",
 };
@@ -354,14 +425,22 @@ const bscData: CasinoChain = {
         address: "0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89",
         abi: kenoAbi,
       },
+      [CASINO_GAME_TYPE.WHEEL]: {
+        address: "0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b",
+        abi: weightedGameAbi,
+      },
+      [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: {
+        address: "0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b",
+        abi: weightedGameAbi,
+      },
     },
     freebet: "0x7a1EFD33f41150E3247F14209b2a733bc6B1cb7a",
     leaderboard: "0x0E5C8EA20a1EB26e5dDE5AFab5279F546dB92a79",
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/deployments/id/QmSYvThPZhMsKcBSCCxH9UiQn9on9PZTmHaPFFeeLYNegP",
-    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-bnb-chain/v2.1.1",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmZq1G2kXuRWuzTkZivDxdEyHffkbmgMSqFcBmBnfYrVSS",
+    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-bnb-chain/v2.2.0",
   },
   defaultAffiliate: "0xCD25325a6eF20BC5dF9bceAc0cC22a48d2e8f6eF",
 };
@@ -391,14 +470,22 @@ const baseData: CasinoChain = {
         address: "0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89",
         abi: kenoAbi,
       },
+      [CASINO_GAME_TYPE.WHEEL]: {
+        address: "0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b",
+        abi: weightedGameAbi,
+      },
+      [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: {
+        address: "0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b",
+        abi: weightedGameAbi,
+      },
     },
     freebet: "0x7a1EFD33f41150E3247F14209b2a733bc6B1cb7a",
     leaderboard: "0x0E5C8EA20a1EB26e5dDE5AFab5279F546dB92a79",
   },
   graphql: {
     endpoint:
-      "https://gateway.thegraph.com/api/{key}/deployments/id/QmW8bVxEXovu5QqdSpvch2xUGyqSPEb6qUY4s5i5kHhkVH",
-    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-base/v2.1.1",
+      "https://gateway.thegraph.com/api/{key}/deployments/id/QmRdCiCM3gKcrdfiSxxRkqSLvS4ApU3iHKmPMhqiUWAuLK",
+    defaultEndpoint: "https://api.studio.thegraph.com/query/1726/betswirl-base/v2.2.0",
   },
   defaultAffiliate: "0xBf1998e1F1cD52fBfb63e7E646bb39c091A7B70A",
 };
@@ -429,6 +516,8 @@ export const labelCasinoGameByType = {
   [CASINO_GAME_TYPE.DICE]: CASINO_GAME_LABEL_TYPE.DICE,
   [CASINO_GAME_TYPE.ROULETTE]: CASINO_GAME_LABEL_TYPE.ROULETTE,
   [CASINO_GAME_TYPE.KENO]: CASINO_GAME_LABEL_TYPE.KENO,
+  [CASINO_GAME_TYPE.WHEEL]: CASINO_GAME_LABEL_TYPE.WHEEL,
+  [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: CASINO_GAME_LABEL_TYPE.CUSTOM_WEIGHTED_GAME,
 } as const;
 
 export const typeBySubgraphCasinoGame = {
@@ -436,6 +525,8 @@ export const typeBySubgraphCasinoGame = {
   [CASINO_GAME_SUBGRAPH_TYPE.DICE]: CASINO_GAME_TYPE.DICE,
   [CASINO_GAME_SUBGRAPH_TYPE.ROULETTE]: CASINO_GAME_TYPE.ROULETTE,
   [CASINO_GAME_SUBGRAPH_TYPE.KENO]: CASINO_GAME_TYPE.KENO,
+  [CASINO_GAME_SUBGRAPH_TYPE.WHEEL]: CASINO_GAME_TYPE.WHEEL,
+  [CASINO_GAME_SUBGRAPH_TYPE.CUSTOM_WEIGHTED_GAME]: CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME,
 } as const;
 
 export const subgraphGameByType = {
@@ -443,6 +534,8 @@ export const subgraphGameByType = {
   [CASINO_GAME_TYPE.DICE]: CASINO_GAME_SUBGRAPH_TYPE.DICE,
   [CASINO_GAME_TYPE.ROULETTE]: CASINO_GAME_SUBGRAPH_TYPE.ROULETTE,
   [CASINO_GAME_TYPE.KENO]: CASINO_GAME_SUBGRAPH_TYPE.KENO,
+  [CASINO_GAME_TYPE.WHEEL]: CASINO_GAME_SUBGRAPH_TYPE.WHEEL,
+  [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: CASINO_GAME_SUBGRAPH_TYPE.CUSTOM_WEIGHTED_GAME,
 } as const;
 
 // Could be increased in the future if we increase vrfCallbackGasExtraBet value in smart contracts
@@ -452,4 +545,6 @@ export const maxGameBetCountByType = {
   [CASINO_GAME_TYPE.DICE]: 200,
   [CASINO_GAME_TYPE.ROULETTE]: 200,
   [CASINO_GAME_TYPE.KENO]: 125,
+  [CASINO_GAME_TYPE.WHEEL]: 100,
+  [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: 100,
 } as const;
