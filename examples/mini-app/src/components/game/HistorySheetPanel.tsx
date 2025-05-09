@@ -44,17 +44,17 @@ export function HistorySheetPanel({
           <div className="p-1 pt-0">
             <Table>
               <TableHeader>
-                <TableRow className="border-b border-border/50">
-                  <TableHead className="px-3 py-2.5 text-muted-foreground font-medium top-0 bg-card">
+                <TableRow className="border-b border-table-separator">
+                  <TableHead className="px-3 py-2.5 text-muted-foreground font-medium top-0 bg-menu-bg">
                     Draw
                   </TableHead>
-                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
+                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-menu-bg">
                     X
                   </TableHead>
-                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
+                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-menu-bg">
                     Payout
                   </TableHead>
-                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-card">
+                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-menu-bg">
                     Time
                   </TableHead>
                 </TableRow>
@@ -80,7 +80,7 @@ export function HistorySheetPanel({
                   historyData.map((entry) => (
                     <TableRow
                       key={entry.id}
-                      className="border-b border-border/50 last:border-b-0"
+                      className="border-b border-table-separator last:border-b-0"
                     >
                       <TableCell
                         className={cn(

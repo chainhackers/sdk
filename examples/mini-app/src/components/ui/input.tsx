@@ -23,11 +23,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           data-slot="input"
           className={cn(
             "flex h-full w-full rounded-[12px] border-0",
-            "bg-input text-foreground font-semibold",
+            "bg-neutral-background text-foreground font-semibold",
             "px-4 py-2",
             hasTokenInfo ? "pr-16 md:pr-20" : "",
             "text-base placeholder:text-muted-foreground",
-            "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0",
             "disabled:cursor-not-allowed disabled:opacity-50",
           )}
           ref={ref}

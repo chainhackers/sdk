@@ -15,7 +15,11 @@ import { HistorySheetPanel, type HistoryEntry } from "./HistorySheetPanel"
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
   theme?: "light" | "dark" | "system"
-  customTheme?: React.CSSProperties
+  customTheme?: {
+    "--primary"?: string
+    "--play-btn-font"?: string
+    "--game-window-overlay"?: string
+  } & React.CSSProperties
 }
 
 const mockHistoryData: HistoryEntry[] = [
@@ -118,6 +122,10 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
+  const gameWindowOverlay = customTheme && '--game-window-overlay' in customTheme 
+    ? 'bg-[var(--game-window-overlay)]'
+    : ''
+
   return (
     <div
       className={cn("cointoss-game-wrapper", themeClass, className)}
@@ -132,13 +140,13 @@ export function CoinTossGame({
         )}
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-          <CardTitle className="text-lg">CoinToss</CardTitle>
+          <CardTitle className="text-lg text-title-color">CoinToss</CardTitle>
           <Button
             variant="secondary"
             className={cn(
-              "bg-button-neutral-background",
+              "bg-neutral-background",
               "rounded-[12px]",
-              "border border-secondary-border",
+              "border border-border-stroke",
               "text-primary",
             )}
           >
@@ -156,7 +164,7 @@ export function CoinTossGame({
               backgroundImage: `url(${coinTossBackground})`,
             }}
           >
-            <div className="absolute inset-0 bg-black/40 rounded-[16px]"></div>
+            <div className={cn("absolute inset-0 rounded-[16px]", gameWindowOverlay)}></div>
 
             <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
               <SheetTrigger asChild>
@@ -165,7 +173,7 @@ export function CoinTossGame({
                   size="iconRound"
                   className={cn(
                     "absolute top-2 left-2",
-                    "text-white",
+                    "text-white border border-border-stroke",
                     isInfoSheetOpen && "text-primary border-primary",
                   )}
                 >
@@ -193,7 +201,7 @@ export function CoinTossGame({
                   size="iconRound"
                   className={cn(
                     "absolute top-2 right-2",
-                    "text-white",
+                    "text-white border border-border-stroke",
                     isHistorySheetOpen && "text-primary border-primary",
                   )}
                 >
@@ -208,7 +216,7 @@ export function CoinTossGame({
               )}
             </Sheet>
 
-            <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white dark:text-foreground">
+            <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
               {multiplier.toFixed(2)} x
             </div>
             <img
@@ -221,14 +229,14 @@ export function CoinTossGame({
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <div className="text-sm font-medium flex items-center">
-                <span className="text-muted-foreground">Balance:&nbsp;</span>
+                <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
                 <span className="font-semibold">0</span>
                 <Cog className="inline h-4 w-4 ml-1 text-orange-500" />
               </div>
 
               <Label
                 htmlFor="betAmount"
-                className="text-sm font-medium -mb-1 text-muted-foreground"
+                className="text-sm font-medium -mb-1 text-text-on-surface-variant"
               >
                 Bet amount
               </Label>
@@ -240,6 +248,7 @@ export function CoinTossGame({
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setBetAmount(e.target.value)
                 }
+                className="relative"
                 token={{
                   icon: <Cog className="h-4 w-4 text-orange-500" />,
                   symbol: "POL",
@@ -254,7 +263,7 @@ export function CoinTossGame({
                       (parseFloat(prev || "0") / 2).toString(),
                     )
                   }
-                  className="border border-secondary-border rounded-[8px] h-[30px] w-[85.33px]"
+                  className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
                   1/2
                 </Button>
@@ -265,13 +274,13 @@ export function CoinTossGame({
                       (parseFloat(prev || "0") * 2).toString(),
                     )
                   }
-                  className="border border-secondary-border rounded-[8px] h-[30px] w-[85.33px]"
+                  className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
                   2x
                 </Button>
                 <Button
                   variant="secondary"
-                  className="border border-secondary-border rounded-[8px] h-[30px] w-[85.33px]"
+                  className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   onClick={() => alert("Max clicked!")}
                 >
                   Max
@@ -284,7 +293,7 @@ export function CoinTossGame({
               className={cn(
                 "w-full",
                 "border-0",
-                "bg-primary hover:bg-primary/90 text-primary-foreground font-bold",
+                "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
               onClick={() => alert(`Betting ${betAmount} POL on ${choice}`)}
