@@ -125,11 +125,6 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const gameWindowOverlay =
-    customTheme && "--game-window-overlay" in customTheme
-      ? "bg-[var(--game-window-overlay)]"
-      : ""
-
   return (
     <div
       className={cn("cointoss-game-wrapper", themeClass, className)}
@@ -171,7 +166,7 @@ export function CoinTossGame({
             <div
               className={cn(
                 "absolute inset-0 rounded-[16px]",
-                gameWindowOverlay,
+                "bg-game-window-overlay",
               )}
             ></div>
 
@@ -210,7 +205,7 @@ export function CoinTossGame({
                   size="iconRound"
                   className={cn(
                     "absolute top-2 right-2 z-5",
-                    "text-white border border-border-stroke",
+                    "text-white border border-border-stroke bg-neutral-background",
                     isHistorySheetOpen && "text-primary border-primary",
                   )}
                 >

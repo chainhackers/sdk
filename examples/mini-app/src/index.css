@@ -118,7 +118,7 @@
     --text-on-surface-variant: oklch(0.61 0.014 271.18);
     --text-on-surface: oklch(0.34 0.0139 235.28);
     --border-stroke: var(--light-stroke);
-    --game-window-overlay: oklch(0 0 0 / 0%);
+    --game-window-overlay: oklch(0 0 0 / 40%);
     --play-btn-font: var(--white);
 
     --game-win: oklch(0.71 0.1322 165.92);
