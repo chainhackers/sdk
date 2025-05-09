@@ -8,6 +8,21 @@ import { cn } from "../../lib/utils"
 import coinTossBackground from "../../assets/game/game-background.png"
 import coinIcon from "../../assets/game/coin-background-icon.png"
 
+import {
+  Wallet,
+  ConnectWallet,
+  WalletDropdown,
+  WalletDropdownDisconnect,
+} from "@coinbase/onchainkit/wallet"
+import {
+  Avatar,
+  Name,
+  Address as OnchainKitAddress,
+  EthBalance,
+  Identity,
+} from "@coinbase/onchainkit/identity"
+import { useAccount } from "wagmi"
+
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { InfoSheetPanel } from "./InfoSheetPanel"
 import { HistorySheetPanel, type HistoryEntry } from "./HistorySheetPanel"
@@ -107,6 +122,7 @@ export function CoinTossGame({
   const [choice] = useState<"Heads" | "Tails">("Heads")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
+  const { isConnected, address } = useAccount()
 
   const multiplier = 1.94
   const winChance = 50
@@ -122,9 +138,10 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const gameWindowOverlay = customTheme && '--game-window-overlay' in customTheme 
-    ? 'bg-[var(--game-window-overlay)]'
-    : ''
+  const gameWindowOverlay =
+    customTheme && "--game-window-overlay" in customTheme
+      ? "bg-[var(--game-window-overlay)]"
+      : ""
 
   return (
     <div
@@ -141,17 +158,49 @@ export function CoinTossGame({
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
           <CardTitle className="text-lg text-title-color">CoinToss</CardTitle>
-          <Button
-            variant="secondary"
-            className={cn(
-              "bg-neutral-background",
-              "rounded-[12px]",
-              "border border-border-stroke",
-              "text-primary",
+          <Wallet>
+            <ConnectWallet
+              className={cn(
+                "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+                "bg-neutral-background",
+                "rounded-[12px]",
+                "border border-border-stroke",
+                !isConnected
+                  ? "text-primary"
+                  : "text-card-foreground dark:text-white",
+                "px-3 py-1.5 h-auto min-h-[36px]",
+              )}
+            >
+              {!isConnected ? (
+                "Connect"
+              ) : (
+                <div className="flex items-center">
+                  <Avatar className="h-5 w-5 mr-2" />
+                  <Name />
+                </div>
+              )}
+            </ConnectWallet>
+
+            {isConnected && address && (
+              <WalletDropdown>
+                <Identity
+                  address={address as `0x${string}`}
+                  className="px-4 pt-3 pb-2 flex items-center"
+                >
+                  <Avatar className="w-10 h-10" />
+                  <div className="ml-3 flex flex-col">
+                    <Name className="font-semibold text-base" />
+                    <OnchainKitAddress className="text-xs text-muted-foreground" />
+                  </div>
+                </Identity>
+                <div className="border-t border-border mx-4 my-2"></div>
+                <div className="px-4 pb-2 pt-1">
+                  <EthBalance className="text-sm font-medium" />
+                </div>
+                <WalletDropdownDisconnect className="text-sm w-full text-left px-4 py-2 hover:bg-muted" />
+              </WalletDropdown>
             )}
-          >
-            Connect
-          </Button>
+          </Wallet>
         </CardHeader>
 
         <CardContent className="flex flex-col gap-4">
@@ -164,7 +213,12 @@ export function CoinTossGame({
               backgroundImage: `url(${coinTossBackground})`,
             }}
           >
-            <div className={cn("absolute inset-0 rounded-[16px]", gameWindowOverlay)}></div>
+            <div
+              className={cn(
+                "absolute inset-0 rounded-[16px]",
+                gameWindowOverlay,
+              )}
+            ></div>
 
             <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
               <SheetTrigger asChild>
@@ -229,7 +283,9 @@ export function CoinTossGame({
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <div className="text-sm font-medium flex items-center">
-                <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
+                <span className="text-text-on-surface-variant">
+                  Balance:&nbsp;
+                </span>
                 <span className="font-semibold">0</span>
                 <Cog className="inline h-4 w-4 ml-1 text-orange-500" />
               </div>
