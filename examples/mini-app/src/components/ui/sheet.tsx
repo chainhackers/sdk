@@ -149,7 +149,7 @@ const SheetBottomPanelContent = React.forwardRef<
       className={cn(
         "ring-offset-background focus:ring-ring data-[state=open]:bg-secondary",
         "absolute right-3 sm:right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100",
-        "focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none",
+        "focus:outline-none disabled:pointer-events-none bg-close-btn-hovered",
         "z-[60]",
         "-top-8",
       )}

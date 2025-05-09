@@ -54,6 +54,7 @@
   --color-menu-bg: var(--menu-bg);
   --color-table-separator: var(--table-separator);
   --color-close-btn-color: var(--close-btn-color);
+  --color-close-btn-hovered: var(--close-btn-hovered);
 }
 
 @layer base {
@@ -124,6 +125,7 @@
     --menu-bg: var(--light-surface);
     --table-separator: var(--light-stroke);
     --close-btn-color: var(--light-surface);
+    --close-btn-hovered: var(--dark-stroke);
   }
 
   .dark {
