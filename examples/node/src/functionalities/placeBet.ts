@@ -7,22 +7,27 @@ import {
   type CasinoGame,
   type CasinoGameToken,
   type CasinoPlacedBet,
+  type CasinoRolledBet,
   type CasinoToken,
   type ChoiceInput,
   CoinToss,
   type CoinTossChoiceInput,
-  type CoinTossPlacedBet,
   Dice,
   type DiceChoiceInput,
-  type DicePlacedBet,
   FORMAT_TYPE,
   GAS_PRICE_TYPE,
   Keno,
   type KenoChoiceInput,
-  type KenoPlacedBet,
+  type NormalCasinoPlacedBet,
+  type NormalGameChoiceInput,
   Roulette,
   type RouletteChoiceInput,
-  type RoulettePlacedBet,
+  WEIGHTED_CASINO_GAME_TYPES,
+  type WeightedCasinoPlacedBet,
+  type WeightedGameChoiceInput,
+  type WeightedGameConfiguration,
+  Wheel,
+  type WheelChoiceInput,
   bigIntFormatter,
   casinoChains,
   chainById,
@@ -72,7 +77,15 @@ export async function startPlaceBetProcess() {
     const placedBet = await _placeBet(gameToken, selectedInput, betCount, betAmount);
 
     // 10. Wait for the roll
-    await _waitRoll(placedBet);
+    if (WEIGHTED_CASINO_GAME_TYPES.includes(placedBet.game)) {
+      await _waitWeightedRoll(
+        placedBet as WeightedCasinoPlacedBet,
+        (selectedInput as WeightedGameChoiceInput).config,
+        gameToken.affiliateHouseEdge,
+      );
+    } else {
+      await _waitRoll(placedBet as NormalCasinoPlacedBet);
+    }
   } catch (error) {
     if (error instanceof BetSwirlError) {
       console.error(
@@ -108,11 +121,13 @@ async function _selectGame(selectedChain: CasinoChain): Promise<CasinoGame> {
   const selectedGame = await select({
     message: "Select a game",
     loop: false,
-    choices: casinoGames.map((g) => ({
-      name: g.label,
-      value: g,
-      disabled: g.paused,
-    })),
+    choices: casinoGames
+      .map((g) => ({
+        name: g.label,
+        value: g,
+        disabled: g.paused,
+      }))
+      .filter((g) => g.value.game !== CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME),
   });
   return selectedGame;
 }
@@ -181,11 +196,9 @@ async function _getTokenInfo(
 
 async function _selectInput(
   gameToken: CasinoGameToken,
-): Promise<CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput | KenoChoiceInput> {
-  let input: CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput | KenoChoiceInput;
+): Promise<NormalGameChoiceInput | WeightedGameChoiceInput> {
+  let input: NormalGameChoiceInput | WeightedGameChoiceInput;
 
-  /*const wheelConfig = await wagmiBetSwirlClient.getWeighedGameConfiguration(0, gameToken.chainId);
-  console.log("test wheel config", wheelConfig); */
   switch (gameToken.game) {
     case CASINO_GAME_TYPE.DICE:
       input = await select({
@@ -228,8 +241,7 @@ async function _selectInput(
       }
       break;
     }
-    // Keno
-    default: {
+    case CASINO_GAME_TYPE.KENO: {
       // Get Keno config for the selected token
       const kenoConfig = await wagmiBetSwirlClient.getKenoConfiguration(
         gameToken,
@@ -247,6 +259,26 @@ async function _selectInput(
             .join("\n")})`,
           value: i,
         })),
+      });
+      break;
+    }
+    // Wheel
+    default: {
+      input = await select({
+        message: "Select a configuration",
+        loop: false,
+        // You could bring your own configurations here by passing customConfigurations in getChoiceInputs
+        choices: Wheel.getChoiceInputs(gameToken.chainId, gameToken.affiliateHouseEdge).map(
+          (i) => ({
+            name: `${i.label} (${i.winChancePercent
+              .map(
+                (chance, index) =>
+                  `${i.formattedNetMultiplier?.[index]}x - ${chance.toFixed(2)}% to win ${index !== i.winChancePercent.length - 1 ? "|" : ""}`,
+              )
+              .join("\n")})`,
+            value: i,
+          }),
+        ),
       });
     }
   }
@@ -373,10 +405,10 @@ async function _selectBetAmount(
 
 async function _placeBet(
   casinoGameToken: CasinoGameToken,
-  inputChoice: DiceChoiceInput | CoinTossChoiceInput | RouletteChoiceInput | KenoChoiceInput,
+  inputChoice: NormalGameChoiceInput | WeightedGameChoiceInput,
   betCount: number,
   betAmount: bigint,
-): Promise<CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet | KenoPlacedBet> {
+): Promise<CasinoPlacedBet> {
   const commonParams = {
     betCount,
     betAmount,
@@ -402,7 +434,8 @@ async function _placeBet(
   };
   let placedBetData: {
     receipt: TransactionReceipt;
-    placedBet: CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet | KenoPlacedBet;
+    placedBet: CasinoPlacedBet;
+    weightedGameConfig?: WeightedGameConfiguration;
   };
   if (inputChoice.game === CASINO_GAME_TYPE.DICE) {
     const diceCap = (inputChoice as DiceChoiceInput).value;
@@ -428,10 +461,20 @@ async function _placeBet(
       callbacks,
       casinoGameToken.chainId,
     );
-  } else {
+  } else if (inputChoice.game === CASINO_GAME_TYPE.KENO) {
     const kenoChoice = inputChoice as KenoChoiceInput;
     placedBetData = await wagmiBetSwirlClient.playKeno(
       { ...commonParams, balls: kenoChoice.value, kenoConfig: kenoChoice.config },
+      undefined,
+      callbacks,
+      casinoGameToken.chainId,
+    );
+  }
+  // Wheel
+  else {
+    const weightedGameChoice = inputChoice as WheelChoiceInput;
+    placedBetData = await wagmiBetSwirlClient.playWheel(
+      { ...commonParams, weightedGameConfig: weightedGameChoice.config },
       undefined,
       callbacks,
       casinoGameToken.chainId,
@@ -450,7 +493,7 @@ async function _placeBet(
   return placedBetData.placedBet;
 }
 
-async function _waitRoll(placedBet: CasinoPlacedBet) {
+async function _waitRoll(placedBet: NormalCasinoPlacedBet) {
   console.log(chalk.blue("⌛ Waiting the bet to be rolled..."));
   const rolledBetData = await wagmiBetSwirlClient.waitRolledBet(placedBet, {
     timeout: 300000, //5min
@@ -459,6 +502,31 @@ async function _waitRoll(placedBet: CasinoPlacedBet) {
   });
 
   const rolledBet = rolledBetData.rolledBet;
+  _displayRolledBet(rolledBet);
+}
+
+async function _waitWeightedRoll(
+  placedBet: WeightedCasinoPlacedBet,
+  weightedGameConfig: WeightedGameConfiguration,
+  houseEdge: number,
+) {
+  console.log(chalk.blue("⌛ Waiting the bet to be rolled..."));
+  const rolledBetData = await wagmiBetSwirlClient.waitRolledBet(
+    placedBet,
+    {
+      timeout: 300000, //5min
+      pollingInterval: process.env.RPC_URL ? 500 : 2500,
+      formatType: FORMAT_TYPE.FULL_PRECISE,
+    },
+    weightedGameConfig,
+    houseEdge,
+  );
+
+  const rolledBet = rolledBetData.rolledBet;
+  _displayRolledBet(rolledBet);
+}
+
+function _displayRolledBet(rolledBet: CasinoRolledBet) {
   const chain = chainById[rolledBet.chainId];
   const commonMessage = chalk.blue(
     `Payout: ${rolledBet.formattedPayout} ${
@@ -472,7 +540,7 @@ async function _waitRoll(placedBet: CasinoPlacedBet) {
     )}\nRoll txn: ${formatTxnUrl(rolledBet.rollTxnHash, rolledBet.chainId)}\nBetSwirl url: ${getBetSwirlBetUrl(rolledBet.id, rolledBet.game, rolledBet.chainId)}`,
   );
   // Win
-  if (rolledBetData.rolledBet.isWin) {
+  if (rolledBet.isWin) {
     console.log(
       chalk.green(
         `🥳 Congrats you won ${rolledBet.formattedBenefit} ${rolledBet.token.symbol} (x${rolledBet.formattedPayoutMultiplier})\n`,

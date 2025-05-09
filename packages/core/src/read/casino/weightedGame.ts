@@ -1,10 +1,68 @@
 import { encodeFunctionData } from "viem";
 import { weightedGameAbi } from "../../abis";
+import { chainByKey } from "../../data";
 import { CASINO_GAME_TYPE, type CasinoChainId, casinoChainById } from "../../data/casino";
 import { ChainError, ERROR_CODES, TransactionError } from "../../errors";
 import type { BetSwirlFunctionData } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider/wallet";
 import { getCasinoChainId } from "../../utils/chains";
+import type { CasinoRolledBet } from "./game";
+
+const normalWheelConfiguration = {
+  configId: 0,
+  weights: [1n, 1n, 1n, 1n, 1n, 1n, 1n, 1n, 1n, 1n],
+  multipliers: [0n, 14580n, 0n, 18760n, 0n, 20830n, 0n, 14580n, 0n, 31250n],
+  colors: [
+    "#29384C",
+    "#55DC36",
+    "#29384C",
+    "#15A2D8",
+    "#29384C",
+    "#7340F4",
+    "#29384C",
+    "#55DC36",
+    "#29384C",
+    "#EC9E3C",
+  ],
+  label: "Normal",
+  game: CASINO_GAME_TYPE.WHEEL,
+};
+
+type WeightedGameCachedConfigurationsPerChain = {
+  [chainId in CasinoChainId]: CachedWeightedGameConfiguration[];
+};
+
+export const wheelCachedConfigurations: WeightedGameCachedConfigurationsPerChain = {
+  [chainByKey.arbitrumSepolia.id]: [
+    { ...normalWheelConfiguration, chainId: chainByKey.arbitrumSepolia.id },
+  ],
+  [chainByKey.avalancheFuji.id]: [
+    { ...normalWheelConfiguration, chainId: chainByKey.avalancheFuji.id },
+  ],
+  [chainByKey.polygonAmoy.id]: [
+    { ...normalWheelConfiguration, chainId: chainByKey.polygonAmoy.id },
+  ],
+  [chainByKey.baseSepolia.id]: [
+    { ...normalWheelConfiguration, chainId: chainByKey.baseSepolia.id },
+  ],
+  [chainByKey.arbitrum.id]: [{ ...normalWheelConfiguration, chainId: chainByKey.arbitrum.id }],
+  [chainByKey.avalanche.id]: [{ ...normalWheelConfiguration, chainId: chainByKey.avalanche.id }],
+  [chainByKey.polygon.id]: [{ ...normalWheelConfiguration, chainId: chainByKey.polygon.id }],
+  [chainByKey.bsc.id]: [{ ...normalWheelConfiguration, chainId: chainByKey.bsc.id }],
+  [chainByKey.base.id]: [{ ...normalWheelConfiguration, chainId: chainByKey.base.id }],
+};
+
+export const weightedGameCachedConfigurations: WeightedGameCachedConfigurationsPerChain = {
+  [chainByKey.arbitrumSepolia.id]: [...wheelCachedConfigurations[chainByKey.arbitrumSepolia.id]],
+  [chainByKey.avalancheFuji.id]: [...wheelCachedConfigurations[chainByKey.avalancheFuji.id]],
+  [chainByKey.polygonAmoy.id]: [...wheelCachedConfigurations[chainByKey.polygonAmoy.id]],
+  [chainByKey.baseSepolia.id]: [...wheelCachedConfigurations[chainByKey.baseSepolia.id]],
+  [chainByKey.arbitrum.id]: [...wheelCachedConfigurations[chainByKey.arbitrum.id]],
+  [chainByKey.avalanche.id]: [...wheelCachedConfigurations[chainByKey.avalanche.id]],
+  [chainByKey.polygon.id]: [...wheelCachedConfigurations[chainByKey.polygon.id]],
+  [chainByKey.bsc.id]: [...wheelCachedConfigurations[chainByKey.bsc.id]],
+  [chainByKey.base.id]: [...wheelCachedConfigurations[chainByKey.base.id]],
+};
 
 export const gameIdByWeightedGameId = {
   [1]: CASINO_GAME_TYPE.WHEEL,
@@ -56,6 +114,11 @@ export interface WeightedGameConfiguration {
   label?: string;
 }
 
+export interface CachedWeightedGameConfiguration extends WeightedGameConfiguration {
+  colors: string[];
+  label: string;
+}
+
 export async function getWeightedGameConfiguration(
   wallet: BetSwirlWallet,
   configId: number | string,
@@ -63,6 +126,16 @@ export async function getWeightedGameConfiguration(
   const casinoChainId = getCasinoChainId(wallet);
 
   try {
+    // Check if the configuration is in the cached configurations to save a fetch is it is the case.
+    const cachedConfigurations = weightedGameCachedConfigurations[casinoChainId];
+    if (cachedConfigurations) {
+      const existingCachedConfiguration = cachedConfigurations.find(
+        (c) => c.configId === Number(configId),
+      );
+      if (existingCachedConfiguration) {
+        return existingCachedConfiguration;
+      }
+    }
     const functionData = getWeightedGameConfigurationFunctionData(configId, casinoChainId);
     const rawConfiguration = await wallet.readContract<
       typeof functionData,
@@ -88,11 +161,11 @@ export function getWeightedGameConfigurationFunctionData(
   casinoChainId: CasinoChainId,
 ): BetSwirlFunctionData<typeof weightedGameAbi, "gameConfigs", readonly [number]> {
   const casinoChain = casinoChainById[casinoChainId];
-  // Use WHEEL address here because Wheel is the first weighted game created
+  // Use WHEEL address here because Wheel is the first created weighted game
   const gameAddress = casinoChain.contracts.games[CASINO_GAME_TYPE.WHEEL]?.address;
   if (!gameAddress) {
     throw new ChainError(
-      `Weighted game contract (wheel) not found for chain ${casinoChainId}`,
+      `Weighted game contract not found for chain ${casinoChainId}`,
       ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
     );
   }
@@ -109,3 +182,9 @@ export function getWeightedGameConfigurationFunctionData(
     }),
   };
 }
+
+export interface WeightedGameRolledBet extends Omit<CasinoRolledBet, "decodedRoll"> {
+  rolled: string[]; // multipliers (eg. x3.24)
+}
+
+// waitRolledBet and formatCasinoRolledBet are in game.ts

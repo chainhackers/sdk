@@ -6,6 +6,8 @@ import {
   type CasinoChain,
   FORMAT_TYPE,
   OrderDirection,
+  WEIGHTED_CASINO_GAME_TYPES,
+  WeightedGame,
   bigIntFormatter,
   casinoChains,
   formatTxnUrl,
@@ -102,7 +104,9 @@ function _showBet(bet: CasinoBet) {
   // Common place bet info
   // TODO replace "Input" and "Rolled" by the game input/output labels
   const placeBetInfo = `Game: ${labelCasinoGameByType[bet.game]}\nInput: ${
-    bet.decodedInput
+    WEIGHTED_CASINO_GAME_TYPES.includes(bet.game)
+      ? WeightedGame.getWeightedGameConfigLabel(bet.decodedInput, bet.chainId)
+      : bet.decodedInput
   }\nBet amount: ${bet.formattedBetAmount} ${bet.token.symbol}\nBet count: ${bet.betCount}\n${
     bet.betCount > 1 ? `Total bet amount ${bet.formattedTotalBetAmount} ${bet.token.symbol}\n` : ""
   }Bet date: ${bet.betDate.toLocaleString()}\nBet txn: ${formatTxnUrl(bet.betTxnHash, bet.chainId)}\n`;

@@ -1,13 +1,16 @@
 import { ApolloClient } from "@apollo/client/core/index.js";
 import { type Address, type Hash, getAddress, zeroAddress } from "viem";
+import type { NORMAL_CASINO_GAME_TYPE, WeightedGameConfiguration } from "../../../..";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../../../../constants";
 import { ERROR_CODES } from "../../../../errors";
 import { SubgraphError } from "../../../../errors/types";
 import type { CasinoBet, Token } from "../../../../interfaces";
 import {
   chainNativeCurrencyToToken,
-  decodeCasinoInput,
-  decodeCasinoRolled,
+  decodeNormalCasinoInput,
+  decodeNormalCasinoRolled,
+  decodeWeightedCasinoInput,
+  decodeWeightedCasinoRolled,
 } from "../../../../utils";
 import { FORMAT_TYPE, formatRawAmount } from "../../../../utils/format";
 import {
@@ -54,11 +57,15 @@ export function formatCasinoBet(
     rollTotalBetAmount && bet.payout ? BigInt(bet.payout) >= rollTotalBetAmount : undefined;
   const isStopTriggered = encodedRolled ? encodedRolled.length !== Number(bet.betCount) : undefined;
 
-  /*const weightedGameConfiguration: WeightedGameConfiguration | undefined = rawBet.weightedGameBet ? {
-    configId: Number(rawBet.weightedGameBet.config.id),
-    multipliers: rawBet.weightedGameBet.config.multipliers.map(multiplier => BigInt(multiplier)),
-    weights: rawBet.weightedGameBet.config.weights.map(weight => BigInt(weight)),
-  } : undefined;*/
+  const weightedGameConfiguration: WeightedGameConfiguration | undefined = bet.weightedGameBet
+    ? {
+        configId: Number(bet.weightedGameBet.config.id),
+        multipliers: bet.weightedGameBet.config.multipliers.map((multiplier) => BigInt(multiplier)),
+        weights: bet.weightedGameBet.config.weights.map((weight) => BigInt(weight)),
+        game,
+        chainId,
+      }
+    : undefined;
   return {
     id: BigInt(bet.id),
     token,
@@ -87,7 +94,9 @@ export function formatCasinoBet(
     ),
     betTxnHash: bet.betTxnHash,
     encodedInput: bet.encodedInput,
-    decodedInput: decodeCasinoInput(bet.encodedInput, game),
+    decodedInput: weightedGameConfiguration
+      ? decodeWeightedCasinoInput(bet.encodedInput, weightedGameConfiguration, bet.houseEdge)
+      : decodeNormalCasinoInput(bet.encodedInput, game as NORMAL_CASINO_GAME_TYPE),
     payout: bet.payout ? BigInt(bet.payout) : undefined,
     formattedPayout: bet.payout
       ? formatRawAmount(BigInt(bet.payout), token.decimals, formatType)
@@ -108,7 +117,11 @@ export function formatCasinoBet(
       : undefined,
     rollBetCount: encodedRolled?.length,
     encodedRolled,
-    decodedRolled: encodedRolled?.map((encoded) => decodeCasinoRolled(encoded, game)),
+    decodedRolled: encodedRolled?.map((encoded) =>
+      weightedGameConfiguration
+        ? decodeWeightedCasinoRolled(encoded, weightedGameConfiguration, bet.houseEdge)
+        : decodeNormalCasinoRolled(encoded, game as NORMAL_CASINO_GAME_TYPE),
+    ),
     affiliate: bet.affiliate?.address ? bet.affiliate.address : undefined,
     isWin,
     isLost: isWin === undefined ? undefined : !isWin,

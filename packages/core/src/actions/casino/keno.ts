@@ -10,7 +10,7 @@ import type { KenoConfiguration } from "../../read";
 import {
   type CasinoBetParams,
   type CasinoPlaceBetOptions,
-  type CasinoPlacedBet,
+  type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
   getPlacedBetFromReceipt,
   placeBet,
@@ -21,9 +21,10 @@ export interface KenoParams extends CasinoBetParams {
   kenoConfig: KenoConfiguration;
 }
 
-export interface KenoPlacedBet extends CasinoPlacedBet {
+export interface KenoPlacedBet extends NormalCasinoPlacedBet {
   balls: KenoBall[];
   encodedBalls: KenoEncodedInput;
+  game: CASINO_GAME_TYPE.KENO;
 }
 
 export async function placeKenoBet(
@@ -100,6 +101,7 @@ export async function getKenoPlacedBetFromReceipt(
   const { args } = decodedKenoPlaceBetEvent;
   return {
     ...gamePlacedBet,
+    game: CASINO_GAME_TYPE.KENO,
     encodedBalls: args.numbers,
     balls: Keno.decodeInput(args.numbers),
   };
