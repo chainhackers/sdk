@@ -19,4 +19,4 @@ module.exports = {
     extend: {},
   },
   plugins: [require("tw-animate-css")],
-};
+}

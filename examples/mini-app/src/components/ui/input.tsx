@@ -1,19 +1,20 @@
-import * as React from "react";
+import * as React from "react"
 
-import { cn } from "../../lib/utils";
+import { cn } from "../../lib/utils"
 
 export interface TokenInfo {
-  icon?: React.ReactNode;
-  symbol: string;
+  icon?: React.ReactNode
+  symbol: string
 }
 
-export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix"> {
-  token?: TokenInfo;
+export interface InputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix"> {
+  token?: TokenInfo
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, token, ...props }, ref) => {
-    const hasTokenInfo = token && (token.icon || token.symbol);
+    const hasTokenInfo = token && (token.icon || token.symbol)
 
     return (
       <div className={cn("relative flex h-12 w-full items-center", className)}>
@@ -39,9 +40,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           </div>
         )}
       </div>
-    );
+    )
   },
-);
-Input.displayName = "Input";
+)
+Input.displayName = "Input"
 
-export { Input };
+export { Input }

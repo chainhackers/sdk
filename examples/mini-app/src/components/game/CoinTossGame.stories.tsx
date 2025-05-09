@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { CoinTossGame } from "./CoinTossGame";
+import type { Meta, StoryObj } from "@storybook/react"
+import { CoinTossGame } from "./CoinTossGame"
 
 const meta = {
   title: "Game/CoinTossGame",
@@ -21,21 +21,21 @@ const meta = {
       options: ["light", "dark", "system"],
     },
   },
-} satisfies Meta<typeof CoinTossGame>;
+} satisfies Meta<typeof CoinTossGame>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 const Template: Story = {
   render: (args) => <CoinTossGame {...args} />,
-};
+}
 
 export const LightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
   },
-};
+}
 
 export const DarkTheme: Story = {
   ...Template,
@@ -45,14 +45,14 @@ export const DarkTheme: Story = {
   parameters: {
     backgrounds: { default: "dark" },
   },
-};
+}
 
 export const SystemTheme: Story = {
   ...Template,
   args: {
     theme: "system",
   },
-};
+}
 
 export const CustomTheme: Story = {
   ...Template,
@@ -61,7 +61,7 @@ export const CustomTheme: Story = {
     customTheme: {
       "--primary": "#4dae52",
       "--play-btn-font": "#1B5E20",
-      "--game-window-overlay": 'oklch(0 0 0 / 40%)',
+      "--game-window-overlay": "oklch(0 0 0 / 40%)",
     } as React.CSSProperties,
   },
-};
+}

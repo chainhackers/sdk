@@ -1,16 +1,16 @@
-import { Cog, History, Info } from "lucide-react";
-import React, { useState, ChangeEvent, useRef, useEffect } from "react";
-import coinIcon from "../../assets/game/coin-background-icon.png";
-import coinTossBackground from "../../assets/game/game-background.png";
-import { cn } from "../../lib/utils";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+import { Cog, History, Info } from "lucide-react"
+import React, { useState, ChangeEvent, useRef, useEffect } from "react"
+import coinIcon from "../../assets/game/coin-background-icon.png"
+import coinTossBackground from "../../assets/game/game-background.png"
+import { cn } from "../../lib/utils"
+import { Button } from "../ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { Input } from "../ui/input"
+import { Label } from "../ui/label"
 
-import { Sheet, SheetTrigger } from "../ui/sheet";
-import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel";
-import { InfoSheetPanel } from "./InfoSheetPanel";
+import { Sheet, SheetTrigger } from "../ui/sheet"
+import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
+import { InfoSheetPanel } from "./InfoSheetPanel"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -95,7 +95,7 @@ const mockHistoryData: HistoryEntry[] = [
     payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~2h ago",
   },
-];
+]
 
 export function CoinTossGame({
   theme = "system",
@@ -103,28 +103,31 @@ export function CoinTossGame({
   className,
   ...props
 }: CoinTossGameProps) {
-  const [betAmount, setBetAmount] = useState("0");
-  const [choice] = useState<"Heads" | "Tails">("Heads");
-  const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false);
-  const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false);
+  const [betAmount, setBetAmount] = useState("0")
+  const [choice] = useState<"Heads" | "Tails">("Heads")
+  const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
+  const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
 
-  const multiplier = 1.94;
-  const winChance = 50;
-  const targetPayout = (Number.parseFloat(betAmount || "0") * multiplier).toFixed(2);
-  const fee = 0;
+  const multiplier = 1.94
+  const winChance = 50
+  const targetPayout = (
+    Number.parseFloat(betAmount || "0") * multiplier
+  ).toFixed(2)
+  const fee = 0
 
-  const themeClass = theme === "system" ? undefined : theme;
+  const themeClass = theme === "system" ? undefined : theme
 
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isMounted, setIsMounted] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    setIsMounted(true)
+  }, [])
 
-  const gameWindowOverlay = customTheme && '--game-window-overlay' in customTheme 
-    ? 'bg-[var(--game-window-overlay)]'
-    : ''
+  const gameWindowOverlay =
+    customTheme && "--game-window-overlay" in customTheme
+      ? "bg-[var(--game-window-overlay)]"
+      : ""
 
   return (
     <div
@@ -134,7 +137,10 @@ export function CoinTossGame({
     >
       <Card
         ref={cardRef}
-        className={cn("relative overflow-hidden", "bg-card text-card-foreground border")}
+        className={cn(
+          "relative overflow-hidden",
+          "bg-card text-card-foreground border",
+        )}
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
           <CardTitle className="text-lg text-title-color">CoinToss</CardTitle>
@@ -161,7 +167,12 @@ export function CoinTossGame({
               backgroundImage: `url(${coinTossBackground})`,
             }}
           >
-            <div className={cn("absolute inset-0 rounded-[16px]", gameWindowOverlay)}></div>
+            <div
+              className={cn(
+                "absolute inset-0 rounded-[16px]",
+                gameWindowOverlay,
+              )}
+            ></div>
 
             <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
               <SheetTrigger asChild>
@@ -188,7 +199,10 @@ export function CoinTossGame({
               )}
             </Sheet>
 
-            <Sheet open={isHistorySheetOpen} onOpenChange={setIsHistorySheetOpen}>
+            <Sheet
+              open={isHistorySheetOpen}
+              onOpenChange={setIsHistorySheetOpen}
+            >
               <SheetTrigger asChild>
                 <Button
                   variant="iconTransparent"
@@ -223,7 +237,9 @@ export function CoinTossGame({
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <div className="text-sm font-medium flex items-center">
-                <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
+                <span className="text-text-on-surface-variant">
+                  Balance:&nbsp;
+                </span>
                 <span className="font-semibold">0</span>
                 <Cog className="inline h-4 w-4 ml-1 text-orange-500" />
               </div>
@@ -253,7 +269,9 @@ export function CoinTossGame({
                 <Button
                   variant="secondary"
                   onClick={() =>
-                    setBetAmount((prev) => (Number.parseFloat(prev || "0") / 2).toString())
+                    setBetAmount((prev) =>
+                      (Number.parseFloat(prev || "0") / 2).toString(),
+                    )
                   }
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
@@ -262,7 +280,9 @@ export function CoinTossGame({
                 <Button
                   variant="secondary"
                   onClick={() =>
-                    setBetAmount((prev) => (Number.parseFloat(prev || "0") * 2).toString())
+                    setBetAmount((prev) =>
+                      (Number.parseFloat(prev || "0") * 2).toString(),
+                    )
                   }
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
@@ -294,5 +314,5 @@ export function CoinTossGame({
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

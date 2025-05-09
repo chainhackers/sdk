@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
-import { Slider } from "./slider";
+import type { Meta, StoryObj } from "@storybook/react"
+import { useState } from "react"
+import { Slider } from "./slider"
 
 const meta = {
   title: "UI/Slider",
@@ -29,20 +29,23 @@ const meta = {
     disabled: false,
     className: "w-60",
   },
-} satisfies Meta<typeof Slider>;
+} satisfies Meta<typeof Slider>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
-function SliderWithState({ defaultValue, ...args }: React.ComponentProps<typeof Slider>) {
-  const [value, setValue] = useState(defaultValue || [50]);
+function SliderWithState({
+  defaultValue,
+  ...args
+}: React.ComponentProps<typeof Slider>) {
+  const [value, setValue] = useState(defaultValue || [50])
 
   return (
     <div className="w-80 p-4">
       <Slider {...args} value={value} onValueChange={setValue} />
       <div className="mt-2 text-center text-sm">Value: {value.join(", ")}</div>
     </div>
-  );
+  )
 }
 
 export const Default: Story = {
@@ -50,7 +53,7 @@ export const Default: Story = {
   args: {
     defaultValue: [25],
   },
-};
+}
 
 export const GreenAccent: Story = {
   render: (args) => <SliderWithState {...args} />,
@@ -58,14 +61,14 @@ export const GreenAccent: Story = {
     defaultValue: [25],
     max: 99,
   },
-};
+}
 
 export const Range: Story = {
   render: (args) => <SliderWithState {...args} />,
   args: {
     defaultValue: [25, 75],
   },
-};
+}
 
 export const Disabled: Story = {
   render: (args) => {
@@ -76,10 +79,10 @@ export const Disabled: Story = {
           Value: {args.value?.join(", ")} (disabled)
         </div>
       </div>
-    );
+    )
   },
   args: {
     value: [60],
     disabled: true,
   },
-};
+}

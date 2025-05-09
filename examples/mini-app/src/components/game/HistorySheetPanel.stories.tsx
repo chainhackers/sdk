@@ -1,25 +1,28 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { Cog, History as HistoryIcon } from "lucide-react";
-import React, { useState, useEffect, useRef } from "react";
-import { cn } from "../../lib/utils";
-import { Button } from "../ui/button";
-import { Sheet, SheetTrigger } from "../ui/sheet";
-import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel";
+import type { Meta, StoryObj } from "@storybook/react"
+import { Cog, History as HistoryIcon } from "lucide-react"
+import React, { useState, useEffect, useRef } from "react"
+import { cn } from "../../lib/utils"
+import { Button } from "../ui/button"
+import { Sheet, SheetTrigger } from "../ui/sheet"
+import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 
 interface PanelStoryWrapperProps {
-  children: (container: HTMLDivElement) => React.ReactNode;
-  theme?: "light" | "dark" | "system";
+  children: (container: HTMLDivElement) => React.ReactNode
+  theme?: "light" | "dark" | "system"
 }
 
-const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme = "system" }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isMounted, setIsMounted] = useState(false);
+const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({
+  children,
+  theme = "system",
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    setIsMounted(true)
+  }, [])
 
-  const themeClass = theme === "system" ? undefined : theme;
+  const themeClass = theme === "system" ? undefined : theme
 
   return (
     <div
@@ -36,11 +39,12 @@ const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme =
         <p>Preparing story...</p>
       )}
       <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-muted-foreground text-center">
-        This is a mock card container. <br /> Click the button to open the panel.
+        This is a mock card container. <br /> Click the button to open the
+        panel.
       </p>
     </div>
-  );
-};
+  )
+}
 
 const mockHistoryDataDefault: HistoryEntry[] = [
   {
@@ -59,7 +63,7 @@ const mockHistoryDataDefault: HistoryEntry[] = [
     payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: "~2h ago",
   },
-];
+]
 
 const mockHistoryDataExtended: HistoryEntry[] = [
   ...mockHistoryDataDefault,
@@ -71,16 +75,16 @@ const mockHistoryDataExtended: HistoryEntry[] = [
     payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
     timestamp: `~${i * 5 + 10}m ago`,
   })),
-];
+]
 
 const HistorySheetWithWrapper = ({
   historyData,
   theme = "light",
 }: {
-  historyData: HistoryEntry[];
-  theme?: "light" | "dark" | "system";
+  historyData: HistoryEntry[]
+  theme?: "light" | "dark" | "system"
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <PanelStoryWrapper theme={theme}>
@@ -95,12 +99,15 @@ const HistorySheetWithWrapper = ({
               <HistoryIcon className="h-4 w-4" />
             </Button>
           </SheetTrigger>
-          <HistorySheetPanel portalContainer={portalContainer} historyData={historyData} />
+          <HistorySheetPanel
+            portalContainer={portalContainer}
+            historyData={historyData}
+          />
         </Sheet>
       )}
     </PanelStoryWrapper>
-  );
-};
+  )
+}
 
 const meta = {
   title: "Game/Components/HistorySheetPanel",
@@ -120,10 +127,10 @@ const meta = {
     historyData: mockHistoryDataDefault,
     theme: "light",
   },
-} satisfies Meta<typeof HistorySheetWithWrapper>;
+} satisfies Meta<typeof HistorySheetWithWrapper>
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+export default meta
+type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
@@ -131,7 +138,7 @@ export const Default: Story = {
     theme: "light",
   },
   name: "Light Theme",
-};
+}
 
 export const DarkThemeHistoryPanel: Story = {
   args: {
@@ -142,7 +149,7 @@ export const DarkThemeHistoryPanel: Story = {
   parameters: {
     backgrounds: { default: "dark" },
   },
-};
+}
 
 export const ExtendedHistory: Story = {
   args: {
@@ -150,7 +157,7 @@ export const ExtendedHistory: Story = {
     theme: "light",
   },
   name: "Extended List",
-};
+}
 
 export const EmptyHistory: Story = {
   args: {
@@ -158,4 +165,4 @@ export const EmptyHistory: Story = {
     theme: "light",
   },
   name: "Empty",
-};
+}
