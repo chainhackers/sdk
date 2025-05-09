@@ -59,8 +59,9 @@ export const CustomTheme: Story = {
   args: {
     theme: "light",
     customTheme: {
-      "--primary": "green",
-      "--card": "#e0f2fe",
+      "--primary": "#4dae52",
+      "--play-btn-font": "#1B5E20",
+      "--game-window-overlay": 'oklch(0 0 0 / 40%)',
     } as React.CSSProperties,
   },
 };
