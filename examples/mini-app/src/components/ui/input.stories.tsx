@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { Input } from "./input"
-import { Cog } from "lucide-react"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Cog } from "lucide-react";
+import { Input } from "./input";
 
 const meta = {
   title: "UI/Input",
@@ -22,10 +22,10 @@ const meta = {
     disabled: false,
     className: "w-64",
   },
-} satisfies Meta<typeof Input>
+} satisfies Meta<typeof Input>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
@@ -37,7 +37,7 @@ export const Default: Story = {
       symbol: "POL",
     },
   },
-}
+};
 
 export const Disabled: Story = {
   args: {
@@ -50,4 +50,4 @@ export const Disabled: Story = {
     },
     disabled: true,
   },
-}
+};
