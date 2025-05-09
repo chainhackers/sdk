@@ -183,6 +183,9 @@ async function _selectInput(
   gameToken: CasinoGameToken,
 ): Promise<CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput | KenoChoiceInput> {
   let input: CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput | KenoChoiceInput;
+
+  /*const wheelConfig = await wagmiBetSwirlClient.getWeighedGameConfiguration(0, gameToken.chainId);
+  console.log("test wheel config", wheelConfig); */
   switch (gameToken.game) {
     case CASINO_GAME_TYPE.DICE:
       input = await select({

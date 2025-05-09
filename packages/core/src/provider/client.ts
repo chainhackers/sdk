@@ -49,6 +49,7 @@ import type {
   KenoRolledBet,
   RouletteRolledBet,
 } from "../read";
+import type { WeightedGameConfiguration } from "../read/casino/weightedGame";
 import { FORMAT_TYPE, getCasinoChainId } from "../utils";
 
 export interface BetSwirlClientOptions {
@@ -153,6 +154,10 @@ export abstract class BetSwirlClient {
   ): Promise<bigint>;
 
   abstract getKenoConfiguration(token: Token): Promise<KenoConfiguration>;
+
+  abstract getWeighedGameConfiguration(
+    configId: number | string,
+  ): Promise<WeightedGameConfiguration>;
 
   /* Subgraph queries */
 

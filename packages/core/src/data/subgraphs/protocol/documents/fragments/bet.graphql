@@ -34,4 +34,11 @@ fragment Bet on Bet {
   rollTxnHash
   encodedRolled: rolled
   rollTimestamp
+  weightedGameBet {
+    config {
+      id
+      multipliers
+      weights
+    }
+  }
 }

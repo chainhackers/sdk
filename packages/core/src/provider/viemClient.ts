@@ -39,6 +39,10 @@ import { type CoinTossPlacedBet, placeCoinTossBet } from "../actions/casino/coin
 import type { CoinTossParams } from "../actions/casino/cointoss";
 import { type KenoParams, type KenoPlacedBet, placeKenoBet } from "../actions/casino/keno";
 import type { CASINO_GAME_TYPE } from "../data";
+import {
+  type WeightedGameConfiguration,
+  getWeightedGameConfiguration,
+} from "../read/casino/weightedGame";
 import { BetSwirlClient } from "./client";
 import { ViemBetSwirlWallet } from "./viemWallet";
 
@@ -221,6 +225,10 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   async getKenoConfiguration(token: Token): Promise<KenoConfiguration> {
     return getKenoConfiguration(this.betSwirlWallet, token);
+  }
+
+  async getWeighedGameConfiguration(configId: number | string): Promise<WeightedGameConfiguration> {
+    return getWeightedGameConfiguration(this.betSwirlWallet, configId);
   }
 
   /* Private */
