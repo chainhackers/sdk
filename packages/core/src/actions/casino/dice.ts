@@ -1,7 +1,7 @@
 import { type TransactionReceipt, decodeEventLog } from "viem";
 import { diceAbi } from "../../abis/v2/casino/dice";
 import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
-import { Dice, type DiceNumber } from "../../entities/casino/dice";
+import { Dice, type DiceEncodedInput, type DiceNumber } from "../../entities/casino/dice";
 import { ERROR_CODES } from "../../errors/codes";
 import { TransactionError } from "../../errors/types";
 import type { Token } from "../../interfaces";
@@ -21,7 +21,7 @@ export interface DiceParams extends CasinoBetParams {
 
 export interface DicePlacedBet extends CasinoPlacedBet {
   cap: DiceNumber;
-  encodedCap: number;
+  encodedCap: DiceEncodedInput;
 }
 
 export async function placeDiceBet(

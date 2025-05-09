@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.0.9
+
+### Patch Changes
+
+- Add Keno Game
+
 ## 0.0.8
 
 ### Patch Changes

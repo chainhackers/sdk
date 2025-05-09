@@ -1,7 +1,11 @@
 import { type TransactionReceipt, decodeEventLog } from "viem";
-import { coinTossAbi } from "../../abis/v2/casino/coinToss";
+import { coinTossAbi } from "../../abis/v2/casino/cointoss";
 import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
-import { type COINTOSS_FACE, CoinToss } from "../../entities/casino/coinToss";
+import {
+  type COINTOSS_FACE,
+  CoinToss,
+  type CoinTossEncodedInput,
+} from "../../entities/casino/cointoss";
 import { ERROR_CODES } from "../../errors/codes";
 import { TransactionError } from "../../errors/types";
 import type { Token } from "../../interfaces";
@@ -21,7 +25,7 @@ export interface CoinTossParams extends CasinoBetParams {
 
 export interface CoinTossPlacedBet extends CasinoPlacedBet {
   face: COINTOSS_FACE;
-  encodedFace: boolean;
+  encodedFace: CoinTossEncodedInput;
 }
 
 export async function placeCoinTossBet(

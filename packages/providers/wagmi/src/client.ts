@@ -18,6 +18,9 @@ import type {
   DiceRolledBet,
   GAS_PRICE_TYPE,
   KenoConfiguration,
+  KenoParams,
+  KenoPlacedBet,
+  KenoRolledBet,
   PlaceBetCallbacks,
   RouletteParams,
   RoulettePlacedBet,
@@ -35,9 +38,11 @@ import {
   getKenoConfiguration,
   placeCoinTossBet,
   placeDiceBet,
+  placeKenoBet,
   placeRouletteBet,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
+  waitKenoRolledBet,
   waitRolledBet,
   waitRouletteRolledBet,
 } from "@betswirl/sdk-core";
@@ -153,6 +158,35 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     });
   }
 
+  async playKeno(
+    params: KenoParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+    chainId?: CasinoChainId,
+  ): Promise<{ placedBet: KenoPlacedBet; receipt: TransactionReceipt }> {
+    this._switchChain(chainId);
+    return placeKenoBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async waitKeno(
+    placedBet: KenoPlacedBet,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: KenoRolledBet; receipt: TransactionReceipt }> {
+    this._switchChain(placedBet.chainId);
+    return waitKenoRolledBet(this.betSwirlWallet, placedBet, {
+      ...this.betSwirlDefaultOptions,
+      ...options,
+    });
+  }
+
   /* Casino Utilities */
 
   async getCasinoGames(onlyActive = false, chainId?: CasinoChainId) {
@@ -182,7 +216,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
 
   async getBetRequirements(
     token: Token,
-    multiplier: number,
+    multiplier: number | number[],
     game: CASINO_GAME_TYPE,
     chainId?: CasinoChainId,
   ): Promise<BetRequirements> {

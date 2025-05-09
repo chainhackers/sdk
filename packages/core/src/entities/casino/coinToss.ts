@@ -8,7 +8,7 @@ export enum COINTOSS_FACE {
   HEADS = "HEADS",
 }
 
-export interface CoinTossChoiceInput extends ChoiceInput {
+export interface CoinTossChoiceInput extends ChoiceInput<CASINO_GAME_TYPE.COINTOSS> {
   value: COINTOSS_FACE;
   id: COINTOSS_FACE;
 }

@@ -1,5 +1,5 @@
 import type { Abi, Chain, Hex } from "viem";
-import { coinTossAbi } from "../abis/v2/casino/coinToss";
+import { coinTossAbi } from "../abis/v2/casino/cointoss";
 import { diceAbi } from "../abis/v2/casino/dice";
 import { kenoAbi } from "../abis/v2/casino/keno";
 import { rouletteAbi } from "../abis/v2/casino/roulette";

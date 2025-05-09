@@ -17,6 +17,9 @@ import {
   type DicePlacedBet,
   FORMAT_TYPE,
   GAS_PRICE_TYPE,
+  Keno,
+  type KenoChoiceInput,
+  type KenoPlacedBet,
   Roulette,
   type RouletteChoiceInput,
   type RoulettePlacedBet,
@@ -108,7 +111,7 @@ async function _selectGame(selectedChain: CasinoChain): Promise<CasinoGame> {
     choices: casinoGames.map((g) => ({
       name: g.label,
       value: g,
-      disabled: g.paused || [CASINO_GAME_TYPE.KENO].includes(g.game),
+      disabled: g.paused,
     })),
   });
   return selectedGame;
@@ -178,8 +181,8 @@ async function _getTokenInfo(
 
 async function _selectInput(
   gameToken: CasinoGameToken,
-): Promise<CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput> {
-  let input: CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput;
+): Promise<CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput | KenoChoiceInput> {
+  let input: CoinTossChoiceInput | DiceChoiceInput | RouletteChoiceInput | KenoChoiceInput;
   switch (gameToken.game) {
     case CASINO_GAME_TYPE.DICE:
       input = await select({
@@ -201,7 +204,7 @@ async function _selectInput(
         })),
       });
       break;
-    default: {
+    case CASINO_GAME_TYPE.ROULETTE: {
       const inputChoices = await checkbox({
         message: "Select a number or a bundle of numbers (space bar to select)",
         loop: false,
@@ -220,6 +223,28 @@ async function _selectInput(
           ),
         );
       }
+      break;
+    }
+    // Keno
+    default: {
+      // Get Keno config for the selected token
+      const kenoConfig = await wagmiBetSwirlClient.getKenoConfiguration(
+        gameToken,
+        gameToken.chainId,
+      );
+      input = await select({
+        message: "Select some balls",
+        loop: false,
+        choices: Keno.getChoiceInputs(kenoConfig, gameToken.affiliateHouseEdge).map((i) => ({
+          name: `${i.label} (${i.winChancePercent
+            .map(
+              (chance, index) =>
+                `${i.formattedNetMultiplier?.[index]}x - ${chance.toFixed(2)}% to win ${index !== i.winChancePercent.length - 1 ? "|" : ""}`,
+            )
+            .join("\n")})`,
+          value: i,
+        })),
+      });
     }
   }
   return input;
@@ -345,10 +370,10 @@ async function _selectBetAmount(
 
 async function _placeBet(
   casinoGameToken: CasinoGameToken,
-  inputChoice: DiceChoiceInput | CoinTossChoiceInput | RouletteChoiceInput,
+  inputChoice: DiceChoiceInput | CoinTossChoiceInput | RouletteChoiceInput | KenoChoiceInput,
   betCount: number,
   betAmount: bigint,
-): Promise<CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet> {
+): Promise<CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet | KenoPlacedBet> {
   const commonParams = {
     betCount,
     betAmount,
@@ -374,7 +399,7 @@ async function _placeBet(
   };
   let placedBetData: {
     receipt: TransactionReceipt;
-    placedBet: CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet;
+    placedBet: CoinTossPlacedBet | DicePlacedBet | RoulettePlacedBet | KenoPlacedBet;
   };
   if (inputChoice.game === CASINO_GAME_TYPE.DICE) {
     const diceCap = (inputChoice as DiceChoiceInput).value;
@@ -392,10 +417,18 @@ async function _placeBet(
       callbacks,
       casinoGameToken.chainId,
     );
-  } else {
+  } else if (inputChoice.game === CASINO_GAME_TYPE.ROULETTE) {
     const rouletteNumbers = (inputChoice as RouletteChoiceInput).value;
     placedBetData = await wagmiBetSwirlClient.playRoulette(
       { ...commonParams, numbers: rouletteNumbers },
+      undefined,
+      callbacks,
+      casinoGameToken.chainId,
+    );
+  } else {
+    const kenoChoice = inputChoice as KenoChoiceInput;
+    placedBetData = await wagmiBetSwirlClient.playKeno(
+      { ...commonParams, balls: kenoChoice.value, kenoConfig: kenoChoice.config },
       undefined,
       callbacks,
       casinoGameToken.chainId,

@@ -130,17 +130,29 @@ export function parseRawBetRequirements(
 export async function getBetRequirements(
   wallet: BetSwirlWallet,
   token: Token,
-  multiplier: number, // gross BP_VALUE
+  multiplier: number | number[], // gross BP_VALUE
   game: CASINO_GAME_TYPE,
 ): Promise<BetRequirements> {
   const casinoChainId = getCasinoChainId(wallet);
+
+  const biggestMultiplier = Math.max(...(Array.isArray(multiplier) ? multiplier : [multiplier]));
   try {
-    const functionData = getBetRequirementsFunctionData(token.address, multiplier, casinoChainId);
+    const functionData = getBetRequirementsFunctionData(
+      token.address,
+      biggestMultiplier,
+      casinoChainId,
+    );
     const rawBetRequirements = await wallet.readContract<typeof functionData, RawBetRequirements>(
       functionData,
     );
 
-    return parseRawBetRequirements(rawBetRequirements, token, multiplier, game, casinoChainId);
+    return parseRawBetRequirements(
+      rawBetRequirements,
+      token,
+      biggestMultiplier,
+      game,
+      casinoChainId,
+    );
   } catch (error) {
     throw new TransactionError(
       "Error getting bet requirements",

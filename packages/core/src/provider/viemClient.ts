@@ -14,6 +14,7 @@ import {
   type DiceRolledBet,
   type GAS_PRICE_TYPE,
   type KenoConfiguration,
+  type KenoRolledBet,
   type PlaceBetCallbacks,
   type RouletteParams,
   type RoulettePlacedBet,
@@ -30,11 +31,13 @@ import {
   placeRouletteBet,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
+  waitKenoRolledBet,
   waitRolledBet,
   waitRouletteRolledBet,
 } from "..";
-import { type CoinTossPlacedBet, placeCoinTossBet } from "../actions/casino/coinToss";
-import type { CoinTossParams } from "../actions/casino/coinToss";
+import { type CoinTossPlacedBet, placeCoinTossBet } from "../actions/casino/cointoss";
+import type { CoinTossParams } from "../actions/casino/cointoss";
+import { type KenoParams, type KenoPlacedBet, placeKenoBet } from "../actions/casino/keno";
 import type { CASINO_GAME_TYPE } from "../data";
 import { BetSwirlClient } from "./client";
 import { ViemBetSwirlWallet } from "./viemWallet";
@@ -141,6 +144,32 @@ export class ViemBetSwirlClient extends BetSwirlClient {
     });
   }
 
+  async playKeno(
+    params: KenoParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: KenoPlacedBet; receipt: TransactionReceipt }> {
+    return placeKenoBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async waitKeno(
+    placedBet: KenoPlacedBet,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: KenoRolledBet; receipt: TransactionReceipt }> {
+    return waitKenoRolledBet(this.betSwirlWallet, placedBet, {
+      ...this.betSwirlDefaultOptions,
+      ...options,
+    });
+  }
+
   /* Casino Utilities */
 
   async getCasinoGames(onlyActive = false) {
@@ -167,7 +196,7 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   async getBetRequirements(
     token: Token,
-    multiplier: number,
+    multiplier: number | number[],
     game: CASINO_GAME_TYPE,
   ): Promise<BetRequirements> {
     return getBetRequirements(this.betSwirlWallet, token, multiplier, game);
