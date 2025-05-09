@@ -52,3 +52,9 @@ export default tseslint.config({
   },
 })
 ```
+
+## Deploy
+
+```shell
+setfacl -R -m u:dev-components:rwx /var/www/betswirl-sdk/
+```
