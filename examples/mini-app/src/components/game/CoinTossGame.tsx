@@ -122,9 +122,10 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const gameWindowOverlay = customTheme && '--game-window-overlay' in customTheme 
-    ? 'bg-[var(--game-window-overlay)]'
-    : ''
+  const gameWindowOverlay =
+    customTheme && "--game-window-overlay" in customTheme
+      ? "bg-[var(--game-window-overlay)]"
+      : ""
 
   return (
     <div
@@ -164,7 +165,12 @@ export function CoinTossGame({
               backgroundImage: `url(${coinTossBackground})`,
             }}
           >
-            <div className={cn("absolute inset-0 rounded-[16px]", gameWindowOverlay)}></div>
+            <div
+              className={cn(
+                "absolute inset-0 rounded-[16px]",
+                gameWindowOverlay,
+              )}
+            ></div>
 
             <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
               <SheetTrigger asChild>
@@ -229,7 +235,9 @@ export function CoinTossGame({
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <div className="text-sm font-medium flex items-center">
-                <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
+                <span className="text-text-on-surface-variant">
+                  Balance:&nbsp;
+                </span>
                 <span className="font-semibold">0</span>
                 <Cog className="inline h-4 w-4 ml-1 text-orange-500" />
               </div>
