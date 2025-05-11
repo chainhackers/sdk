@@ -7,8 +7,11 @@ import {
   type CasinoChain,
   type CasinoChainId,
   MAX_SDK_HOUSE_EGDE,
+  type NORMAL_CASINO_GAME_TYPE,
+  type WEIGHTED_CASINO_GAME_TYPE,
   casinoChainById,
 } from "../../data/casino";
+import type { KenoEncodedInput } from "../../entities";
 import type { CoinTossEncodedInput } from "../../entities/casino/cointoss";
 import type { DiceEncodedInput } from "../../entities/casino/dice";
 import type { RouletteEncodedInput } from "../../entities/casino/roulette";
@@ -56,14 +59,17 @@ export const defaultCasinoPlaceBetOptions = {
   allowanceType: ALLOWANCE_TYPE.AUTO,
 };
 // Game should not know the game implementation details, but well..  it helps developers
-export type GameEncodedInput = CoinTossEncodedInput | DiceEncodedInput | RouletteEncodedInput;
-
+export type GameEncodedInput =
+  | CoinTossEncodedInput
+  | DiceEncodedInput
+  | RouletteEncodedInput
+  | KenoEncodedInput;
 export interface GenericCasinoBetParams extends CasinoBetParams {
   game: CASINO_GAME_TYPE;
   gameEncodedInput: GameEncodedInput;
 }
 
-export interface CasinoPlacedBet {
+interface CommonCasinoPlacedBet {
   id: bigint;
   betAmount: bigint;
   betCount: number;
@@ -77,8 +83,15 @@ export interface CasinoPlacedBet {
   betTxnHash: Hash;
   betBlock: bigint;
   chainId: CasinoChainId;
-  game: CASINO_GAME_TYPE;
 }
+export interface NormalCasinoPlacedBet extends CommonCasinoPlacedBet {
+  game: NORMAL_CASINO_GAME_TYPE;
+}
+export interface WeightedCasinoPlacedBet extends CommonCasinoPlacedBet {
+  game: WEIGHTED_CASINO_GAME_TYPE;
+}
+
+export type CasinoPlacedBet = NormalCasinoPlacedBet | WeightedCasinoPlacedBet;
 
 export interface PlaceBetCallbacks {
   onApprovePending?: (tx: Hash, result: ApproveResult) => void | Promise<void>;

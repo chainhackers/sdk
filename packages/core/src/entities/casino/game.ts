@@ -1,6 +1,14 @@
-import { CASINO_GAME_TYPE } from "../../data/casino";
+import type {
+  CoinTossChoiceInput,
+  DiceChoiceInput,
+  KenoChoiceInput,
+  RouletteChoiceInput,
+} from "..";
+import { CASINO_GAME_TYPE, type WEIGHTED_CASINO_GAME_TYPE } from "../../data/casino";
 
-type MayBeMultiOutputsValue<T extends CASINO_GAME_TYPE> = T extends typeof CASINO_GAME_TYPE.KENO
+type MayBeMultiOutputsValue<T extends CASINO_GAME_TYPE> = T extends
+  | CASINO_GAME_TYPE.KENO
+  | WEIGHTED_CASINO_GAME_TYPE
   ? number[]
   : number;
 
@@ -13,6 +21,13 @@ export interface ChoiceInput<T extends CASINO_GAME_TYPE = CASINO_GAME_TYPE> {
   netMultiplier?: MayBeMultiOutputsValue<T>;
   formattedNetMultiplier?: MayBeMultiOutputsValue<T>;
 }
+
+// Game should not know the game implementation details, but well..  it helps developers
+export type NormalGameChoiceInput =
+  | CoinTossChoiceInput
+  | DiceChoiceInput
+  | RouletteChoiceInput
+  | KenoChoiceInput;
 
 export abstract class AbstractCasinoGame<TInput, TEncodedInput, TRolled, TEncodedRolled> {
   getWinChancePercent(_input: TInput | string): number {

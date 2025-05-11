@@ -9,7 +9,7 @@ import type { BetSwirlWallet } from "../../provider";
 import {
   type CasinoBetParams,
   type CasinoPlaceBetOptions,
-  type CasinoPlacedBet,
+  type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
   getPlacedBetFromReceipt,
   placeBet,
@@ -19,9 +19,10 @@ export interface DiceParams extends CasinoBetParams {
   cap: DiceNumber;
 }
 
-export interface DicePlacedBet extends CasinoPlacedBet {
+export interface DicePlacedBet extends NormalCasinoPlacedBet {
   cap: DiceNumber;
   encodedCap: DiceEncodedInput;
+  game: CASINO_GAME_TYPE.DICE;
 }
 
 export async function placeDiceBet(
@@ -98,6 +99,7 @@ export async function getDicePlacedBetFromReceipt(
   const { args } = decodedDicePlaceBetEvent;
   return {
     ...gamePlacedBet,
+    game: CASINO_GAME_TYPE.DICE,
     encodedCap: args.cap,
     cap: Dice.decodeInput(args.cap),
   };

@@ -41,3 +41,11 @@ export function getBetSwirlBetUrl(
 ) {
   return `${BETSWIRL_BASE_URL}/${slugById[chainId]}/casino/${game}/${betId.toString()}`;
 }
+
+export function generateRandomHexColor(): string {
+  const randomRGBValue = () =>
+    Math.floor(Math.random() * 256)
+      .toString(16)
+      .padStart(2, "0");
+  return `#${randomRGBValue()}${randomRGBValue()}${randomRGBValue()}`;
+}
