@@ -1,7 +1,11 @@
 import { type TransactionReceipt, decodeEventLog } from "viem";
-import { coinTossAbi } from "../../abis/v2/casino/coinToss";
+import { coinTossAbi } from "../../abis/v2/casino/cointoss";
 import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
-import { type COINTOSS_FACE, CoinToss } from "../../entities/casino/coinToss";
+import {
+  type COINTOSS_FACE,
+  CoinToss,
+  type CoinTossEncodedInput,
+} from "../../entities/casino/cointoss";
 import { ERROR_CODES } from "../../errors/codes";
 import { TransactionError } from "../../errors/types";
 import type { Token } from "../../interfaces";
@@ -9,7 +13,7 @@ import type { BetSwirlWallet } from "../../provider";
 import {
   type CasinoBetParams,
   type CasinoPlaceBetOptions,
-  type CasinoPlacedBet,
+  type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
   getPlacedBetFromReceipt,
   placeBet,
@@ -19,9 +23,10 @@ export interface CoinTossParams extends CasinoBetParams {
   face: COINTOSS_FACE;
 }
 
-export interface CoinTossPlacedBet extends CasinoPlacedBet {
+export interface CoinTossPlacedBet extends NormalCasinoPlacedBet {
   face: COINTOSS_FACE;
-  encodedFace: boolean;
+  encodedFace: CoinTossEncodedInput;
+  game: CASINO_GAME_TYPE.COINTOSS;
 }
 
 export async function placeCoinTossBet(
@@ -98,6 +103,7 @@ export async function getCoinTossPlacedBetFromReceipt(
   const { args } = decodedCoinTossPlaceBetEvent;
   return {
     ...gamePlacedBet,
+    game: CASINO_GAME_TYPE.COINTOSS,
     encodedFace: args.face,
     face: CoinToss.decodeInput(args.face),
   };

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import { BellRing, Check } from "lucide-react"
 import { Button } from "./button"
 import {
   Card,
@@ -8,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "./card"
-import { BellRing, Check } from "lucide-react"
 
 const meta = {
   title: "UI/Card",

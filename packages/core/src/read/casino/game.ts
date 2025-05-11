@@ -9,11 +9,17 @@ import {
 } from "viem";
 import { getLogs } from "viem/actions";
 import { casinoGameAbi } from "../../abis/v2/casino/game";
-import type { CasinoPlacedBet } from "../../actions/casino/game";
+import type {
+  CasinoPlacedBet,
+  NormalCasinoPlacedBet,
+  WeightedCasinoPlacedBet,
+} from "../../actions/casino/game";
 import {
   CASINO_GAME_ROLL_ABI,
   CASINO_GAME_TYPE,
   type CasinoChainId,
+  type NORMAL_CASINO_GAME_TYPE,
+  type WEIGHTED_CASINO_GAME_TYPE,
   casinoChainById,
   labelCasinoGameByType,
 } from "../../data/casino";
@@ -28,12 +34,17 @@ import type {
   Token,
 } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
-import { chainNativeCurrencyToToken, decodeCasinoRolled } from "../../utils";
+import {
+  chainNativeCurrencyToToken,
+  decodeNormalCasinoRolled,
+  decodeWeightedCasinoRolled,
+} from "../../utils";
 import { getCasinoChainId } from "../../utils/chains";
 import { FORMAT_TYPE, formatRawAmount } from "../../utils/format";
 import { getTransactionReceiptWithRetry } from "../../utils/wallet";
+import type { WeightedGameConfiguration } from "./weightedGame";
 
-export interface CasinoRolledBet extends CasinoPlacedBet {
+export type CasinoRolledBet = CasinoPlacedBet & {
   isWin: boolean;
   isLost: boolean;
   isStopLossTriggered: boolean;
@@ -56,7 +67,7 @@ export interface CasinoRolledBet extends CasinoPlacedBet {
   formattedStopLoss: string;
   formattedStopGain: string;
   formattedChargedVRFFees: string;
-}
+};
 
 export interface CasinoWaitRollOptions {
   pollingInterval?: number;
@@ -76,16 +87,33 @@ interface RollEventArgs {
   rolled?: any[];
 }
 
-// Interface pour le log complet
 interface RollEvent {
   args: RollEventArgs;
   transactionHash: Hash;
 }
 
+// Normal game
+export function formatCasinoRolledBet(
+  placedBet: NormalCasinoPlacedBet,
+  rollEvent: RollEvent,
+  formatType?: FORMAT_TYPE,
+): CasinoRolledBet;
+
+// Weighted game
+export function formatCasinoRolledBet(
+  placedBet: WeightedCasinoPlacedBet,
+  rollEvent: RollEvent,
+  formatType: FORMAT_TYPE | undefined,
+  weightedGameConfiguration: WeightedGameConfiguration,
+  houseEdge: number,
+): CasinoRolledBet;
+
 export function formatCasinoRolledBet(
   placedBet: CasinoPlacedBet,
   rollEvent: RollEvent,
   formatType: FORMAT_TYPE = FORMAT_TYPE.STANDARD,
+  weightedGameConfiguration?: WeightedGameConfiguration,
+  houseEdge?: number,
 ): CasinoRolledBet {
   const args = rollEvent.args;
   const isWin = args.payout! >= args.totalBetAmount!;
@@ -121,7 +149,11 @@ export function formatCasinoRolledBet(
     ).toFixed(3),
     rollTxnHash: rollEvent.transactionHash,
     encodedRolled: args.rolled! as any[],
-    decodedRolled: args.rolled!.map((r) => decodeCasinoRolled(r, placedBet.game)),
+    decodedRolled: args.rolled!.map((r) =>
+      weightedGameConfiguration
+        ? decodeWeightedCasinoRolled(r, weightedGameConfiguration, houseEdge)
+        : decodeNormalCasinoRolled(r, placedBet.game as NORMAL_CASINO_GAME_TYPE),
+    ),
     nativeCurrency,
     // Placed bet formatted properties
     formattedBetAmount: formatRawAmount(placedBet.betAmount, tokenDecimals, formatType),
@@ -136,10 +168,27 @@ export function formatCasinoRolledBet(
   };
 }
 
+// Only need weightedGameConfiguration if game from placeBet is a WEIGHTED_CASINO_GAME_TYPE
+export async function waitRolledBet(
+  wallet: BetSwirlWallet,
+  placedBet: NormalCasinoPlacedBet,
+  options?: CasinoWaitRollOptions,
+): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
+
+export async function waitRolledBet(
+  wallet: BetSwirlWallet,
+  placedBet: WeightedCasinoPlacedBet,
+  options: CasinoWaitRollOptions | undefined,
+  weightedGameConfiguration: WeightedGameConfiguration,
+  houseEdge: number,
+): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
+
 export async function waitRolledBet(
   wallet: BetSwirlWallet,
   placedBet: CasinoPlacedBet,
   options?: CasinoWaitRollOptions,
+  weightedGameConfiguration?: WeightedGameConfiguration,
+  houseEdge?: number,
 ): Promise<{
   rolledBet: CasinoRolledBet;
   receipt: TransactionReceipt;
@@ -169,7 +218,19 @@ export async function waitRolledBet(
         const receipt = await getTransactionReceiptWithRetry(wallet, log.transactionHash);
 
         resolve({
-          rolledBet: formatCasinoRolledBet(placedBet, log, options?.formatType),
+          rolledBet: weightedGameConfiguration
+            ? formatCasinoRolledBet(
+                placedBet as { game: WEIGHTED_CASINO_GAME_TYPE } & CasinoPlacedBet,
+                log,
+                options?.formatType,
+                weightedGameConfiguration,
+                houseEdge!,
+              )
+            : formatCasinoRolledBet(
+                placedBet as { game: NORMAL_CASINO_GAME_TYPE } & CasinoPlacedBet,
+                log,
+                options?.formatType,
+              ),
           receipt,
         });
       } catch (error) {

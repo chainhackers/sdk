@@ -1,15 +1,15 @@
 import React from "react"
 import { cn } from "../../lib/utils"
 import { ScrollArea } from "../ui/scroll-area"
+import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import {
   Table,
-  TableHeader,
   TableBody,
-  TableRow,
-  TableHead,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "../ui/table"
-import { SheetPortal, SheetOverlay, SheetBottomPanelContent } from "../ui/sheet"
 
 export interface HistoryEntry {
   id: string

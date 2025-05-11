@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from "react"
 import type { Meta, StoryObj } from "@storybook/react"
+import { Cog, History as HistoryIcon } from "lucide-react"
+import React, { useState, useEffect, useRef } from "react"
+import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import { Sheet, SheetTrigger } from "../ui/sheet"
-import { HistorySheetPanel, type HistoryEntry } from "./HistorySheetPanel"
-import { cn } from "../../lib/utils"
-import { History as HistoryIcon, Cog } from "lucide-react"
+import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode

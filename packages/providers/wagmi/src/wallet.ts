@@ -2,6 +2,7 @@ import {
   type BetSwirlEventData,
   type BetSwirlFunctionData,
   BetSwirlWallet,
+  wrappedGasTokenById,
 } from "@betswirl/sdk-core";
 import {
   type Config as WagmiConfig,
@@ -59,6 +60,8 @@ export class WagmiBetSwirlWallet extends BetSwirlWallet {
         to: functionData.data.to,
         data: functionData.encodedData,
         gasPrice,
+        gas: 3000000n, // workaround to avoid not enough gas issue
+        account: wrappedGasTokenById[this.getChainId()], // workaround to avoid not enough gas issue
       }) as Promise<CallReturnType>;
     }
     return readContract(this.wagmiConfig, {

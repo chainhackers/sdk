@@ -58,7 +58,7 @@ export enum ROULETTE_INPUT_BUNDLE {
   BLACK = "Black",
 }
 
-export interface RouletteChoiceInput extends ChoiceInput {
+export interface RouletteChoiceInput extends ChoiceInput<CASINO_GAME_TYPE.ROULETTE> {
   value: RouletteNumber[];
   id: RouletteNumber[] | ROULETTE_INPUT_BUNDLE;
 }

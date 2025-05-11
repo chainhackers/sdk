@@ -14,11 +14,15 @@ import {
   type DiceRolledBet,
   type GAS_PRICE_TYPE,
   type KenoConfiguration,
+  type KenoRolledBet,
+  type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
   type RouletteParams,
   type RoulettePlacedBet,
   type RouletteRolledBet,
   type Token,
+  WEIGHTED_CASINO_GAME_TYPES,
+  type WeightedCasinoPlacedBet,
   casinoChainById,
   getBetRequirements,
   getCasinoGameToken,
@@ -30,12 +34,20 @@ import {
   placeRouletteBet,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
+  waitKenoRolledBet,
   waitRolledBet,
   waitRouletteRolledBet,
 } from "..";
-import { type CoinTossPlacedBet, placeCoinTossBet } from "../actions/casino/coinToss";
-import type { CoinTossParams } from "../actions/casino/coinToss";
+import { type CoinTossPlacedBet, placeCoinTossBet } from "../actions/casino/cointoss";
+import type { CoinTossParams } from "../actions/casino/cointoss";
+import { type KenoParams, type KenoPlacedBet, placeKenoBet } from "../actions/casino/keno";
+import { type WheelParams, type WheelPlacedBet, placeWheelBet } from "../actions/casino/wheel";
 import type { CASINO_GAME_TYPE } from "../data";
+import {
+  type WeightedGameConfiguration,
+  getWeightedGameConfiguration,
+} from "../read/casino/weightedGame";
+import { type WheelRolledBet, waitWheelRolledBet } from "../read/casino/wheel";
 import { BetSwirlClient } from "./client";
 import { ViemBetSwirlWallet } from "./viemWallet";
 
@@ -54,10 +66,34 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   /* Casino Games */
 
   async waitRolledBet(
+    placedBet: NormalCasinoPlacedBet,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
+
+  async waitRolledBet(
+    placedBet: WeightedCasinoPlacedBet,
+    options: CasinoWaitRollOptions | undefined,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: number,
+  ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
+
+  async waitRolledBet(
     placedBet: CasinoPlacedBet,
     options?: CasinoWaitRollOptions,
+    weightedGameConfiguration?: WeightedGameConfiguration,
+    houseEdge?: number,
   ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }> {
-    return waitRolledBet(this.betSwirlWallet, placedBet, {
+    const isWeighted = WEIGHTED_CASINO_GAME_TYPES.includes(placedBet.game);
+    if (isWeighted) {
+      return waitRolledBet(
+        this.betSwirlWallet,
+        placedBet as WeightedCasinoPlacedBet,
+        { ...this.betSwirlDefaultOptions, ...options },
+        weightedGameConfiguration!,
+        houseEdge!,
+      );
+    }
+    return waitRolledBet(this.betSwirlWallet, placedBet as NormalCasinoPlacedBet, {
       ...this.betSwirlDefaultOptions,
       ...options,
     });
@@ -141,6 +177,66 @@ export class ViemBetSwirlClient extends BetSwirlClient {
     });
   }
 
+  async playKeno(
+    params: KenoParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: KenoPlacedBet; receipt: TransactionReceipt }> {
+    return placeKenoBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async waitKeno(
+    placedBet: KenoPlacedBet,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: KenoRolledBet; receipt: TransactionReceipt }> {
+    return waitKenoRolledBet(this.betSwirlWallet, placedBet, {
+      ...this.betSwirlDefaultOptions,
+      ...options,
+    });
+  }
+
+  async playWheel(
+    params: WheelParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: WheelPlacedBet; receipt: TransactionReceipt }> {
+    return placeWheelBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async waitWheel(
+    placedBet: WheelPlacedBet,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: number,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: WheelRolledBet; receipt: TransactionReceipt }> {
+    return waitWheelRolledBet(
+      this.betSwirlWallet,
+      placedBet,
+      weightedGameConfiguration,
+      houseEdge,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+    );
+  }
+
   /* Casino Utilities */
 
   async getCasinoGames(onlyActive = false) {
@@ -167,7 +263,7 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   async getBetRequirements(
     token: Token,
-    multiplier: number,
+    multiplier: number | number[],
     game: CASINO_GAME_TYPE,
   ): Promise<BetRequirements> {
     return getBetRequirements(this.betSwirlWallet, token, multiplier, game);
@@ -192,6 +288,10 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   async getKenoConfiguration(token: Token): Promise<KenoConfiguration> {
     return getKenoConfiguration(this.betSwirlWallet, token);
+  }
+
+  async getWeighedGameConfiguration(configId: number | string): Promise<WeightedGameConfiguration> {
+    return getWeightedGameConfiguration(this.betSwirlWallet, configId);
   }
 
   /* Private */

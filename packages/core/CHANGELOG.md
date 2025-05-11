@@ -1,5 +1,17 @@
 # @betswirl/sdk-core
 
+## 0.1.0
+
+### Minor Changes
+
+- Add Wheel game with weighted gamr logic
+
+## 0.0.9
+
+### Patch Changes
+
+- Add Keno Game
+
 ## 0.0.8
 
 ### Patch Changes

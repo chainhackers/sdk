@@ -1,12 +1,12 @@
+import { Cog, History, Info } from "lucide-react"
 import React, { useState, ChangeEvent, useRef, useEffect } from "react"
+import coinIcon from "../../assets/game/coin-background-icon.png"
+import coinTossBackground from "../../assets/game/game-background.png"
+import { cn } from "../../lib/utils"
+import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
-import { Button } from "../ui/button"
 import { Label } from "../ui/label"
-import { Info, History, Cog } from "lucide-react"
-import { cn } from "../../lib/utils"
-import coinTossBackground from "../../assets/game/game-background.png"
-import coinIcon from "../../assets/game/coin-background-icon.png"
 
 import {
   Wallet,
@@ -24,8 +24,8 @@ import {
 import { useAccount } from "wagmi"
 
 import { Sheet, SheetTrigger } from "../ui/sheet"
+import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
-import { HistorySheetPanel, type HistoryEntry } from "./HistorySheetPanel"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -126,7 +126,9 @@ export function CoinTossGame({
 
   const multiplier = 1.94
   const winChance = 50
-  const targetPayout = (parseFloat(betAmount || "0") * multiplier).toFixed(2)
+  const targetPayout = (
+    Number.parseFloat(betAmount || "0") * multiplier
+  ).toFixed(2)
   const fee = 0
 
   const themeClass = theme === "system" ? undefined : theme
@@ -316,7 +318,7 @@ export function CoinTossGame({
                   variant="secondary"
                   onClick={() =>
                     setBetAmount((prev) =>
-                      (parseFloat(prev || "0") / 2).toString(),
+                      (Number.parseFloat(prev || "0") / 2).toString(),
                     )
                   }
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
@@ -327,7 +329,7 @@ export function CoinTossGame({
                   variant="secondary"
                   onClick={() =>
                     setBetAmount((prev) =>
-                      (parseFloat(prev || "0") * 2).toString(),
+                      (Number.parseFloat(prev || "0") * 2).toString(),
                     )
                   }
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"

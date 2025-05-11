@@ -1,6 +1,6 @@
 import { type TransactionReceipt } from "viem";
-import { type CoinTossPlacedBet } from "../../actions/casino/coinToss";
-import { type COINTOSS_FACE, CoinToss } from "../../entities/casino/coinToss";
+import { type CoinTossPlacedBet } from "../../actions/casino/cointoss";
+import { type COINTOSS_FACE, CoinToss } from "../../entities/casino/cointoss";
 import type { BetSwirlWallet } from "../../provider";
 import { type CasinoRolledBet, type CasinoWaitRollOptions, waitRolledBet } from "./game";
 

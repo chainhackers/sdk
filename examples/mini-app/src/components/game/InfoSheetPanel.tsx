@@ -1,6 +1,5 @@
-import React from "react"
 import { cn } from "../../lib/utils"
-import { SheetPortal, SheetOverlay, SheetBottomPanelContent } from "../ui/sheet"
+import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 
 interface InfoSheetPanelProps {
   portalContainer: HTMLElement
