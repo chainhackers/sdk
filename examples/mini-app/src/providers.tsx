@@ -1,4 +1,4 @@
-import React, { type ReactNode } from "react"
+import { type ReactNode } from "react"
 import { OnchainKitProvider } from "@coinbase/onchainkit"
 import { baseSepolia } from "wagmi/chains"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
