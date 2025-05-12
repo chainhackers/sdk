@@ -8,19 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 
-import {
-  Wallet,
-  ConnectWallet,
-  WalletDropdown,
-  WalletDropdownDisconnect,
-} from "@coinbase/onchainkit/wallet"
-import {
-  Avatar,
-  Name,
-  Address as OnchainKitAddress,
-  EthBalance,
-  Identity,
-} from "@coinbase/onchainkit/identity"
+import { Wallet, ConnectWallet } from "@coinbase/onchainkit/wallet"
+import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { useAccount } from "wagmi"
 
@@ -124,7 +113,7 @@ export function CoinTossGame({
   const [choice] = useState<"Heads" | "Tails">("Heads")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
-  const { isConnected, address } = useAccount()
+  const { isConnected } = useAccount()
 
   const multiplier = 1.94
   const winChance = 50
@@ -169,41 +158,19 @@ export function CoinTossGame({
                 "bg-neutral-background",
                 "rounded-[12px]",
                 "border border-border-stroke",
-                !isConnected
-                  ? "text-primary"
-                  : "text-card-foreground dark:text-white",
-                "px-3 py-1.5 h-auto min-h-[36px]",
+                "px-3 py-1.5 h-[44px]",
+                "text-primary",
               )}
+              disconnectedLabel="Connect"
             >
-              {!isConnected ? (
-                "Connect"
-              ) : (
-                <div className="flex items-center">
-                  <Avatar className="h-5 w-5 mr-2" />
-                  <Name />
-                </div>
-              )}
+              <div className="flex items-center">
+                <Avatar
+                  className="h-8 w-8 mr-2"
+                  address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9"
+                />
+                <Name className="text-secondary-foreground" />
+              </div>
             </ConnectWallet>
-
-            {isConnected && address && (
-              <WalletDropdown>
-                <Identity
-                  address={address as `0x${string}`}
-                  className="px-4 pt-3 pb-2 flex items-center"
-                >
-                  <Avatar className="w-10 h-10" />
-                  <div className="ml-3 flex flex-col">
-                    <Name className="font-semibold text-base" />
-                    <OnchainKitAddress className="text-xs text-muted-foreground" />
-                  </div>
-                </Identity>
-                <div className="border-t border-border mx-4 my-2"></div>
-                <div className="px-4 pb-2 pt-1">
-                  <EthBalance className="text-sm font-medium" />
-                </div>
-                <WalletDropdownDisconnect className="text-sm w-full text-left px-4 py-2 hover:bg-muted" />
-              </WalletDropdown>
-            )}
           </Wallet>
         </CardHeader>
 
