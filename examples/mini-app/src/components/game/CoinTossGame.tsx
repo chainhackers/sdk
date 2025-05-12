@@ -26,12 +26,9 @@ import { useAccount } from "wagmi"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
-import {Token} from "@coinbase/onchainkit/src/token/types.ts";
-import {TokenChip} from "@coinbase/onchainkit/token";
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  token: Token
   theme?: "light" | "dark" | "system"
   customTheme?: {
     "--primary"?: string
@@ -116,20 +113,12 @@ const mockHistoryData: HistoryEntry[] = [
 ]
 
 export function CoinTossGame({
-    token = {
-      address: '',
-      chainId: 8453,
-      decimals: 18,
-      image: 'https://dynamic-assets.coinbase.com/dbb4b4983bde81309ddab83eb598358eb44375b930b94687ebe38bc22e52c3b2125258ffb8477a5ef22e33d6bd72e32a506c391caa13af64c00e46613c3e5806/asset_icons/4113b082d21cc5fab17fc8f2d19fb996165bcce635e6900f7fc2d57c4ef33ae9.png',
-      name: 'Ethereum',
-      symbol: 'ETH',
-    },
   theme = "system",
   customTheme,
   className,
   ...props
 }: CoinTossGameProps) {
-  const [betAmount, setBetAmount] = useState("0.01")
+  const [betAmount, setBetAmount] = useState("0")
   const [choice] = useState<"Heads" | "Tails">("Heads")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
@@ -172,7 +161,6 @@ export function CoinTossGame({
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
           <CardTitle className="text-lg text-title-color">CoinToss</CardTitle>
           <Wallet>
-            {/*TODO https://docs.base.org/builderkits/onchainkit/identity/identity*/}
             <ConnectWallet
               className={cn(
                 "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
@@ -300,9 +288,8 @@ export function CoinTossGame({
                 <span className="text-text-on-surface-variant">
                   Balance:&nbsp;
                 </span>
-                <span className="font-semibold">1.55</span>
-                &nbsp;
-                <TokenChip token={token} />
+                <span className="font-semibold">0</span>
+                <Cog className="inline h-4 w-4 ml-1 text-orange-500" />
               </div>
 
               <Label
@@ -314,14 +301,16 @@ export function CoinTossGame({
               <Input
                 id="betAmount"
                 type="number"
-                placeholder="0.01"
+                placeholder="0"
                 value={betAmount}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setBetAmount(e.target.value)
                 }
                 className="relative"
-                  //TODO use TokenChip https://docs.base.org/builderkits/onchainkit/token/token-chip
-                token={token}
+                token={{
+                  icon: <Cog className="h-4 w-4 text-orange-500" />,
+                  symbol: "POL",
+                }}
               />
 
               <div className="grid grid-cols-3 gap-2">
@@ -365,13 +354,9 @@ export function CoinTossGame({
                 "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
-              onClick={() => alert(`Betting ${betAmount} ${token.symbol} on ${choice}`)}
+              onClick={() => alert(`Betting ${betAmount} POL on ${choice}`)}
             >
-              {!isConnected ? (
-                  "Connect"
-              ) : (
-                  `Bet ${betAmount} ${token.symbol}`
-              )}
+              Connect
             </Button>
           </div>
         </CardContent>

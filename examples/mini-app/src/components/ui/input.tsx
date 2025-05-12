@@ -1,16 +1,17 @@
 import * as React from "react"
 
 import { cn } from "../../lib/utils"
-import { TokenChip } from "@coinbase/onchainkit/token"
-import {Token} from "@coinbase/onchainkit/src/token/types.ts";
+
+export interface TokenInfo {
+  icon?: React.ReactNode
+  symbol: string
+}
 
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix"> {
-  token?: Token
+  token?: TokenInfo
 }
-// TODO consider using an existing component like
-// https://docs.base.org/builderkits/onchainkit/buy/buy
-// https://docs.base.org/builderkits/onchainkit/fund/fund-card
+
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, token, ...props }, ref) => {
     const hasTokenInfo = token && (token.icon || token.symbol)
@@ -34,7 +35,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         />
         {hasTokenInfo && (
           <div className="absolute right-0 top-1/2 mr-3 flex -translate-y-1/2 transform items-center gap-1 text-sm text-foreground pointer-events-none font-semibold">
-              <TokenChip token={token} />
+            {token.icon}
+            <span>{token.symbol}</span>
           </div>
         )}
       </div>
