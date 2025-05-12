@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { Cog, History as HistoryIcon } from "lucide-react"
+import { History as HistoryIcon } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
 import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
+import { TokenImage } from "@coinbase/onchainkit/token"
+import { ETH_TOKEN } from "../../lib/tokens"
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode
@@ -52,7 +54,7 @@ const mockHistoryDataDefault: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: "1.94675",
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~24h ago",
   },
   {
@@ -60,7 +62,7 @@ const mockHistoryDataDefault: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.2,
     payoutAmount: 0.0,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
 ]
@@ -72,7 +74,7 @@ const mockHistoryDataExtended: HistoryEntry[] = [
     status: Math.random() > 0.5 ? ("Won bet" as const) : ("Busted" as const),
     multiplier: (Math.random() * 5 + 1).toFixed(2),
     payoutAmount: (Math.random() * 10).toFixed(4),
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: `~${i * 5 + 10}m ago`,
   })),
 ]

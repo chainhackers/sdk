@@ -32,13 +32,13 @@ export function InfoSheetPanel({
           <div>
             <p className="text-muted-foreground font-medium">RNG fee:</p>
             <p className="font-medium text-base text-card-foreground">
-              {rngFee} POL
+              {rngFee} ETH
             </p>
           </div>
           <div>
             <p className="text-muted-foreground font-medium">Target payout:</p>
             <p className="font-medium text-base text-card-foreground">
-              {targetPayout} POL
+              {targetPayout} ETH
             </p>
           </div>
           <div>
