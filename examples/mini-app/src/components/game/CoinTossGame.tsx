@@ -1,4 +1,4 @@
-import { Cog, History, Info } from "lucide-react"
+import { History, Info } from "lucide-react"
 import React, { useState, ChangeEvent, useRef, useEffect } from "react"
 import coinIcon from "../../assets/game/coin-background-icon.png"
 import coinTossBackground from "../../assets/game/game-background.png"
@@ -7,6 +7,7 @@ import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
+import tokenIcon from "../../assets/game/token-icon.svg"
 
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
@@ -28,7 +29,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: "1.94675",
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px] ms-[4px]" />,
     timestamp: "~24h ago",
   },
   {
@@ -36,7 +37,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.2,
     payoutAmount: 0.2,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px] ms-[4px]" />,
     timestamp: "~2h ago",
   },
   {
@@ -44,7 +45,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.94,
     payoutAmount: 1.94,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px] ms-[4px]" />,
     timestamp: "~2h ago",
   },
   {
@@ -52,7 +53,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.946,
     payoutAmount: 2.453,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px] ms-[4px]" />,
     timestamp: "~2h ago",
   },
   {
@@ -60,7 +61,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.94,
     payoutAmount: 1.94,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px] ms-[4px]" />,
     timestamp: "~2h ago",
   },
   {
@@ -68,7 +69,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.946,
     payoutAmount: 2.453,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px] ms-[4px]" />,
     timestamp: "~2h ago",
   },
   {
@@ -76,7 +77,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px] ms-[4px]" />,
     timestamp: "~2h ago",
   },
   {
@@ -84,7 +85,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px] ms-[4px]" />,
     timestamp: "~2h ago",
   },
   {
@@ -92,7 +93,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px] ms-[4px]" />,
     timestamp: "~2h ago",
   },
 ]
@@ -241,7 +242,7 @@ export function CoinTossGame({
                   Balance:&nbsp;
                 </span>
                 <span className="font-semibold">0</span>
-                <Cog className="inline h-4 w-4 ml-1 text-orange-500" />
+                <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px] mx-[6px]" />
               </div>
 
               <Label
@@ -260,8 +261,8 @@ export function CoinTossGame({
                 }
                 className="relative"
                 token={{
-                  icon: <Cog className="h-4 w-4 text-orange-500" />,
-                  symbol: "POL",
+                  icon: <img src={tokenIcon} alt="token Icon" className="h-[18px] w-[18px]" />,
+                  symbol: "ETH",
                 }}
               />
 
@@ -306,7 +307,7 @@ export function CoinTossGame({
                 "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
-              onClick={() => alert(`Betting ${betAmount} POL on ${choice}`)}
+              onClick={() => alert(`Betting ${betAmount} ETH on ${choice}`)}
             >
               Connect
             </Button>

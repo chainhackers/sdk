@@ -34,7 +34,7 @@ export const Default: Story = {
     value: "10.5",
     token: {
       icon: <Cog className="h-4 w-4 mr-1 text-orange-500" />,
-      symbol: "POL",
+      symbol: "ETH",
     },
   },
 }
@@ -46,7 +46,7 @@ export const Disabled: Story = {
     value: "10.5",
     token: {
       icon: <Cog className="h-4 w-4 mr-1 text-orange-500" />,
-      symbol: "POL",
+      symbol: "ETH",
     },
     disabled: true,
   },
