@@ -127,7 +127,7 @@ export function CoinTossGame({
 
   return (
     <div
-      className={cn("cointoss-game-wrapper", themeClass, className)}
+      className={cn("cointoss-game-wrapper global-styles", themeClass, className)}
       style={customTheme}
       {...props}
     >
@@ -139,7 +139,7 @@ export function CoinTossGame({
         )}
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-          <CardTitle className="text-lg text-title-color">CoinToss</CardTitle>
+          <CardTitle className="text-lg text-title-color font-bold">CoinToss</CardTitle>
           <Button
             variant="secondary"
             className={cn(

@@ -56,6 +56,7 @@
   --color-close-btn-color: var(--close-btn-color);
   --color-close-btn-hovered: var(--close-btn-hovered);
   --color-game-result-icon-bg: var(--game-result-icon-bg);
+  --color-table-text: var(--table-text);
 }
 
 @layer base {
@@ -129,6 +130,7 @@
     --close-btn-color: var(--light-surface);
     --close-btn-hovered: var(--dark-stroke);
     --game-result-icon-bg: var(--white);
+    --table-text: var(--dark-surface);
   }
 
   .dark {
@@ -167,13 +169,42 @@
     --border-stroke: var(--dark-stroke);
     --play-btn-font: var(--white);
 
-    --game-win: #36bc8f;
-    --game-loss: #e44b4e;
+    --game-win: oklch(0.78 0.1418 166.22);
 
     --menu-bg: var(--dark-surface-high);
     --table-separator: var(--dark-stroke);
     --close-btn-color: var(--dark-on-surface-variant);
     --game-result-icon-bg: var(--dark-surface-high);
+    --table-text: var(--white);
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('./assets/fonts/Inter-Medium.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('./assets//fonts/Inter-SemiBold.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('./assets/fonts/Inter-Bold.woff2') format('woff2');
+  }
+
+  .global-styles {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
   }
 
   /* Hide arrows for input[type=number] */
@@ -193,6 +224,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;

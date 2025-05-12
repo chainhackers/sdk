@@ -22,28 +22,28 @@ export function InfoSheetPanel({
       <SheetBottomPanelContent
         className={cn("!h-auto !max-h-[70%]", "p-5 sm:p-6")}
       >
-        <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm">
+        <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm font-medium text-text-on-surface-variant">
           <div>
-            <p className="text-muted-foreground font-medium">Win chance:</p>
-            <p className="font-medium text-base text-card-foreground">
+            <p>Win chance:</p>
+            <p className="text-text-on-surface">
               {winChance}%
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground font-medium">RNG fee:</p>
-            <p className="font-medium text-base text-card-foreground">
+            <p>RNG fee:</p>
+            <p className="text-text-on-surface">
               {rngFee} POL
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground font-medium">Target payout:</p>
-            <p className="font-medium text-base text-card-foreground">
+            <p>Target payout:</p>
+            <p className="text-text-on-surface">
               {targetPayout} POL
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground font-medium">Gas price:</p>
-            <p className="font-medium text-base text-card-foreground">
+            <p>Gas price:</p>
+            <p className="text-text-on-surface">
               {gasPrice}
             </p>
           </div>
