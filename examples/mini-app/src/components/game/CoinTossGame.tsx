@@ -165,7 +165,7 @@ export function CoinTossGame({
             >
               <div className="flex items-center">
                 <Avatar
-                  className="h-8 w-8 mr-2"
+                  className="h-7 w-7 mr-2"
                   address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9"
                 />
                 <Name className="text-secondary-foreground" />
