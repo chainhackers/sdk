@@ -1,24 +1,16 @@
 import winIcon from "../../assets/game/game-result/win-icon.svg"
 import lossIcon from "../../assets/game/game-result/loss-icon.svg"
-import winBg from "../../assets/game/game-result/win-bg.jpg"
-import lossBg from "../../assets/game/game-result/loss-bg.jpg"
 import winBgWebp from "../../assets/game/game-result/win-bg.webp"
 import lossBgWebp from "../../assets/game/game-result/loss-bg.webp"
 import { useEffect } from "react"
 
 const images = {
   win: {
-    bg: {
-      webp: winBgWebp,
-      jpg: winBg,
-    },
+    bg: winBgWebp,
     icon: winIcon
   },
   loss: {
-    bg: {
-      webp: lossBgWebp,
-      jpg: lossBg,
-    },
+    bg: lossBgWebp,
     icon: lossIcon,
   }
 } as const
@@ -46,8 +38,7 @@ export function GameResultWindow({
     }
   
     Object.values(images).forEach(({ bg, icon }) => {
-      preloadImg(bg.webp)
-      preloadImg(bg.jpg)
+      preloadImg(bg)
       preloadImg(icon)
     })
   }, [])
@@ -58,14 +49,8 @@ export function GameResultWindow({
 
   return (
     <div className={`w-full h-full flex flex-col items-center py-[12px] px-[42px] absolute left-0 top-0 text-white ${className}`}>
-      <picture className={`absolute left-0 top-0 w-full h-full ${result === "win" ? "visible" : "invisible"}`}>
-        <source srcSet={images[result].bg.webp} type="image/webp" />
-        <img src={images[result].bg.jpg} className="w-full h-full object-cover" alt="win bg" />
-      </picture>
-      <picture className={`absolute left-0 top-0 w-full h-full ${result === "loss" ? "visible" : "invisible"}`}>
-        <source srcSet={images[result].bg.webp} type="image/webp" />
-        <img src={images[result].bg.jpg} className="w-full h-full object-cover" alt="loss bg"/>
-      </picture>
+      <img src={images[result].bg} className={`absolute left-0 top-0 w-full h-full ${result === "win" ? "visible" : "invisible"}`} alt="win bg" />
+      <img src={images[result].bg} className={`absolute left-0 top-0 w-full h-full ${result === "loss" ? "visible" : "invisible"}`} alt="loss bg"/>
     
       <div className="flex flex-col items-center gap-[8px] text-center relative">
         <div className="w-[48px] h-[44px] flex items-center justify-center bg-game-result-icon-bg relative rounded-[6px]">
