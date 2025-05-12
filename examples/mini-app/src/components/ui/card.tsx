@@ -12,6 +12,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
         "px-3 py-4",
         "gap-3",
         "w-[328px] h-[512px]",
+        "border-border",
         className,
       )}
       {...props}
