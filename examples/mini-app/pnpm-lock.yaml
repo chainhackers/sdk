@@ -53,31 +53,31 @@ importers:
     devDependencies:
       '@chromatic-com/storybook':
         specifier: ^3
-        version: 3.2.6(react@19.1.0)(storybook@8.6.12)
+        version: 3.2.6(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@eslint/js':
         specifier: ^9.22.0
         version: 9.25.1
       '@storybook/addon-essentials':
         specifier: ^8.6.12
-        version: 8.6.12(@types/react@19.1.2)(storybook@8.6.12)
+        version: 8.6.12(@types/react@19.1.2)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@storybook/addon-onboarding':
         specifier: ^8.6.12
-        version: 8.6.12(storybook@8.6.12)
+        version: 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@storybook/blocks':
         specifier: ^8.6.12
-        version: 8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)
+        version: 8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@storybook/experimental-addon-test':
         specifier: ^8.6.12
-        version: 8.6.12(@vitest/browser@3.1.2)(@vitest/runner@3.1.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)(vitest@3.1.2)
+        version: 8.6.12(@vitest/browser@3.1.2)(@vitest/runner@3.1.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(vitest@3.1.2)
       '@storybook/react':
         specifier: ^8.6.12
-        version: 8.6.12(@storybook/test@8.6.12(storybook@8.6.12))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)(typescript@5.7.3)
+        version: 8.6.12(@storybook/test@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.7.3)
       '@storybook/react-vite':
         specifier: ^8.6.12
-        version: 8.6.12(@storybook/test@8.6.12(storybook@8.6.12))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.40.1)(storybook@8.6.12)(typescript@5.7.3)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))
+        version: 8.6.12(@storybook/test@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.40.1)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.7.3)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))
       '@storybook/test':
         specifier: ^8.6.12
-        version: 8.6.12(storybook@8.6.12)
+        version: 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@types/node':
         specifier: ^22.15.3
         version: 22.15.3
@@ -92,7 +92,7 @@ importers:
         version: 4.4.1(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))
       '@vitest/browser':
         specifier: ^3.1.2
-        version: 3.1.2(playwright@1.52.0)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))(vitest@3.1.2)
+        version: 3.1.2(bufferutil@4.0.9)(playwright@1.52.0)(utf-8-validate@5.0.10)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))(vitest@3.1.2)
       '@vitest/coverage-v8':
         specifier: ^3.1.2
         version: 3.1.2(@vitest/browser@3.1.2)(vitest@3.1.2)
@@ -116,7 +116,7 @@ importers:
         version: 1.52.0
       storybook:
         specifier: ^8.6.12
-        version: 8.6.12
+        version: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       tw-animate-css:
         specifier: ^1.2.8
         version: 1.2.8
@@ -131,7 +131,7 @@ importers:
         version: 6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2)
       vitest:
         specifier: ^3.1.2
-        version: 3.1.2(@types/node@22.15.3)(@vitest/browser@3.1.2)(jiti@2.4.2)(lightningcss@1.29.2)
+        version: 3.1.2(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.2)(jiti@2.4.2)(lightningcss@1.29.2)
 
 packages:
 
@@ -1296,6 +1296,9 @@ packages:
   '@types/babel__traverse@7.20.7':
     resolution: {integrity: sha512-dkO5fhS7+/oos4ciWxyEyjWe48zmG6wbCheo/G2ZnHx4fs3EU6YC6UM8rk56gAjNJ9P3MTH2jo5jb92/K6wbng==}
 
+  '@types/debug@4.1.12':
+    resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
+
   '@types/doctrine@0.0.9':
     resolution: {integrity: sha512-eOIHzCUSH7SMfonMG1LsC2f8vxBFtho6NGBznK41R84YzPuvSBzrhEps33IsQiOW9+VL6NQ9DbjQJznk/S4uRA==}
 
@@ -1307,6 +1310,9 @@ packages:
 
   '@types/mdx@2.0.13':
     resolution: {integrity: sha512-+OWZQfAYyio6YkJb3HLxDrvnx6SWWDbC0zVPfBRzUk0/nqoDyf6dNxQi3eArPe8rJ473nobTMQ/8Zk+LxJ+Yuw==}
+
+  '@types/ms@2.1.0':
+    resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
   '@types/node@22.15.3':
     resolution: {integrity: sha512-lX7HFZeHf4QG/J7tBZqrCAXwz9J5RD56Y6MpP0eJkka8p+K0RY/yBTW7CYFJ4VGCclxqOLKmiGP5juQc6MKgcw==}
@@ -1532,6 +1538,10 @@ packages:
     resolution: {integrity: sha512-KDi1Ny1gSePi1vm0q4oxSF8b4DR44GF4BbmS2YdhPLOEqd8pDviZOGH/GsmRwoWJ2+5Lr085X7naowMwKHDG1A==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
+
+  bufferutil@4.0.9:
+    resolution: {integrity: sha512-WDtdLmJvAuNNPzByAYpRo2rF1Mmradw6gvWsQKf63476DDXmomT9zUiGypLcG4ibIM67vhAj8jJRdbmEws2Aqw==}
+    engines: {node: '>=6.14.2'}
 
   cac@6.7.14:
     resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
@@ -2221,6 +2231,10 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
+  node-gyp-build@4.8.4:
+    resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
+    hasBin: true
+
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
 
@@ -2654,6 +2668,10 @@ packages:
       '@types/react':
         optional: true
 
+  utf-8-validate@5.0.10:
+    resolution: {integrity: sha512-Z6czzLq4u8fPOyx7TU6X3dvUZVvoJmxSQ+IcrlmagKhilxlhZgxPK6C5Jqbkw1IDUmFTM+cz9QDnnLTwDz/2gQ==}
+    engines: {node: '>=6.14.2'}
+
   util@0.12.5:
     resolution: {integrity: sha512-kZf/K6hEIrWHI6XqOFUiiMa+79wE/D8Q+NCNAWclkyg3b4d2k7s0QGepNjiABc+aR3N1PAyHL7p6UcLY6LmrnA==}
 
@@ -2905,13 +2923,13 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@chromatic-com/storybook@3.2.6(react@19.1.0)(storybook@8.6.12)':
+  '@chromatic-com/storybook@3.2.6(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       chromatic: 11.28.2
       filesize: 10.1.6
       jsonfile: 6.1.0
       react-confetti: 6.4.0(react@19.1.0)
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       strip-ansi: 7.1.0
     transitivePeerDependencies:
       - '@chromatic-com/cypress'
@@ -3525,112 +3543,112 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.40.1':
     optional: true
 
-  '@storybook/addon-actions@8.6.12(storybook@8.6.12)':
+  '@storybook/addon-actions@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@storybook/global': 5.0.0
       '@types/uuid': 9.0.8
       dequal: 2.0.3
       polished: 4.3.1
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       uuid: 9.0.1
 
-  '@storybook/addon-backgrounds@8.6.12(storybook@8.6.12)':
+  '@storybook/addon-backgrounds@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@storybook/global': 5.0.0
       memoizerific: 1.11.3
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ts-dedent: 2.2.0
 
-  '@storybook/addon-controls@8.6.12(storybook@8.6.12)':
+  '@storybook/addon-controls@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@storybook/global': 5.0.0
       dequal: 2.0.3
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ts-dedent: 2.2.0
 
-  '@storybook/addon-docs@8.6.12(@types/react@19.1.2)(storybook@8.6.12)':
+  '@storybook/addon-docs@8.6.12(@types/react@19.1.2)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@mdx-js/react': 3.1.0(@types/react@19.1.2)(react@19.1.0)
-      '@storybook/blocks': 8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)
-      '@storybook/csf-plugin': 8.6.12(storybook@8.6.12)
-      '@storybook/react-dom-shim': 8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)
+      '@storybook/blocks': 8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/csf-plugin': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/react-dom-shim': 8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ts-dedent: 2.2.0
     transitivePeerDependencies:
       - '@types/react'
 
-  '@storybook/addon-essentials@8.6.12(@types/react@19.1.2)(storybook@8.6.12)':
+  '@storybook/addon-essentials@8.6.12(@types/react@19.1.2)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
-      '@storybook/addon-actions': 8.6.12(storybook@8.6.12)
-      '@storybook/addon-backgrounds': 8.6.12(storybook@8.6.12)
-      '@storybook/addon-controls': 8.6.12(storybook@8.6.12)
-      '@storybook/addon-docs': 8.6.12(@types/react@19.1.2)(storybook@8.6.12)
-      '@storybook/addon-highlight': 8.6.12(storybook@8.6.12)
-      '@storybook/addon-measure': 8.6.12(storybook@8.6.12)
-      '@storybook/addon-outline': 8.6.12(storybook@8.6.12)
-      '@storybook/addon-toolbars': 8.6.12(storybook@8.6.12)
-      '@storybook/addon-viewport': 8.6.12(storybook@8.6.12)
-      storybook: 8.6.12
+      '@storybook/addon-actions': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/addon-backgrounds': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/addon-controls': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/addon-docs': 8.6.12(@types/react@19.1.2)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/addon-highlight': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/addon-measure': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/addon-outline': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/addon-toolbars': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/addon-viewport': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ts-dedent: 2.2.0
     transitivePeerDependencies:
       - '@types/react'
 
-  '@storybook/addon-highlight@8.6.12(storybook@8.6.12)':
+  '@storybook/addon-highlight@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@storybook/global': 5.0.0
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/addon-measure@8.6.12(storybook@8.6.12)':
+  '@storybook/addon-measure@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@storybook/global': 5.0.0
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       tiny-invariant: 1.3.3
 
-  '@storybook/addon-onboarding@8.6.12(storybook@8.6.12)':
+  '@storybook/addon-onboarding@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/addon-outline@8.6.12(storybook@8.6.12)':
+  '@storybook/addon-outline@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@storybook/global': 5.0.0
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ts-dedent: 2.2.0
 
-  '@storybook/addon-toolbars@8.6.12(storybook@8.6.12)':
+  '@storybook/addon-toolbars@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/addon-viewport@8.6.12(storybook@8.6.12)':
+  '@storybook/addon-viewport@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       memoizerific: 1.11.3
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/blocks@8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)':
+  '@storybook/blocks@8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@storybook/icons': 1.4.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ts-dedent: 2.2.0
     optionalDependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  '@storybook/builder-vite@8.6.12(storybook@8.6.12)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))':
+  '@storybook/builder-vite@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))':
     dependencies:
-      '@storybook/csf-plugin': 8.6.12(storybook@8.6.12)
+      '@storybook/csf-plugin': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       browser-assert: 1.2.1
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ts-dedent: 2.2.0
       vite: 6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2)
 
-  '@storybook/components@8.6.12(storybook@8.6.12)':
+  '@storybook/components@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/core@8.6.12(storybook@8.6.12)':
+  '@storybook/core@8.6.12(bufferutil@4.0.9)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)':
     dependencies:
-      '@storybook/theming': 8.6.12(storybook@8.6.12)
+      '@storybook/theming': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       better-opn: 3.0.2
       browser-assert: 1.2.1
       esbuild: 0.25.3
@@ -3640,36 +3658,36 @@ snapshots:
       recast: 0.23.11
       semver: 7.7.1
       util: 0.12.5
-      ws: 8.18.1
+      ws: 8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - storybook
       - supports-color
       - utf-8-validate
 
-  '@storybook/csf-plugin@8.6.12(storybook@8.6.12)':
+  '@storybook/csf-plugin@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       unplugin: 1.16.1
 
   '@storybook/csf@0.1.13':
     dependencies:
       type-fest: 2.19.0
 
-  '@storybook/experimental-addon-test@8.6.12(@vitest/browser@3.1.2)(@vitest/runner@3.1.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)(vitest@3.1.2)':
+  '@storybook/experimental-addon-test@8.6.12(@vitest/browser@3.1.2)(@vitest/runner@3.1.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(vitest@3.1.2)':
     dependencies:
       '@storybook/global': 5.0.0
       '@storybook/icons': 1.4.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@storybook/instrumenter': 8.6.12(storybook@8.6.12)
-      '@storybook/test': 8.6.12(storybook@8.6.12)
+      '@storybook/instrumenter': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/test': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       polished: 4.3.1
       prompts: 2.4.2
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ts-dedent: 2.2.0
     optionalDependencies:
-      '@vitest/browser': 3.1.2(playwright@1.52.0)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))(vitest@3.1.2)
+      '@vitest/browser': 3.1.2(bufferutil@4.0.9)(playwright@1.52.0)(utf-8-validate@5.0.10)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))(vitest@3.1.2)
       '@vitest/runner': 3.1.2
-      vitest: 3.1.2(@types/node@22.15.3)(@vitest/browser@3.1.2)(jiti@2.4.2)(lightningcss@1.29.2)
+      vitest: 3.1.2(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.2)(jiti@2.4.2)(lightningcss@1.29.2)
     transitivePeerDependencies:
       - react
       - react-dom
@@ -3681,77 +3699,77 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  '@storybook/instrumenter@8.6.12(storybook@8.6.12)':
+  '@storybook/instrumenter@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@storybook/global': 5.0.0
       '@vitest/utils': 2.1.9
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/manager-api@8.6.12(storybook@8.6.12)':
+  '@storybook/manager-api@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/preview-api@8.6.12(storybook@8.6.12)':
+  '@storybook/preview-api@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/react-dom-shim@8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)':
+  '@storybook/react-dom-shim@8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/react-vite@8.6.12(@storybook/test@8.6.12(storybook@8.6.12))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.40.1)(storybook@8.6.12)(typescript@5.7.3)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))':
+  '@storybook/react-vite@8.6.12(@storybook/test@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.40.1)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.7.3)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))':
     dependencies:
       '@joshwooding/vite-plugin-react-docgen-typescript': 0.5.0(typescript@5.7.3)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))
       '@rollup/pluginutils': 5.1.4(rollup@4.40.1)
-      '@storybook/builder-vite': 8.6.12(storybook@8.6.12)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))
-      '@storybook/react': 8.6.12(@storybook/test@8.6.12(storybook@8.6.12))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)(typescript@5.7.3)
+      '@storybook/builder-vite': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))
+      '@storybook/react': 8.6.12(@storybook/test@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.7.3)
       find-up: 5.0.0
       magic-string: 0.30.17
       react: 19.1.0
       react-docgen: 7.1.1
       react-dom: 19.1.0(react@19.1.0)
       resolve: 1.22.10
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       tsconfig-paths: 4.2.0
       vite: 6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2)
     optionalDependencies:
-      '@storybook/test': 8.6.12(storybook@8.6.12)
+      '@storybook/test': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
     transitivePeerDependencies:
       - rollup
       - supports-color
       - typescript
 
-  '@storybook/react@8.6.12(@storybook/test@8.6.12(storybook@8.6.12))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)(typescript@5.7.3)':
+  '@storybook/react@8.6.12(@storybook/test@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.7.3)':
     dependencies:
-      '@storybook/components': 8.6.12(storybook@8.6.12)
+      '@storybook/components': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@storybook/global': 5.0.0
-      '@storybook/manager-api': 8.6.12(storybook@8.6.12)
-      '@storybook/preview-api': 8.6.12(storybook@8.6.12)
-      '@storybook/react-dom-shim': 8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12)
-      '@storybook/theming': 8.6.12(storybook@8.6.12)
+      '@storybook/manager-api': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/preview-api': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/react-dom-shim': 8.6.12(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@storybook/theming': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     optionalDependencies:
-      '@storybook/test': 8.6.12(storybook@8.6.12)
+      '@storybook/test': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       typescript: 5.7.3
 
-  '@storybook/test@8.6.12(storybook@8.6.12)':
+  '@storybook/test@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@storybook/global': 5.0.0
-      '@storybook/instrumenter': 8.6.12(storybook@8.6.12)
+      '@storybook/instrumenter': 8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@testing-library/dom': 10.4.0
       '@testing-library/jest-dom': 6.5.0
       '@testing-library/user-event': 14.5.2(@testing-library/dom@10.4.0)
       '@vitest/expect': 2.0.5
       '@vitest/spy': 2.0.5
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/theming@8.6.12(storybook@8.6.12)':
+  '@storybook/theming@8.6.12(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
-      storybook: 8.6.12
+      storybook: 8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
   '@tailwindcss/node@4.1.5':
     dependencies:
@@ -3870,6 +3888,11 @@ snapshots:
     dependencies:
       '@babel/types': 7.27.1
 
+  '@types/debug@4.1.12':
+    dependencies:
+      '@types/ms': 2.1.0
+    optional: true
+
   '@types/doctrine@0.0.9': {}
 
   '@types/estree@1.0.7': {}
@@ -3877,6 +3900,9 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/mdx@2.0.13': {}
+
+  '@types/ms@2.1.0':
+    optional: true
 
   '@types/node@22.15.3':
     dependencies:
@@ -3982,7 +4008,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/browser@3.1.2(playwright@1.52.0)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))(vitest@3.1.2)':
+  '@vitest/browser@3.1.2(bufferutil@4.0.9)(playwright@1.52.0)(utf-8-validate@5.0.10)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))(vitest@3.1.2)':
     dependencies:
       '@testing-library/dom': 10.4.0
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
@@ -3991,8 +4017,8 @@ snapshots:
       magic-string: 0.30.17
       sirv: 3.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.1.2(@types/node@22.15.3)(@vitest/browser@3.1.2)(jiti@2.4.2)(lightningcss@1.29.2)
-      ws: 8.18.1
+      vitest: 3.1.2(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.2)(jiti@2.4.2)(lightningcss@1.29.2)
+      ws: 8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     optionalDependencies:
       playwright: 1.52.0
     transitivePeerDependencies:
@@ -4015,9 +4041,9 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.1.2(@types/node@22.15.3)(@vitest/browser@3.1.2)(jiti@2.4.2)(lightningcss@1.29.2)
+      vitest: 3.1.2(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.2)(jiti@2.4.2)(lightningcss@1.29.2)
     optionalDependencies:
-      '@vitest/browser': 3.1.2(playwright@1.52.0)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))(vitest@3.1.2)
+      '@vitest/browser': 3.1.2(bufferutil@4.0.9)(playwright@1.52.0)(utf-8-validate@5.0.10)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))(vitest@3.1.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -4167,6 +4193,11 @@ snapshots:
       electron-to-chromium: 1.5.148
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.24.4)
+
+  bufferutil@4.0.9:
+    dependencies:
+      node-gyp-build: 4.8.4
+    optional: true
 
   cac@6.7.14: {}
 
@@ -4810,6 +4841,9 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
+  node-gyp-build@4.8.4:
+    optional: true
+
   node-releases@2.0.19: {}
 
   open@8.4.2:
@@ -5063,9 +5097,9 @@ snapshots:
 
   std-env@3.9.0: {}
 
-  storybook@8.6.12:
+  storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10):
     dependencies:
-      '@storybook/core': 8.6.12(storybook@8.6.12)
+      '@storybook/core': 8.6.12(bufferutil@4.0.9)(storybook@8.6.12(bufferutil@4.0.9)(utf-8-validate@5.0.10))(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -5216,6 +5250,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.1.2
 
+  utf-8-validate@5.0.10:
+    dependencies:
+      node-gyp-build: 4.8.4
+    optional: true
+
   util@0.12.5:
     dependencies:
       inherits: 2.0.4
@@ -5261,7 +5300,7 @@ snapshots:
       jiti: 2.4.2
       lightningcss: 1.29.2
 
-  vitest@3.1.2(@types/node@22.15.3)(@vitest/browser@3.1.2)(jiti@2.4.2)(lightningcss@1.29.2):
+  vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.15.3)(@vitest/browser@3.1.2)(jiti@2.4.2)(lightningcss@1.29.2):
     dependencies:
       '@vitest/expect': 3.1.2
       '@vitest/mocker': 3.1.2(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))
@@ -5285,8 +5324,9 @@ snapshots:
       vite-node: 3.1.2(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2)
       why-is-node-running: 2.3.0
     optionalDependencies:
+      '@types/debug': 4.1.12
       '@types/node': 22.15.3
-      '@vitest/browser': 3.1.2(playwright@1.52.0)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))(vitest@3.1.2)
+      '@vitest/browser': 3.1.2(bufferutil@4.0.9)(playwright@1.52.0)(utf-8-validate@5.0.10)(vite@6.3.4(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.2))(vitest@3.1.2)
     transitivePeerDependencies:
       - jiti
       - less
@@ -5336,7 +5376,10 @@ snapshots:
       string-width: 5.1.2
       strip-ansi: 7.1.0
 
-  ws@8.18.1: {}
+  ws@8.18.1(bufferutil@4.0.9)(utf-8-validate@5.0.10):
+    optionalDependencies:
+      bufferutil: 4.0.9
+      utf-8-validate: 5.0.10
 
   yallist@3.1.1: {}
 
