@@ -109,7 +109,7 @@ export type DiceNumber =
 
 export type DiceRolledNumber = 100 & DiceNumber;
 
-export interface DiceChoiceInput extends ChoiceInput {
+export interface DiceChoiceInput extends ChoiceInput<CASINO_GAME_TYPE.DICE> {
   value: DiceNumber;
   id: DiceNumber;
 }

@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@betswirl/sdk",
-  "packageManager": "pnpm@8.15.4",
+  "packageManager": "pnpm@10.10.0",
   "scripts": {
     "build": "pnpm turbo build",
     "build:libs": "pnpm turbo --filter \"./packages/**\" build",
@@ -16,7 +16,7 @@
   "type": "module",
   "workspaces": ["packages/core", "packages/providers/*", "examples/*"],
   "engines": {
-    "node": ">=20.11.1 <23",
+    "node": ">=20.11.1 <24",
     "npm": "please-use-pnpm",
     "pnpm": ">=8",
     "yarn": "please-use-pnpm"

@@ -27,15 +27,18 @@ import { fetchToken, fetchTokens } from "../data/subgraphs/protocol/clients/toke
 import type { BetSwirlWallet } from "./wallet";
 
 import type { ApolloCache, DefaultOptions } from "@apollo/client/core/index.js";
-import type { CoinTossParams, CoinTossPlacedBet } from "../actions/casino/coinToss";
+import type { CoinTossParams, CoinTossPlacedBet } from "../actions/casino/cointoss";
 import type { DiceParams } from "../actions/casino/dice";
 import type { DicePlacedBet } from "../actions/casino/dice";
 import type {
   CasinoPlaceBetOptions,
-  CasinoPlacedBet,
+  NormalCasinoPlacedBet,
   PlaceBetCallbacks,
+  WeightedCasinoPlacedBet,
 } from "../actions/casino/game";
+import type { KenoParams, KenoPlacedBet } from "../actions/casino/keno";
 import type { RouletteParams, RoulettePlacedBet } from "../actions/casino/roulette";
+import type { WheelParams, WheelPlacedBet } from "../actions/casino/wheel";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
 import type { ChainId } from "../data";
 import type {
@@ -45,8 +48,11 @@ import type {
   DiceRolledBet,
   GAS_PRICE_TYPE,
   KenoConfiguration,
+  KenoRolledBet,
   RouletteRolledBet,
 } from "../read";
+import type { WeightedGameConfiguration } from "../read/casino/weightedGame";
+import type { WheelRolledBet } from "../read/casino/wheel";
 import { FORMAT_TYPE, getCasinoChainId } from "../utils";
 
 export interface BetSwirlClientOptions {
@@ -76,8 +82,15 @@ export abstract class BetSwirlClient {
   /* Casino games */
 
   abstract waitRolledBet(
-    placedBet: CasinoPlacedBet,
+    placedBet: NormalCasinoPlacedBet,
     options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
+
+  abstract waitRolledBet(
+    placedBet: WeightedCasinoPlacedBet,
+    options: CasinoWaitRollOptions | undefined,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: number,
   ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
 
   abstract playCoinToss(
@@ -113,6 +126,30 @@ export abstract class BetSwirlClient {
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: RouletteRolledBet; receipt: TransactionReceipt }>;
 
+  abstract playKeno(
+    params: KenoParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: KenoPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract waitKeno(
+    placedBet: KenoPlacedBet,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: KenoRolledBet; receipt: TransactionReceipt }>;
+
+  abstract playWheel(
+    params: WheelParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: WheelPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract waitWheel(
+    placedBet: WheelPlacedBet,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: number,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: WheelRolledBet; receipt: TransactionReceipt }>;
+
   /* Casino utilities */
 
   abstract getCasinoGames(onlyActive?: boolean): Promise<CasinoGame[]>;
@@ -140,6 +177,10 @@ export abstract class BetSwirlClient {
   ): Promise<bigint>;
 
   abstract getKenoConfiguration(token: Token): Promise<KenoConfiguration>;
+
+  abstract getWeighedGameConfiguration(
+    configId: number | string,
+  ): Promise<WeightedGameConfiguration>;
 
   /* Subgraph queries */
 

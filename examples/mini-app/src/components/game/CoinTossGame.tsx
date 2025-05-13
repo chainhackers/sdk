@@ -1,4 +1,4 @@
-import { Cog, History, Info } from "lucide-react"
+import { History, Info } from "lucide-react"
 import React, { useState, ChangeEvent, useRef, useEffect } from "react"
 import coinIcon from "../../assets/game/coin-background-icon.png"
 import coinTossBackground from "../../assets/game/game-background.png"
@@ -8,9 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 
+import { Wallet, ConnectWallet } from "@coinbase/onchainkit/wallet"
+import { Avatar, Name } from "@coinbase/onchainkit/identity"
+import { TokenImage } from "@coinbase/onchainkit/token"
+import { useAccount } from "wagmi"
+
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
+import { ETH_TOKEN } from "../../lib/tokens"
 import { GameResultWindow } from "./GameResultWindow"
 
 export interface CoinTossGameProps
@@ -29,7 +35,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: "1.94675",
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~24h ago",
   },
   {
@@ -37,7 +43,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.2,
     payoutAmount: 0.2,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
   {
@@ -45,7 +51,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.94,
     payoutAmount: 1.94,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
   {
@@ -53,7 +59,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.946,
     payoutAmount: 2.453,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
   {
@@ -61,7 +67,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.94,
     payoutAmount: 1.94,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
   {
@@ -69,7 +75,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.946,
     payoutAmount: 2.453,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
   {
@@ -77,7 +83,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
   {
@@ -85,7 +91,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
   {
@@ -93,7 +99,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <Cog className="h-3.5 w-3.5 text-orange-500" />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
 ]
@@ -108,6 +114,7 @@ export function CoinTossGame({
   const [choice] = useState<"Heads" | "Tails">("Heads")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
+  const { isConnected } = useAccount()
 
   const multiplier = 1.94
   const winChance = 50
@@ -140,17 +147,27 @@ export function CoinTossGame({
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
           <CardTitle className="text-lg text-title-color font-bold">CoinToss</CardTitle>
-          <Button
-            variant="secondary"
-            className={cn(
-              "bg-neutral-background",
-              "rounded-[12px]",
-              "border border-border-stroke",
-              "text-primary",
-            )}
-          >
-            Connect
-          </Button>
+          <Wallet>
+            <ConnectWallet
+              className={cn(
+                "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+                "bg-neutral-background",
+                "rounded-[12px]",
+                "border border-border-stroke",
+                "px-3 py-1.5 h-[44px]",
+                "text-primary",
+              )}
+              disconnectedLabel="Connect"
+            >
+              <div className="flex items-center">
+                <Avatar
+                  className="h-7 w-7 mr-2"
+                  address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9"
+                />
+                <Name className="text-secondary-foreground" />
+              </div>
+            </ConnectWallet>
+          </Wallet>
         </CardHeader>
 
         <CardContent className="flex flex-col gap-4">
@@ -243,7 +260,7 @@ export function CoinTossGame({
                   Balance:&nbsp;
                 </span>
                 <span className="font-semibold">0</span>
-                <Cog className="inline h-4 w-4 ml-1 text-orange-500" />
+                <TokenImage token={ETH_TOKEN} size={16} className="ml-1" />
               </div>
 
               <Label
@@ -262,8 +279,8 @@ export function CoinTossGame({
                 }
                 className="relative"
                 token={{
-                  icon: <Cog className="h-4 w-4 text-orange-500" />,
-                  symbol: "POL",
+                  icon: <TokenImage token={ETH_TOKEN} size={16} />,
+                  symbol: "ETH",
                 }}
               />
 
@@ -308,9 +325,12 @@ export function CoinTossGame({
                 "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
-              onClick={() => alert(`Betting ${betAmount} POL on ${choice}`)}
+              onClick={() => alert(`Betting ${betAmount} ETH on ${choice}`)}
+              disabled={
+                !isConnected && Number.parseFloat(betAmount || "0") <= 0
+              }
             >
-              Connect
+              {isConnected ? "Place Bet" : "Connect"}
             </Button>
           </div>
         </CardContent>
