@@ -11,7 +11,8 @@ import { Label } from "../ui/label"
 import { Wallet, ConnectWallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
-import { useAccount } from "wagmi"
+import { useAccount, useBalance } from "wagmi"
+import { formatUnits } from 'viem'
 
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
@@ -113,7 +114,12 @@ export function CoinTossGame({
   const [choice] = useState<"Heads" | "Tails">("Heads")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
+  const { data: balance } = useBalance({
+    address,
+  })
+  const balanceFloat = balance ? parseFloat(formatUnits(balance.value, balance.decimals)) : 0
+  const formattedBalance = balanceFloat.toFixed(4)
 
   const multiplier = 1.94
   const winChance = 50
@@ -257,7 +263,7 @@ export function CoinTossGame({
                 <span className="text-text-on-surface-variant">
                   Balance:&nbsp;
                 </span>
-                <span className="font-semibold">0</span>
+                <span className="font-semibold">{formattedBalance}</span>
                 <TokenImage token={ETH_TOKEN} size={16} className="ml-1" />
               </div>
 
@@ -297,9 +303,11 @@ export function CoinTossGame({
                 <Button
                   variant="secondary"
                   onClick={() =>
-                    setBetAmount((prev) =>
-                      (Number.parseFloat(prev || "0") * 2).toString(),
-                    )
+                      setBetAmount((prev) => {
+                              const old = Number.parseFloat(prev || "0")
+                              return Math.min(balanceFloat, old * 2).toFixed(4).toString()
+                          }
+                      )
                   }
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
@@ -308,7 +316,7 @@ export function CoinTossGame({
                 <Button
                   variant="secondary"
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  onClick={() => alert("Max clicked!")}
+                  onClick={() => setBetAmount(formattedBalance)}
                 >
                   Max
                 </Button>
