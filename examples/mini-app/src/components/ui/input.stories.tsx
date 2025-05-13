@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { Cog } from "lucide-react"
+import { TokenImage } from "@coinbase/onchainkit/token"
+import { ETH_TOKEN } from "../../lib/tokens"
 import { Input } from "./input"
 
 const meta = {
@@ -33,7 +34,7 @@ export const Default: Story = {
     placeholder: "0",
     value: "10.5",
     token: {
-      icon: <Cog className="h-4 w-4 mr-1 text-orange-500" />,
+      icon: <TokenImage token={ETH_TOKEN} size={16} className="mr-1" />,
       symbol: "ETH",
     },
   },
@@ -45,7 +46,7 @@ export const Disabled: Story = {
     placeholder: "0",
     value: "10.5",
     token: {
-      icon: <Cog className="h-4 w-4 mr-1 text-orange-500" />,
+      icon: <TokenImage token={ETH_TOKEN} size={16} className="mr-1" />,
       symbol: "ETH",
     },
     disabled: true,
