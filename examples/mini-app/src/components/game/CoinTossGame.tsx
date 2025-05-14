@@ -1,5 +1,11 @@
 import { History, Info } from "lucide-react"
-import React, { useState, ChangeEvent, useRef, useEffect } from "react"
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import coinIcon from "../../assets/game/coin-background-icon.png"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
@@ -8,16 +14,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 
-import { Wallet, ConnectWallet } from "@coinbase/onchainkit/wallet"
+import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { useAccount, useBalance } from "wagmi"
-import { formatUnits } from 'viem'
+import { formatUnits, Hex } from "viem"
 
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
+
+import {
+  CASINO_GAME_TYPE,
+  CoinToss,
+  COINTOSS_FACE,
+  GenericCasinoBetParams,
+} from "@betswirl/sdk-core"
+import { usePlaceBet } from "../../hooks/usePlaceBet.ts"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -111,14 +125,15 @@ export function CoinTossGame({
   ...props
 }: CoinTossGameProps) {
   const [betAmount, setBetAmount] = useState("0")
-  const [choice] = useState<"Heads" | "Tails">("Heads")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
   const { isConnected, address } = useAccount()
   const { data: balance } = useBalance({
     address,
   })
-  const balanceFloat = balance ? parseFloat(formatUnits(balance.value, balance.decimals)) : 0
+  const balanceFloat = balance
+    ? parseFloat(formatUnits(balance.value, balance.decimals))
+    : 0
   const formattedBalance = balanceFloat.toFixed(4)
 
   const multiplier = 1.94
@@ -136,6 +151,22 @@ export function CoinTossGame({
   useEffect(() => {
     setIsMounted(true)
   }, [])
+
+  const { placeBet } = usePlaceBet()
+
+  const placeBetCallback = useCallback(async () => {
+    if (address) {
+      //TODO use component state for bet params
+      const BET_AMOUNT = 10n ** 15n
+      const betParams: GenericCasinoBetParams = {
+        betAmount: BET_AMOUNT,
+        game: CASINO_GAME_TYPE.COINTOSS,
+        gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
+      }
+
+      placeBet(betParams, address as Hex)
+    }
+  }, [address, placeBet])
 
   const gameWindowOverlay =
     customTheme && "--game-window-overlay" in customTheme
@@ -303,11 +334,12 @@ export function CoinTossGame({
                 <Button
                   variant="secondary"
                   onClick={() =>
-                      setBetAmount((prev) => {
-                              const old = Number.parseFloat(prev || "0")
-                              return Math.min(balanceFloat, old * 2).toFixed(4).toString()
-                          }
-                      )
+                    setBetAmount((prev) => {
+                      const old = Number.parseFloat(prev || "0")
+                      return Math.min(balanceFloat, old * 2)
+                        .toFixed(4)
+                        .toString()
+                    })
                   }
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
@@ -331,7 +363,7 @@ export function CoinTossGame({
                 "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
-              onClick={() => alert(`Betting ${betAmount} ETH on ${choice}`)}
+              onClick={placeBetCallback}
               disabled={
                 !isConnected && Number.parseFloat(betAmount || "0") <= 0
               }
