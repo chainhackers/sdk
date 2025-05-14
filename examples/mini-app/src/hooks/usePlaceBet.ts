@@ -38,7 +38,7 @@ export function usePlaceBet() {
       address: to,
       functionName,
       args,
-      chainId: CHAIN.id,
+      chainId: chain.id,
       value: betParams.betAmount + GAS_FEE,
     })
   }

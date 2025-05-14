@@ -31,7 +31,7 @@ import {
   COINTOSS_FACE,
   GenericCasinoBetParams,
 } from "@betswirl/sdk-core"
-import { usePlaceBet } from "../../hooks/usePlaceBet.ts"
+import { usePlaceBet } from "../../hooks/usePlaceBet"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
