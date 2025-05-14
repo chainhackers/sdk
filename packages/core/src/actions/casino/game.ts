@@ -11,7 +11,7 @@ import {
   type WEIGHTED_CASINO_GAME_TYPE,
   casinoChainById,
 } from "../../data/casino";
-import type { KenoEncodedInput } from "../../entities";
+import type { KenoEncodedInput, WeightedGameEncodedInput } from "../../entities";
 import type { CoinTossEncodedInput } from "../../entities/casino/cointoss";
 import type { DiceEncodedInput } from "../../entities/casino/dice";
 import type { RouletteEncodedInput } from "../../entities/casino/roulette";
@@ -63,7 +63,8 @@ export type GameEncodedInput =
   | CoinTossEncodedInput
   | DiceEncodedInput
   | RouletteEncodedInput
-  | KenoEncodedInput;
+  | KenoEncodedInput
+  | WeightedGameEncodedInput;
 export interface GenericCasinoBetParams extends CasinoBetParams {
   game: CASINO_GAME_TYPE;
   gameEncodedInput: GameEncodedInput;
@@ -219,11 +220,24 @@ export async function placeBet(
 }
 type GameAbi<T extends CASINO_GAME_TYPE> = NonNullable<CasinoChain["contracts"]["games"][T]>["abi"];
 
-export function getPlaceBetFunctionData(
-  gameParams: Omit<GenericCasinoBetParams, "receiver" | "vrfFees" | "token"> & {
+/* Previously was Omit<GenericCasinoBetParams, "receiver" | "vrfFees" | "token"> & {
     receiver: Hex;
     tokenAddress?: Hex;
-  },
+  } */
+export interface PlaceBetFunctionDataGameParams {
+  receiver: Hex;
+  game: CASINO_GAME_TYPE;
+  gameEncodedInput: GameEncodedInput;
+  betAmount: bigint;
+  tokenAddress?: Hex;
+  betCount?: number;
+  stopGain?: bigint;
+  stopLoss?: bigint;
+  affiliate?: Hex;
+}
+
+export function getPlaceBetFunctionData(
+  gameParams: PlaceBetFunctionDataGameParams,
   chainId: CasinoChainId,
 ): BetSwirlFunctionData<
   GameAbi<typeof gameParams.game>,
