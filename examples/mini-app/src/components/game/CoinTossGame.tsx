@@ -25,7 +25,8 @@ export interface CoinTossGameProps
     "--primary"?: string
     "--play-btn-font"?: string
     "--game-window-overlay"?: string
-  } & React.CSSProperties
+  } & React.CSSProperties,
+  backgroundImage?: string
 }
 
 const mockHistoryData: HistoryEntry[] = [
@@ -107,6 +108,7 @@ export function CoinTossGame({
   theme = "system",
   customTheme,
   className,
+  backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
   const [betAmount, setBetAmount] = useState("0")
@@ -181,7 +183,7 @@ export function CoinTossGame({
               "bg-muted",
             )}
             style={{
-              backgroundImage: `url(${coinTossBackground})`,
+              backgroundImage: `url(${backgroundImage})`,
             }}
           >
             <div
