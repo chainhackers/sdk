@@ -164,7 +164,7 @@ export function CoinTossGame({
                   className="h-7 w-7 mr-2"
                   address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9"
                 />
-                <Name className="text-secondary-foreground" />
+                <Name className="text-title-color" />
               </div>
             </ConnectWallet>
           </Wallet>
