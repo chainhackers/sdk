@@ -1,6 +1,6 @@
-import { useState } from "react"
-import { Hex, zeroAddress, decodeAbiParameters } from "viem"
-import { usePublicClient } from "wagmi"
+import { useState, useCallback } from "react"
+import { Hex, zeroAddress, Abi } from "viem"
+import { useReadContract } from "wagmi"
 import {
   CASINO_GAME_TYPE,
   CasinoChainId,
@@ -11,82 +11,66 @@ interface UseVrfCostProps {
   chainId: CasinoChainId
 }
 
+interface VrfContractCallParams {
+  address: Hex | undefined
+  abi: Abi | undefined
+  functionName: string | undefined
+  args: readonly unknown[] | undefined
+}
+
 export function useVrfCost({ chainId }: UseVrfCostProps) {
-  const publicClient = usePublicClient({ chainId })
+  const [contractCallParams, setContractCallParams] =
+    useState<VrfContractCallParams | null>(null)
 
-  const [vrfCost, setVrfCost] = useState<bigint | null>(null)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<Error | null>(null)
+  const {
+    data: rawVrfCost,
+    error: vrfCostError,
+    isLoading: isLoadingVrfCost,
+  } = useReadContract({
+    address: contractCallParams?.address,
+    abi: contractCallParams?.abi,
+    functionName: contractCallParams?.functionName,
+    args: contractCallParams?.args,
+    chainId: chainId,
+    query: {
+      enabled: !!contractCallParams?.address && !!contractCallParams?.abi,
+    },
+  })
 
-  const fetchVrfCost = async (
-    gameType: CASINO_GAME_TYPE,
-    numWords: number = 1,
-    tokenAddress: Hex = zeroAddress,
-  ) => {
-    setIsLoading(true)
-    setError(null)
-    setVrfCost(null)
-
-    if (!publicClient) {
-      const err = new Error(
-        "Public client is not available for the current chain.",
+  const getVrfCost = useCallback(
+    (
+      gameType: CASINO_GAME_TYPE,
+      betCount: number = 1,
+      tokenAddress: Hex = zeroAddress,
+    ) => {
+      const vrfFunctionData = getChainlinkVrfCostFunctionData(
+        gameType,
+        tokenAddress,
+        betCount,
+        chainId,
       )
-      setError(err)
-      setIsLoading(false)
-      console.error("useVrfCost:", err.message)
-      return null
-    }
 
-    const vrfFunctionData = getChainlinkVrfCostFunctionData(
-      gameType,
-      tokenAddress,
-      numWords,
-      chainId,
-    )
-
-    const currentGasPrice = await publicClient.getGasPrice()
-    const effectiveGasPrice = (currentGasPrice * 120n) / 100n
-
-    const vrfCallResult = await publicClient.call({
-      to: vrfFunctionData.data.to,
-      data: vrfFunctionData.encodedData,
-      gasPrice: effectiveGasPrice,
-    })
-
-    if (vrfCallResult.data === undefined) {
-      const err = new Error(
-        "Failed to retrieve VRF cost: contract call returned no data.",
-      )
-      setError(err)
-      setIsLoading(false)
-      console.error("useVrfCost:", err.message, {
-        vrfFunctionData,
-        vrfCallResult,
+      setContractCallParams({
+        address: vrfFunctionData.data.to,
+        abi: vrfFunctionData.data.abi,
+        functionName: vrfFunctionData.data.functionName,
+        args: vrfFunctionData.data.args,
       })
-      return null
-    }
+    },
+    [chainId],
+  )
 
-    const decodedCost = decodeAbiParameters(
-      [{ type: "uint256" }],
-      vrfCallResult.data,
-    )[0] as bigint
+  const resetVrfCostState = useCallback(() => {
+    setContractCallParams(null)
+  }, [])
 
-    setVrfCost(decodedCost)
-    setIsLoading(false)
-    return decodedCost
-  }
-
-  const resetVrfCostState = () => {
-    setVrfCost(null)
-    setIsLoading(false)
-    setError(null)
-  }
+  const vrfCost = typeof rawVrfCost === "bigint" ? rawVrfCost : undefined
 
   return {
     vrfCost,
-    isLoadingVrfCost: isLoading,
-    vrfCostError: error,
-    fetchVrfCost,
+    isLoadingVrfCost,
+    vrfCostError,
+    fetchVrfCost: getVrfCost,
     resetVrfCostState,
   }
 }

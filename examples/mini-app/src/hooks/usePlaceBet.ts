@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback } from "react"
 import { Hex, zeroAddress } from "viem"
 import { useWriteContract } from "wagmi"
 
@@ -13,6 +14,11 @@ interface UsePlaceBetProps {
   chainId?: CasinoChainId
 }
 
+interface BetRequest {
+  params: GenericCasinoBetParams
+  receiver: Hex
+}
+
 export function usePlaceBet({ chainId = CHAIN.id }: UsePlaceBetProps = {}) {
   const {
     data: transactionHash,
@@ -22,27 +28,53 @@ export function usePlaceBet({ chainId = CHAIN.id }: UsePlaceBetProps = {}) {
     reset: resetWriteContract,
   } = useWriteContract()
 
-  const { isLoadingVrfCost, vrfCostError, fetchVrfCost, resetVrfCostState } =
-    useVrfCost({ chainId })
+  const {
+    isLoadingVrfCost,
+    vrfCostError,
+    fetchVrfCost,
+    resetVrfCostState,
+    vrfCost,
+  } = useVrfCost({ chainId })
 
-  const isActive = isLoadingVrfCost || isTransactionPending
+  const [currentBetRequest, setCurrentBetRequest] = useState<BetRequest | null>(
+    null,
+  )
+  const [prepareBetError, setPrepareBetError] = useState<Error | null>(null)
 
-  const placeBet = async (betParams: GenericCasinoBetParams, receiver: Hex) => {
-    resetWriteContract()
-    resetVrfCostState()
+  const placeBet = useCallback(
+    (betParams: GenericCasinoBetParams, receiver: Hex) => {
+      resetWriteContract()
+      resetVrfCostState()
+      setPrepareBetError(null)
+      setCurrentBetRequest({ params: betParams, receiver })
+      fetchVrfCost(betParams.game, 1, zeroAddress)
+    },
+    [resetWriteContract, resetVrfCostState, fetchVrfCost],
+  )
 
-    const fetchedVrfCost = await fetchVrfCost(betParams.game, 1, zeroAddress)
-
-    if (fetchedVrfCost === null) {
-      console.error(
-        "usePlaceBet: Failed to fetch VRF cost. Error should be in vrfCostError from useVrfCost hook.",
-      )
+  useEffect(() => {
+    if (!currentBetRequest || isLoadingVrfCost) {
       return
     }
 
+    if (vrfCostError) {
+      setCurrentBetRequest(null)
+      return
+    }
+
+    if (vrfCost === undefined) {
+      setPrepareBetError(
+        new Error("Failed to determine VRF cost. Bet cannot be placed."),
+      )
+      setCurrentBetRequest(null)
+      return
+    }
+
+    const { params, receiver } = currentBetRequest
+
     const placeBetTxData = getPlaceBetFunctionData(
       {
-        ...betParams,
+        ...params,
         tokenAddress: zeroAddress,
         receiver,
       },
@@ -55,16 +87,25 @@ export function usePlaceBet({ chainId = CHAIN.id }: UsePlaceBetProps = {}) {
       functionName: placeBetTxData.data.functionName,
       args: placeBetTxData.data.args,
       chainId: chainId,
-      value: placeBetTxData.extraData.getValue(
-        betParams.betAmount + fetchedVrfCost,
-      ),
+      value: placeBetTxData.extraData.getValue(params.betAmount + vrfCost),
     })
-  }
+
+    setCurrentBetRequest(null)
+  }, [
+    currentBetRequest,
+    vrfCost,
+    isLoadingVrfCost,
+    vrfCostError,
+    chainId,
+    writeContract,
+  ])
+
+  const isActive = isLoadingVrfCost || isTransactionPending
 
   return {
     placeBet,
     isPlacingBet: isActive,
-    betError: vrfCostError || transactionError,
+    betError: vrfCostError || transactionError || prepareBetError,
     transactionHash,
   }
 }
