@@ -18,7 +18,7 @@ import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { useAccount, useBalance } from "wagmi"
-import { formatUnits, Hex } from "viem"
+import { formatUnits, Hex, parseEther } from "viem"
 
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
@@ -32,6 +32,7 @@ import {
   GenericCasinoBetParams,
 } from "@betswirl/sdk-core"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
+import { CHAIN } from "../../providers.tsx"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -138,8 +139,10 @@ export function CoinTossGame({
 
   const multiplier = 1.94
   const winChance = 50
+  const parsedBetAmountForPayout = Number.parseFloat(betAmount || "0")
   const targetPayout = (
-    Number.parseFloat(betAmount || "0") * multiplier
+    (Number.isNaN(parsedBetAmountForPayout) ? 0 : parsedBetAmountForPayout) *
+    multiplier
   ).toFixed(2)
   const fee = 0
 
@@ -152,26 +155,64 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const { placeBet } = usePlaceBet()
+  const {
+    placeBet,
+    isPlacingBet,
+    betError,
+    transactionHash,
+    resetWriteContractState,
+  } = usePlaceBet()
+
+  useEffect(() => {
+    if (transactionHash && !betError) {
+      const explorerUrl = CHAIN.blockExplorers?.default.url
+      const txMessage = explorerUrl
+        ? `Transaction Hash: ${transactionHash}, Link: ${explorerUrl}/tx/${transactionHash}`
+        : `Transaction Hash: ${transactionHash}`
+      console.log(`Bet placed! ${txMessage}`)
+    }
+  }, [transactionHash, betError])
 
   const placeBetCallback = useCallback(async () => {
-    if (address) {
-      //TODO use component state for bet params
-      const BET_AMOUNT = 10n ** 15n
-      const betParams: GenericCasinoBetParams = {
-        betAmount: BET_AMOUNT,
-        game: CASINO_GAME_TYPE.COINTOSS,
-        gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
-      }
-
-      placeBet(betParams, address as Hex)
+    if (!address || !isConnected) {
+      console.error("Attempted to place bet without address or connection.")
+      return
     }
-  }, [address, placeBet])
+
+    if (isPlacingBet) return
+
+    let betAmountWei: bigint
+    try {
+      betAmountWei = parseEther(betAmount)
+    } catch {
+      console.error("Invalid bet amount format:", betAmount)
+      alert("Invalid bet amount format. Please enter a valid number.")
+      return
+    }
+
+    if (betAmountWei <= 0n) {
+      console.error("Bet amount must be greater than 0.")
+      alert("Bet amount must be greater than 0.")
+      return
+    }
+
+    const betParams: GenericCasinoBetParams = {
+      betAmount: betAmountWei,
+      game: CASINO_GAME_TYPE.COINTOSS,
+      gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
+    }
+
+    placeBet(betParams, address as Hex)
+  }, [address, isConnected, betAmount, placeBet, isPlacingBet])
 
   const gameWindowOverlay =
     customTheme && "--game-window-overlay" in customTheme
       ? "bg-[var(--game-window-overlay)]"
       : ""
+
+  const isBetAmountInvalid =
+    Number.isNaN(Number.parseFloat(betAmount)) ||
+    Number.parseFloat(betAmount || "0") <= 0
 
   return (
     <div
@@ -309,9 +350,10 @@ export function CoinTossGame({
                 type="number"
                 placeholder="0"
                 value={betAmount}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setBetAmount(e.target.value)
-                }
+                  if (betError) resetWriteContractState()
+                }}
                 className="relative"
                 token={{
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
@@ -322,25 +364,31 @@ export function CoinTossGame({
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   variant="secondary"
-                  onClick={() =>
-                    setBetAmount((prev) =>
-                      (Number.parseFloat(prev || "0") / 2).toString(),
-                    )
-                  }
+                  onClick={() => {
+                    setBetAmount((prev) => {
+                      const prevNum = Number.parseFloat(prev || "0")
+                      return Number.isNaN(prevNum)
+                        ? "0"
+                        : (prevNum / 2).toString()
+                    })
+                    if (betError) resetWriteContractState()
+                  }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
                   1/2
                 </Button>
                 <Button
                   variant="secondary"
-                  onClick={() =>
+                  onClick={() => {
                     setBetAmount((prev) => {
                       const old = Number.parseFloat(prev || "0")
-                      return Math.min(balanceFloat, old * 2)
+                      const newAmount = Number.isNaN(old) ? 0 : old * 2
+                      return Math.min(balanceFloat, newAmount)
                         .toFixed(4)
                         .toString()
                     })
-                  }
+                    if (betError) resetWriteContractState()
+                  }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
                   2x
@@ -348,7 +396,10 @@ export function CoinTossGame({
                 <Button
                   variant="secondary"
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  onClick={() => setBetAmount(formattedBalance)}
+                  onClick={() => {
+                    setBetAmount(formattedBalance)
+                    if (betError) resetWriteContractState()
+                  }}
                 >
                   Max
                 </Button>
@@ -365,11 +416,20 @@ export function CoinTossGame({
               )}
               onClick={placeBetCallback}
               disabled={
-                !isConnected && Number.parseFloat(betAmount || "0") <= 0
+                !isConnected || !address || isPlacingBet || isBetAmountInvalid
               }
             >
-              {isConnected ? "Place Bet" : "Connect"}
+              {isConnected
+                ? isPlacingBet
+                  ? "Placing Bet..."
+                  : "Place Bet"
+                : "Connect Wallet"}
             </Button>
+            {betError && (
+              <p className="text-destructive text-sm mt-2 text-center">
+                Error: {betError.message || "Transaction failed"}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>

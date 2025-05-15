@@ -1,7 +1,6 @@
 import { createContext, useContext } from "react"
 import { Chain, Hex } from "viem"
 import { useWriteContract } from "wagmi"
-import { base } from "wagmi/chains"
 
 import {
   CasinoChainId,
@@ -15,15 +14,22 @@ const GAS_FEE = 10n ** 13n
 
 export const BetContext = createContext<{
   chain: Chain & { id: CasinoChainId }
-}>({ chain: base })
+}>({ chain: CHAIN })
 
 export function usePlaceBet() {
   const { chain } = useContext(BetContext)
-  const { data, writeContract } = useWriteContract()
+  const {
+    data: transactionHash,
+    isPending: isPlacingBet,
+    error: betError,
+    writeContract,
+    reset,
+  } = useWriteContract()
 
   const placeBet = (betParams: GenericCasinoBetParams, receiver: Hex) => {
     const {
       data: { to, abi, functionName, args },
+      extraData: { getValue },
     } = getPlaceBetFunctionData(
       {
         ...betParams,
@@ -31,7 +37,6 @@ export function usePlaceBet() {
       },
       chain.id,
     )
-    console.log(`to=${to}, abi.len=${abi.length}, args=${args}`)
 
     writeContract({
       abi,
@@ -39,8 +44,14 @@ export function usePlaceBet() {
       functionName,
       args,
       chainId: chain.id,
-      value: betParams.betAmount + GAS_FEE,
+      value: getValue(betParams.betAmount + GAS_FEE),
     })
   }
-  return { data, placeBet }
+  return {
+    placeBet,
+    isPlacingBet,
+    betError,
+    transactionHash,
+    resetWriteContractState: reset,
+  }
 }
