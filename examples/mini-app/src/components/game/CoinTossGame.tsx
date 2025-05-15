@@ -1,11 +1,5 @@
 import { History, Info } from "lucide-react"
-import React, {
-  ChangeEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react"
+import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import coinIcon from "../../assets/game/coin-background-icon.png"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
@@ -155,13 +149,7 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const {
-    placeBet,
-    isPlacingBet,
-    betError,
-    transactionHash,
-    resetWriteContractState,
-  } = usePlaceBet()
+  const { placeBet, isPlacingBet, betError, transactionHash } = usePlaceBet()
 
   useEffect(() => {
     if (transactionHash && !betError) {
@@ -173,37 +161,21 @@ export function CoinTossGame({
     }
   }, [transactionHash, betError])
 
-  const placeBetCallback = useCallback(async () => {
-    if (!address || !isConnected) {
-      console.error("Attempted to place bet without address or connection.")
-      return
-    }
-
-    if (isPlacingBet) return
-
-    let betAmountWei: bigint
-    try {
-      betAmountWei = parseEther(betAmount)
-    } catch {
-      console.error("Invalid bet amount format:", betAmount)
-      alert("Invalid bet amount format. Please enter a valid number.")
-      return
-    }
-
-    if (betAmountWei <= 0n) {
-      console.error("Bet amount must be greater than 0.")
-      alert("Bet amount must be greater than 0.")
+  const placeGameBet = async () => {
+    if (!address || !isConnected || isPlacingBet) {
+      console.error(
+        "Attempted to place bet without address or connection or while placing bet.",
+      )
       return
     }
 
     const betParams: GenericCasinoBetParams = {
-      betAmount: betAmountWei,
+      betAmount: parseEther(betAmount),
       game: CASINO_GAME_TYPE.COINTOSS,
       gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
     }
-
-    placeBet(betParams, address as Hex)
-  }, [address, isConnected, betAmount, placeBet, isPlacingBet])
+    await placeBet(betParams, address as Hex)
+  }
 
   const gameWindowOverlay =
     customTheme && "--game-window-overlay" in customTheme
@@ -352,7 +324,6 @@ export function CoinTossGame({
                 value={betAmount}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setBetAmount(e.target.value)
-                  if (betError) resetWriteContractState()
                 }}
                 className="relative"
                 token={{
@@ -371,7 +342,6 @@ export function CoinTossGame({
                         ? "0"
                         : (prevNum / 2).toString()
                     })
-                    if (betError) resetWriteContractState()
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
@@ -387,7 +357,6 @@ export function CoinTossGame({
                         .toFixed(4)
                         .toString()
                     })
-                    if (betError) resetWriteContractState()
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
@@ -398,7 +367,6 @@ export function CoinTossGame({
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   onClick={() => {
                     setBetAmount(formattedBalance)
-                    if (betError) resetWriteContractState()
                   }}
                 >
                   Max
@@ -414,7 +382,7 @@ export function CoinTossGame({
                 "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
-              onClick={placeBetCallback}
+              onClick={placeGameBet}
               disabled={
                 !isConnected || !address || isPlacingBet || isBetAmountInvalid
               }
@@ -425,11 +393,6 @@ export function CoinTossGame({
                   : "Place Bet"
                 : "Connect Wallet"}
             </Button>
-            {betError && (
-              <p className="text-destructive text-sm mt-2 text-center">
-                Error: {betError.message || "Transaction failed"}
-              </p>
-            )}
           </div>
         </CardContent>
       </Card>
