@@ -17,6 +17,7 @@ import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
+import { GameResultWindow } from "./GameResultWindow"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -131,14 +132,9 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const gameWindowOverlay =
-    customTheme && "--game-window-overlay" in customTheme
-      ? "bg-[var(--game-window-overlay)]"
-      : ""
-
   return (
     <div
-      className={cn("cointoss-game-wrapper", themeClass, className)}
+      className={cn("cointoss-game-wrapper global-styles", themeClass, className)}
       style={customTheme}
       {...props}
     >
@@ -150,7 +146,7 @@ export function CoinTossGame({
         )}
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-          <CardTitle className="text-lg text-title-color">CoinToss</CardTitle>
+          <CardTitle className="text-lg text-title-color font-bold">CoinToss</CardTitle>
           <Wallet>
             <ConnectWallet
               className={cn(
@@ -168,7 +164,7 @@ export function CoinTossGame({
                   className="h-7 w-7 mr-2"
                   address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9"
                 />
-                <Name className="text-secondary-foreground" />
+                <Name className="text-title-color" />
               </div>
             </ConnectWallet>
           </Wallet>
@@ -178,7 +174,7 @@ export function CoinTossGame({
           <div
             className={cn(
               "h-[160px] rounded-[16px] flex flex-col justify-end items-center relative bg-cover bg-center bg-no-repeat",
-              "bg-muted",
+              "bg-muted overflow-hidden",
             )}
             style={{
               backgroundImage: `url(${coinTossBackground})`,
@@ -187,7 +183,7 @@ export function CoinTossGame({
             <div
               className={cn(
                 "absolute inset-0 rounded-[16px]",
-                gameWindowOverlay,
+                "bg-game-window-overlay",
               )}
             ></div>
 
@@ -197,7 +193,7 @@ export function CoinTossGame({
                   variant="iconTransparent"
                   size="iconRound"
                   className={cn(
-                    "absolute top-2 left-2",
+                    "absolute top-2 left-2 z-10",
                     "text-white border border-border-stroke",
                     isInfoSheetOpen && "text-primary border-primary",
                   )}
@@ -225,8 +221,8 @@ export function CoinTossGame({
                   variant="iconTransparent"
                   size="iconRound"
                   className={cn(
-                    "absolute top-2 right-2",
-                    "text-white border border-border-stroke",
+                    "absolute top-2 right-2 z-5",
+                    "text-white border border-border-stroke bg-neutral-background",
                     isHistorySheetOpen && "text-primary border-primary",
                   )}
                 >
@@ -248,6 +244,12 @@ export function CoinTossGame({
               src={coinIcon}
               alt="Coin"
               className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2 h-16 w-16"
+            />
+            <GameResultWindow
+              result="pending"
+              amount={0.094}
+              payout={1.094}
+              currency="ETH"
             />
           </div>
 
