@@ -1,6 +1,8 @@
 import { type ReactNode } from "react"
 import { OnchainKitProvider } from "@coinbase/onchainkit"
-import { baseSepolia } from "wagmi/chains"
+import { base } from "wagmi/chains"
+
+export const CHAIN = base
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const apiKey = import.meta.env.VITE_PUBLIC_ONCHAINKIT_API_KEY as string
@@ -14,7 +16,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <OnchainKitProvider
       apiKey={apiKey}
-      chain={baseSepolia}
+      chain={CHAIN}
       config={{
         wallet: {
           display: "modal",

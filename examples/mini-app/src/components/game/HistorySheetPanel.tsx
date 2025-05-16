@@ -42,19 +42,19 @@ export function HistorySheetPanel({
       >
         <ScrollArea className="h-full w-full rounded-t-[16px] overflow-hidden">
           <div className="p-1 pt-0">
-            <Table>
+            <Table className="text-sm font-medium">
               <TableHeader>
                 <TableRow className="border-b border-table-separator">
-                  <TableHead className="px-3 py-2.5 text-muted-foreground font-medium top-0 bg-menu-bg">
+                  <TableHead className="px-3 py-2.5 text-text-on-surface-variant top-0 bg-menu-bg">
                     Draw
                   </TableHead>
-                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-menu-bg">
+                  <TableHead className="px-3 py-2.5 text-right text-text-on-surface-variant top-0 bg-menu-bg">
                     X
                   </TableHead>
-                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-menu-bg">
+                  <TableHead className="px-3 py-2.5 text-right text-text-on-surface-variant top-0 bg-menu-bg">
                     Payout
                   </TableHead>
-                  <TableHead className="px-3 py-2.5 text-right text-muted-foreground font-medium top-0 bg-menu-bg">
+                  <TableHead className="px-3 py-2.5 text-right text-text-on-surface-variant top-0 bg-menu-bg">
                     Time
                   </TableHead>
                 </TableRow>
@@ -84,7 +84,7 @@ export function HistorySheetPanel({
                     >
                       <TableCell
                         className={cn(
-                          "px-3 py-2.5 font-medium",
+                          "px-3 py-2.5",
                           entry.status === "Won bet"
                             ? "text-game-win"
                             : "text-game-loss",
@@ -92,16 +92,16 @@ export function HistorySheetPanel({
                       >
                         {entry.status}
                       </TableCell>
-                      <TableCell className="px-3 py-2.5 text-right text-foreground font-medium">
+                      <TableCell className="px-3 py-2.5 text-right text-table-text">
                         {entry.multiplier}
                       </TableCell>
-                      <TableCell className="px-3 py-2.5 text-foreground font-medium">
+                      <TableCell className="px-3 py-2.5 text-table-text">
                         <div className="flex items-center justify-end gap-1">
                           <span>{entry.payoutAmount}</span>
                           {entry.payoutCurrencyIcon}
                         </div>
                       </TableCell>
-                      <TableCell className="px-3 py-2.5 text-right text-muted-foreground font-medium">
+                      <TableCell className="px-3 py-2.5 text-right text-text-on-surface-variant">
                         {entry.timestamp}
                       </TableCell>
                     </TableRow>
