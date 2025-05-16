@@ -1,5 +1,5 @@
 import { History, Info } from "lucide-react"
-import React, { useState, ChangeEvent, useRef, useEffect } from "react"
+import React, { useState, ChangeEvent, useRef, useEffect, KeyboardEvent } from "react"
 import coinIcon from "../../assets/game/coin-background-icon.png"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
@@ -132,9 +132,15 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
+  const disableInputArrowKeys = (e: KeyboardEvent<HTMLInputElement>) => {
+    if(e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div
-      className={cn("cointoss-game-wrapper global-styles", themeClass, className)}
+      className={cn("cointoss-game-wrapper game-global-styles", themeClass, className)}
       style={customTheme}
       {...props}
     >
@@ -282,6 +288,7 @@ export function CoinTossGame({
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
                   symbol: "ETH",
                 }}
+                onKeyDown={disableInputArrowKeys}
               />
 
               <div className="grid grid-cols-3 gap-2">

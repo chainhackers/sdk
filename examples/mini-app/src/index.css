@@ -200,23 +200,23 @@
     src: url('./assets/fonts/Inter-Bold.woff2') format('woff2');
   }
 
-  .global-styles {
+  .game-global-styles{
     font-family: 'Inter', sans-serif;
     font-weight: 500;
-  }
 
-  /* Hide arrows for input[type=number] */
-  /* Chrome, Safari, Edge, Opera */
-  input[type="number"]::-webkit-outer-spin-button,
-  input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
+    /* Hide arrows for input[type=number] */
+    /* Chrome, Safari, Edge, Opera */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
 
-  /* Firefox */
-  input[type="number"] {
-    -moz-appearance: textfield;
-    appearance: textfield;
+    /* Firefox */
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
   }
 
   body {
