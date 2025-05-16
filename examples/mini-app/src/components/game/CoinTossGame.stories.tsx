@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { CoinTossGame } from "./CoinTossGame"
+import gameBg from "../../assets/game/game-background-1.png"
 
 const meta = {
   title: "Game/CoinTossGame",
@@ -19,6 +20,25 @@ const meta = {
     theme: {
       control: "radio",
       options: ["light", "dark", "system"],
+    },
+    customTheme: {
+      control: "object",
+      description: "Custom theme",
+      table: {
+        type: {
+          summary: "object",
+          detail: `{
+            "--primary": string,
+            "--play-btn-font": string,
+            "--game-window-overlay": string,
+          }`
+        }
+      }
+    },
+    backgroundImage: {
+      control: "file",
+      description: "Background image",
+      accept: "image/*",
     },
   },
 } satisfies Meta<typeof CoinTossGame>
@@ -54,7 +74,7 @@ export const SystemTheme: Story = {
   },
 }
 
-export const CustomTheme: Story = {
+export const CustomTheme1: Story = {
   ...Template,
   args: {
     theme: "light",
@@ -63,5 +83,18 @@ export const CustomTheme: Story = {
       "--play-btn-font": "#1B5E20",
       "--game-window-overlay": "oklch(0 0 0 / 40%)",
     } as React.CSSProperties,
+  },
+}
+
+export const CustomTheme2: Story = {
+  ...Template,
+  args: {
+    theme: "light",
+    customTheme: {
+      "--primary": "#6AB3D3",
+      "--play-btn-font": "#ffffff",
+      "--game-window-overlay": "oklch(0 0 0 / 10%)",
+    } as React.CSSProperties,
+    backgroundImage: gameBg,
   },
 }
