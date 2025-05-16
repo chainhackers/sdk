@@ -154,7 +154,9 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const { placeBet, isPlacingBet, betError, transactionHash } = usePlaceBet()
+  const { placeBet, isPlacingBet, betError, transactionHash } = usePlaceBet({
+    chainId: CHAIN.id,
+  })
 
   useEffect(() => {
     if (transactionHash && !betError) {
