@@ -1,5 +1,5 @@
 import { History, Info } from "lucide-react"
-import React, { ChangeEvent, useEffect, useRef, useState, KeyboardEvent } from "react"
+import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import coinIcon from "../../assets/game/coin-background-icon.png"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
@@ -187,11 +187,6 @@ export function CoinTossGame({
     Number.isNaN(Number.parseFloat(betAmount)) ||
     Number.parseFloat(betAmount || "0") <= 0
 
-  const disableInputArrowKeys = (e: KeyboardEvent<HTMLInputElement>) => {
-    if(e.key === "ArrowUp" || e.key === "ArrowDown") {
-      e.preventDefault();
-    }
-  };
   return (
     <div
       className={cn(
@@ -351,7 +346,6 @@ export function CoinTossGame({
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
                   symbol: "ETH",
                 }}
-                onKeyDown={disableInputArrowKeys}
               />
 
               <div className="grid grid-cols-3 gap-2">
