@@ -1,5 +1,5 @@
 import { History, Info } from "lucide-react"
-import React, { useState, ChangeEvent, useRef, useEffect } from "react"
+import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import coinIcon from "../../assets/game/coin-background-icon.png"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
@@ -8,16 +8,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 
-import { Wallet, ConnectWallet } from "@coinbase/onchainkit/wallet"
+import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
-import { useAccount } from "wagmi"
+import { useAccount, useBalance } from "wagmi"
+import { formatUnits, Hex, parseEther } from "viem"
 
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { GameResultWindow } from "./GameResultWindow"
+
+import {
+  CASINO_GAME_TYPE,
+  CoinToss,
+  COINTOSS_FACE,
+  GenericCasinoBetParams,
+} from "@betswirl/sdk-core"
+import { usePlaceBet } from "../../hooks/usePlaceBet"
+import { CHAIN } from "../../providers.tsx"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -111,15 +121,23 @@ export function CoinTossGame({
   ...props
 }: CoinTossGameProps) {
   const [betAmount, setBetAmount] = useState("0")
-  const [choice] = useState<"Heads" | "Tails">("Heads")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
+  const { data: balance } = useBalance({
+    address,
+  })
+  const balanceFloat = balance
+    ? parseFloat(formatUnits(balance.value, balance.decimals))
+    : 0
+  const formattedBalance = balanceFloat.toFixed(4)
 
   const multiplier = 1.94
   const winChance = 50
+  const parsedBetAmountForPayout = Number.parseFloat(betAmount || "0")
   const targetPayout = (
-    Number.parseFloat(betAmount || "0") * multiplier
+    (Number.isNaN(parsedBetAmountForPayout) ? 0 : parsedBetAmountForPayout) *
+    multiplier
   ).toFixed(2)
   const fee = 0
 
@@ -132,9 +150,45 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
+  const { placeBet, isPlacingBet, betError, transactionHash } = usePlaceBet()
+
+  useEffect(() => {
+    if (transactionHash && !betError) {
+      const explorerUrl = CHAIN.blockExplorers?.default.url
+      const txMessage = explorerUrl
+        ? `Transaction Hash: ${transactionHash}, Link: ${explorerUrl}/tx/${transactionHash}`
+        : `Transaction Hash: ${transactionHash}`
+      console.log(`Bet placed! ${txMessage}`)
+    }
+  }, [transactionHash, betError])
+
+  const placeGameBet = async () => {
+    if (!address || !isConnected || isPlacingBet) {
+      console.error(
+        "Attempted to place bet without address or connection or while placing bet.",
+      )
+      return
+    }
+
+    const betParams: GenericCasinoBetParams = {
+      betAmount: parseEther(betAmount),
+      game: CASINO_GAME_TYPE.COINTOSS,
+      gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
+    }
+    placeBet(betParams, address as Hex)
+  }
+
+  const isBetAmountInvalid =
+    Number.isNaN(Number.parseFloat(betAmount)) ||
+    Number.parseFloat(betAmount || "0") <= 0
+
   return (
     <div
-      className={cn("cointoss-game-wrapper global-styles", themeClass, className)}
+      className={cn(
+        "cointoss-game-wrapper global-styles",
+        themeClass,
+        className,
+      )}
       style={customTheme}
       {...props}
     >
@@ -146,7 +200,9 @@ export function CoinTossGame({
         )}
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-          <CardTitle className="text-lg text-title-color font-bold">CoinToss</CardTitle>
+          <CardTitle className="text-lg text-title-color font-bold">
+            CoinToss
+          </CardTitle>
           <Wallet>
             <ConnectWallet
               className={cn(
@@ -259,7 +315,7 @@ export function CoinTossGame({
                 <span className="text-text-on-surface-variant">
                   Balance:&nbsp;
                 </span>
-                <span className="font-semibold">0</span>
+                <span className="font-semibold">{formattedBalance}</span>
                 <TokenImage token={ETH_TOKEN} size={16} className="ml-1" />
               </div>
 
@@ -274,9 +330,9 @@ export function CoinTossGame({
                 type="number"
                 placeholder="0"
                 value={betAmount}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setBetAmount(e.target.value)
-                }
+                }}
                 className="relative"
                 token={{
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
@@ -287,22 +343,29 @@ export function CoinTossGame({
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   variant="secondary"
-                  onClick={() =>
-                    setBetAmount((prev) =>
-                      (Number.parseFloat(prev || "0") / 2).toString(),
-                    )
-                  }
+                  onClick={() => {
+                    setBetAmount((prev) => {
+                      const prevNum = Number.parseFloat(prev || "0")
+                      return Number.isNaN(prevNum)
+                        ? "0"
+                        : (prevNum / 2).toString()
+                    })
+                  }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
                   1/2
                 </Button>
                 <Button
                   variant="secondary"
-                  onClick={() =>
-                    setBetAmount((prev) =>
-                      (Number.parseFloat(prev || "0") * 2).toString(),
-                    )
-                  }
+                  onClick={() => {
+                    setBetAmount((prev) => {
+                      const old = Number.parseFloat(prev || "0")
+                      const newAmount = Number.isNaN(old) ? 0 : old * 2
+                      return Math.min(balanceFloat, newAmount)
+                        .toFixed(4)
+                        .toString()
+                    })
+                  }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                 >
                   2x
@@ -310,7 +373,9 @@ export function CoinTossGame({
                 <Button
                   variant="secondary"
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  onClick={() => alert("Max clicked!")}
+                  onClick={() => {
+                    setBetAmount(formattedBalance)
+                  }}
                 >
                   Max
                 </Button>
@@ -325,12 +390,16 @@ export function CoinTossGame({
                 "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
-              onClick={() => alert(`Betting ${betAmount} ETH on ${choice}`)}
+              onClick={placeGameBet}
               disabled={
-                !isConnected && Number.parseFloat(betAmount || "0") <= 0
+                !isConnected || !address || isPlacingBet || isBetAmountInvalid
               }
             >
-              {isConnected ? "Place Bet" : "Connect"}
+              {isConnected
+                ? isPlacingBet
+                  ? "Placing Bet..."
+                  : "Place Bet"
+                : "Connect Wallet"}
             </Button>
           </div>
         </CardContent>
