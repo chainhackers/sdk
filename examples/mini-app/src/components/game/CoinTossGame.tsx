@@ -36,7 +36,7 @@ export interface CoinTossGameProps
     "--primary"?: string
     "--play-btn-font"?: string
     "--game-window-overlay"?: string
-  } & React.CSSProperties,
+  } & React.CSSProperties
   backgroundImage?: string
 }
 
@@ -115,6 +115,8 @@ const mockHistoryData: HistoryEntry[] = [
   },
 ]
 
+const STEP = 0.0001
+
 export function CoinTossGame({
   theme = "system",
   customTheme,
@@ -187,7 +189,7 @@ export function CoinTossGame({
   return (
     <div
       className={cn(
-        "cointoss-game-wrapper global-styles",
+        "cointoss-game-wrapper game-global-styles",
         themeClass,
         className,
       )}
@@ -331,6 +333,9 @@ export function CoinTossGame({
                 id="betAmount"
                 type="number"
                 placeholder="0"
+                min={0}
+                max={balanceFloat}
+                step={STEP}
                 value={betAmount}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setBetAmount(e.target.value)
