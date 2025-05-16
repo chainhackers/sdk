@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { Hex, zeroAddress } from "viem"
-import { useWriteContract } from "wagmi"
+import { useAccount, useWriteContract } from "wagmi"
 
 import {
   CasinoChainId,
@@ -36,6 +36,8 @@ export function usePlaceBet({ chainId = CHAIN.id }: UsePlaceBetProps = {}) {
     vrfCost,
   } = useVrfCost({ chainId })
 
+  const { chainId: currentChainId } = useAccount()
+
   const [currentBetRequest, setCurrentBetRequest] = useState<BetRequest | null>(
     null,
   )
@@ -43,13 +45,25 @@ export function usePlaceBet({ chainId = CHAIN.id }: UsePlaceBetProps = {}) {
 
   const placeBet = useCallback(
     (betParams: GenericCasinoBetParams, receiver: Hex) => {
+      if (currentChainId !== chainId) {
+        console.error(
+          `Wrong network. Expected: ${chainId}, connected: ${currentChainId}`,
+        )
+        return
+      }
       resetWriteContract()
       resetVrfCostState()
       setPrepareBetError(null)
       setCurrentBetRequest({ params: betParams, receiver })
       fetchVrfCost(betParams.game, 1, zeroAddress)
     },
-    [resetWriteContract, resetVrfCostState, fetchVrfCost],
+    [
+      resetWriteContract,
+      resetVrfCostState,
+      fetchVrfCost,
+      chainId,
+      currentChainId,
+    ],
   )
 
   useEffect(() => {
