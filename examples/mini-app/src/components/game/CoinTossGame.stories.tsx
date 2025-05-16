@@ -74,7 +74,7 @@ export const SystemTheme: Story = {
   },
 }
 
-export const CustomTheme: Story = {
+export const CustomTheme1: Story = {
   ...Template,
   args: {
     theme: "light",
@@ -86,7 +86,7 @@ export const CustomTheme: Story = {
   },
 }
 
-export const CustomThemeAndBackground: Story = {
+export const CustomTheme2: Story = {
   ...Template,
   args: {
     theme: "light",
