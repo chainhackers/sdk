@@ -135,7 +135,6 @@ export function CoinTossGame({
     ? parseFloat(formatUnits(balance.value, balance.decimals))
     : 0
   const formattedBalance = balanceFloat.toFixed(4)
-  const currentStep = balanceFloat < STEP ? balanceFloat : STEP
 
   const multiplier = 1.94
   const winChance = 50
@@ -336,7 +335,7 @@ export function CoinTossGame({
                 placeholder="0"
                 min={0}
                 max={balanceFloat}
-                step={currentStep}
+                step={STEP}
                 value={betAmount}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setBetAmount(e.target.value)
