@@ -36,6 +36,9 @@ export abstract class AbstractCasinoGame<TInput, TEncodedInput, TRolled, TEncode
   encodeInput(_input: TInput | string): TEncodedInput {
     throw new Error("Not implemented");
   }
+  encodeAbiParametersInput(_input: TInput | string): TEncodedInput {
+    throw new Error("Not implemented");
+  }
   decodeInput(_encodedInput: TEncodedInput | string): TInput {
     throw new Error("Not implemented");
   }

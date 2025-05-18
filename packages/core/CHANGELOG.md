@@ -1,5 +1,21 @@
 # @betswirl/sdk-core
 
+## 0.1.2-beta.0
+
+### Patch Changes
+
+- Add place freebet
+
+- Add fetch campaign & freebets from clients
+
+## 0.1.1
+
+### Patch Changes
+
+- Improve getPlaceBetFunctionData params typing
+
+- Add freebet & campaign fetching
+
 ## 0.1.0
 
 ### Minor Changes

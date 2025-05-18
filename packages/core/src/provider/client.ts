@@ -27,20 +27,37 @@ import { fetchToken, fetchTokens } from "../data/subgraphs/protocol/clients/toke
 import type { BetSwirlWallet } from "./wallet";
 
 import type { ApolloCache, DefaultOptions } from "@apollo/client/core/index.js";
-import type { CoinTossParams, CoinTossPlacedBet } from "../actions/casino/cointoss";
-import type { DiceParams } from "../actions/casino/dice";
+import type {
+  CoinTossBetParams,
+  CoinTossFreebetParams,
+  CoinTossPlacedBet,
+} from "../actions/casino/cointoss";
+import type { DiceBetParams, DiceFreebetParams } from "../actions/casino/dice";
 import type { DicePlacedBet } from "../actions/casino/dice";
 import type {
   CasinoPlaceBetOptions,
   NormalCasinoPlacedBet,
   PlaceBetCallbacks,
+  PlaceFreebetCallbacks,
   WeightedCasinoPlacedBet,
 } from "../actions/casino/game";
-import type { KenoParams, KenoPlacedBet } from "../actions/casino/keno";
-import type { RouletteParams, RoulettePlacedBet } from "../actions/casino/roulette";
-import type { WheelParams, WheelPlacedBet } from "../actions/casino/wheel";
+import type { KenoBetParams, KenoFreebetParams, KenoPlacedBet } from "../actions/casino/keno";
+import type {
+  RouletteBetParams,
+  RouletteFreebetParams,
+  RoulettePlacedBet,
+} from "../actions/casino/roulette";
+import type { WheelBetParams, WheelFreebetParams, WheelPlacedBet } from "../actions/casino/wheel";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
-import type { ChainId } from "../data";
+import {
+  type ChainId,
+  FREEBET_CAMPAIGN_STATUS,
+  type FreebetCampaign,
+  type SignedFreebet,
+  fetchFreebetCampaign,
+  fetchFreebetCampaigns,
+  fetchFreebets,
+} from "../data";
 import type {
   CasinoRolledBet,
   CasinoWaitRollOptions,
@@ -68,6 +85,9 @@ export interface BetSwirlClientOptions {
     cache?: ApolloCache<any>;
     defaultOptions?: DefaultOptions;
   };
+  api?: {
+    testMode?: boolean;
+  };
 }
 
 export abstract class BetSwirlClient {
@@ -94,10 +114,16 @@ export abstract class BetSwirlClient {
   ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
 
   abstract playCoinToss(
-    params: CoinTossParams,
+    params: CoinTossBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract playFreebetCoinToss(
+    params: CoinTossFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: CoinTossPlacedBet; receipt: TransactionReceipt }>;
 
   abstract waitCoinToss(
     placedBet: CoinTossPlacedBet,
@@ -105,10 +131,16 @@ export abstract class BetSwirlClient {
   ): Promise<{ rolledBet: CoinTossRolledBet; receipt: TransactionReceipt }>;
 
   abstract playDice(
-    params: DiceParams,
+    params: DiceBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }>;
+
+  abstract playFreebetDice(
+    params: DiceFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: DicePlacedBet; receipt: TransactionReceipt }>;
 
   abstract waitDice(
     placedBet: DicePlacedBet,
@@ -116,10 +148,16 @@ export abstract class BetSwirlClient {
   ): Promise<{ rolledBet: DiceRolledBet; receipt: TransactionReceipt }>;
 
   abstract playRoulette(
-    params: RouletteParams,
+    params: RouletteBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: RoulettePlacedBet; receipt: TransactionReceipt }>;
+
+  abstract playFreebetRoulette(
+    params: RouletteFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: RoulettePlacedBet; receipt: TransactionReceipt }>;
 
   abstract waitRoulette(
     placedBet: RoulettePlacedBet,
@@ -127,10 +165,16 @@ export abstract class BetSwirlClient {
   ): Promise<{ rolledBet: RouletteRolledBet; receipt: TransactionReceipt }>;
 
   abstract playKeno(
-    params: KenoParams,
+    params: KenoBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: KenoPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract playFreebetKeno(
+    params: KenoFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: KenoPlacedBet; receipt: TransactionReceipt }>;
 
   abstract waitKeno(
     placedBet: KenoPlacedBet,
@@ -138,10 +182,16 @@ export abstract class BetSwirlClient {
   ): Promise<{ rolledBet: KenoRolledBet; receipt: TransactionReceipt }>;
 
   abstract playWheel(
-    params: WheelParams,
+    params: WheelBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: WheelPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract playFreebetWheel(
+    params: WheelFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: WheelPlacedBet; receipt: TransactionReceipt }>;
 
   abstract waitWheel(
     placedBet: WheelPlacedBet,
@@ -270,5 +320,38 @@ export abstract class BetSwirlClient {
       chainId: casinoChainId,
       formatType: this.betSwirlDefaultOptions.formatType,
     });
+  }
+
+  // API calls
+  async fetchFreebets(
+    player: Address,
+    affiliates?: Address[],
+    withExternalBankrollFreebets = false,
+  ): Promise<SignedFreebet[]> {
+    return fetchFreebets(
+      player,
+      affiliates,
+      withExternalBankrollFreebets,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
+    );
+  }
+
+  async fetchFreebetCampaigns(
+    limit = 10,
+    offset = 0,
+    status?: FREEBET_CAMPAIGN_STATUS,
+    affiliate?: Address,
+  ): Promise<FreebetCampaign[]> {
+    return fetchFreebetCampaigns(
+      limit,
+      offset,
+      status,
+      affiliate,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
+    );
+  }
+
+  async fetchFreebetCampaign(id: number): Promise<FreebetCampaign | null> {
+    return fetchFreebetCampaign(id, Boolean(this.betSwirlDefaultOptions.api?.testMode));
   }
 }

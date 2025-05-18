@@ -9,7 +9,8 @@ import {
   type CasinoToken,
   type CasinoWaitRollOptions,
   type CoinTossRolledBet,
-  type DiceParams,
+  type DiceBetParams,
+  type DiceFreebetParams,
   type DicePlacedBet,
   type DiceRolledBet,
   type GAS_PRICE_TYPE,
@@ -17,7 +18,9 @@ import {
   type KenoRolledBet,
   type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
-  type RouletteParams,
+  type PlaceFreebetCallbacks,
+  type RouletteBetParams,
+  type RouletteFreebetParams,
   type RoulettePlacedBet,
   type RouletteRolledBet,
   type Token,
@@ -31,17 +34,35 @@ import {
   getChainlinkVrfCost,
   getKenoConfiguration,
   placeDiceBet,
+  placeDiceFreebet,
   placeRouletteBet,
+  placeRouletteFreebet,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
   waitKenoRolledBet,
   waitRolledBet,
   waitRouletteRolledBet,
 } from "..";
-import { type CoinTossPlacedBet, placeCoinTossBet } from "../actions/casino/cointoss";
-import type { CoinTossParams } from "../actions/casino/cointoss";
-import { type KenoParams, type KenoPlacedBet, placeKenoBet } from "../actions/casino/keno";
-import { type WheelParams, type WheelPlacedBet, placeWheelBet } from "../actions/casino/wheel";
+import {
+  type CoinTossPlacedBet,
+  placeCoinTossBet,
+  placeCoinTossFreebet,
+} from "../actions/casino/cointoss";
+import type { CoinTossBetParams, CoinTossFreebetParams } from "../actions/casino/cointoss";
+import {
+  type KenoBetParams,
+  type KenoFreebetParams,
+  type KenoPlacedBet,
+  placeKenoBet,
+  placeKenoFreebet,
+} from "../actions/casino/keno";
+import {
+  type WheelBetParams,
+  type WheelFreebetParams,
+  type WheelPlacedBet,
+  placeWheelBet,
+  placeWheelFreebet,
+} from "../actions/casino/wheel";
 import type { CASINO_GAME_TYPE } from "../data";
 import {
   type WeightedGameConfiguration,
@@ -100,13 +121,29 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   }
 
   async playCoinToss(
-    params: CoinTossParams,
+    params: CoinTossBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
     return placeCoinTossBet(
       this.betSwirlWallet,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetCoinToss(
+    params: CoinTossFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
+    return placeCoinTossFreebet(
+      this.betSwirlWallet,
+      params,
       {
         ...this.betSwirlDefaultOptions,
         ...options,
@@ -126,13 +163,29 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   }
 
   async playDice(
-    params: DiceParams,
+    params: DiceBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
     return placeDiceBet(
       this.betSwirlWallet,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetDice(
+    params: DiceFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: DicePlacedBet; receipt: TransactionReceipt }> {
+    return placeDiceFreebet(
+      this.betSwirlWallet,
+      params,
       {
         ...this.betSwirlDefaultOptions,
         ...options,
@@ -152,13 +205,29 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   }
 
   async playRoulette(
-    params: RouletteParams,
+    params: RouletteBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: RoulettePlacedBet; receipt: TransactionReceipt }> {
     return placeRouletteBet(
       this.betSwirlWallet,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetRoulette(
+    params: RouletteFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: RoulettePlacedBet; receipt: TransactionReceipt }> {
+    return placeRouletteFreebet(
+      this.betSwirlWallet,
+      params,
       {
         ...this.betSwirlDefaultOptions,
         ...options,
@@ -178,13 +247,29 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   }
 
   async playKeno(
-    params: KenoParams,
+    params: KenoBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: KenoPlacedBet; receipt: TransactionReceipt }> {
     return placeKenoBet(
       this.betSwirlWallet,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetKeno(
+    params: KenoFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: KenoPlacedBet; receipt: TransactionReceipt }> {
+    return placeKenoFreebet(
+      this.betSwirlWallet,
+      params,
       {
         ...this.betSwirlDefaultOptions,
         ...options,
@@ -204,13 +289,29 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   }
 
   async playWheel(
-    params: WheelParams,
+    params: WheelBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
   ): Promise<{ placedBet: WheelPlacedBet; receipt: TransactionReceipt }> {
     return placeWheelBet(
       this.betSwirlWallet,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetWheel(
+    params: WheelFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: WheelPlacedBet; receipt: TransactionReceipt }> {
+    return placeWheelFreebet(
+      this.betSwirlWallet,
+      params,
       {
         ...this.betSwirlDefaultOptions,
         ...options,

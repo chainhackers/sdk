@@ -336,7 +336,6 @@ export async function getCasinoGames(
   onlyActive = false,
 ): Promise<CasinoGame[]> {
   const casinoChainId = getCasinoChainId(wallet);
-
   const casinoChain = casinoChainById[casinoChainId];
 
   const games = casinoChain.contracts.games;

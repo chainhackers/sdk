@@ -1,5 +1,23 @@
 # @betswirl/wagmi-provider
 
+## 0.1.2-beta.0
+
+### Patch Changes
+
+- Add place freebet
+
+- Add fetch campaign & freebets from clients
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.2-beta.0
+
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`41a7eed`](https://github.com/BetSwirl/sdk/commit/41a7eed274fccaa774102184f8e973db7b2e6fff)]:
+  - @betswirl/sdk-core@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
