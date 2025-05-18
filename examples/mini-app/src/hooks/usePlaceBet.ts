@@ -10,17 +10,17 @@ import {
   CoinToss,
 } from "@betswirl/sdk-core"
 import { useVrfCost } from "./useVrfCost"
-
-interface UsePlaceBetProps {
-  chainId: CasinoChainId
-}
+import { useOnchainKit } from "@coinbase/onchainkit"
 
 interface BetRequest {
   params: GenericCasinoBetParams
   receiver: Hex
 }
 
-export function usePlaceBet({ chainId }: UsePlaceBetProps) {
+export function usePlaceBet() {
+  const { chain } = useOnchainKit()
+  const chainId = chain.id as CasinoChainId
+
   const {
     data: transactionHash,
     isPending: isTransactionPending,
@@ -35,7 +35,7 @@ export function usePlaceBet({ chainId }: UsePlaceBetProps) {
     fetchVrfCost,
     resetVrfCostState,
     vrfCost,
-  } = useVrfCost({ chainId })
+  } = useVrfCost()
 
   const { chainId: currentConnectedChainId } = useAccount()
   const publicClient = usePublicClient({ chainId })

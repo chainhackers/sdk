@@ -27,7 +27,7 @@ import {
   GenericCasinoBetParams,
 } from "@betswirl/sdk-core"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
-import { CHAIN } from "../../providers.tsx"
+import { useOnchainKit } from "@coinbase/onchainkit"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -122,6 +122,7 @@ export function CoinTossGame({
   backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
+  const { chain } = useOnchainKit()
   const [betAmount, setBetAmount] = useState("0")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
@@ -152,19 +153,17 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const { placeBet, isPlacingBet, betError, transactionHash } = usePlaceBet({
-    chainId: CHAIN.id,
-  })
+  const { placeBet, isPlacingBet, betError, transactionHash } = usePlaceBet()
 
   useEffect(() => {
     if (transactionHash && !betError) {
-      const explorerUrl = CHAIN.blockExplorers?.default.url
+      const explorerUrl = chain.blockExplorers?.default.url
       const txMessage = explorerUrl
         ? `Transaction Hash: ${transactionHash}, Link: ${explorerUrl}/tx/${transactionHash}`
         : `Transaction Hash: ${transactionHash}`
       console.log(`Bet placed! ${txMessage}`)
     }
-  }, [transactionHash, betError])
+  }, [chain, transactionHash, betError])
 
   const placeGameBet = async () => {
     if (!address || !isConnected || isPlacingBet) {

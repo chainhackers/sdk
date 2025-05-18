@@ -2,15 +2,17 @@ import { type ReactNode } from "react"
 import { OnchainKitProvider } from "@coinbase/onchainkit"
 import { base } from "wagmi/chains"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { http } from "viem"
+import { http, type Hex } from "viem"
 import { createConfig, WagmiProvider } from "wagmi"
+import { BettingConfigProvider } from "./context/BettingConfigContext.tsx"
 
-export const CHAIN = base
+const CHAIN = base
 
 const queryClient = new QueryClient()
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const apiKey = import.meta.env.VITE_PUBLIC_ONCHAINKIT_API_KEY as string
+  const affiliate = import.meta.env.AFFILIATE_ADDRESS as Hex
 
   if (!apiKey && import.meta.env.DEV) {
     console.warn(
@@ -47,7 +49,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
             },
           }}
         >
-          {children}
+          <BettingConfigProvider value={{ affiliate }}>
+            {children}
+          </BettingConfigProvider>
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

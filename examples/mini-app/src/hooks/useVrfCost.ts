@@ -1,24 +1,24 @@
+import { useOnchainKit } from "@coinbase/onchainkit"
 import { useState, useCallback } from "react"
-import { Hex, zeroAddress, Abi } from "viem"
+import { type Abi, type Hex, zeroAddress } from "viem"
 import { useReadContract } from "wagmi"
 import {
   CASINO_GAME_TYPE,
-  CasinoChainId,
+  type CasinoChainId,
   getChainlinkVrfCostFunctionData,
 } from "@betswirl/sdk-core"
 
-interface UseVrfCostProps {
-  chainId: CasinoChainId
-}
-
 interface VrfContractCallParams {
-  address: Hex | undefined
-  abi: Abi | undefined
-  functionName: string | undefined
-  args: readonly unknown[] | undefined
+  address: Hex
+  abi: Abi
+  functionName: string
+  args: readonly [Hex, number]
 }
 
-export function useVrfCost({ chainId }: UseVrfCostProps) {
+export function useVrfCost() {
+  const { chain } = useOnchainKit()
+  const chainId = chain.id as CasinoChainId
+  console.log("chainId", chainId)
   const [contractCallParams, setContractCallParams] =
     useState<VrfContractCallParams | null>(null)
 
