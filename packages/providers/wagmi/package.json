@@ -1,11 +1,11 @@
 {
-  "name": "@betswirl/wagmi-provider",
+  "name": "@chainhackers/wagmi-provider",
   "description": "Wagmi client & wallet for Betswirl core SDK",
   "version": "0.1.0",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/betswirl/sdk.git",
+    "url": "https://github.com/chainhackers/sdk.git",
     "directory": "packages/providers/wagmi"
   },
   "type": "module",
@@ -34,7 +34,7 @@
   },
   "files": ["dist"],
   "dependencies": {
-    "@betswirl/sdk-core": "workspace:*",
+    "@chainhackers/sdk-core": "^0.1.0",
     "viem": "catalog:"
   },
   "devDependencies": {

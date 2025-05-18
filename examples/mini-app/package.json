@@ -1,8 +1,14 @@
 {
-  "name": "shadcn-components-test",
-  "private": true,
+  "name": "@chainhackers/ui",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chainhackers/sdk.git",
+    "directory": "examples/mini-app"
+  },
   "version": "0.0.1",
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,7 +19,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@betswirl/sdk-core": "^0.1.0",
+    "@chainhackers/sdk-core": "^0.1.0",
     "@coinbase/onchainkit": "^0.38.13",
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-label": "^2.1.4",
@@ -64,8 +70,6 @@
     "vitest": "^3.1.2"
   },
   "eslintConfig": {
-    "extends": [
-      "plugin:storybook/recommended"
-    ]
+    "extends": ["plugin:storybook/recommended"]
   }
 }

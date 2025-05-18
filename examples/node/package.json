@@ -1,6 +1,11 @@
 {
   "name": "@examples/node",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chainhackers/sdk.git",
+    "directory": "examples/node"
+  },
   "version": "1.0.0",
   "description": "",
   "main": "src/index.ts",
@@ -12,8 +17,8 @@
   "license": "ISC",
   "dependencies": {
     "@apollo/client": "^3.12.11",
-    "@betswirl/sdk-core": "workspace:*",
-    "@betswirl/wagmi-provider": "workspace:*",
+    "@chainhackers/sdk-core": "^0.1.0",
+    "@chainhackers/wagmi-provider": "workspace:*",
     "@inquirer/prompts": "^7.3.1",
     "@wagmi/core": "^2.16.3",
     "viem": "catalog:"
