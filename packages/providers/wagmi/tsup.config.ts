@@ -26,4 +26,9 @@ export default defineConfig({
     js: format === "esm" ? ".mjs" : ".cjs",
   }),
   treeshake: true,
+  esbuildOptions(options) {
+    options.alias = {
+      "@betswirl/sdk-core": "@chainhackers/sdk-core",
+    };
+  },
 });
