@@ -13,7 +13,6 @@ import {
   getChainlinkVrfCostFunctionData,
   getPlaceBetFunctionData,
   CoinToss,
-  CASINO_GAME_TYPE,
   CASINO_GAME_ROLL_ABI,
 } from "@betswirl/sdk-core"
 
@@ -120,7 +119,7 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
 
         if (rollArgs.id.toString() === betId) {
           if (
-            gameType === CASINO_GAME_TYPE.COINTOSS &&
+            gameType === betParams.game &&
             rollArgs.rolled &&
             rollArgs.rolled.length > 0
           ) {
