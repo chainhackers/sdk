@@ -1,7 +1,7 @@
 {
   "name": "@chainhackers/sdk-core",
   "description": "VanillaJS library for Betswirl protocol",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -34,7 +34,7 @@
   "peerDependencies": {
     "@apollo/client": ">=3.12.11",
     "typescript": ">=5.0.4",
-    "viem": "catalog:"
+    "viem": "^2.29.2"
   },
   "peerDependenciesMeta": {
     "typescript": {

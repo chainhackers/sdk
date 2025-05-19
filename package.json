@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@betswirl/sdk",
+  "name": "@chainhackers/sdk",
   "packageManager": "pnpm@10.10.0",
   "scripts": {
     "build": "pnpm turbo build",

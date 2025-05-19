@@ -5,7 +5,7 @@
     "url": "https://github.com/chainhackers/sdk.git",
     "directory": "examples/mini-app"
   },
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,7 +19,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@chainhackers/sdk-core": "^0.1.0",
+    "@chainhackers/sdk-core": "^0.1.1",
     "@coinbase/onchainkit": "^0.38.13",
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-label": "^2.1.4",
