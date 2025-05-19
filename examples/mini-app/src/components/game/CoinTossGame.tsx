@@ -12,7 +12,7 @@ import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { useAccount, useBalance } from "wagmi"
-import { formatUnits, Hex, parseEther } from "viem"
+import { formatUnits, parseEther } from "viem"
 
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
@@ -20,14 +20,8 @@ import { InfoSheetPanel } from "./InfoSheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { GameResultWindow } from "./GameResultWindow"
 
-import {
-  CASINO_GAME_TYPE,
-  CoinToss,
-  COINTOSS_FACE,
-  GenericCasinoBetParams,
-} from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, CoinToss, COINTOSS_FACE } from "@betswirl/sdk-core"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
-import { useOnchainKit } from "@coinbase/onchainkit"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -122,7 +116,6 @@ export function CoinTossGame({
   backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
-  const { chain } = useOnchainKit()
   const [betAmount, setBetAmount] = useState("0")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
@@ -153,33 +146,11 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const { placeBet, isPlacingBet, betError, transactionHash } = usePlaceBet()
-
-  useEffect(() => {
-    if (transactionHash && !betError) {
-      const explorerUrl = chain.blockExplorers?.default.url
-      const txMessage = explorerUrl
-        ? `Transaction Hash: ${transactionHash}, Link: ${explorerUrl}/tx/${transactionHash}`
-        : `Transaction Hash: ${transactionHash}`
-      console.log(`Bet placed! ${txMessage}`)
-    }
-  }, [chain, transactionHash, betError])
-
-  const placeGameBet = async () => {
-    if (!address || !isConnected || isPlacingBet) {
-      console.error(
-        "Attempted to place bet without address or connection or while placing bet.",
-      )
-      return
-    }
-
-    const betParams: GenericCasinoBetParams = {
-      betAmount: parseEther(betAmount),
-      game: CASINO_GAME_TYPE.COINTOSS,
-      gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
-    }
-    placeBet(betParams, address as Hex)
-  }
+  const { placeBet } = usePlaceBet({
+    betAmount: parseEther(betAmount),
+    game: CASINO_GAME_TYPE.COINTOSS,
+    gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
+  })
 
   const isBetAmountInvalid =
     Number.isNaN(Number.parseFloat(betAmount)) ||
@@ -393,16 +364,10 @@ export function CoinTossGame({
                 "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
-              onClick={placeGameBet}
-              disabled={
-                !isConnected || !address || isPlacingBet || isBetAmountInvalid
-              }
+              onClick={placeBet}
+              disabled={!isConnected || !address || isBetAmountInvalid}
             >
-              {isConnected
-                ? isPlacingBet
-                  ? "Placing Bet..."
-                  : "Place Bet"
-                : "Connect Wallet"}
+              {isConnected ? "Place Bet" : "Connect Wallet"}
             </Button>
           </div>
         </CardContent>

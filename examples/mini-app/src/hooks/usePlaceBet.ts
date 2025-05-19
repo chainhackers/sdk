@@ -1,335 +1,237 @@
-import { useState, useEffect, useCallback } from "react"
-import { Hex, zeroAddress, decodeEventLog } from "viem"
-import { useAccount, useWriteContract, usePublicClient } from "wagmi"
-
+import { useState, useCallback } from "react"
+import { Hex, zeroAddress, decodeEventLog, Abi, parseAbiItem } from "viem"
 import {
-  CasinoChainId,
-  GenericCasinoBetParams,
-  getPlaceBetFunctionData,
-  CASINO_GAME_TYPE,
-  CoinToss,
-} from "@betswirl/sdk-core"
-import { useVrfCost } from "./useVrfCost"
+  useAccount,
+  usePublicClient,
+  useWriteContract,
+  useWatchContractEvent,
+} from "wagmi"
 import { useOnchainKit } from "@coinbase/onchainkit"
+import {
+  GenericCasinoBetParams,
+  CasinoChainId,
+  getChainlinkVrfCostFunctionData,
+  getPlaceBetFunctionData,
+  CoinToss,
+  CASINO_GAME_TYPE,
+  CASINO_GAME_ROLL_ABI,
+} from "@betswirl/sdk-core"
 
-interface BetRequest {
-  params: GenericCasinoBetParams
-  receiver: Hex
+interface WatchTarget {
+  betId: string
+  contractAddress: Hex
+  gameType: GenericCasinoBetParams["game"]
 }
 
-export function usePlaceBet() {
+interface SubmitBetResult {
+  txHash: Hex
+  contractAddress: Hex
+  gameAbiForPlaceBet: Abi
+}
+
+const POLLING_INTERVAL = 2500
+
+export function usePlaceBet(betParams: GenericCasinoBetParams) {
   const { chain } = useOnchainKit()
-  const chainId = chain.id as CasinoChainId
-
-  const {
-    data: transactionHash,
-    isPending: isTransactionPending,
-    error: transactionError,
-    writeContract,
-    reset: resetWriteContract,
-  } = useWriteContract()
-
-  const {
-    isLoadingVrfCost,
-    vrfCostError,
-    fetchVrfCost,
-    resetVrfCostState,
-    vrfCost,
-  } = useVrfCost()
-
-  const { chainId: currentConnectedChainId } = useAccount()
+  const chainId = chain?.id as CasinoChainId | undefined
   const publicClient = usePublicClient({ chainId })
+  const { address: connectedAddress } = useAccount()
+  const { writeContractAsync, reset: resetWagmiWriteContract } =
+    useWriteContract()
 
-  const [currentBetRequest, setCurrentBetRequest] = useState<BetRequest | null>(
-    null,
-  )
-  const [prepareBetError, setPrepareBetError] = useState<Error | null>(null)
+  const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
+  const rollEventAbiItem = parseAbiItem(CASINO_GAME_ROLL_ABI[betParams.game])
 
-  const [isWaitingForRollEvent, setIsWaitingForRollEvent] =
-    useState<boolean>(false)
-  const [activeBetDetailsForRoll, setActiveBetDetailsForRoll] = useState<{
-    betId: string
-    betAmount: bigint
-    gameType: CASINO_GAME_TYPE
-  } | null>(null)
-  const [rollEventError, setRollEventError] = useState<Error | null>(null)
+  const placeBet = useCallback(async () => {
+    setWatchTarget(null)
+    resetWagmiWriteContract()
 
-  const placeBet = useCallback(
-    (betParams: GenericCasinoBetParams, receiver: Hex) => {
-      setIsWaitingForRollEvent(false)
-      setActiveBetDetailsForRoll(null)
-      setRollEventError(null)
+    if (!publicClient || !chainId || !connectedAddress || !writeContractAsync) {
+      console.error("Wagmi/OnchainKit clients or address are not initialized.")
+      return
+    }
+    console.log("Starting bet process:", { betParams, connectedAddress })
 
-      resetWriteContract()
-      resetVrfCostState()
-      setPrepareBetError(null)
+    const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
 
-      if (currentConnectedChainId !== chainId) {
-        const errMsg = `Wrong network. Expected: ${chainId}, connected: ${currentConnectedChainId}`
-        console.error(errMsg)
-        setPrepareBetError(new Error(errMsg))
-        return
-      }
-      setCurrentBetRequest({ params: betParams, receiver })
-      fetchVrfCost(betParams.game, 1, zeroAddress)
-    },
-    [
-      resetWriteContract,
-      resetVrfCostState,
-      fetchVrfCost,
+    const submitResult = await _submitBetTransaction(
+      betParams,
+      connectedAddress,
+      vrfCost,
       chainId,
-      currentConnectedChainId,
-    ],
-  )
+      writeContractAsync,
+    )
+    const { txHash, contractAddress, gameAbiForPlaceBet } = submitResult
 
-  useEffect(() => {
-    if (!currentBetRequest || isLoadingVrfCost) {
-      return
-    }
-
-    if (vrfCostError) {
-      setCurrentBetRequest(null)
-      return
-    }
-
-    if (vrfCost === undefined) {
-      setPrepareBetError(
-        new Error("Failed to determine VRF cost. Bet cannot be placed."),
-      )
-      setCurrentBetRequest(null)
-      return
-    }
-
-    const { params, receiver } = currentBetRequest
-
-    const placeBetTxData = getPlaceBetFunctionData(
-      {
-        ...params,
-        receiver,
-      },
-      chainId,
+    const betId = await _extractBetIdFromReceipt(
+      txHash,
+      contractAddress,
+      gameAbiForPlaceBet,
+      publicClient,
     )
 
-    writeContract({
-      abi: placeBetTxData.data.abi,
-      address: placeBetTxData.data.to,
-      functionName: placeBetTxData.data.functionName,
-      args: placeBetTxData.data.args,
-      chainId: chainId,
-      value: placeBetTxData.extraData.getValue(params.betAmount + vrfCost),
+    if (!betId) {
+      console.warn(
+        "Bet ID was not extracted. Roll event listener will not be started.",
+      )
+      return
+    }
+
+    console.log("Setting up Roll event listener...")
+    setWatchTarget({
+      betId,
+      contractAddress,
+      gameType: betParams.game,
     })
   }, [
-    currentBetRequest,
-    vrfCost,
-    isLoadingVrfCost,
-    vrfCostError,
-    chainId,
-    writeContract,
-  ])
-
-  useEffect(() => {
-    if (
-      transactionHash &&
-      !transactionError &&
-      currentBetRequest &&
-      publicClient
-    ) {
-      const { params: betParamsFromRequest, receiver } = currentBetRequest
-      console.log(
-        `[usePlaceBet] Bet transaction sent: ${transactionHash}. Waiting for receipt to get betId...`,
-      )
-
-      const processReceiptForBetDetails = async () => {
-        const receipt = await publicClient.waitForTransactionReceipt({
-          hash: transactionHash,
-        })
-        console.log("[usePlaceBet] Transaction receipt for PlaceBet:", receipt)
-
-        const gameType = betParamsFromRequest.game
-        const placeBetTxData = getPlaceBetFunctionData(
-          {
-            ...betParamsFromRequest,
-            receiver,
-          },
-          chainId,
-        )
-
-        const placeBetEventDefinition = placeBetTxData.data.abi.find(
-          (item) => item.type === "event" && item.name === "PlaceBet",
-        )
-        if (!placeBetEventDefinition) {
-          throw new Error(
-            `PlaceBet event definition not found in ABI for game ${gameType}.`,
-          )
-        }
-
-        let foundBetId: string | null = null
-        let foundBetAmount: bigint | null = null
-
-        for (const log of receipt.logs) {
-          if (
-            log.address.toLowerCase() !== placeBetTxData.data.to.toLowerCase()
-          ) {
-            continue
-          }
-          const decodedLog = decodeEventLog({
-            abi: [placeBetEventDefinition],
-            data: log.data,
-            topics: log.topics,
-            strict: false,
-          })
-
-          if (decodedLog.eventName === "PlaceBet") {
-            const args = decodedLog.args as {
-              id: bigint
-              amount: bigint
-            }
-            foundBetId = args.id.toString()
-            foundBetAmount = args.amount
-            console.log(
-              `[usePlaceBet] PlaceBet event decoded. Bet ID: ${foundBetId}, Amount: ${foundBetAmount}`,
-            )
-            break
-          }
-        }
-
-        if (foundBetId && foundBetAmount !== null) {
-          setActiveBetDetailsForRoll({
-            betId: foundBetId,
-            betAmount: foundBetAmount,
-            gameType: gameType,
-          })
-          setIsWaitingForRollEvent(true)
-          setRollEventError(null)
-        } else {
-          console.error(
-            "[usePlaceBet] PlaceBet event not found in transaction receipt.",
-          )
-          setRollEventError(new Error("PlaceBet event not found in receipt."))
-        }
-      }
-
-      processReceiptForBetDetails()
-    } else if (transactionError && currentBetRequest) {
-      setCurrentBetRequest(null)
-    }
-  }, [
-    transactionHash,
-    transactionError,
-    currentBetRequest,
+    betParams,
     publicClient,
     chainId,
+    connectedAddress,
+    writeContractAsync,
+    resetWagmiWriteContract,
   ])
 
-  useEffect(() => {
-    if (!activeBetDetailsForRoll || !publicClient || !currentBetRequest) {
-      return
-    }
+  useWatchContractEvent({
+    address: watchTarget?.contractAddress,
+    abi: [rollEventAbiItem],
+    eventName: rollEventAbiItem.name,
+    args: watchTarget ? { id: BigInt(watchTarget.betId) } : undefined,
+    enabled: !!watchTarget,
+    pollingInterval: POLLING_INTERVAL,
+    onLogs: (logs) => {
+      if (!watchTarget) return
 
-    const { betId, gameType, betAmount } = activeBetDetailsForRoll
-    const { params: betParamsFromRequest, receiver } = currentBetRequest
-    console.log({ betParamsFromRequest, receiver })
-    const placeBetTxData = getPlaceBetFunctionData(
-      {
-        ...betParamsFromRequest,
-        receiver,
-      },
-      chainId,
-    )
-    const rollEventDefinition = placeBetTxData.data.abi.find(
-      (item) => item.type === "event" && item.name === "Roll",
-    )
-    console.log({ rollEventDefinition })
-    if (!rollEventDefinition) {
-      const errorMsg = `[usePlaceBet] Roll event definition not found in ABI for game ${gameType}`
-      console.error(errorMsg)
-      setRollEventError(new Error(errorMsg))
-      setIsWaitingForRollEvent(false)
-      setActiveBetDetailsForRoll(null)
-      return
-    }
+      const { betId, gameType } = watchTarget
 
-    console.log(
-      `[usePlaceBet] Starting to listen for Roll event for Bet ID: ${betId} on contract ${placeBetTxData.data.to}`,
-    )
-
-    const unwatch = publicClient.watchContractEvent({
-      address: placeBetTxData.data.to,
-      abi: [rollEventDefinition],
-      eventName: "Roll",
-      args: { id: BigInt(betId) as any },
-      pollingInterval: 1000,
-      onLogs: (logs) => {
-        logs.forEach((log: any) => {
-          const decodedRollLog = decodeEventLog({
-            abi: [rollEventDefinition],
-            data: log.data,
-            topics: log.topics,
-            strict: false,
-          })
-          const rollArgs = decodedRollLog.args as {
-            id: bigint
-            payout: bigint
-            rolled: boolean[]
-          }
-
-          if (rollArgs.id.toString() === betId) {
-            console.log("===== [usePlaceBet] GAME RESULT (Roll event) =====")
-            console.log("Bet ID:", betId)
-            console.log("Rolled (raw from event):", rollArgs.rolled)
-
-            let decodedRolledValueStr =
-              "N/A (logic for this game type not implemented in usePlaceBet log)"
-            if (
-              gameType === CASINO_GAME_TYPE.COINTOSS &&
-              rollArgs.rolled &&
-              rollArgs.rolled.length > 0
-            ) {
-              const decodedRolled = CoinToss.decodeRolled(rollArgs.rolled[0])
-              decodedRolledValueStr = decodedRolled.toString()
-              console.log(
-                "Rolled (decoded for CoinToss):",
-                decodedRolledValueStr,
-              )
-            }
-
-            console.log("Payout:", rollArgs.payout.toString())
-            console.log("Original Bet Amount:", betAmount.toString())
-            const isWin = rollArgs.payout > 0n
-            console.log("Is Win:", isWin)
-            console.log("Roll Transaction Hash:", log.transactionHash)
-            console.log("================================================")
-
-            setIsWaitingForRollEvent(false)
-            setActiveBetDetailsForRoll(null)
-            unwatch()
-          }
+      logs.forEach((log) => {
+        const decodedRollLog = decodeEventLog({
+          abi: [rollEventAbiItem],
+          data: log.data,
+          topics: log.topics,
+          strict: false,
         })
-      },
-      onError: (error) => {
-        console.error("[usePlaceBet] Error watching Roll event:", error)
-        setRollEventError(error)
-        setIsWaitingForRollEvent(false)
-        setActiveBetDetailsForRoll(null)
-      },
-    })
 
-    return () => {
-      console.log(
-        `[usePlaceBet] Stopped listening for Roll event for Bet ID: ${betId}`,
-      )
-      unwatch()
-    }
-  }, [activeBetDetailsForRoll, publicClient, chainId, currentBetRequest])
+        const rollArgs = decodedRollLog.args as unknown as {
+          id: bigint
+          payout: bigint
+          rolled: boolean[]
+        }
 
-  const combinedError =
-    vrfCostError || transactionError || prepareBetError || rollEventError
+        if (rollArgs.id.toString() === betId) {
+          if (
+            gameType === CASINO_GAME_TYPE.COINTOSS &&
+            rollArgs.rolled &&
+            rollArgs.rolled.length > 0
+          ) {
+            const decodedRolledValueStr = CoinToss.decodeRolled(
+              rollArgs.rolled[0],
+            ).toString()
+            console.log("  Rolled (CoinToss):", decodedRolledValueStr)
+          } else {
+            console.log("  Rolled (raw):", rollArgs.rolled)
+          }
+          console.log({
+            betId,
+            payout: rollArgs.payout.toString(),
+            isWin: rollArgs.payout > 0n,
+            rollTransactionHash: log.transactionHash,
+          })
+          setWatchTarget(null)
+        }
+      })
+    },
+    onError: (errorWatch) => {
+      console.error(" Error listening to Roll event:", errorWatch)
+      setWatchTarget(null)
+    },
+  })
 
+  return { placeBet }
+}
+
+async function _fetchVrfCost(
+  gameType: GenericCasinoBetParams["game"],
+  chainId: CasinoChainId,
+  publicClient: ReturnType<typeof usePublicClient>,
+): Promise<bigint> {
+  if (!publicClient) throw new Error("publicClient is undefined")
+  console.log("Getting VRF cost...")
+  const vrfCostFunctionData = getChainlinkVrfCostFunctionData(
+    gameType,
+    zeroAddress,
+    1,
+    chainId,
+  )
+  const vrfCost = (await publicClient.readContract({
+    address: vrfCostFunctionData.data.to,
+    abi: vrfCostFunctionData.data.abi,
+    functionName: vrfCostFunctionData.data.functionName,
+    args: vrfCostFunctionData.data.args,
+  })) as bigint
+  console.log("VRF cost received:", vrfCost?.toString())
+  return vrfCost
+}
+
+async function _submitBetTransaction(
+  betParams: GenericCasinoBetParams,
+  receiver: Hex,
+  vrfCost: bigint,
+  chainId: CasinoChainId,
+  writeContractAsync: ReturnType<typeof useWriteContract>["writeContractAsync"],
+): Promise<SubmitBetResult> {
+  console.log("Preparing and sending transaction...")
+  const placeBetTxData = getPlaceBetFunctionData(
+    { ...betParams, receiver },
+    chainId,
+  )
+  const txHash = await writeContractAsync({
+    abi: placeBetTxData.data.abi,
+    address: placeBetTxData.data.to,
+    functionName: placeBetTxData.data.functionName,
+    args: placeBetTxData.data.args,
+    value: placeBetTxData.extraData.getValue(betParams.betAmount + vrfCost),
+  })
+  console.log("Transaction sent, hash:", txHash)
   return {
-    placeBet,
-    isPlacingBet: isLoadingVrfCost || isTransactionPending,
-    isWaitingForResult: isWaitingForRollEvent,
-    betError: combinedError,
-    transactionHash,
+    txHash,
+    contractAddress: placeBetTxData.data.to,
+    gameAbiForPlaceBet: placeBetTxData.data.abi as Abi,
   }
+}
+
+async function _extractBetIdFromReceipt(
+  txHash: Hex,
+  expectedContractAddress: Hex,
+  placeBetAbi: Abi,
+  publicClient: ReturnType<typeof usePublicClient>,
+): Promise<string | null> {
+  if (!publicClient) throw new Error("publicClient is undefined")
+  console.log("Waiting for receipt for", txHash)
+  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
+  console.log("Receipt received.")
+
+  const placeBetEventDefinition = placeBetAbi.find(
+    (item) => item.type === "event" && item.name === "PlaceBet",
+  )
+
+  if (!placeBetEventDefinition) {
+    console.warn("PlaceBet event definition not found in ABI.")
+    return null
+  }
+
+  for (const log of receipt.logs) {
+    if (log.address.toLowerCase() !== expectedContractAddress.toLowerCase())
+      continue
+    const decodedLog = decodeEventLog({
+      abi: [placeBetEventDefinition],
+      data: log.data,
+      topics: log.topics,
+      strict: false,
+    })
+    if (decodedLog.eventName !== "PlaceBet") continue
+    return (decodedLog.args as { id: bigint }).id.toString()
+  }
+  console.warn("Bet ID not found in receipt.")
+  return null
 }
