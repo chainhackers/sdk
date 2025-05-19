@@ -7,5 +7,5 @@
     "@betswirl/sdk-core": "0.1.1",
     "@betswirl/wagmi-provider": "0.1.1"
   },
-  "changesets": ["free-ideas-cover", "seven-coins-sing"]
+  "changesets": ["eager-actors-fry", "free-ideas-cover", "seven-coins-sing"]
 }

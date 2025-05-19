@@ -57,7 +57,7 @@ export type FreebetCampaign = {
   formattedTotalWageredAmount: string;
 };
 
-export type GetCampaignsResponse = {
+export type GetCampaignsRawResponse = {
   campaigns: RawAggregatedFreebetCampaign[];
   total: number;
   offset: number;
@@ -80,7 +80,7 @@ export const fetchFreebetCampaigns = async (
   status?: FREEBET_CAMPAIGN_STATUS,
   affiliate?: Address,
   testMode = false,
-): Promise<FreebetCampaign[]> => {
+): Promise<{ campaigns: FreebetCampaign[]; total: number; offset: number; limit: number }> => {
   try {
     const params = new URLSearchParams();
     params.set("limit", limit.toString());
@@ -98,15 +98,25 @@ export const fetchFreebetCampaigns = async (
       throw new Error(`Status ${res.status}: ${res.statusText}`);
     }
 
-    const response: GetCampaignsResponse = await res.json();
-    return response.campaigns.map((campaign) => _formatRawFreebetCampaign(campaign));
+    const response: GetCampaignsRawResponse = await res.json();
+    return {
+      campaigns: response.campaigns.map((campaign) => _formatRawFreebetCampaign(campaign)),
+      total: response.total,
+      offset: response.offset,
+      limit: response.limit,
+    };
   } catch (error) {
-    console.error("An error occured while fetching freebet campaigns", JSON.stringify(error));
-    return [];
+    console.error("An error occured while fetching freebet campaigns", error);
+    return {
+      campaigns: [],
+      total: 0,
+      offset,
+      limit,
+    };
   }
 };
 
-export type GetCampaignResponse = RawAggregatedFreebetCampaign;
+export type GetCampaignRawResponse = RawAggregatedFreebetCampaign;
 
 /**
  * Fetches freebet campaign by id from the Betswirl API
@@ -125,10 +135,10 @@ export const fetchFreebetCampaign = async (
       throw new Error(`Status ${res.status}: ${res.statusText}`);
     }
 
-    const response: GetCampaignResponse = await res.json();
+    const response: GetCampaignRawResponse = await res.json();
     return _formatRawFreebetCampaign(response);
   } catch (error) {
-    console.error("An error occured while fetching freebet campaigns", JSON.stringify(error));
+    console.error("An error occured while fetching freebet campaigns", error);
     return null;
   }
 };

@@ -3,7 +3,7 @@ import type { CasinoChainId } from "../..";
 import type { Token } from "../../../interfaces";
 import { getBetSwirlApiUrl } from "../../../utils/api";
 
-export type GetFreebetsResponse = SignedRawFreebet[];
+export type GetFreebetsRawResponse = SignedRawFreebet[];
 
 export type SignedRawFreebet = {
   id: number;
@@ -69,7 +69,7 @@ export const fetchFreebets = async (
       throw new Error(`Status ${res.status}: ${res.statusText}`);
     }
 
-    const response: GetFreebetsResponse = await res.json();
+    const response: GetFreebetsRawResponse = await res.json();
     return response.map((freebet) => ({
       ...freebet,
       playerAddress: freebet.player_address,

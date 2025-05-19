@@ -341,7 +341,7 @@ export abstract class BetSwirlClient {
     offset = 0,
     status?: FREEBET_CAMPAIGN_STATUS,
     affiliate?: Address,
-  ): Promise<FreebetCampaign[]> {
+  ): Promise<{ campaigns: FreebetCampaign[]; total: number; offset: number; limit: number }> {
     return fetchFreebetCampaigns(
       limit,
       offset,
