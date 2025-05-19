@@ -1,7 +1,8 @@
 import { createContext, useContext } from "react"
+import { Hex } from "viem"
 
 export type BettingConfig = {
-  affiliate?: string
+  affiliate?: Hex
 }
 export const BettingConfigContext = createContext<BettingConfig | undefined>(
   undefined,

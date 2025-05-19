@@ -12,7 +12,7 @@ import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { useAccount, useBalance } from "wagmi"
-import { formatUnits, Hex, parseEther } from "viem"
+import { formatEther, formatUnits, parseEther } from "viem"
 
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
@@ -20,14 +20,9 @@ import { InfoSheetPanel } from "./InfoSheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { GameResultWindow } from "./GameResultWindow"
 
-import {
-  CASINO_GAME_TYPE,
-  CoinToss,
-  COINTOSS_FACE,
-  GenericCasinoBetParams,
-} from "@betswirl/sdk-core"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { useOnchainKit } from "@coinbase/onchainkit"
+import { COINTOSS_FACE } from "@betswirl/sdk-core"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -123,37 +118,38 @@ export function CoinTossGame({
   ...props
 }: CoinTossGameProps) {
   const { chain } = useOnchainKit()
-  const [betAmount, setBetAmount] = useState("0")
+  const [betAmount, setBetAmount] = useState(0n)
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
   const { isConnected, address } = useAccount()
   const { data: balance } = useBalance({
     address,
   })
+  console.log(`--- balance: ${balance?.value}`)
+  const balanceValue = balance?.value || 0n
   const balanceFloat = balance
     ? parseFloat(formatUnits(balance.value, balance.decimals))
     : 0
   const formattedBalance = balanceFloat.toFixed(4)
 
-  const multiplier = 1.94
+  const multiplierPrecision = 10000n
+  const multiplier = 19400n
   const winChance = 50
-  const parsedBetAmountForPayout = Number.parseFloat(betAmount || "0")
-  const targetPayout = (
-    (Number.isNaN(parsedBetAmountForPayout) ? 0 : parsedBetAmountForPayout) *
-    multiplier
-  ).toFixed(2)
+  const targetPayout = betAmount * multiplier / 10000n
   const fee = 0
 
   const themeClass = theme === "system" ? undefined : theme
 
   const cardRef = useRef<HTMLDivElement>(null)
   const [isMounted, setIsMounted] = useState(false)
+  console.log(`--- isMounted: ${isMounted}`)
 
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
-  const { placeBet, isPlacingBet, betError, transactionHash } = usePlaceBet()
+  const { placeBet, isPlacingBet, betError, transactionHash } = usePlaceBet(betAmount, COINTOSS_FACE.HEADS)
+  console.log(`--- betError: ${betError}`)
 
   useEffect(() => {
     if (transactionHash && !betError) {
@@ -172,18 +168,11 @@ export function CoinTossGame({
       )
       return
     }
-
-    const betParams: GenericCasinoBetParams = {
-      betAmount: parseEther(betAmount),
-      game: CASINO_GAME_TYPE.COINTOSS,
-      gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
-    }
-    placeBet(betParams, address as Hex)
+    placeBet()
   }
 
-  const isBetAmountInvalid =
-    Number.isNaN(Number.parseFloat(betAmount)) ||
-    Number.parseFloat(betAmount || "0") <= 0
+  const isBetAmountInvalid = betAmount <= 0n
+  console.log(`--- isBetAmountInvalid: ${isBetAmountInvalid}`)
 
   return (
     <div
@@ -265,7 +254,7 @@ export function CoinTossGame({
                   portalContainer={cardRef.current}
                   winChance={winChance}
                   rngFee={fee}
-                  targetPayout={targetPayout}
+                  targetPayout={formatEther(targetPayout)}
                   gasPrice="34.2123 gwei"
                 />
               )}
@@ -297,7 +286,7 @@ export function CoinTossGame({
             </Sheet>
 
             <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
-              {multiplier.toFixed(2)} x
+              {(Number(multiplier)/Number(multiplierPrecision)).toFixed(2)} x
             </div>
             <img
               src={coinIcon}
@@ -332,9 +321,9 @@ export function CoinTossGame({
                 id="betAmount"
                 type="number"
                 placeholder="0"
-                value={betAmount}
+                value={formatEther(betAmount)}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setBetAmount(e.target.value)
+                  setBetAmount(parseEther(e.target.value))
                 }}
                 className="relative"
                 token={{
@@ -348,10 +337,7 @@ export function CoinTossGame({
                   variant="secondary"
                   onClick={() => {
                     setBetAmount((prev) => {
-                      const prevNum = Number.parseFloat(prev || "0")
-                      return Number.isNaN(prevNum)
-                        ? "0"
-                        : (prevNum / 2).toString()
+                      return prev / 2n
                     })
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
@@ -362,11 +348,8 @@ export function CoinTossGame({
                   variant="secondary"
                   onClick={() => {
                     setBetAmount((prev) => {
-                      const old = Number.parseFloat(prev || "0")
-                      const newAmount = Number.isNaN(old) ? 0 : old * 2
-                      return Math.min(balanceFloat, newAmount)
-                        .toFixed(4)
-                        .toString()
+                      const newAmount = prev * 2n
+                      return balanceValue < newAmount ? balanceValue : newAmount
                     })
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
@@ -377,7 +360,7 @@ export function CoinTossGame({
                   variant="secondary"
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   onClick={() => {
-                    setBetAmount(formattedBalance)
+                    setBetAmount(balanceValue)
                   }}
                 >
                   Max

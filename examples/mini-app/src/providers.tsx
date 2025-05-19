@@ -20,14 +20,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
     )
   }
 
-  const rpcUrl = import.meta.env.VITE_RPC_URL
-  if (!rpcUrl) {
-    throw new Error("RPC URL is not set")
-  }
+  // const rpcUrl = import.meta.env.VITE_RPC_URL
+  // if (!rpcUrl) {
+  //   throw new Error("RPC URL is not set")
+  // }
   const config = createConfig({
     chains: [CHAIN],
     transports: {
-      [CHAIN.id]: http(rpcUrl),
+      [CHAIN.id]: http(),
     },
   })
 
