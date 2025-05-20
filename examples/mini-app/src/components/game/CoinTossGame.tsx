@@ -146,7 +146,7 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const { placeBet } = usePlaceBet({
+  const { placeBet, betStatus } = usePlaceBet({
     betAmount: parseEther(betAmount),
     game: CASINO_GAME_TYPE.COINTOSS,
     gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
@@ -312,6 +312,7 @@ export function CoinTossGame({
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
                   symbol: "ETH",
                 }}
+                disabled={betStatus === "pending"}
               />
 
               <div className="grid grid-cols-3 gap-2">
@@ -326,6 +327,7 @@ export function CoinTossGame({
                     })
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
+                  disabled={betStatus === "pending"}
                 >
                   1/2
                 </Button>
@@ -341,6 +343,7 @@ export function CoinTossGame({
                     })
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
+                  disabled={betStatus === "pending"}
                 >
                   2x
                 </Button>
@@ -350,6 +353,7 @@ export function CoinTossGame({
                   onClick={() => {
                     setBetAmount(formattedBalance)
                   }}
+                  disabled={betStatus === "pending"}
                 >
                   Max
                 </Button>
@@ -365,9 +369,18 @@ export function CoinTossGame({
                 "rounded-[16px]",
               )}
               onClick={placeBet}
-              disabled={!isConnected || !address || isBetAmountInvalid}
+              disabled={
+                !isConnected ||
+                !address ||
+                isBetAmountInvalid ||
+                betStatus === "pending"
+              }
             >
-              {isConnected ? "Place Bet" : "Connect Wallet"}
+              {betStatus === "pending"
+                ? "Placing Bet..."
+                : isConnected
+                  ? "Place Bet"
+                  : "Connect Wallet"}
             </Button>
           </div>
         </CardContent>

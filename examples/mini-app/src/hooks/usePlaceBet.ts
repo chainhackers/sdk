@@ -40,6 +40,9 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
 
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
   const rollEventAbiItem = parseAbiItem(CASINO_GAME_ROLL_ABI[betParams.game])
+  const [betStatus, setBetStatus] = useState<
+    "pending" | "success" | "error" | null
+  >(null)
 
   const placeBet = useCallback(async () => {
     setWatchTarget(null)
@@ -47,9 +50,11 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
 
     if (!publicClient || !chainId || !connectedAddress || !writeContractAsync) {
       console.error("Wagmi/OnchainKit clients or address are not initialized.")
+      setBetStatus("error")
       return
     }
     console.log("Starting bet process:", { betParams, connectedAddress })
+    setBetStatus("pending")
 
     const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
 
@@ -73,6 +78,7 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
       console.warn(
         "Bet ID was not extracted. Roll event listener will not be started.",
       )
+      setBetStatus("error")
       return
     }
 
@@ -137,16 +143,18 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
             rollTransactionHash: log.transactionHash,
           })
           setWatchTarget(null)
+          setBetStatus("success")
         }
       })
     },
     onError: (errorWatch) => {
       console.error(" Error listening to Roll event:", errorWatch)
       setWatchTarget(null)
+      setBetStatus("error")
     },
   })
 
-  return { placeBet }
+  return { placeBet, betStatus }
 }
 
 async function _fetchVrfCost(
