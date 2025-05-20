@@ -11,7 +11,7 @@ import { Label } from "../ui/label"
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
-import { useAccount, useBalance } from "wagmi"
+import { useAccount, useBalance, useNetwork } from "wagmi"
 import { formatUnits, Hex, parseEther } from "viem"
 
 import { Sheet, SheetTrigger } from "../ui/sheet"
@@ -128,6 +128,7 @@ export function CoinTossGame({
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
   const { isConnected, address } = useAccount()
+  const { chain } = useNetwork()
   const { data: balance } = useBalance({
     address,
   })
@@ -399,14 +400,20 @@ export function CoinTossGame({
               )}
               onClick={placeGameBet}
               disabled={
-                !isConnected || !address || isPlacingBet || isBetAmountInvalid
+                !isConnected ||
+                !address ||
+                isPlacingBet ||
+                isBetAmountInvalid ||
+                (isConnected && chain?.id !== CHAIN.id)
               }
             >
-              {isConnected
-                ? isPlacingBet
-                  ? "Placing Bet..."
-                  : "Place Bet"
-                : "Connect Wallet"}
+              {!isConnected
+                ? "Connect Wallet"
+                : chain?.id !== CHAIN.id
+                  ? "Switch Network"
+                  : isPlacingBet
+                    ? "Placing Bet..."
+                    : "Place Bet"}
             </Button>
           </div>
         </CardContent>

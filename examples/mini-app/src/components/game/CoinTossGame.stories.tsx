@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { CoinTossGame } from "./CoinTossGame"
 import gameBg from "../../assets/game/game-background-1.png"
+import { CHAIN } from "../../providers"
 
 const meta = {
   title: "Game/CoinTossGame",
@@ -96,5 +97,51 @@ export const CustomTheme2: Story = {
       "--game-window-overlay": "oklch(0 0 0 / 10%)",
     } as React.CSSProperties,
     backgroundImage: gameBg,
+  },
+}
+
+export const PlayButtonDisabledOnInvalidNetwork: Story = {
+  ...Template,
+  args: {
+    theme: "light",
+  },
+  decorators: [
+    (StoryComponent) => {
+      jest.mock("wagmi", () => ({
+        ...jest.requireActual("wagmi"),
+        useNetwork: () => ({ chain: { id: CHAIN.id + 1 } }),
+      }))
+      return <StoryComponent />
+    },
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = require("@storybook/testing-library").within(canvasElement)
+    const playButton = await canvas.findByRole("button", {
+      name: /Switch Network/i,
+    })
+    expect(playButton).toBeDisabled()
+  },
+}
+
+export const PlayButtonEnabledOnValidNetwork: Story = {
+  ...Template,
+  args: {
+    theme: "light",
+  },
+  decorators: [
+    (StoryComponent) => {
+      jest.mock("wagmi", () => ({
+        ...jest.requireActual("wagmi"),
+        useNetwork: () => ({ chain: { id: CHAIN.id } }),
+      }))
+      return <StoryComponent />
+    },
+  ],
+  play: async ({ canvasElement }) => {
+    const canvas = require("@storybook/testing-library").within(canvasElement)
+    const playButton = await canvas.findByRole("button", {
+      name: /Place Bet/i,
+    })
+    expect(playButton).toBeEnabled()
   },
 }
