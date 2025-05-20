@@ -14,6 +14,7 @@ import {
   getPlaceBetFunctionData,
   CoinToss,
   CASINO_GAME_ROLL_ABI,
+  COINTOSS_FACE,
 } from "@betswirl/sdk-core"
 
 interface WatchTarget {
@@ -33,6 +34,7 @@ interface GameResult {
   amount: bigint
   payout: bigint
   currency: string
+  rolled: COINTOSS_FACE
 }
 
 const POLLING_INTERVAL = 2500
@@ -115,7 +117,7 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
     onLogs: (logs) => {
       if (!watchTarget) return
 
-      const { betId, gameType } = watchTarget
+      const { betId } = watchTarget
 
       logs.forEach((log) => {
         const decodedRollLog = decodeEventLog({
@@ -132,29 +134,20 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
         }
 
         if (rollArgs.id.toString() === betId) {
-          if (
-            gameType === betParams.game &&
-            rollArgs.rolled &&
-            rollArgs.rolled.length > 0
-          ) {
-            const decodedRolledValueStr = CoinToss.decodeRolled(
-              rollArgs.rolled[0],
-            ).toString()
-            console.log("  Rolled (CoinToss):", decodedRolledValueStr)
-          } else {
-            console.log("  Rolled (raw):", rollArgs.rolled)
-          }
+          const rolled = CoinToss.decodeRolled(rollArgs.rolled[0])
           console.log({
             betId,
             payout: rollArgs.payout.toString(),
             isWin: rollArgs.payout > 0n,
             rollTransactionHash: log.transactionHash,
+            rolled,
           })
           setGameResult({
             isWin: rollArgs.payout > 0n,
             amount: betParams.betAmount,
             payout: rollArgs.payout,
             currency: "ETH",
+            rolled,
           })
           setWatchTarget(null)
           setBetStatus("success")

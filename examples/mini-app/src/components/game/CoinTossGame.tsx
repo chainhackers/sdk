@@ -281,6 +281,7 @@ export function CoinTossGame({
                 amount={Number(betAmount)}
                 payout={Number(formatEther(gameResult.payout))}
                 currency="ETH"
+                rolled={gameResult.rolled}
               />
             )}
           </div>

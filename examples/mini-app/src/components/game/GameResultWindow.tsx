@@ -19,6 +19,7 @@ interface GameResultWindowProps {
   amount: number
   payout: number
   currency: string
+  rolled: string
   className?: string
 }
 
@@ -27,6 +28,7 @@ export function GameResultWindow({
   amount,
   payout,
   currency,
+  rolled,
   className,
 }: GameResultWindowProps) {
   const resultType = isWin ? "win" : "loss"
@@ -61,7 +63,7 @@ export function GameResultWindow({
           <span className="uppercase"> {currency}</span>
         </p>
         <p className="text-[12px] leading-[167%] font-medium uppercase">
-          Draw: HEADS
+          Draw: {rolled}
         </p>
       </div>
     </div>
