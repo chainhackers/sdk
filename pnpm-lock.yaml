@@ -37,7 +37,7 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: ^3.12.11
-        version: 3.13.8(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)
+        version: 3.13.8(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.2))(graphql@16.11.0)
       '@betswirl/sdk-core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -100,6 +100,9 @@ importers:
       '@apollo/client':
         specifier: '>=3.12.11'
         version: 3.13.8(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.2))(graphql@16.11.0)
+      abitype:
+        specifier: ^1.0.8
+        version: 1.0.8(typescript@5.8.3)
       decimal.js:
         specifier: ^10.5.0
         version: 10.5.0
@@ -2935,27 +2938,6 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@apollo/client@3.13.8(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1))(graphql@16.11.0)':
-    dependencies:
-      '@graphql-typed-document-node/core': 3.2.0(graphql@16.11.0)
-      '@wry/caches': 1.0.1
-      '@wry/equality': 0.5.7
-      '@wry/trie': 0.5.0
-      graphql: 16.11.0
-      graphql-tag: 2.12.6(graphql@16.11.0)
-      hoist-non-react-statics: 3.3.2
-      optimism: 0.18.1
-      prop-types: 15.8.1
-      rehackt: 0.1.0
-      symbol-observable: 4.0.0
-      ts-invariant: 0.10.3
-      tslib: 2.8.1
-      zen-observable-ts: 1.2.5
-    optionalDependencies:
-      graphql-ws: 6.0.4(graphql@16.11.0)(ws@8.18.1)
-    transitivePeerDependencies:
-      - '@types/react'
-
   '@apollo/client@3.13.8(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.2))(graphql@16.11.0)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.11.0)
@@ -5020,13 +5002,6 @@ snapshots:
     dependencies:
       graphql: 16.11.0
       tslib: 2.8.1
-
-  graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.1):
-    dependencies:
-      graphql: 16.11.0
-    optionalDependencies:
-      ws: 8.18.1
-    optional: true
 
   graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.2):
     dependencies:

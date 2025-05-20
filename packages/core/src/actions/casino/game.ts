@@ -13,7 +13,6 @@ import { GAS_TOKEN_ADDRESS } from "../../constants";
 import type { SignedFreebet } from "../../data";
 import {
   CASINO_GAME_TYPE,
-  type CasinoChain,
   type CasinoChainId,
   MAX_SDK_HOUSE_EGDE,
   type NORMAL_CASINO_GAME_TYPE,
@@ -26,7 +25,7 @@ import type { DiceEncodedInput } from "../../entities/casino/dice";
 import type { RouletteEncodedInput } from "../../entities/casino/roulette";
 import { ERROR_CODES } from "../../errors/codes";
 import { ChainError, ConfigurationError, TransactionError } from "../../errors/types";
-import type { BetSwirlFunctionData, Token } from "../../interfaces";
+import type { BetSwirlFunctionData, GameAbi, Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
 import { getChainlinkVrfCost } from "../../read/common/chainlinkVrfCost";
 import { GAS_PRICE_TYPE, getGasPrices } from "../../read/common/gasPrice";
@@ -227,7 +226,6 @@ export async function placeBet(
     );
   }
 }
-type GameAbi<T extends CASINO_GAME_TYPE> = NonNullable<CasinoChain["contracts"]["games"][T]>["abi"];
 
 /* Previously was Omit<GenericCasinoBetParams, "receiver" | "vrfFees" | "token"> & {
     receiver: Hex;

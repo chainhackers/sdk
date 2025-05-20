@@ -1,5 +1,9 @@
 import type { Abi, Address, ContractEventName, ContractFunctionName, Hash, Hex, Log } from "viem";
-import type { CASINO_GAME_TYPE, CasinoChainId } from "./data/casino";
+import type { CASINO_GAME_TYPE, CasinoChain, CasinoChainId } from "./data/casino";
+
+export type GameAbi<T extends CASINO_GAME_TYPE> = NonNullable<
+  CasinoChain["contracts"]["games"][T]
+>["abi"];
 
 export interface BetSwirlFunctionData<
   TAbi extends Abi,
@@ -14,7 +18,20 @@ export interface BetSwirlFunctionData<
   };
   encodedData: Hex;
 }
+
 export interface BetSwirlEventData<
+  TAbi extends Abi,
+  TEventName extends ContractEventName<TAbi>,
+  TArgs extends Record<string, any>,
+> {
+  data: {
+    to: Address;
+    abi: TAbi;
+    eventName: TEventName;
+    args: TArgs;
+  };
+}
+export interface BetSwirlExtendedEventData<
   TAbi extends Abi,
   TEventName extends ContractEventName<TAbi>,
   TArgs extends Record<string, any>,

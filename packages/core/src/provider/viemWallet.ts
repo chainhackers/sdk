@@ -6,7 +6,7 @@ import type {
   TransactionReceipt,
   WalletClient,
 } from "viem";
-import type { BetSwirlEventData, BetSwirlFunctionData } from "../interfaces";
+import type { BetSwirlExtendedEventData, BetSwirlFunctionData } from "../interfaces";
 import { BetSwirlWallet } from "./wallet";
 
 export class ViemBetSwirlWallet extends BetSwirlWallet {
@@ -72,7 +72,7 @@ export class ViemBetSwirlWallet extends BetSwirlWallet {
     return this.publicClient.getTransactionReceipt({ hash: txHash });
   }
 
-  watchContractEvent<TEventData extends BetSwirlEventData<Abi, string, any>>(
+  watchContractEvent<TEventData extends BetSwirlExtendedEventData<Abi, string, any>>(
     eventData: TEventData,
   ): () => void {
     return this.publicClient.watchContractEvent({

@@ -1,5 +1,14 @@
 # @betswirl/wagmi-provider
 
+## 0.1.2-beta.2
+
+### Patch Changes
+
+- Add getWaitRollEventData
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.2-beta.2
+
 ## 0.1.2-beta.1
 
 ### Patch Changes

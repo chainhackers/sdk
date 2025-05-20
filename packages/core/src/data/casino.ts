@@ -1,4 +1,5 @@
-import type { Abi, Chain, Hex } from "viem";
+import type { ExtractAbiEvent } from "abitype";
+import { type Abi, type Chain, type Hex } from "viem";
 import { coinTossAbi } from "../abis/v2/casino/cointoss";
 import { diceAbi } from "../abis/v2/casino/dice";
 import { kenoAbi } from "../abis/v2/casino/keno";
@@ -81,16 +82,16 @@ export enum CASINO_GAME_LABEL_TYPE {
   CUSTOM_WEIGHTED_GAME = "Custom game",
 }
 
-const COINTOSS_ROLL_ABI =
-  "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, bool face, bool[] rolled, uint256 payout)";
-const DICE_ROLL_ABI =
-  "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, uint8 cap, uint8[] rolled, uint256 payout)";
-const ROULETTE_ROLL_ABI =
-  "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, uint40 numbers, uint8[] rolled, uint256 payout)";
-const KENO_ROLL_ABI =
-  "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, uint40 numbers, uint40[] rolled, uint256 payout)";
-const WEIGHTED_GAME_ROLL_ABI =
-  "event Roll(uint256 indexed id, address indexed receiver, address indexed token, uint256 totalBetAmount, uint32 configId, uint8[] rolled, uint256 payout)";
+const _extractRollEvent = <T extends Abi>(abi: T) =>
+  [
+    abi.find((e): e is ExtractAbiEvent<T, "Roll"> => e.type === "event" && e.name === "Roll")!,
+  ] as const;
+
+const COINTOSS_ROLL_ABI = _extractRollEvent(coinTossAbi);
+const DICE_ROLL_ABI = _extractRollEvent(diceAbi);
+const ROULETTE_ROLL_ABI = _extractRollEvent(rouletteAbi);
+const KENO_ROLL_ABI = _extractRollEvent(kenoAbi);
+const WEIGHTED_GAME_ROLL_ABI = _extractRollEvent(weightedGameAbi);
 
 export const CASINO_GAME_ROLL_ABI: Record<
   CASINO_GAME_TYPE,
@@ -107,6 +108,9 @@ export const CASINO_GAME_ROLL_ABI: Record<
   [CASINO_GAME_TYPE.WHEEL]: WEIGHTED_GAME_ROLL_ABI,
   [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: WEIGHTED_GAME_ROLL_ABI,
 };
+
+export type CASINO_GAME_TYPE_ROLL = keyof typeof CASINO_GAME_ROLL_ABI;
+export type GameRollAbi<T extends CASINO_GAME_TYPE_ROLL> = (typeof CASINO_GAME_ROLL_ABI)[T];
 
 const arbitrumSepoliaData: CasinoChain = {
   id: chainByKey.arbitrumSepolia.id,

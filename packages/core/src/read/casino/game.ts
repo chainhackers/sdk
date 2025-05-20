@@ -5,8 +5,9 @@ import {
   type TransactionReceipt,
   encodeFunctionData,
   formatUnits,
-  parseAbiItem,
 } from "viem";
+
+import type { ExtractAbiEvent } from "abitype";
 import { getLogs } from "viem/actions";
 import { casinoGameAbi } from "../../abis/v2/casino/game";
 import type {
@@ -18,6 +19,7 @@ import {
   CASINO_GAME_ROLL_ABI,
   CASINO_GAME_TYPE,
   type CasinoChainId,
+  type GameRollAbi,
   type NORMAL_CASINO_GAME_TYPE,
   type WEIGHTED_CASINO_GAME_TYPE,
   casinoChainById,
@@ -27,10 +29,12 @@ import { ERROR_CODES } from "../../errors/codes";
 import { ChainError } from "../../errors/types";
 import { TransactionError } from "../../errors/types";
 import type {
+  BetSwirlEventData,
   BetSwirlFunctionData,
   CasinoGame,
   CasinoGameToken,
   CasinoToken,
+  GameAbi,
   Token,
 } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
@@ -244,12 +248,13 @@ export async function waitRolledBet(
       }
     };
     // Subcribe to Roll event
+    const eventData = getRollEventData(placedBet.game, placedBet.chainId, placedBet.id);
     const unwatch = wallet.watchContractEvent({
       data: {
-        to: game.address,
-        abi: game.abi,
-        eventName: "Roll",
-        args: { id: placedBet.id },
+        to: eventData.data.to,
+        abi: eventData.data.abi,
+        eventName: eventData.data.eventName,
+        args: eventData.data.args,
         pollingInterval: options?.pollingInterval || casinoChain.options.pollingInterval,
       },
       callbacks: {
@@ -282,9 +287,9 @@ export async function waitRolledBet(
 
     // Check in the past blocks if the bet has been rolled
     getLogs(publicClient, {
-      address: game.address,
-      event: parseAbiItem(CASINO_GAME_ROLL_ABI[placedBet.game]),
-      args: { id: placedBet.id },
+      address: eventData.data.to,
+      event: eventData.event.abiEvent,
+      args: eventData.data.args,
       fromBlock: placedBet.betBlock,
       toBlock: "latest",
     })
@@ -327,6 +332,37 @@ export async function waitRolledBet(
       }
     }, options?.timeout || defaultCasinoWaiRollOptions.timeout);
   });
+}
+
+export function getRollEventData(
+  game: CASINO_GAME_TYPE,
+  casinoChainId: CasinoChainId,
+  betId: string | bigint,
+): BetSwirlEventData<GameAbi<typeof game>, "Roll", { id: bigint }> & {
+  event: { abiEvent: ExtractAbiEvent<GameRollAbi<typeof game>, "Roll"> };
+} {
+  const casinoChain = casinoChainById[casinoChainId];
+
+  const gameData = casinoChain.contracts.games[game];
+  if (!gameData) {
+    throw new ChainError(
+      `Game ${game} not found for chain ${casinoChainId}`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
+    );
+  }
+
+  const abi = CASINO_GAME_ROLL_ABI[game];
+  const eventName = "Roll" as const;
+  const args = { id: BigInt(betId) } as const;
+
+  const rollEvent = abi!.find((e) => e.type === "event" && e.name === "Roll")!;
+
+  return {
+    data: { to: gameData.address, abi, eventName, args },
+    event: {
+      abiEvent: rollEvent,
+    },
+  };
 }
 
 export type RawPaused = boolean;

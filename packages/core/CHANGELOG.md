@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.2-beta.2
+
+### Patch Changes
+
+- Add getWaitRollEventData
+
 ## 0.1.2-beta.1
 
 ### Patch Changes
