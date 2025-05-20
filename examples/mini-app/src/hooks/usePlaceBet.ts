@@ -57,6 +57,7 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
   const placeBet = useCallback(async () => {
     setWatchTarget(null)
     resetWagmiWriteContract()
+    setGameResult(null)
 
     if (!publicClient || !chainId || !connectedAddress || !writeContractAsync) {
       console.error("Wagmi/OnchainKit clients or address are not initialized.")
@@ -161,7 +162,12 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
     },
   })
 
-  return { placeBet, betStatus, gameResult }
+  const resetBetState = useCallback(() => {
+    setBetStatus(null)
+    setGameResult(null)
+  }, [])
+
+  return { placeBet, betStatus, gameResult, resetBetState }
 }
 
 async function _fetchVrfCost(

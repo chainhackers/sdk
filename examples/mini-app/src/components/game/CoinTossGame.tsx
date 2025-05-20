@@ -146,7 +146,7 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const { placeBet, betStatus, gameResult } = usePlaceBet({
+  const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet({
     betAmount: parseEther(betAmount),
     game: CASINO_GAME_TYPE.COINTOSS,
     gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
@@ -155,6 +155,36 @@ export function CoinTossGame({
   const isBetAmountInvalid =
     Number.isNaN(Number.parseFloat(betAmount)) ||
     Number.parseFloat(betAmount || "0") <= 0
+
+  const isInGameResultState = !!gameResult
+  const isBettingInProgress = betStatus === "pending"
+  const isWalletConnected = isConnected && !!address
+  const canInitiateBet =
+    isWalletConnected && !isBetAmountInvalid && !isBettingInProgress
+
+  let playButtonText: string
+  if (isInGameResultState) {
+    playButtonText = "Try again"
+  } else if (isBettingInProgress) {
+    playButtonText = "Placing Bet..."
+  } else if (!isWalletConnected) {
+    playButtonText = "Connect Wallet"
+  } else {
+    playButtonText = "Place Bet"
+  }
+
+  const isPlayButtonDisabled: boolean = isInGameResultState
+    ? false
+    : !canInitiateBet
+
+  const handlePlayButtonClick = () => {
+    if (isInGameResultState) {
+      resetBetState()
+      setBetAmount("0")
+    } else {
+      placeBet()
+    }
+  }
 
   return (
     <div
@@ -315,7 +345,7 @@ export function CoinTossGame({
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
                   symbol: "ETH",
                 }}
-                disabled={betStatus === "pending"}
+                disabled={betStatus === "pending" || !!gameResult}
               />
 
               <div className="grid grid-cols-3 gap-2">
@@ -330,7 +360,11 @@ export function CoinTossGame({
                     })
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={betStatus === "pending"}
+                  disabled={
+                    isBettingInProgress ||
+                    isInGameResultState ||
+                    isBetAmountInvalid
+                  }
                 >
                   1/2
                 </Button>
@@ -346,7 +380,11 @@ export function CoinTossGame({
                     })
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={betStatus === "pending"}
+                  disabled={
+                    isBettingInProgress ||
+                    isInGameResultState ||
+                    isBetAmountInvalid
+                  }
                 >
                   2x
                 </Button>
@@ -356,7 +394,11 @@ export function CoinTossGame({
                   onClick={() => {
                     setBetAmount(formattedBalance)
                   }}
-                  disabled={betStatus === "pending"}
+                  disabled={
+                    isBettingInProgress ||
+                    isInGameResultState ||
+                    isBetAmountInvalid
+                  }
                 >
                   Max
                 </Button>
@@ -371,19 +413,10 @@ export function CoinTossGame({
                 "text-play-btn-font font-bold",
                 "rounded-[16px]",
               )}
-              onClick={placeBet}
-              disabled={
-                !isConnected ||
-                !address ||
-                isBetAmountInvalid ||
-                betStatus === "pending"
-              }
+              onClick={handlePlayButtonClick}
+              disabled={isPlayButtonDisabled}
             >
-              {betStatus === "pending"
-                ? "Placing Bet..."
-                : isConnected
-                  ? "Place Bet"
-                  : "Connect Wallet"}
+              {playButtonText}
             </Button>
           </div>
         </CardContent>
