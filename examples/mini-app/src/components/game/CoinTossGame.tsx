@@ -162,8 +162,12 @@ export function CoinTossGame({
   const canInitiateBet =
     isWalletConnected && !isBetAmountInvalid && !isBettingInProgress
 
+  const isErrorState = betStatus === "error"
+
   let playButtonText: string
-  if (isInGameResultState) {
+  if (isErrorState) {
+    playButtonText = "Error, try again"
+  } else if (isInGameResultState) {
     playButtonText = "Try again"
   } else if (isBettingInProgress) {
     playButtonText = "Placing Bet..."
@@ -173,12 +177,17 @@ export function CoinTossGame({
     playButtonText = "Place Bet"
   }
 
-  const isPlayButtonDisabled: boolean = isInGameResultState
+  const isPlayButtonDisabled: boolean = isErrorState
     ? false
-    : !canInitiateBet
+    : isInGameResultState
+      ? false
+      : !canInitiateBet
 
   const handlePlayButtonClick = () => {
-    if (isInGameResultState) {
+    if (betStatus === "error") {
+      resetBetState()
+      placeBet()
+    } else if (isInGameResultState) {
       resetBetState()
       setBetAmount("0")
     } else {
@@ -410,9 +419,11 @@ export function CoinTossGame({
               className={cn(
                 "w-full",
                 "border-0",
-                "text-play-btn-font font-bold",
+                "font-bold",
                 "rounded-[16px]",
+                "text-play-btn-font",
               )}
+              variant={isErrorState ? "destructive" : "default"}
               onClick={handlePlayButtonClick}
               disabled={isPlayButtonDisabled}
             >

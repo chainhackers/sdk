@@ -55,50 +55,62 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
   const [gameResult, setGameResult] = useState<GameResult | null>(null)
 
   const placeBet = useCallback(async () => {
-    setWatchTarget(null)
-    resetWagmiWriteContract()
-    setGameResult(null)
+    try {
+      setWatchTarget(null)
+      resetWagmiWriteContract()
+      setGameResult(null)
 
-    if (!publicClient || !chainId || !connectedAddress || !writeContractAsync) {
-      console.error("Wagmi/OnchainKit clients or address are not initialized.")
-      setBetStatus("error")
-      return
-    }
-    console.log("Starting bet process:", { betParams, connectedAddress })
-    setBetStatus("pending")
+      if (
+        !publicClient ||
+        !chainId ||
+        !connectedAddress ||
+        !writeContractAsync
+      ) {
+        console.error(
+          "Wagmi/OnchainKit clients or address are not initialized.",
+        )
+        setBetStatus("error")
+        return
+      }
+      console.log("Starting bet process:", { betParams, connectedAddress })
+      setBetStatus("pending")
 
-    const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
+      const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
 
-    const submitResult = await _submitBetTransaction(
-      betParams,
-      connectedAddress,
-      vrfCost,
-      chainId,
-      writeContractAsync,
-    )
-    const { txHash, contractAddress, gameAbiForPlaceBet } = submitResult
-
-    const betId = await _extractBetIdFromReceipt(
-      txHash,
-      contractAddress,
-      gameAbiForPlaceBet,
-      publicClient,
-    )
-
-    if (!betId) {
-      console.warn(
-        "Bet ID was not extracted. Roll event listener will not be started.",
+      const submitResult = await _submitBetTransaction(
+        betParams,
+        connectedAddress,
+        vrfCost,
+        chainId,
+        writeContractAsync,
       )
-      setBetStatus("error")
-      return
-    }
+      const { txHash, contractAddress, gameAbiForPlaceBet } = submitResult
 
-    console.log("Setting up Roll event listener...")
-    setWatchTarget({
-      betId,
-      contractAddress,
-      gameType: betParams.game,
-    })
+      const betId = await _extractBetIdFromReceipt(
+        txHash,
+        contractAddress,
+        gameAbiForPlaceBet,
+        publicClient,
+      )
+
+      if (!betId) {
+        console.warn(
+          "Bet ID was not extracted. Roll event listener will not be started.",
+        )
+        setBetStatus("error")
+        return
+      }
+
+      console.log("Setting up Roll event listener...")
+      setWatchTarget({
+        betId,
+        contractAddress,
+        gameType: betParams.game,
+      })
+    } catch (error) {
+      console.error("Error placing bet:", error)
+      setBetStatus("error")
+    }
   }, [
     betParams,
     publicClient,
