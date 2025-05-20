@@ -12,7 +12,7 @@ import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { useAccount, useBalance } from "wagmi"
-import { formatUnits, parseEther } from "viem"
+import { formatEther, formatUnits, parseEther } from "viem"
 
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
@@ -146,7 +146,7 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const { placeBet, betStatus } = usePlaceBet({
+  const { placeBet, betStatus, gameResult } = usePlaceBet({
     betAmount: parseEther(betAmount),
     game: CASINO_GAME_TYPE.COINTOSS,
     gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
@@ -275,12 +275,14 @@ export function CoinTossGame({
               alt="Coin"
               className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2 h-16 w-16"
             />
-            <GameResultWindow
-              result="pending"
-              amount={0.094}
-              payout={1.094}
-              currency="ETH"
-            />
+            {gameResult && (
+              <GameResultWindow
+                isWin={gameResult.isWin}
+                amount={Number(betAmount)}
+                payout={Number(formatEther(gameResult.payout))}
+                currency="ETH"
+              />
+            )}
           </div>
 
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">

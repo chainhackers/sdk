@@ -28,6 +28,13 @@ interface SubmitBetResult {
   gameAbiForPlaceBet: Abi
 }
 
+interface GameResult {
+  isWin: boolean
+  amount: bigint
+  payout: bigint
+  currency: string
+}
+
 const POLLING_INTERVAL = 2500
 
 export function usePlaceBet(betParams: GenericCasinoBetParams) {
@@ -43,6 +50,7 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
   const [betStatus, setBetStatus] = useState<
     "pending" | "success" | "error" | null
   >(null)
+  const [gameResult, setGameResult] = useState<GameResult | null>(null)
 
   const placeBet = useCallback(async () => {
     setWatchTarget(null)
@@ -142,6 +150,12 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
             isWin: rollArgs.payout > 0n,
             rollTransactionHash: log.transactionHash,
           })
+          setGameResult({
+            isWin: rollArgs.payout > 0n,
+            amount: betParams.betAmount,
+            payout: rollArgs.payout,
+            currency: "ETH",
+          })
           setWatchTarget(null)
           setBetStatus("success")
         }
@@ -154,7 +168,7 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
     },
   })
 
-  return { placeBet, betStatus }
+  return { placeBet, betStatus, gameResult }
 }
 
 async function _fetchVrfCost(
