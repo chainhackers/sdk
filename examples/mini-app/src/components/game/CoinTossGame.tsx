@@ -390,8 +390,7 @@ export function CoinTossGame({
                   disabled={
                     !isWalletConnected ||
                     isBettingInProgress ||
-                    isInGameResultState ||
-                    isBetAmountInvalid
+                    isInGameResultState
                   }
                 >
                   1/2
@@ -410,8 +409,7 @@ export function CoinTossGame({
                   disabled={
                     !isWalletConnected ||
                     isBettingInProgress ||
-                    isInGameResultState ||
-                    isBetAmountInvalid
+                    isInGameResultState
                   }
                 >
                   2x
