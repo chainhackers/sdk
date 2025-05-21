@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo } from "react"
-import { Hex, zeroAddress, decodeEventLog, Abi, parseAbiItem } from "viem"
+import { useState, useCallback } from "react"
+import { Hex, zeroAddress, decodeEventLog, Abi } from "viem"
 import {
   useAccount,
   usePublicClient,
@@ -12,8 +12,8 @@ import {
   CasinoChainId,
   getChainlinkVrfCostFunctionData,
   getPlaceBetFunctionData,
+  getRollEventData,
   CoinToss,
-  CASINO_GAME_ROLL_ABI,
   COINTOSS_FACE,
 } from "@betswirl/sdk-core"
 
@@ -21,6 +21,9 @@ interface WatchTarget {
   betId: string
   contractAddress: Hex
   gameType: GenericCasinoBetParams["game"]
+  eventAbi: Abi
+  eventName: string
+  eventArgs: { id: bigint }
 }
 
 interface SubmitBetResult {
@@ -47,10 +50,6 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
     useWriteContract()
 
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
-  const rollEventAbiItem = useMemo(
-    () => parseAbiItem(CASINO_GAME_ROLL_ABI[betParams.game]),
-    [betParams.game],
-  )
   const [betStatus, setBetStatus] = useState<
     "pending" | "success" | "error" | null
   >(null)
@@ -103,11 +102,19 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
         return
       }
 
+      const { data: rollEventData } = getRollEventData(
+        betParams.game,
+        chainId,
+        betId,
+      )
       console.log("Setting up Roll event listener...")
       setWatchTarget({
         betId,
         contractAddress,
         gameType: betParams.game,
+        eventAbi: rollEventData.abi,
+        eventName: rollEventData.eventName,
+        eventArgs: rollEventData.args,
       })
     } catch (error) {
       console.error("Error placing bet:", error)
@@ -124,8 +131,8 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
 
   useWatchContractEvent({
     address: watchTarget?.contractAddress,
-    abi: [rollEventAbiItem],
-    eventName: rollEventAbiItem.name,
+    abi: watchTarget?.eventAbi,
+    eventName: watchTarget?.eventName,
     args: watchTarget ? { id: BigInt(watchTarget.betId) } : undefined,
     enabled: !!watchTarget,
     pollingInterval: POLLING_INTERVAL,
@@ -136,7 +143,7 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
 
       logs.forEach((log) => {
         const decodedRollLog = decodeEventLog({
-          abi: [rollEventAbiItem],
+          abi: watchTarget.eventAbi,
           data: log.data,
           topics: log.topics,
           strict: false,
