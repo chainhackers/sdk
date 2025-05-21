@@ -109,22 +109,6 @@ const mockHistoryData: HistoryEntry[] = [
   },
 ]
 
-function formatBetAmount(num: number, decimals: number): string {
-  if (Number.isNaN(num)) return "0"
-  if (num === 0) return "0"
-
-  let s = num.toFixed(decimals)
-
-  if (s.includes(".")) {
-    s = s.replace(/\.?0+$/, "")
-  }
-
-  if (s.endsWith(".")) {
-    s = s.slice(0, -1)
-  }
-
-  return s === "" || Number.isNaN(parseFloat(s)) ? "0" : s
-}
 const STEP = 0.0001
 
 export function CoinTossGame({
@@ -455,4 +439,21 @@ export function CoinTossGame({
       </Card>
     </div>
   )
+}
+
+function formatBetAmount(num: number, decimals: number): string {
+  if (Number.isNaN(num)) return "0"
+  if (num === 0) return "0"
+
+  let s = num.toFixed(decimals)
+
+  if (s.includes(".")) {
+    s = s.replace(/\.?0+$/, "")
+  }
+
+  if (s.endsWith(".")) {
+    s = s.slice(0, -1)
+  }
+
+  return s === "" || Number.isNaN(parseFloat(s)) ? "0" : s
 }
