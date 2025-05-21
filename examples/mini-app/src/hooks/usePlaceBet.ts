@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { Hex, zeroAddress, decodeEventLog, Abi, parseAbiItem } from "viem"
 import {
   useAccount,
@@ -31,7 +31,6 @@ interface SubmitBetResult {
 
 interface GameResult {
   isWin: boolean
-  amount: bigint
   payout: bigint
   currency: string
   rolled: COINTOSS_FACE
@@ -48,7 +47,10 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
     useWriteContract()
 
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
-  const rollEventAbiItem = parseAbiItem(CASINO_GAME_ROLL_ABI[betParams.game])
+  const rollEventAbiItem = useMemo(
+    () => parseAbiItem(CASINO_GAME_ROLL_ABI[betParams.game]),
+    [betParams.game],
+  )
   const [betStatus, setBetStatus] = useState<
     "pending" | "success" | "error" | null
   >(null)
@@ -157,7 +159,6 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
           })
           setGameResult({
             isWin: rollArgs.payout > 0n,
-            amount: betParams.betAmount,
             payout: rollArgs.payout,
             currency: "ETH",
             rolled,
