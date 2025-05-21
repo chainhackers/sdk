@@ -109,6 +109,23 @@ const mockHistoryData: HistoryEntry[] = [
   },
 ]
 
+function formatBetAmount(num: number, decimals: number): string {
+  if (Number.isNaN(num)) return "0"
+  if (num === 0) return "0"
+
+  let s = num.toFixed(decimals)
+
+  if (s.includes(".")) {
+    s = s.replace(/\.?0+$/, "")
+  }
+
+  if (s.endsWith(".")) {
+    s = s.slice(0, -1)
+  }
+
+  return s === "" || Number.isNaN(parseFloat(s)) ? "0" : s
+}
+
 export function CoinTossGame({
   theme = "system",
   customTheme,
@@ -127,6 +144,8 @@ export function CoinTossGame({
     ? parseFloat(formatUnits(balance.value, balance.decimals))
     : 0
   const formattedBalance = balanceFloat.toFixed(4)
+
+  const tokenDecimals = balance?.decimals ?? 18
 
   const multiplier = 1.94
   const winChance = 50
@@ -363,9 +382,8 @@ export function CoinTossGame({
                   onClick={() => {
                     setBetAmount((prev) => {
                       const prevNum = Number.parseFloat(prev || "0")
-                      return Number.isNaN(prevNum)
-                        ? "0"
-                        : (prevNum / 2).toString()
+                      if (Number.isNaN(prevNum) || prevNum === 0) return "0"
+                      return formatBetAmount(prevNum / 2, tokenDecimals)
                     })
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
@@ -382,11 +400,10 @@ export function CoinTossGame({
                   variant="secondary"
                   onClick={() => {
                     setBetAmount((prev) => {
-                      const old = Number.parseFloat(prev || "0")
-                      const newAmount = Number.isNaN(old) ? 0 : old * 2
-                      return Math.min(balanceFloat, newAmount)
-                        .toFixed(4)
-                        .toString()
+                      const oldNum = Number.parseFloat(prev || "0")
+                      const newAmount = oldNum * 2
+                      const finalAmount = Math.min(balanceFloat, newAmount)
+                      return formatBetAmount(finalAmount, tokenDecimals)
                     })
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
