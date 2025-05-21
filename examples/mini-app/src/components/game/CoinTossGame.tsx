@@ -352,7 +352,9 @@ export function CoinTossGame({
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
                   symbol: "ETH",
                 }}
-                disabled={betStatus === "pending" || !!gameResult}
+                disabled={
+                  !isWalletConnected || betStatus === "pending" || !!gameResult
+                }
               />
 
               <div className="grid grid-cols-3 gap-2">
@@ -368,6 +370,7 @@ export function CoinTossGame({
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   disabled={
+                    !isWalletConnected ||
                     isBettingInProgress ||
                     isInGameResultState ||
                     isBetAmountInvalid
@@ -388,6 +391,7 @@ export function CoinTossGame({
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   disabled={
+                    !isWalletConnected ||
                     isBettingInProgress ||
                     isInGameResultState ||
                     isBetAmountInvalid
@@ -402,6 +406,7 @@ export function CoinTossGame({
                     setBetAmount(formattedBalance)
                   }}
                   disabled={
+                    !isWalletConnected ||
                     isBettingInProgress ||
                     isInGameResultState ||
                     isBetAmountInvalid
