@@ -11,19 +11,8 @@ const CHAIN = base
 const queryClient = new QueryClient()
 
 export function AppProviders({ children }: { children: ReactNode }) {
-  const apiKey = import.meta.env.VITE_PUBLIC_ONCHAINKIT_API_KEY as string
   const affiliate = import.meta.env.AFFILIATE_ADDRESS as Hex
-
-  if (!apiKey && import.meta.env.DEV) {
-    console.warn(
-      "OnchainKit API Key (VITE_PUBLIC_ONCHAINKIT_API_KEY) is missing. Some OnchainKit features might not work as expected.",
-    )
-  }
-
   const rpcUrl = import.meta.env.VITE_RPC_URL
-  if (!rpcUrl) {
-    throw new Error("RPC URL is not set")
-  }
   const config = createConfig({
     chains: [CHAIN],
     transports: {
@@ -35,7 +24,6 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
-          apiKey={apiKey}
           chain={CHAIN}
           config={{
             wallet: {
