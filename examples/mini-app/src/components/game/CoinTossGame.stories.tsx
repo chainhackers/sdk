@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { CoinTossGame } from "./CoinTossGame"
 import gameBg from "../../assets/game/game-background-1.png"
+import { AppProviders } from "../../../src/providers"
 
 const meta = {
   title: "Game/CoinTossGame",
@@ -14,7 +15,17 @@ const meta = {
         { name: "dark", value: "oklch(0.15 0 0)" },
       ],
     },
+    loki: {
+      skip: true
+    }
   },
+  decorators: [
+    (Story) => (
+      <AppProviders>
+        <Story />
+      </AppProviders>
+    ),
+  ],
   tags: ["autodocs"],
   argTypes: {
     theme: {

@@ -1,0 +1,136 @@
+import type { Meta, StoryObj } from "@storybook/react"
+import { GameFrame } from "./GameFrame"
+import { TokenImage } from "@coinbase/onchainkit/token"
+import { ETH_TOKEN } from "../../lib/tokens"
+import { type HistoryEntry } from "./HistorySheetPanel"
+import gameBg from "../../assets/game/game-background.png"
+
+const meta = {
+  title: "Game/GameFrame",
+  component: GameFrame,
+  parameters: {
+    layout: "centered",
+    backgrounds: {
+      default: "light",
+      values: [
+        { name: "light", value: "#FFFFFF" },
+        { name: "dark", value: "oklch(0.15 0 0)" },
+      ],
+    },
+  },
+  tags: ["autodocs"],
+} satisfies Meta<typeof GameFrame>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+const connectWalletBtnStub = (
+  <div></div>
+)
+
+const mockHistoryData: HistoryEntry[] = [
+  {
+    id: "1",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: "1.94675",
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    timestamp: "~24h ago",
+  },
+  {
+    id: "2",
+    status: "Won bet",
+    multiplier: 1.2,
+    payoutAmount: 0.2,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "3",
+    status: "Busted",
+    multiplier: 1.94,
+    payoutAmount: 1.94,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "4",
+    status: "Won bet",
+    multiplier: 1.946,
+    payoutAmount: 2.453,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "5",
+    status: "Busted",
+    multiplier: 1.94,
+    payoutAmount: 1.94,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "6",
+    status: "Won bet",
+    multiplier: 1.946,
+    payoutAmount: 2.453,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "7",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: 0.1,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "8",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: 0.1,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    timestamp: "~2h ago",
+  },
+  {
+    id: "9",
+    status: "Won bet",
+    multiplier: 1.94,
+    payoutAmount: 0.1,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    timestamp: "~2h ago",
+  },
+]
+
+const Template: Story = {
+  args: {
+    themeSettings: {
+      backgroundImage: gameBg,
+    },
+    historyData: mockHistoryData,
+    balance: 1.7,
+    connectWallletBtn: connectWalletBtnStub,
+    address: "",
+    isConnected: false,
+    isPlacingBet: false,
+    onPlaceBet: (betAmount: string) => console.log("betAmount: ", betAmount),
+  },
+  render: (args) => (
+    <GameFrame {...args} />
+  ),
+}
+
+export const WalletNotConnected: Story = {
+  args: {
+    ...Template.args
+  },
+}
+
+export const WalletConnected: Story = {
+  args: {
+    ...Template.args,
+    address: "0x0000000000000000000000000000000000000000",
+    isConnected: true,
+  },
+}

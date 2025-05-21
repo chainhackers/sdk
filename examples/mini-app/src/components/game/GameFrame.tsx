@@ -23,7 +23,7 @@ interface IThemeSettings {
     "--play-btn-font"?: string
     "--game-window-overlay"?: string
   } & React.CSSProperties
-  backgroundImage?: string
+  backgroundImage: string
 }
 
 interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {

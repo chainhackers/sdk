@@ -1,15 +1,10 @@
 import React from "react"
 import type { Preview, Decorator } from "@storybook/react"
-//import { AppProviders } from "../src/providers"
 import "../src/index.css"
 
 const withAppProviders: Decorator = (StoryComponent) => {
   return (
-    <>
-      {/* <AppProviders> */}
-        <StoryComponent />
-      {/* </AppProviders> */}
-    </>
+    <StoryComponent />
   )
 }
 
