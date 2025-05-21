@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { Hex, zeroAddress, decodeEventLog, Abi } from "viem"
 import {
   useAccount,
@@ -42,7 +42,7 @@ interface GameResult {
 
 const POLLING_INTERVAL = 2500
 
-export function usePlaceBet(betParams: GenericCasinoBetParams) {
+export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
   const { chain } = useOnchainKit()
   const chainId = chain?.id as CasinoChainId | undefined
   const publicClient = usePublicClient({ chainId })
@@ -55,6 +55,15 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
     "pending" | "success" | "error" | null
   >(null)
   const [gameResult, setGameResult] = useState<GameResult | null>(null)
+
+  const betParams = useMemo(
+    () => ({
+      game: CASINO_GAME_TYPE.COINTOSS,
+      gameEncodedInput: CoinToss.encodeInput(choice),
+      betAmount,
+    }),
+    [betAmount, choice],
+  )
 
   const placeBet = useCallback(async () => {
     try {

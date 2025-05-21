@@ -20,8 +20,8 @@ import { InfoSheetPanel } from "./InfoSheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { GameResultWindow } from "./GameResultWindow"
 
-import { CASINO_GAME_TYPE, CoinToss, COINTOSS_FACE } from "@betswirl/sdk-core"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
+import { COINTOSS_FACE } from "@betswirl/sdk-core"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -146,11 +146,10 @@ export function CoinTossGame({
     setIsMounted(true)
   }, [])
 
-  const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet({
-    betAmount: parseEther(betAmount),
-    game: CASINO_GAME_TYPE.COINTOSS,
-    gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
-  })
+  const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet(
+    parseEther(betAmount),
+    COINTOSS_FACE.HEADS,
+  )
 
   const isBetAmountInvalid =
     Number.isNaN(Number.parseFloat(betAmount)) ||
