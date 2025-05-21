@@ -15,12 +15,13 @@ import {
   getRollEventData,
   CoinToss,
   COINTOSS_FACE,
+  CASINO_GAME_TYPE,
 } from "@betswirl/sdk-core"
 
 interface WatchTarget {
   betId: string
   contractAddress: Hex
-  gameType: GenericCasinoBetParams["game"]
+  gameType: CASINO_GAME_TYPE
   eventAbi: Abi
   eventName: string
   eventArgs: { id: bigint }
@@ -156,7 +157,7 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
         }
 
         if (rollArgs.id.toString() === betId) {
-          const rolled = CoinToss.decodeRolled(rollArgs.rolled[0])
+          const rolled = _decodeRolled(rollArgs.rolled, betParams.game)
           console.log({
             betId,
             payout: rollArgs.payout.toString(),
@@ -191,7 +192,7 @@ export function usePlaceBet(betParams: GenericCasinoBetParams) {
 }
 
 async function _fetchVrfCost(
-  gameType: GenericCasinoBetParams["game"],
+  gameType: CASINO_GAME_TYPE,
   chainId: CasinoChainId,
   publicClient: ReturnType<typeof usePublicClient>,
 ): Promise<bigint> {
@@ -274,4 +275,16 @@ async function _extractBetIdFromReceipt(
   }
   console.warn("Bet ID not found in receipt.")
   return null
+}
+
+function _decodeRolled(
+  rolled: boolean[],
+  game: CASINO_GAME_TYPE,
+): COINTOSS_FACE {
+  switch (game) {
+    case CASINO_GAME_TYPE.COINTOSS:
+      return CoinToss.decodeRolled(rolled[0])
+    default:
+      throw new Error(`Unsupported game type: ${game}`)
+  }
 }

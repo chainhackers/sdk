@@ -119,7 +119,7 @@ export function CoinTossGame({
   const [betAmount, setBetAmount] = useState("0")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
-  const { isConnected, address } = useAccount()
+  const { isConnected: isWalletConnected, address } = useAccount()
   const { data: balance } = useBalance({
     address,
   })
@@ -158,7 +158,6 @@ export function CoinTossGame({
 
   const isInGameResultState = !!gameResult
   const isBettingInProgress = betStatus === "pending"
-  const isWalletConnected = isConnected && !!address
   const canInitiateBet =
     isWalletConnected && !isBetAmountInvalid && !isBettingInProgress
 
