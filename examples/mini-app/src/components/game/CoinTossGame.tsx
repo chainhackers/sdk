@@ -408,8 +408,7 @@ export function CoinTossGame({
                   disabled={
                     !isWalletConnected ||
                     isBettingInProgress ||
-                    isInGameResultState ||
-                    isBetAmountInvalid
+                    isInGameResultState
                   }
                 >
                   Max
