@@ -4,6 +4,9 @@ import { decodeEventLog } from "viem"
 import { usePublicClient, useWatchContractEvent } from "wagmi"
 import { CASINO_GAME_TYPE, COINTOSS_FACE, CoinToss } from "@betswirl/sdk-core"
 import type { GameResult, WatchTarget } from "./types"
+import { createLogger } from "../lib/logger"
+
+const logger = createLogger("useBetResultWatcher")
 
 interface UseBetResultWatcherProps {
   watchParams: WatchTarget | null
@@ -27,13 +30,6 @@ interface BetResultWatcherOutput {
 
 const POLLING_INTERVAL = 2500
 
-function logDebug(context: string, message: string, data?: unknown) {
-  console.log(
-    `[useBetResultWatcher:${context}] ${message}`,
-    data !== undefined ? data : "",
-  )
-}
-
 function _decodeRolled(
   rolled: boolean[],
   game: CASINO_GAME_TYPE,
@@ -42,7 +38,7 @@ function _decodeRolled(
     case CASINO_GAME_TYPE.COINTOSS:
       return CoinToss.decodeRolled(rolled[0])
     default:
-      logDebug("_decodeRolled", `Unsupported game type: ${game}`)
+      logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
       throw new Error(`Unsupported game type for decoding roll: ${game}`)
   }
 }
@@ -66,7 +62,7 @@ export function useBetResultWatcher({
   }, [watchParams?.betId])
 
   const reset = useCallback(() => {
-    logDebug("reset", "Resetting watcher state")
+    logger.debug("reset: Resetting watcher state")
     setInternalGameResult(null)
     setStatus("idle")
     setError(null)
@@ -80,9 +76,12 @@ export function useBetResultWatcher({
     }
 
     if (watchParams && publicClient && status === "idle") {
-      logDebug("useEffect[enabled,watchParams]", "Watcher enabled, starting.", {
-        watchParams,
-      })
+      logger.debug(
+        "useEffect[enabled,watchParams]: Watcher enabled, starting.",
+        {
+          watchParams,
+        },
+      )
       setStatus("listening")
       setError(null)
       setFilterErrorOccurred(false)
@@ -92,9 +91,8 @@ export function useBetResultWatcher({
   const processEventLogs = useCallback(
     (logs: readonly Log[], currentWatchParams: WatchTarget) => {
       const { betId, gameType, eventAbi, eventName } = currentWatchParams
-      logDebug(
-        "processEventLogs",
-        `Processing ${logs.length} logs for betId ${betId}`,
+      logger.debug(
+        `processEventLogs: Processing ${logs.length} logs for betId ${betId}`,
         { eventName },
       )
 
@@ -122,7 +120,7 @@ export function useBetResultWatcher({
             currency: "ETH",
             rolled: rolledResult,
           }
-          logDebug("processEventLogs", "Bet event processed:", {
+          logger.debug("processEventLogs: Bet event processed:", {
             betId,
             ...result,
             txHash: log.transactionHash,
@@ -150,16 +148,14 @@ export function useBetResultWatcher({
     pollingInterval: POLLING_INTERVAL,
     onLogs: (logs) => {
       if (!watchParams) return
-      logDebug(
-        "useWatchContractEvent",
-        `Received ${logs.length} logs (primary)`,
+      logger.debug(
+        `useWatchContractEvent: Received ${logs.length} logs (primary)`,
       )
       processEventLogs(logs, watchParams)
     },
     onError: (watchError) => {
-      logDebug(
-        "useWatchContractEvent",
-        "Error from primary watcher:",
+      logger.debug(
+        "useWatchContractEvent: Error from primary watcher:",
         watchError,
       )
       setFilterErrorOccurred(true)
@@ -177,8 +173,7 @@ export function useBetResultWatcher({
     ) {
       return
     }
-
-    logDebug("fallbackPoller", "Starting fallback polling.", {
+    logger.debug("fallbackPoller: Starting fallback polling.", {
       betId: watchParams.betId,
     })
     let isActive = true
@@ -193,9 +188,8 @@ export function useBetResultWatcher({
       )
 
       if (!eventDefinition) {
-        logDebug(
-          "fallbackPoller",
-          `Critical: Event definition for ${eventName} not found.`,
+        logger.debug(
+          `fallbackPoller: Critical: Event definition for ${eventName} not found.`,
         )
         setError(new Error(`Event definition for ${eventName} not found.`))
         setStatus("error")
@@ -204,10 +198,8 @@ export function useBetResultWatcher({
 
       const currentBlock = await publicClient.getBlockNumber()
       const fromBlock = currentBlock > 100n ? currentBlock - 100n : 0n
-
-      logDebug(
-        "fallbackPoller",
-        `Querying logs from ${fromBlock} to ${currentBlock}`,
+      logger.debug(
+        `fallbackPoller: Querying logs from ${fromBlock} to ${currentBlock}`,
       )
       const logs = await publicClient.getLogs({
         address: contractAddress,
@@ -216,10 +208,8 @@ export function useBetResultWatcher({
         fromBlock,
         toBlock: currentBlock,
       })
-
-      logDebug(
-        "fallbackPoller",
-        `Fetched ${logs.length} logs (fallback) for betId ${betId}`,
+      logger.debug(
+        `fallbackPoller: Fetched ${logs.length} logs (fallback) for betId ${betId}`,
       )
       if (logs.length > 0) {
         processEventLogs(logs, watchParams)
@@ -230,7 +220,7 @@ export function useBetResultWatcher({
     const intervalId = setInterval(poll, POLLING_INTERVAL)
 
     return () => {
-      logDebug("fallbackPoller", "Stopping fallback polling.")
+      logger.debug("fallbackPoller: Stopping fallback polling.")
       isActive = false
       clearInterval(intervalId)
     }
@@ -245,9 +235,8 @@ export function useBetResultWatcher({
 
   useEffect(() => {
     if (status === "success" || status === "error") {
-      logDebug(
-        "useEffect[status]",
-        `Final status reached: ${status}. Watcher inactive.`,
+      logger.debug(
+        `useEffect[status]: Final status reached: ${status}. Watcher inactive.`,
       )
     }
   }, [status])

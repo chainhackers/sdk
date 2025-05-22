@@ -14,13 +14,9 @@ import {
 } from "@betswirl/sdk-core"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import type { GameResult, WatchTarget } from "./types"
+import { createLogger } from "../lib/logger"
 
-function logDebug(context: string, message: string, data?: unknown) {
-  console.log(
-    `[usePlaceBet:${context}] ${message}`,
-    data !== undefined ? data : "",
-  )
-}
+const logger = createLogger("usePlaceBet")
 
 interface SubmitBetResult {
   txHash: Hex
@@ -56,12 +52,12 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
     if (watcherStatus === "success" && watcherGameResult) {
       setGameResult(watcherGameResult)
       setBetStatus("success")
-      logDebug("watcher", "Bet resolved: SUCCESS", {
+      logger.debug("watcher: Bet resolved: SUCCESS", {
         gameResult: watcherGameResult,
       })
     } else if (watcherStatus === "error") {
       setBetStatus("error")
-      logDebug("watcher", "Bet resolved: ERROR from watcher")
+      logger.debug("watcher: Bet resolved: ERROR from watcher")
     }
   }, [watcherStatus, watcherGameResult])
 
@@ -87,13 +83,13 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
         !connectedAddress ||
         !writeContractAsync
       ) {
-        console.error(
-          "Wagmi/OnchainKit clients or address are not initialized.",
+        logger.error(
+          "placeBet: Wagmi/OnchainKit clients or address are not initialized.",
         )
         setBetStatus("error")
         return
       }
-      logDebug("placeBet", "Starting bet process:", {
+      logger.debug("placeBet: Starting bet process:", {
         betParams,
         connectedAddress,
       })
@@ -118,9 +114,8 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
       )
 
       if (!betId) {
-        logDebug(
-          "placeBet",
-          "Bet ID was not extracted. Roll event listener will not be started.",
+        logger.warn(
+          "placeBet: Bet ID was not extracted. Roll event listener will not be started.",
         )
         setBetStatus("error")
         return
@@ -131,7 +126,7 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
         chainId,
         betId,
       )
-      logDebug("placeBet", "Setting up Roll event listener...")
+      logger.debug("placeBet: Setting up Roll event listener...")
       setWatchTarget({
         betId,
         contractAddress,
@@ -141,7 +136,7 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
         eventArgs: rollEventData.args,
       })
     } catch (error) {
-      logDebug("placeBet", "Error placing bet:", error)
+      logger.error("placeBet: Error placing bet:", error)
       setBetStatus("error")
     }
   }, [
@@ -169,8 +164,11 @@ async function _fetchVrfCost(
   chainId: CasinoChainId,
   publicClient: ReturnType<typeof usePublicClient>,
 ): Promise<bigint> {
-  if (!publicClient) throw new Error("publicClient is undefined")
-  logDebug("_fetchVrfCost", "Getting VRF cost...")
+  if (!publicClient) {
+    logger.error("_fetchVrfCost: publicClient is undefined")
+    throw new Error("publicClient is undefined")
+  }
+  logger.debug("_fetchVrfCost: Getting VRF cost...")
   const vrfCostFunctionData = getChainlinkVrfCostFunctionData(
     gameType,
     zeroAddress,
@@ -183,7 +181,7 @@ async function _fetchVrfCost(
     functionName: vrfCostFunctionData.data.functionName,
     args: vrfCostFunctionData.data.args,
   })) as bigint
-  logDebug("_fetchVrfCost", "VRF cost received:", vrfCost?.toString())
+  logger.debug("_fetchVrfCost: VRF cost received:", vrfCost?.toString())
   return vrfCost
 }
 
@@ -194,7 +192,7 @@ async function _submitBetTransaction(
   chainId: CasinoChainId,
   writeContractAsync: ReturnType<typeof useWriteContract>["writeContractAsync"],
 ): Promise<SubmitBetResult> {
-  logDebug("_submitBetTransaction", "Preparing and sending transaction...")
+  logger.debug("_submitBetTransaction: Preparing and sending transaction...")
   const placeBetTxData = getPlaceBetFunctionData(
     { ...betParams, receiver },
     chainId,
@@ -206,7 +204,7 @@ async function _submitBetTransaction(
     args: placeBetTxData.data.args,
     value: placeBetTxData.extraData.getValue(betParams.betAmount + vrfCost),
   })
-  logDebug("_submitBetTransaction", "Transaction sent, hash:", txHash)
+  logger.debug("_submitBetTransaction: Transaction sent, hash:", txHash)
   return {
     txHash,
     contractAddress: placeBetTxData.data.to,
@@ -220,19 +218,21 @@ async function _extractBetIdFromReceipt(
   placeBetAbi: Abi,
   publicClient: ReturnType<typeof usePublicClient>,
 ): Promise<string | null> {
-  if (!publicClient) throw new Error("publicClient is undefined")
-  logDebug("_extractBetIdFromReceipt", "Waiting for receipt for", txHash)
+  if (!publicClient) {
+    logger.error("_extractBetIdFromReceipt: publicClient is undefined")
+    throw new Error("publicClient is undefined")
+  }
+  logger.debug("_extractBetIdFromReceipt: Waiting for receipt for", txHash)
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
-  logDebug("_extractBetIdFromReceipt", "Receipt received.")
+  logger.debug("_extractBetIdFromReceipt: Receipt received.")
 
   const placeBetEventDefinition = placeBetAbi.find(
     (item) => item.type === "event" && item.name === "PlaceBet",
   )
 
   if (!placeBetEventDefinition) {
-    logDebug(
-      "_extractBetIdFromReceipt",
-      "PlaceBet event definition not found in ABI.",
+    logger.warn(
+      "_extractBetIdFromReceipt: PlaceBet event definition not found in ABI.",
     )
     return null
   }
@@ -246,9 +246,10 @@ async function _extractBetIdFromReceipt(
       topics: log.topics,
       strict: false,
     })
-    if (decodedLog.eventName !== "PlaceBet") continue
-    return (decodedLog.args as { id: bigint }).id.toString()
+    if (decodedLog.eventName === "PlaceBet") {
+      return (decodedLog.args as { id: bigint }).id.toString()
+    }
   }
-  logDebug("_extractBetIdFromReceipt", "Bet ID not found in receipt.")
+  logger.warn("_extractBetIdFromReceipt: Bet ID not found in receipt.")
   return null
 }
