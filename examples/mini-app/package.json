@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:loki": "pnpm loki test --chromeTolerance 1"
   },
   "dependencies": {
     "@betswirl/sdk-core": "^0.1.2-beta.2",
@@ -25,6 +26,7 @@
     "@tanstack/react-query": "^5.75.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "loki": "^0.35.1",
     "lucide-react": "^0.503.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -36,13 +38,12 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^3",
     "@eslint/js": "^9.22.0",
-    "@storybook/addon-essentials": "^8.6.12",
-    "@storybook/addon-onboarding": "^8.6.12",
-    "@storybook/blocks": "^8.6.12",
-    "@storybook/experimental-addon-test": "^8.6.12",
-    "@storybook/react": "^8.6.12",
-    "@storybook/react-vite": "^8.6.12",
-    "@storybook/test": "^8.6.12",
+    "@storybook/addon-essentials": "8.2.9",
+    "@storybook/addon-onboarding": "8.2.9",
+    "@storybook/blocks": "8.2.9",
+    "@storybook/react": "8.2.9",
+    "@storybook/react-vite": "8.2.9",
+    "@storybook/test": "8.2.9",
     "@types/node": "^22.15.3",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
@@ -56,7 +57,7 @@
     "globals": "^16.0.0",
     "playwright": "^1.52.0",
     "prettier": "3.5.3",
-    "storybook": "^8.6.12",
+    "storybook": "8.2.9",
     "tw-animate-css": "^1.2.8",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
@@ -67,5 +68,20 @@
     "extends": [
       "plugin:storybook/recommended"
     ]
+  },
+  "loki": {
+    "configurations": {
+      "chrome.laptop": {
+        "target": "chrome.docker",
+        "width": 1366,
+        "height": 768,
+        "deviceScaleFactor": 1,
+        "mobile": false
+      },
+      "chrome.iphone7": {
+        "target": "chrome.docker",
+        "preset": "iPhone 7"
+      }
+    }
   }
 }

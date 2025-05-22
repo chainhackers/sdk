@@ -2,6 +2,7 @@ import winIcon from "../../assets/game/game-result/win-icon.svg"
 import lossIcon from "../../assets/game/game-result/loss-icon.svg"
 import winBgWebp from "../../assets/game/game-result/win-bg.webp"
 import lossBgWebp from "../../assets/game/game-result/loss-bg.webp"
+import { useEffect } from "react"
 
 const images = {
   win: {
@@ -15,18 +16,20 @@ const images = {
 } as const
 
 interface GameResultWindowProps {
-  isWin: boolean
+  isWin?: boolean
+  isVisible: boolean
   amount: number
-  payout: number
+  payout?: number
   currency: string
   rolled: string
   className?: string
 }
 
 export function GameResultWindow({
-  isWin,
+  isWin = false,
+  isVisible,
   amount,
-  payout,
+  payout = 0,
   currency,
   rolled,
   className,
@@ -34,6 +37,22 @@ export function GameResultWindow({
   const resultType = isWin ? "win" : "loss"
   const currentImages = images[resultType]
   const sign = isWin ? "+" : "-"
+
+  useEffect(() => {
+    const preloadImg = (imgSrc: string) => {
+      const img = new Image()
+      img.src = imgSrc
+    }
+
+    Object.values(images).forEach(({ bg, icon }) => {
+      preloadImg(bg)
+      preloadImg(icon)
+    })
+  }, [])
+
+  if (!isVisible) {
+    return null
+  }
 
   return (
     <div

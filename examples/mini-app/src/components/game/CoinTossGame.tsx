@@ -1,12 +1,6 @@
-import { History, Info } from "lucide-react"
-import React, { ChangeEvent, useEffect, useRef, useState } from "react"
-import coinIcon from "../../assets/game/coin-background-icon.png"
+import React from "react"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
-import { Button } from "../ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { Input } from "../ui/input"
-import { Label } from "../ui/label"
 
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
@@ -14,14 +8,12 @@ import { TokenImage } from "@coinbase/onchainkit/token"
 import { useAccount, useBalance } from "wagmi"
 import { formatEther, formatUnits, parseEther } from "viem"
 
-import { Sheet, SheetTrigger } from "../ui/sheet"
-import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
-import { InfoSheetPanel } from "./InfoSheetPanel"
+import { type HistoryEntry } from "./HistorySheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
-import { GameResultWindow } from "./GameResultWindow"
 
 import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { GameFrame } from "./GameFrame"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -109,18 +101,13 @@ const mockHistoryData: HistoryEntry[] = [
   },
 ]
 
-const STEP = 0.0001
-
 export function CoinTossGame({
   theme = "system",
   customTheme,
-  className,
   backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
-  const [betAmount, setBetAmount] = useState("0")
-  const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
-  const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
+  const themeSettings = { theme, customTheme, backgroundImage }
   const { isConnected: isWalletConnected, address } = useAccount()
   const { data: balance } = useBalance({
     address,
@@ -128,332 +115,66 @@ export function CoinTossGame({
   const balanceFloat = balance
     ? parseFloat(formatUnits(balance.value, balance.decimals))
     : 0
-  const formattedBalance = balanceFloat.toFixed(4)
 
   const tokenDecimals = balance?.decimals ?? 18
 
-  const multiplier = 1.94
-  const winChance = 50
-  const parsedBetAmountForPayout = Number.parseFloat(betAmount || "0")
-  const targetPayout = (
-    (Number.isNaN(parsedBetAmountForPayout) ? 0 : parsedBetAmountForPayout) *
-    multiplier
-  ).toFixed(2)
-  const fee = 0
-
-  const themeClass = theme === "system" ? undefined : theme
-
-  const cardRef = useRef<HTMLDivElement>(null)
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
   const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet(
-    parseEther(betAmount),
     COINTOSS_FACE.HEADS,
   )
-
-  const isBetAmountInvalid =
-    Number.isNaN(Number.parseFloat(betAmount)) ||
-    Number.parseFloat(betAmount || "0") <= 0
-
   const isInGameResultState = !!gameResult
-  const isBettingInProgress = betStatus === "pending"
-  const canInitiateBet =
-    isWalletConnected && !isBetAmountInvalid && !isBettingInProgress
 
-  const isErrorState = betStatus === "error"
-
-  let playButtonText: string
-  if (isErrorState) {
-    playButtonText = "Error, try again"
-  } else if (isInGameResultState) {
-    playButtonText = "Try again"
-  } else if (isBettingInProgress) {
-    playButtonText = "Placing Bet..."
-  } else if (!isWalletConnected) {
-    playButtonText = "Connect Wallet"
-  } else {
-    playButtonText = "Place Bet"
-  }
-
-  const isPlayButtonDisabled: boolean = isErrorState
-    ? false
-    : isInGameResultState
-      ? false
-      : !canInitiateBet
-
-  const handlePlayButtonClick = () => {
+  const handlePlayButtonClick = (betAmount: string) => {
     if (betStatus === "error") {
       resetBetState()
-      placeBet()
+      placeBet(parseEther(betAmount))
     } else if (isInGameResultState) {
       resetBetState()
-      setBetAmount("0")
     } else {
-      placeBet()
+      placeBet(parseEther(betAmount))
     }
   }
 
+  const gameResultFormatted = gameResult
+    ? {
+        ...gameResult,
+        payout: Number(formatEther(gameResult.payout)),
+      }
+    : null
+
   return (
-    <div
-      className={cn(
-        "cointoss-game-wrapper game-global-styles",
-        themeClass,
-        className,
-      )}
-      style={customTheme}
+    <GameFrame
       {...props}
-    >
-      <Card
-        ref={cardRef}
-        className={cn(
-          "relative overflow-hidden",
-          "bg-card text-card-foreground border",
-        )}
-      >
-        <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-          <CardTitle className="text-lg text-title-color font-bold">
-            CoinToss
-          </CardTitle>
-          <Wallet>
-            <ConnectWallet
-              className={cn(
-                "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-                "bg-neutral-background",
-                "rounded-[12px]",
-                "border border-border-stroke",
-                "px-3 py-1.5 h-[44px]",
-                "text-primary",
-              )}
-              disconnectedLabel="Connect"
-            >
-              <div className="flex items-center">
-                <Avatar
-                  className="h-7 w-7 mr-2"
-                  address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9"
-                />
-                <Name className="text-title-color" />
-              </div>
-            </ConnectWallet>
-          </Wallet>
-        </CardHeader>
-
-        <CardContent className="flex flex-col gap-4">
-          <div
+      onPlayBtnClick={handlePlayButtonClick}
+      historyData={mockHistoryData}
+      tokenDecimals={tokenDecimals}
+      themeSettings={themeSettings}
+      isConnected={isWalletConnected}
+      balance={balanceFloat}
+      gameResult={gameResultFormatted}
+      betStatus={betStatus}
+      connectWallletBtn={
+        <Wallet>
+          <ConnectWallet
             className={cn(
-              "h-[160px] rounded-[16px] flex flex-col justify-end items-center relative bg-cover bg-center bg-no-repeat",
-              "bg-muted overflow-hidden",
+              "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+              "bg-neutral-background",
+              "rounded-[12px]",
+              "border border-border-stroke",
+              "px-3 py-1.5 h-[44px]",
+              "text-primary",
             )}
-            style={{
-              backgroundImage: `url(${backgroundImage})`,
-            }}
+            disconnectedLabel="Connect"
           >
-            <div
-              className={cn(
-                "absolute inset-0 rounded-[16px]",
-                "bg-game-window-overlay",
-              )}
-            ></div>
-
-            <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="iconTransparent"
-                  size="iconRound"
-                  className={cn(
-                    "absolute top-2 left-2 z-10",
-                    "text-white border border-border-stroke",
-                    isInfoSheetOpen && "text-primary border-primary",
-                  )}
-                >
-                  <Info className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
-              {isMounted && cardRef.current && (
-                <InfoSheetPanel
-                  portalContainer={cardRef.current}
-                  winChance={winChance}
-                  rngFee={fee}
-                  targetPayout={targetPayout}
-                  gasPrice="34.2123 gwei"
-                />
-              )}
-            </Sheet>
-
-            <Sheet
-              open={isHistorySheetOpen}
-              onOpenChange={setIsHistorySheetOpen}
-            >
-              <SheetTrigger asChild>
-                <Button
-                  variant="iconTransparent"
-                  size="iconRound"
-                  className={cn(
-                    "absolute top-2 right-2 z-5",
-                    "text-white border border-border-stroke bg-neutral-background",
-                    isHistorySheetOpen && "text-primary border-primary",
-                  )}
-                >
-                  <History className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
-              {isMounted && cardRef.current && (
-                <HistorySheetPanel
-                  portalContainer={cardRef.current}
-                  historyData={mockHistoryData}
-                />
-              )}
-            </Sheet>
-
-            <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
-              {multiplier.toFixed(2)} x
-            </div>
-            <img
-              src={coinIcon}
-              alt="Coin"
-              className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2 h-16 w-16"
-            />
-            {gameResult && (
-              <GameResultWindow
-                isWin={gameResult.isWin}
-                amount={Number(betAmount)}
-                payout={Number(formatEther(gameResult.payout))}
-                currency="ETH"
-                rolled={gameResult.rolled}
+            <div className="flex items-center">
+              <Avatar
+                className="h-7 w-7 mr-2"
+                address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9"
               />
-            )}
-          </div>
-
-          <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
-            <div className="flex flex-col gap-3">
-              <div className="text-sm font-medium flex items-center">
-                <span className="text-text-on-surface-variant">
-                  Balance:&nbsp;
-                </span>
-                <span className="font-semibold">{formattedBalance}</span>
-                <TokenImage token={ETH_TOKEN} size={16} className="ml-1" />
-              </div>
-
-              <Label
-                htmlFor="betAmount"
-                className="text-sm font-medium -mb-1 text-text-on-surface-variant"
-              >
-                Bet amount
-              </Label>
-              <Input
-                id="betAmount"
-                type="number"
-                placeholder="0"
-                min={0}
-                max={balanceFloat}
-                step={STEP}
-                value={betAmount}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setBetAmount(e.target.value)
-                }}
-                className="relative"
-                token={{
-                  icon: <TokenImage token={ETH_TOKEN} size={16} />,
-                  symbol: "ETH",
-                }}
-                disabled={
-                  !isWalletConnected || betStatus === "pending" || !!gameResult
-                }
-              />
-
-              <div className="grid grid-cols-3 gap-2">
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setBetAmount((prev) => {
-                      const prevNum = Number.parseFloat(prev || "0")
-                      if (Number.isNaN(prevNum) || prevNum === 0) return "0"
-                      return formatBetAmount(prevNum / 2, tokenDecimals)
-                    })
-                  }}
-                  className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isWalletConnected ||
-                    isBettingInProgress ||
-                    isInGameResultState
-                  }
-                >
-                  1/2
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setBetAmount((prev) => {
-                      const oldNum = Number.parseFloat(prev || "0")
-                      const newAmount = oldNum * 2
-                      const finalAmount = Math.min(balanceFloat, newAmount)
-                      return formatBetAmount(finalAmount, tokenDecimals)
-                    })
-                  }}
-                  className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isWalletConnected ||
-                    isBettingInProgress ||
-                    isInGameResultState
-                  }
-                >
-                  2x
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  onClick={() => {
-                    setBetAmount(formattedBalance)
-                  }}
-                  disabled={
-                    !isWalletConnected ||
-                    isBettingInProgress ||
-                    isInGameResultState
-                  }
-                >
-                  Max
-                </Button>
-              </div>
+              <Name className="text-title-color" />
             </div>
-
-            <Button
-              size="lg"
-              className={cn(
-                "w-full",
-                "border-0",
-                "font-bold",
-                "rounded-[16px]",
-                "text-play-btn-font",
-              )}
-              variant={isErrorState ? "destructive" : "default"}
-              onClick={handlePlayButtonClick}
-              disabled={isPlayButtonDisabled}
-            >
-              {playButtonText}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          </ConnectWallet>
+        </Wallet>
+      }
+    />
   )
-}
-
-function formatBetAmount(num: number, decimals: number): string {
-  if (Number.isNaN(num)) return "0"
-  if (num === 0) return "0"
-
-  let s = num.toFixed(decimals)
-
-  if (s.includes(".")) {
-    s = s.replace(/\.?0+$/, "")
-  }
-
-  if (s.endsWith(".")) {
-    s = s.slice(0, -1)
-  }
-
-  return s === "" || Number.isNaN(parseFloat(s)) ? "0" : s
 }

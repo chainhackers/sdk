@@ -25,27 +25,19 @@ export function InfoSheetPanel({
         <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm font-medium text-text-on-surface-variant">
           <div>
             <p>Win chance:</p>
-            <p className="text-text-on-surface">
-              {winChance}%
-            </p>
+            <p className="text-text-on-surface">{winChance}%</p>
           </div>
           <div>
             <p>RNG fee:</p>
-            <p className="text-text-on-surface">
-              {rngFee} ETH
-            </p>
+            <p className="text-text-on-surface">{rngFee} ETH</p>
           </div>
           <div>
             <p>Target payout:</p>
-            <p className="text-text-on-surface">
-              {targetPayout} ETH
-            </p>
+            <p className="text-text-on-surface">{targetPayout} ETH</p>
           </div>
           <div>
             <p>Gas price:</p>
-            <p className="text-text-on-surface">
-              {gasPrice}
-            </p>
+            <p className="text-text-on-surface">{gasPrice}</p>
           </div>
         </div>
       </SheetBottomPanelContent>
