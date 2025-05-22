@@ -29,6 +29,7 @@ interface BetResultWatcherOutput {
 }
 
 const POLLING_INTERVAL = 2500
+const PRIMARY_WATCHER_TIMEOUT = 30000
 
 function _decodeRolled(
   rolled: boolean[],
@@ -87,6 +88,34 @@ export function useBetResultWatcher({
       setFilterErrorOccurred(false)
     }
   }, [enabled, watchParams, publicClient, status, reset])
+
+  useEffect(() => {
+    if (
+      enabled &&
+      watchParams &&
+      status === "listening" &&
+      !filterErrorOccurred
+    ) {
+      logger.debug(
+        `useEffect[timeout]: Starting primary watcher timeout (${PRIMARY_WATCHER_TIMEOUT}ms).`,
+        { betId: watchParams.betId },
+      )
+      const timerId = setTimeout(() => {
+        logger.warn(
+          `useEffect[timeout]: Primary watcher timed out for betId ${watchParams.betId}. Switching to fallback.`,
+        )
+        setFilterErrorOccurred(true)
+        setStatus("fallback_listening")
+      }, PRIMARY_WATCHER_TIMEOUT)
+
+      return () => {
+        logger.debug(
+          `useEffect[timeout]: Clearing primary watcher timeout for betId ${watchParams.betId}.`,
+        )
+        clearTimeout(timerId)
+      }
+    }
+  }, [enabled, watchParams, status, filterErrorOccurred])
 
   const processEventLogs = useCallback(
     (logs: readonly Log[], currentWatchParams: WatchTarget) => {
