@@ -18,6 +18,10 @@ import {
   CASINO_GAME_TYPE,
 } from "@betswirl/sdk-core"
 
+function logDebug(context: string, message: string, data?: any) {
+  console.log(`[usePlaceBet:${context}] ${message}`, data !== undefined ? data : '');
+}
+
 interface WatchTarget {
   betId: string
   contractAddress: Hex
@@ -83,7 +87,7 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
         setBetStatus("error")
         return
       }
-      console.log("Starting bet process:", { betParams, connectedAddress })
+      logDebug("placeBet", "Starting bet process:", { betParams, connectedAddress })
       setBetStatus("pending")
 
       const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
@@ -105,9 +109,7 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
       )
 
       if (!betId) {
-        console.warn(
-          "Bet ID was not extracted. Roll event listener will not be started.",
-        )
+        logDebug("placeBet", "Bet ID was not extracted. Roll event listener will not be started.")
         setBetStatus("error")
         return
       }
@@ -117,7 +119,7 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
         chainId,
         betId,
       )
-      console.log("Setting up Roll event listener...")
+      logDebug("placeBet", "Setting up Roll event listener...")
       setWatchTarget({
         betId,
         contractAddress,
@@ -127,7 +129,7 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
         eventArgs: rollEventData.args,
       })
     } catch (error) {
-      console.error("Error placing bet:", error)
+      logDebug("placeBet", "Error placing bet:", error)
       setBetStatus("error")
     }
   }, [
@@ -147,6 +149,7 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
     enabled: !!watchTarget,
     pollingInterval: POLLING_INTERVAL,
     onLogs: (logs) => {
+      logDebug("useWatchContractEvent", "Received logs:", { count: logs.length })
       if (!watchTarget) return
 
       const { betId } = watchTarget
@@ -206,7 +209,7 @@ async function _fetchVrfCost(
   publicClient: ReturnType<typeof usePublicClient>,
 ): Promise<bigint> {
   if (!publicClient) throw new Error("publicClient is undefined")
-  console.log("Getting VRF cost...")
+  logDebug("_fetchVrfCost", "Getting VRF cost...")
   const vrfCostFunctionData = getChainlinkVrfCostFunctionData(
     gameType,
     zeroAddress,
@@ -219,7 +222,7 @@ async function _fetchVrfCost(
     functionName: vrfCostFunctionData.data.functionName,
     args: vrfCostFunctionData.data.args,
   })) as bigint
-  console.log("VRF cost received:", vrfCost?.toString())
+  logDebug("_fetchVrfCost", "VRF cost received:", vrfCost?.toString())
   return vrfCost
 }
 
@@ -230,7 +233,7 @@ async function _submitBetTransaction(
   chainId: CasinoChainId,
   writeContractAsync: ReturnType<typeof useWriteContract>["writeContractAsync"],
 ): Promise<SubmitBetResult> {
-  console.log("Preparing and sending transaction...")
+  logDebug("_submitBetTransaction", "Preparing and sending transaction...")
   const placeBetTxData = getPlaceBetFunctionData(
     { ...betParams, receiver },
     chainId,
@@ -242,7 +245,7 @@ async function _submitBetTransaction(
     args: placeBetTxData.data.args,
     value: placeBetTxData.extraData.getValue(betParams.betAmount + vrfCost),
   })
-  console.log("Transaction sent, hash:", txHash)
+  logDebug("_submitBetTransaction", "Transaction sent, hash:", txHash)
   return {
     txHash,
     contractAddress: placeBetTxData.data.to,
@@ -257,16 +260,16 @@ async function _extractBetIdFromReceipt(
   publicClient: ReturnType<typeof usePublicClient>,
 ): Promise<string | null> {
   if (!publicClient) throw new Error("publicClient is undefined")
-  console.log("Waiting for receipt for", txHash)
+  logDebug("_extractBetIdFromReceipt", "Waiting for receipt for", txHash)
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
-  console.log("Receipt received.")
+  logDebug("_extractBetIdFromReceipt", "Receipt received.")
 
   const placeBetEventDefinition = placeBetAbi.find(
     (item) => item.type === "event" && item.name === "PlaceBet",
   )
 
   if (!placeBetEventDefinition) {
-    console.warn("PlaceBet event definition not found in ABI.")
+    logDebug("_extractBetIdFromReceipt", "PlaceBet event definition not found in ABI.")
     return null
   }
 
@@ -282,7 +285,7 @@ async function _extractBetIdFromReceipt(
     if (decodedLog.eventName !== "PlaceBet") continue
     return (decodedLog.args as { id: bigint }).id.toString()
   }
-  console.warn("Bet ID not found in receipt.")
+  logDebug("_extractBetIdFromReceipt", "Bet ID not found in receipt.")
   return null
 }
 
