@@ -104,7 +104,6 @@ const mockHistoryData: HistoryEntry[] = [
 export function CoinTossGame({
   theme = "system",
   customTheme,
-  className,
   backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {

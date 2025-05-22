@@ -24,9 +24,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const connectWalletBtnStub = (
-  <div></div>
-)
+const connectWalletBtnStub = <div></div>
 
 const mockHistoryData: HistoryEntry[] = [
   {
@@ -113,19 +111,18 @@ const Template: Story = {
     connectWallletBtn: connectWalletBtnStub,
     address: "",
     isConnected: false,
-    onPlayBtnClick: (betAmount: string) => console.log("betAmount: ", betAmount),
+    onPlayBtnClick: (betAmount: string) =>
+      console.log("betAmount: ", betAmount),
     tokenDecimals: 18,
     gameResult: null,
-    betStatus: null
+    betStatus: null,
   },
-  render: (args) => (
-    <GameFrame {...args} />
-  ),
+  render: (args) => <GameFrame {...args} />,
 }
 
 export const WalletNotConnected: Story = {
   args: {
-    ...Template.args
+    ...Template.args,
   },
 }
 

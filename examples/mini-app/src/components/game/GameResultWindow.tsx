@@ -43,14 +43,14 @@ export function GameResultWindow({
       const img = new Image()
       img.src = imgSrc
     }
-  
+
     Object.values(images).forEach(({ bg, icon }) => {
       preloadImg(bg)
       preloadImg(icon)
     })
   }, [])
-  
-  if (!isVisible) { 
+
+  if (!isVisible) {
     return null
   }
 

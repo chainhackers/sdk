@@ -16,8 +16,8 @@ const meta = {
       ],
     },
     loki: {
-      skip: true
-    }
+      skip: true,
+    },
   },
   decorators: [
     (Story) => (
@@ -42,9 +42,9 @@ const meta = {
             "--primary": string,
             "--play-btn-font": string,
             "--game-window-overlay": string,
-          }`
-        }
-      }
+          }`,
+        },
+      },
     },
     backgroundImage: {
       control: "file",

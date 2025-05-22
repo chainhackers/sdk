@@ -3,9 +3,7 @@ import type { Preview, Decorator } from "@storybook/react"
 import "../src/index.css"
 
 const withAppProviders: Decorator = (StoryComponent) => {
-  return (
-    <StoryComponent />
-  )
+  return <StoryComponent />
 }
 
 const preview: Preview = {

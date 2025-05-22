@@ -1,4 +1,3 @@
-
 import { History, Info } from "lucide-react"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 import coinIcon from "../../assets/game/coin-background-icon.png"
@@ -65,13 +64,12 @@ export function GameFrame({
   historyData,
   balance,
   connectWallletBtn,
-  address,
   isConnected,
   onPlayBtnClick,
   tokenDecimals,
   gameResult,
   betStatus,
-    ...props
+  ...props
 }: GameFrameProps) {
   const [betAmount, setBetAmount] = useState("0")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
@@ -128,7 +126,7 @@ export function GameFrame({
   }
 
   const handlePlayBtnClick = () => {
-    if(isInGameResultState) {
+    if (isInGameResultState) {
       setBetAmount("0")
     }
     onPlayBtnClick(betAmount)
@@ -165,7 +163,7 @@ export function GameFrame({
               "bg-muted overflow-hidden",
             )}
             style={{
-                backgroundImage: `url(${themeSettings.backgroundImage})`,
+              backgroundImage: `url(${themeSettings.backgroundImage})`,
             }}
           >
             <div
@@ -220,7 +218,7 @@ export function GameFrame({
               {isMounted && cardRef.current && (
                 <HistorySheetPanel
                   portalContainer={cardRef.current}
-                    historyData={historyData}
+                  historyData={historyData}
                 />
               )}
             </Sheet>
@@ -292,9 +290,7 @@ export function GameFrame({
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   disabled={
-                    !isConnected ||
-                    isBettingInProgress ||
-                    isInGameResultState
+                    !isConnected || isBettingInProgress || isInGameResultState
                   }
                 >
                   1/2
@@ -311,9 +307,7 @@ export function GameFrame({
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   disabled={
-                    !isConnected ||
-                    isBettingInProgress ||
-                    isInGameResultState
+                    !isConnected || isBettingInProgress || isInGameResultState
                   }
                 >
                   2x
@@ -325,9 +319,7 @@ export function GameFrame({
                     setBetAmount(formattedBalance)
                   }}
                   disabled={
-                    !isConnected ||
-                    isBettingInProgress ||
-                    isInGameResultState
+                    !isConnected || isBettingInProgress || isInGameResultState
                   }
                 >
                   Max

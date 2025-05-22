@@ -56,81 +56,91 @@ export function usePlaceBet(choice: COINTOSS_FACE) {
     [choice],
   )
 
-  const placeBet = useCallback(async (betAmount: bigint) => {
-    try {
-      setWatchTarget(null)
-      resetWagmiWriteContract()
-      setGameResult(null)
+  const placeBet = useCallback(
+    async (betAmount: bigint) => {
+      try {
+        setWatchTarget(null)
+        resetWagmiWriteContract()
+        setGameResult(null)
 
-      if (
-        !publicClient ||
-        !chainId ||
-        !connectedAddress ||
-        !writeContractAsync
-      ) {
-        console.error(
-          "Wagmi/OnchainKit clients or address are not initialized.",
+        if (
+          !publicClient ||
+          !chainId ||
+          !connectedAddress ||
+          !writeContractAsync
+        ) {
+          console.error(
+            "Wagmi/OnchainKit clients or address are not initialized.",
+          )
+          setBetStatus("error")
+          return
+        }
+
+        const betParamsWithAmount = { ...betParams, betAmount: betAmount }
+        console.log("Starting bet process:", {
+          betParamsWithAmount,
+          connectedAddress,
+        })
+        setBetStatus("pending")
+
+        const vrfCost = await _fetchVrfCost(
+          betParams.game,
+          chainId,
+          publicClient,
         )
-        setBetStatus("error")
-        return
-      }
 
-      const betParamsWithAmount = { ...betParams, betAmount: betAmount }
-      console.log("Starting bet process:", { betParamsWithAmount, connectedAddress })
-      setBetStatus("pending")
-
-      const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
-
-      const submitResult = await _submitBetTransaction(
-        betParamsWithAmount,
-        connectedAddress,
-        vrfCost,
-        chainId,
-        writeContractAsync,
-      )
-      const { txHash, contractAddress, gameAbiForPlaceBet } = submitResult
-
-      const betId = await _extractBetIdFromReceipt(
-        txHash,
-        contractAddress,
-        gameAbiForPlaceBet,
-        publicClient,
-      )
-
-      if (!betId) {
-        console.warn(
-          "Bet ID was not extracted. Roll event listener will not be started.",
+        const submitResult = await _submitBetTransaction(
+          betParamsWithAmount,
+          connectedAddress,
+          vrfCost,
+          chainId,
+          writeContractAsync,
         )
-        setBetStatus("error")
-        return
-      }
+        const { txHash, contractAddress, gameAbiForPlaceBet } = submitResult
 
-      const { data: rollEventData } = getRollEventData(
-        betParams.game,
-        chainId,
-        betId,
-      )
-      console.log("Setting up Roll event listener...")
-      setWatchTarget({
-        betId,
-        contractAddress,
-        gameType: betParams.game,
-        eventAbi: rollEventData.abi,
-        eventName: rollEventData.eventName,
-        eventArgs: rollEventData.args,
-      })
-    } catch (error) {
-      console.error("Error placing bet:", error)
-      setBetStatus("error")
-    }
-  }, [
-    betParams,
-    publicClient,
-    chainId,
-    connectedAddress,
-    writeContractAsync,
-    resetWagmiWriteContract,
-  ])
+        const betId = await _extractBetIdFromReceipt(
+          txHash,
+          contractAddress,
+          gameAbiForPlaceBet,
+          publicClient,
+        )
+
+        if (!betId) {
+          console.warn(
+            "Bet ID was not extracted. Roll event listener will not be started.",
+          )
+          setBetStatus("error")
+          return
+        }
+
+        const { data: rollEventData } = getRollEventData(
+          betParams.game,
+          chainId,
+          betId,
+        )
+        console.log("Setting up Roll event listener...")
+        setWatchTarget({
+          betId,
+          contractAddress,
+          gameType: betParams.game,
+          eventAbi: rollEventData.abi,
+          eventName: rollEventData.eventName,
+          eventArgs: rollEventData.args,
+        })
+      } catch (error) {
+        console.error("Error placing bet:", error)
+        setBetStatus("error")
+      }
+    },
+    [
+      betParams,
+      publicClient,
+      chainId,
+      connectedAddress,
+      writeContractAsync,
+      resetWagmiWriteContract,
+    ],
+  )
 
   useWatchContractEvent({
     address: watchTarget?.contractAddress,
