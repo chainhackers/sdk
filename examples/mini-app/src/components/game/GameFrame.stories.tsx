@@ -4,6 +4,7 @@ import { TokenImage } from "@coinbase/onchainkit/token"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { type HistoryEntry } from "./HistorySheetPanel"
 import gameBg from "../../assets/game/game-background.png"
+import { COINTOSS_FACE } from "@betswirl/sdk-core"
 
 const meta = {
   title: "Game/GameFrame",
@@ -109,7 +110,6 @@ const Template: Story = {
     historyData: mockHistoryData,
     balance: 1.7,
     connectWallletBtn: connectWalletBtnStub,
-    address: "",
     isConnected: false,
     onPlayBtnClick: (betAmount: string) =>
       console.log("betAmount: ", betAmount),
@@ -129,7 +129,50 @@ export const WalletNotConnected: Story = {
 export const WalletConnected: Story = {
   args: {
     ...Template.args,
-    address: "0x0000000000000000000000000000000000000000",
     isConnected: true,
+  },
+}
+
+export const PlacingBet: Story = {
+  args: {
+    ...Template.args,
+    isConnected: true,
+    betStatus: "pending",
+  },
+}
+
+export const ErrorBet: Story = {
+  args: {
+    ...Template.args,
+    isConnected: true,
+    betStatus: "error",
+  },
+}
+
+export const Win: Story = {
+  args: {
+    ...Template.args,
+    isConnected: true,
+    betStatus: "success",
+    gameResult: {
+      isWin: true,
+      payout: 0.19,
+      currency: "ETH",
+      rolled: COINTOSS_FACE.HEADS,
+    },
+  },
+}
+
+export const Loss: Story = {
+  args: {
+    ...Template.args,
+    isConnected: true,
+    betStatus: "success",
+    gameResult: {
+      isWin: false,
+      payout: 0.19,
+      currency: "ETH",
+      rolled: COINTOSS_FACE.TAILS,
+    },
   },
 }

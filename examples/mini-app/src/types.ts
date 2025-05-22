@@ -7,4 +7,8 @@ export interface GameResult {
   rolled: COINTOSS_FACE
 }
 
+export interface GameResultFormatted extends Omit<GameResult, "payout"> {
+  payout: number
+}
+
 export type BetStatus = "pending" | "success" | "error"

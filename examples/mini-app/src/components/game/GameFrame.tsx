@@ -14,8 +14,7 @@ import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { GameResultWindow } from "./GameResultWindow"
-import { formatEther } from "viem"
-import { BetStatus, GameResult } from "../../types"
+import { BetStatus, GameResultFormatted } from "../../types"
 
 function formatBetAmount(num: number, decimals: number): string {
   if (Number.isNaN(num)) return "0"
@@ -49,11 +48,10 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   historyData: HistoryEntry[]
   balance: number
   connectWallletBtn: React.ReactNode
-  address: string
   isConnected: boolean
   onPlayBtnClick: (betAmount: string) => void
   tokenDecimals: number
-  gameResult: GameResult | null
+  gameResult: GameResultFormatted | null
   betStatus: BetStatus | null
 }
 
@@ -235,7 +233,7 @@ export function GameFrame({
               isVisible={!!gameResult}
               isWin={gameResult?.isWin}
               amount={Number(betAmount)}
-              payout={Number(gameResult ? formatEther(gameResult?.payout) : 0)}
+              payout={gameResult?.payout}
               currency="ETH"
               rolled={gameResult?.rolled || ""}
             />

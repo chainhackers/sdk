@@ -6,7 +6,7 @@ import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { useAccount, useBalance } from "wagmi"
-import { formatUnits, Hex, parseEther } from "viem"
+import { formatEther, formatUnits, parseEther } from "viem"
 
 import { type HistoryEntry } from "./HistorySheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
@@ -134,18 +134,24 @@ export function CoinTossGame({
     }
   }
 
+  const gameResultFormatted = gameResult
+    ? {
+        ...gameResult,
+        payout: Number(formatEther(gameResult.payout)),
+      }
+    : null
+
   return (
     <GameFrame
       {...props}
       onPlayBtnClick={handlePlayButtonClick}
-      gameResult={gameResult}
-      betStatus={betStatus}
-      tokenDecimals={tokenDecimals}
-      address={address as Hex}
-      isConnected={isWalletConnected}
-      themeSettings={themeSettings}
       historyData={mockHistoryData}
+      tokenDecimals={tokenDecimals}
+      themeSettings={themeSettings}
+      isConnected={isWalletConnected}
       balance={balanceFloat}
+      gameResult={gameResultFormatted}
+      betStatus={betStatus}
       connectWallletBtn={
         <Wallet>
           <ConnectWallet
