@@ -1,0 +1,256 @@
+import { useState, useCallback, useEffect, useMemo } from "react"
+import type { Log, AbiEvent } from "viem"
+import { decodeEventLog } from "viem"
+import { usePublicClient, useWatchContractEvent } from "wagmi"
+import { CASINO_GAME_TYPE, COINTOSS_FACE, CoinToss } from "@betswirl/sdk-core"
+import type { GameResult, WatchTarget } from "./types"
+
+interface UseBetResultWatcherProps {
+  watchParams: WatchTarget | null
+  publicClient: ReturnType<typeof usePublicClient> | null
+  enabled: boolean
+}
+
+type BetResultWatcherStatus =
+  | "idle"
+  | "listening"
+  | "fallback_listening"
+  | "success"
+  | "error"
+
+interface BetResultWatcherOutput {
+  gameResult: GameResult | null
+  status: BetResultWatcherStatus
+  error: Error | null
+  reset: () => void
+}
+
+const POLLING_INTERVAL = 2500
+
+function logDebug(context: string, message: string, data?: unknown) {
+  console.log(
+    `[useBetResultWatcher:${context}] ${message}`,
+    data !== undefined ? data : "",
+  )
+}
+
+function _decodeRolled(
+  rolled: boolean[],
+  game: CASINO_GAME_TYPE,
+): COINTOSS_FACE {
+  switch (game) {
+    case CASINO_GAME_TYPE.COINTOSS:
+      return CoinToss.decodeRolled(rolled[0])
+    default:
+      logDebug("_decodeRolled", `Unsupported game type: ${game}`)
+      throw new Error(`Unsupported game type for decoding roll: ${game}`)
+  }
+}
+
+export function useBetResultWatcher({
+  watchParams,
+  publicClient,
+  enabled,
+}: UseBetResultWatcherProps): BetResultWatcherOutput {
+  const [internalGameResult, setInternalGameResult] =
+    useState<GameResult | null>(null)
+  const [status, setStatus] = useState<BetResultWatcherStatus>("idle")
+  const [error, setError] = useState<Error | null>(null)
+  const [filterErrorOccurred, setFilterErrorOccurred] = useState<boolean>(false)
+
+  const eventArgs = useMemo(() => {
+    if (watchParams?.betId) {
+      return { id: BigInt(watchParams.betId) }
+    }
+    return undefined
+  }, [watchParams?.betId])
+
+  const reset = useCallback(() => {
+    logDebug("reset", "Resetting watcher state")
+    setInternalGameResult(null)
+    setStatus("idle")
+    setError(null)
+    setFilterErrorOccurred(false)
+  }, [])
+
+  useEffect(() => {
+    if (!enabled) {
+      if (status !== "idle") reset()
+      return
+    }
+
+    if (watchParams && publicClient && status === "idle") {
+      logDebug("useEffect[enabled,watchParams]", "Watcher enabled, starting.", {
+        watchParams,
+      })
+      setStatus("listening")
+      setError(null)
+      setFilterErrorOccurred(false)
+    }
+  }, [enabled, watchParams, publicClient, status, reset])
+
+  const processEventLogs = useCallback(
+    (logs: readonly Log[], currentWatchParams: WatchTarget) => {
+      const { betId, gameType, eventAbi, eventName } = currentWatchParams
+      logDebug(
+        "processEventLogs",
+        `Processing ${logs.length} logs for betId ${betId}`,
+        { eventName },
+      )
+
+      for (const log of logs) {
+        const decodedRollLog = decodeEventLog({
+          abi: eventAbi,
+          data: log.data,
+          topics: log.topics,
+          strict: false,
+        })
+
+        if (decodedRollLog.eventName !== eventName) continue
+
+        const rollArgs = decodedRollLog.args as unknown as {
+          id: bigint
+          payout: bigint
+          rolled: boolean[]
+        }
+
+        if (rollArgs.id.toString() === betId) {
+          const rolledResult = _decodeRolled(rollArgs.rolled, gameType)
+          const result: GameResult = {
+            isWin: rollArgs.payout > 0n,
+            payout: rollArgs.payout,
+            currency: "ETH",
+            rolled: rolledResult,
+          }
+          logDebug("processEventLogs", "Bet event processed:", {
+            betId,
+            ...result,
+            txHash: log.transactionHash,
+          })
+          setInternalGameResult(result)
+          setStatus("success")
+          setError(null)
+          return
+        }
+      }
+    },
+    [],
+  )
+
+  useWatchContractEvent({
+    address: watchParams?.contractAddress,
+    abi: watchParams?.eventAbi,
+    eventName: watchParams?.eventName,
+    args: eventArgs,
+    enabled:
+      enabled &&
+      !!watchParams &&
+      !filterErrorOccurred &&
+      status === "listening",
+    pollingInterval: POLLING_INTERVAL,
+    onLogs: (logs) => {
+      if (!watchParams) return
+      logDebug(
+        "useWatchContractEvent",
+        `Received ${logs.length} logs (primary)`,
+      )
+      processEventLogs(logs, watchParams)
+    },
+    onError: (watchError) => {
+      logDebug(
+        "useWatchContractEvent",
+        "Error from primary watcher:",
+        watchError,
+      )
+      setFilterErrorOccurred(true)
+      setStatus("fallback_listening")
+    },
+  })
+
+  useEffect(() => {
+    if (
+      !enabled ||
+      !watchParams ||
+      !publicClient ||
+      !filterErrorOccurred ||
+      status !== "fallback_listening"
+    ) {
+      return
+    }
+
+    logDebug("fallbackPoller", "Starting fallback polling.", {
+      betId: watchParams.betId,
+    })
+    let isActive = true
+
+    const poll = async () => {
+      if (!isActive || !watchParams || !publicClient) return
+
+      const { contractAddress, eventName, eventAbi, betId } = watchParams
+      const eventDefinition = eventAbi.find(
+        (item): item is AbiEvent =>
+          item.type === "event" && item.name === eventName,
+      )
+
+      if (!eventDefinition) {
+        logDebug(
+          "fallbackPoller",
+          `Critical: Event definition for ${eventName} not found.`,
+        )
+        setError(new Error(`Event definition for ${eventName} not found.`))
+        setStatus("error")
+        return
+      }
+
+      const currentBlock = await publicClient.getBlockNumber()
+      const fromBlock = currentBlock > 100n ? currentBlock - 100n : 0n
+
+      logDebug(
+        "fallbackPoller",
+        `Querying logs from ${fromBlock} to ${currentBlock}`,
+      )
+      const logs = await publicClient.getLogs({
+        address: contractAddress,
+        event: eventDefinition,
+        args: { id: BigInt(betId) },
+        fromBlock,
+        toBlock: currentBlock,
+      })
+
+      logDebug(
+        "fallbackPoller",
+        `Fetched ${logs.length} logs (fallback) for betId ${betId}`,
+      )
+      if (logs.length > 0) {
+        processEventLogs(logs, watchParams)
+      }
+    }
+
+    poll()
+    const intervalId = setInterval(poll, POLLING_INTERVAL)
+
+    return () => {
+      logDebug("fallbackPoller", "Stopping fallback polling.")
+      isActive = false
+      clearInterval(intervalId)
+    }
+  }, [
+    enabled,
+    watchParams,
+    publicClient,
+    filterErrorOccurred,
+    status,
+    processEventLogs,
+  ])
+
+  useEffect(() => {
+    if (status === "success" || status === "error") {
+      logDebug(
+        "useEffect[status]",
+        `Final status reached: ${status}. Watcher inactive.`,
+      )
+    }
+  }, [status])
+
+  return { gameResult: internalGameResult, status, error, reset }
+}

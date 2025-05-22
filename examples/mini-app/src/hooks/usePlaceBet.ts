@@ -1,11 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react"
-import { Hex, zeroAddress, decodeEventLog, Abi, Log, AbiEvent } from "viem"
-import {
-  useAccount,
-  usePublicClient,
-  useWriteContract,
-  useWatchContractEvent,
-} from "wagmi"
+import { Hex, zeroAddress, decodeEventLog, Abi } from "viem"
+import { useAccount, usePublicClient, useWriteContract } from "wagmi"
 import { useOnchainKit } from "@coinbase/onchainkit"
 import {
   GenericCasinoBetParams,
@@ -17,6 +12,8 @@ import {
   COINTOSS_FACE,
   CASINO_GAME_TYPE,
 } from "@betswirl/sdk-core"
+import { useBetResultWatcher } from "./useBetResultWatcher"
+import type { GameResult, WatchTarget } from "./types"
 
 function logDebug(context: string, message: string, data?: unknown) {
   console.log(
@@ -25,29 +22,11 @@ function logDebug(context: string, message: string, data?: unknown) {
   )
 }
 
-interface WatchTarget {
-  betId: string
-  contractAddress: Hex
-  gameType: CASINO_GAME_TYPE
-  eventAbi: Abi
-  eventName: string
-  eventArgs: { id: bigint }
-}
-
 interface SubmitBetResult {
   txHash: Hex
   contractAddress: Hex
   gameAbiForPlaceBet: Abi
 }
-
-interface GameResult {
-  isWin: boolean
-  payout: bigint
-  currency: string
-  rolled: COINTOSS_FACE
-}
-
-const POLLING_INTERVAL = 2500
 
 export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
   const { chain } = useOnchainKit()
@@ -57,12 +36,34 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
   const { writeContractAsync, reset: resetWagmiWriteContract } =
     useWriteContract()
 
-  const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
   const [betStatus, setBetStatus] = useState<
     "pending" | "success" | "error" | null
   >(null)
   const [gameResult, setGameResult] = useState<GameResult | null>(null)
-  const [filterError, setFilterError] = useState<boolean>(false)
+  const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
+
+  const {
+    gameResult: watcherGameResult,
+    status: watcherStatus,
+    reset: resetWatcher,
+  } = useBetResultWatcher({
+    watchParams: watchTarget,
+    publicClient,
+    enabled: !!watchTarget,
+  })
+
+  useEffect(() => {
+    if (watcherStatus === "success" && watcherGameResult) {
+      setGameResult(watcherGameResult)
+      setBetStatus("success")
+      logDebug("watcher", "Bet resolved: SUCCESS", {
+        gameResult: watcherGameResult,
+      })
+    } else if (watcherStatus === "error") {
+      setBetStatus("error")
+      logDebug("watcher", "Bet resolved: ERROR from watcher")
+    }
+  }, [watcherStatus, watcherGameResult])
 
   const betParams = useMemo(
     () => ({
@@ -75,10 +76,10 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
 
   const placeBet = useCallback(async () => {
     try {
-      setWatchTarget(null)
       resetWagmiWriteContract()
       setGameResult(null)
-      setFilterError(false)
+      setWatchTarget(null)
+      resetWatcher()
 
       if (
         !publicClient ||
@@ -150,126 +151,15 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
     connectedAddress,
     writeContractAsync,
     resetWagmiWriteContract,
+    resetWatcher,
   ])
-
-  // Primary event watcher using useWatchContractEvent
-  useWatchContractEvent({
-    address: watchTarget?.contractAddress,
-    abi: watchTarget?.eventAbi,
-    eventName: watchTarget?.eventName,
-    args: watchTarget ? { id: BigInt(watchTarget.betId) } : undefined,
-    enabled: !!watchTarget && !filterError,
-    pollingInterval: POLLING_INTERVAL,
-    onLogs: (logs) => {
-      logDebug("useWatchContractEvent", "Received logs:", {
-        count: logs.length,
-      })
-      if (!watchTarget) return
-
-      _processEventLogs(logs, watchTarget)
-    },
-    onError: (errorWatch) => {
-      logDebug(
-        "useWatchContractEvent",
-        "Error listening to Roll event:",
-        errorWatch,
-      )
-      // Mark that we had a filter error so we can use the fallback
-      setFilterError(true)
-    },
-  })
-
-  const _processEventLogs = useCallback((logs: Log[], target: WatchTarget) => {
-    const { betId } = target
-
-    logs.forEach((log) => {
-      const decodedRollLog = decodeEventLog({
-        abi: target.eventAbi,
-        data: log.data,
-        topics: log.topics,
-        strict: false,
-      })
-
-      const rollArgs = decodedRollLog.args as unknown as {
-        id: bigint
-        payout: bigint
-        rolled: boolean[]
-      }
-
-      if (rollArgs.id.toString() === betId) {
-        const rolled = _decodeRolled(rollArgs.rolled, target.gameType)
-        logDebug("processLogs", "Bet rolled:", {
-          betId,
-          payout: rollArgs.payout.toString(),
-          isWin: rollArgs.payout > 0n,
-          rollTransactionHash: log.transactionHash,
-          rolled,
-        })
-
-        setGameResult({
-          isWin: rollArgs.payout > 0n,
-          payout: rollArgs.payout,
-          currency: "ETH",
-          rolled,
-        })
-        setWatchTarget(null)
-        setFilterError(false)
-        setBetStatus("success")
-      }
-    })
-  }, [])
-
-  // Fallback for when filter-based watching fails - manually poll for logs
-  useEffect(() => {
-    if (!watchTarget || !filterError || !publicClient) return
-
-    logDebug("fallbackPoller", "Starting fallback polling for events")
-
-    let isActive = true
-    const intervalId = setInterval(async () => {
-      if (!isActive || !watchTarget) return
-
-      const eventDefinition = watchTarget.eventAbi.find(
-        (item): item is AbiEvent =>
-          item.type === "event" && item.name === watchTarget.eventName,
-      )
-
-      if (!eventDefinition) {
-        logDebug(
-          "fallbackPoller",
-          `Critical: Event definition for ${watchTarget.eventName} not found in provided ABI. Cannot poll for logs.`,
-        )
-        return
-      }
-
-      const fromBlock = (await publicClient.getBlockNumber()) - 10n // Last 10 blocks
-      const logs = await publicClient.getLogs({
-        address: watchTarget.contractAddress,
-        event: eventDefinition,
-        args: {
-          id: BigInt(watchTarget.betId),
-        },
-        fromBlock,
-      })
-
-      logDebug("fallbackPoller", `Fetched ${logs.length} logs directly`)
-
-      if (logs.length > 0) {
-        _processEventLogs(logs, watchTarget)
-      }
-    }, POLLING_INTERVAL)
-
-    return () => {
-      isActive = false
-      clearInterval(intervalId)
-    }
-  }, [watchTarget, filterError, publicClient, _processEventLogs])
 
   const resetBetState = useCallback(() => {
     setBetStatus(null)
     setGameResult(null)
-    setFilterError(false)
-  }, [])
+    setWatchTarget(null)
+    resetWatcher()
+  }, [resetWatcher])
 
   return { placeBet, betStatus, gameResult, resetBetState }
 }
@@ -361,16 +251,4 @@ async function _extractBetIdFromReceipt(
   }
   logDebug("_extractBetIdFromReceipt", "Bet ID not found in receipt.")
   return null
-}
-
-function _decodeRolled(
-  rolled: boolean[],
-  game: CASINO_GAME_TYPE,
-): COINTOSS_FACE {
-  switch (game) {
-    case CASINO_GAME_TYPE.COINTOSS:
-      return CoinToss.decodeRolled(rolled[0])
-    default:
-      throw new Error(`Unsupported game type: ${game}`)
-  }
 }
