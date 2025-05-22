@@ -12,6 +12,7 @@ import { freebetAbi } from "../../abis/v2/casino/freebet";
 import { GAS_TOKEN_ADDRESS } from "../../constants";
 import type { SignedFreebet } from "../../data";
 import {
+  CASINO_GAME_PLACE_BET_ABI,
   CASINO_GAME_TYPE,
   type CasinoChainId,
   MAX_SDK_HOUSE_EGDE,
@@ -25,7 +26,7 @@ import type { DiceEncodedInput } from "../../entities/casino/dice";
 import type { RouletteEncodedInput } from "../../entities/casino/roulette";
 import { ERROR_CODES } from "../../errors/codes";
 import { ChainError, ConfigurationError, TransactionError } from "../../errors/types";
-import type { BetSwirlFunctionData, GameAbi, Token } from "../../interfaces";
+import type { BetSwirlEventData, BetSwirlFunctionData, GameAbi, Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
 import { getChainlinkVrfCost } from "../../read/common/chainlinkVrfCost";
 import { GAS_PRICE_TYPE, getGasPrices } from "../../read/common/gasPrice";
@@ -589,5 +590,36 @@ export async function getPlacedBetFromReceipt(
     betBlock: receipt.blockNumber,
     chainId: casinoChainId,
     game,
+  };
+}
+
+export function getPlaceBetEventData(
+  game: CASINO_GAME_TYPE,
+  casinoChainId: CasinoChainId,
+  receiver: Address,
+): BetSwirlEventData<GameAbi<typeof game>, "PlaceBet", { receiver: Address }> & {
+  event: { abiEvent: (typeof CASINO_GAME_PLACE_BET_ABI)[typeof game][number] };
+} {
+  const casinoChain = casinoChainById[casinoChainId];
+
+  const gameData = casinoChain.contracts.games[game];
+  if (!gameData) {
+    throw new ChainError(
+      `Game ${game} not found for chain ${casinoChainId}`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
+    );
+  }
+
+  const abi = CASINO_GAME_PLACE_BET_ABI[game];
+  const eventName = "PlaceBet" as const;
+  const args = { receiver: receiver } as const;
+
+  const placeBetEvent = CASINO_GAME_PLACE_BET_ABI[game]![0];
+
+  return {
+    data: { to: gameData.address, abi, eventName, args },
+    event: {
+      abiEvent: placeBetEvent,
+    },
   };
 }

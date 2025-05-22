@@ -7,7 +7,6 @@ import {
   formatUnits,
 } from "viem";
 
-import type { ExtractAbiEvent } from "abitype";
 import { getLogs } from "viem/actions";
 import { casinoGameAbi } from "../../abis/v2/casino/game";
 import type {
@@ -19,7 +18,6 @@ import {
   CASINO_GAME_ROLL_ABI,
   CASINO_GAME_TYPE,
   type CasinoChainId,
-  type GameRollAbi,
   type NORMAL_CASINO_GAME_TYPE,
   type WEIGHTED_CASINO_GAME_TYPE,
   casinoChainById,
@@ -339,7 +337,7 @@ export function getRollEventData(
   casinoChainId: CasinoChainId,
   betId: string | bigint,
 ): BetSwirlEventData<GameAbi<typeof game>, "Roll", { id: bigint }> & {
-  event: { abiEvent: ExtractAbiEvent<GameRollAbi<typeof game>, "Roll"> };
+  event: { abiEvent: (typeof CASINO_GAME_ROLL_ABI)[typeof game][number] };
 } {
   const casinoChain = casinoChainById[casinoChainId];
 
@@ -355,7 +353,7 @@ export function getRollEventData(
   const eventName = "Roll" as const;
   const args = { id: BigInt(betId) } as const;
 
-  const rollEvent = abi!.find((e) => e.type === "event" && e.name === "Roll")!;
+  const rollEvent = CASINO_GAME_ROLL_ABI[game]![0];
 
   return {
     data: { to: gameData.address, abi, eventName, args },

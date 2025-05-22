@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.2-beta.3
+
+### Patch Changes
+
+- Add getPlaceBetEventData
+
 ## 0.1.2-beta.2
 
 ### Patch Changes

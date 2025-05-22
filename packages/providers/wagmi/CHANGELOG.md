@@ -1,5 +1,14 @@
 # @betswirl/wagmi-provider
 
+## 0.1.2-beta.3
+
+### Patch Changes
+
+- Add getPlaceBetEventData
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.2-beta.3
+
 ## 0.1.2-beta.2
 
 ### Patch Changes

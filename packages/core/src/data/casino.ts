@@ -109,8 +109,34 @@ export const CASINO_GAME_ROLL_ABI: Record<
   [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: WEIGHTED_GAME_ROLL_ABI,
 };
 
-export type CASINO_GAME_TYPE_ROLL = keyof typeof CASINO_GAME_ROLL_ABI;
-export type GameRollAbi<T extends CASINO_GAME_TYPE_ROLL> = (typeof CASINO_GAME_ROLL_ABI)[T];
+const _extractPlaceBetEvent = <T extends Abi>(abi: T) =>
+  [
+    abi.find(
+      (e): e is ExtractAbiEvent<T, "PlaceBet"> => e.type === "event" && e.name === "PlaceBet",
+    )!,
+  ] as const;
+
+const COINTOSS_PLACE_BET_ABI = _extractPlaceBetEvent(coinTossAbi);
+const DICE_PLACE_BET_ABI = _extractPlaceBetEvent(diceAbi);
+const ROULETTE_PLACE_BET_ABI = _extractPlaceBetEvent(rouletteAbi);
+const KENO_PLACE_BET_ABI = _extractPlaceBetEvent(kenoAbi);
+const WEIGHTED_GAME_PLACE_BET_ABI = _extractPlaceBetEvent(weightedGameAbi);
+
+export const CASINO_GAME_PLACE_BET_ABI: Record<
+  CASINO_GAME_TYPE,
+  | typeof COINTOSS_PLACE_BET_ABI
+  | typeof DICE_PLACE_BET_ABI
+  | typeof ROULETTE_PLACE_BET_ABI
+  | typeof KENO_PLACE_BET_ABI
+  | typeof WEIGHTED_GAME_PLACE_BET_ABI
+> = {
+  [CASINO_GAME_TYPE.COINTOSS]: COINTOSS_PLACE_BET_ABI,
+  [CASINO_GAME_TYPE.DICE]: DICE_PLACE_BET_ABI,
+  [CASINO_GAME_TYPE.ROULETTE]: ROULETTE_PLACE_BET_ABI,
+  [CASINO_GAME_TYPE.KENO]: KENO_PLACE_BET_ABI,
+  [CASINO_GAME_TYPE.WHEEL]: WEIGHTED_GAME_PLACE_BET_ABI,
+  [CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME]: WEIGHTED_GAME_PLACE_BET_ABI,
+};
 
 const arbitrumSepoliaData: CasinoChain = {
   id: chainByKey.arbitrumSepolia.id,
