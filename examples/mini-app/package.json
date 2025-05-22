@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:loki": "pnpm loki test --chromeTolerance 1"
   },
   "dependencies": {
     "@betswirl/sdk-core": "^0.1.2-beta.2",
