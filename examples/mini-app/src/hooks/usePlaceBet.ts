@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from "react"
-import { Hex, zeroAddress, decodeEventLog, Abi } from "viem"
+import { Hex, zeroAddress, decodeEventLog, Abi, Log, AbiEvent } from "viem"
 import {
   useAccount,
   usePublicClient,
@@ -18,8 +18,11 @@ import {
   CASINO_GAME_TYPE,
 } from "@betswirl/sdk-core"
 
-function logDebug(context: string, message: string, data?: any) {
-  console.log(`[usePlaceBet:${context}] ${message}`, data !== undefined ? data : '');
+function logDebug(context: string, message: string, data?: unknown) {
+  console.log(
+    `[usePlaceBet:${context}] ${message}`,
+    data !== undefined ? data : "",
+  )
 }
 
 interface WatchTarget {
@@ -89,7 +92,10 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
         setBetStatus("error")
         return
       }
-      logDebug("placeBet", "Starting bet process:", { betParams, connectedAddress })
+      logDebug("placeBet", "Starting bet process:", {
+        betParams,
+        connectedAddress,
+      })
       setBetStatus("pending")
 
       const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
@@ -111,7 +117,10 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
       )
 
       if (!betId) {
-        logDebug("placeBet", "Bet ID was not extracted. Roll event listener will not be started.")
+        logDebug(
+          "placeBet",
+          "Bet ID was not extracted. Roll event listener will not be started.",
+        )
         setBetStatus("error")
         return
       }
@@ -152,53 +161,101 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
     enabled: !!watchTarget && !filterError,
     pollingInterval: POLLING_INTERVAL,
     onLogs: (logs) => {
-      logDebug("useWatchContractEvent", "Received logs:", { count: logs.length })
+      logDebug("useWatchContractEvent", "Received logs:", {
+        count: logs.length,
+      })
       if (!watchTarget) return
 
       _processEventLogs(logs, watchTarget)
     },
     onError: (errorWatch) => {
-      logDebug("useWatchContractEvent", "Error listening to Roll event:", errorWatch)
+      logDebug(
+        "useWatchContractEvent",
+        "Error listening to Roll event:",
+        errorWatch,
+      )
       // Mark that we had a filter error so we can use the fallback
       setFilterError(true)
     },
   })
+
+  const _processEventLogs = useCallback((logs: Log[], target: WatchTarget) => {
+    const { betId } = target
+
+    logs.forEach((log) => {
+      const decodedRollLog = decodeEventLog({
+        abi: target.eventAbi,
+        data: log.data,
+        topics: log.topics,
+        strict: false,
+      })
+
+      const rollArgs = decodedRollLog.args as unknown as {
+        id: bigint
+        payout: bigint
+        rolled: boolean[]
+      }
+
+      if (rollArgs.id.toString() === betId) {
+        const rolled = _decodeRolled(rollArgs.rolled, target.gameType)
+        logDebug("processLogs", "Bet rolled:", {
+          betId,
+          payout: rollArgs.payout.toString(),
+          isWin: rollArgs.payout > 0n,
+          rollTransactionHash: log.transactionHash,
+          rolled,
+        })
+
+        setGameResult({
+          isWin: rollArgs.payout > 0n,
+          payout: rollArgs.payout,
+          currency: "ETH",
+          rolled,
+        })
+        setWatchTarget(null)
+        setFilterError(false)
+        setBetStatus("success")
+      }
+    })
+  }, [])
 
   // Fallback for when filter-based watching fails - manually poll for logs
   useEffect(() => {
     if (!watchTarget || !filterError || !publicClient) return
 
     logDebug("fallbackPoller", "Starting fallback polling for events")
-    
+
     let isActive = true
     const intervalId = setInterval(async () => {
       if (!isActive || !watchTarget) return
-      
-      try {
-        // Fetch logs directly instead of using filters
-        const fromBlock = await publicClient.getBlockNumber() - 10n // Last 10 blocks
-        const logs = await publicClient.getLogs({
-          address: watchTarget.contractAddress,
-          event: {
-            type: 'event',
-            name: watchTarget.eventName,
-            inputs: watchTarget.eventAbi.find(item => 
-              item.type === 'event' && item.name === watchTarget.eventName
-            )?.inputs || [],
-          },
-          args: {
-            id: BigInt(watchTarget.betId)
-          },
-          fromBlock,
-        })
-        
-        logDebug("fallbackPoller", `Fetched ${logs.length} logs directly`)
-        
-        if (logs.length > 0) {
-          _processEventLogs(logs, watchTarget)
-        }
-      } catch (error) {
-        logDebug("fallbackPoller", "Error in fallback log polling:", error)
+
+      const eventDefinition = watchTarget.eventAbi.find(
+        (item): item is AbiEvent =>
+          item.type === "event" && item.name === watchTarget.eventName,
+      )
+
+      if (!eventDefinition) {
+        logDebug(
+          "fallbackPoller",
+          `Critical: Event definition for ${watchTarget.eventName} not found in provided ABI. Cannot poll for logs.`,
+        )
+        return
+      }
+
+      const fromBlock = (await publicClient.getBlockNumber()) - 10n // Last 10 blocks
+      const logs = await publicClient.getLogs({
+        address: watchTarget.contractAddress,
+        event: eventDefinition,
+        args: {
+          id: BigInt(watchTarget.betId),
+        },
+        fromBlock,
+      })
+
+      logDebug("fallbackPoller", `Fetched ${logs.length} logs directly`)
+
+      if (logs.length > 0) {
+        _processEventLogs(logs, watchTarget)
       }
     }, POLLING_INTERVAL)
 
@@ -206,52 +263,7 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
       isActive = false
       clearInterval(intervalId)
     }
-  }, [watchTarget, filterError, publicClient])
-
-  // Function to process event logs - extract to avoid duplication
-  const _processEventLogs = useCallback((logs: any[], target: WatchTarget) => {
-    const { betId } = target
-
-    logs.forEach((log) => {
-      try {
-        const decodedRollLog = decodeEventLog({
-          abi: target.eventAbi,
-          data: log.data,
-          topics: log.topics,
-          strict: false,
-        })
-
-        const rollArgs = decodedRollLog.args as unknown as {
-          id: bigint
-          payout: bigint
-          rolled: boolean[]
-        }
-
-        if (rollArgs.id.toString() === betId) {
-          const rolled = _decodeRolled(rollArgs.rolled, target.gameType)
-          logDebug("processLogs", "Bet rolled:", {
-            betId,
-            payout: rollArgs.payout.toString(),
-            isWin: rollArgs.payout > 0n,
-            rollTransactionHash: log.transactionHash,
-            rolled,
-          })
-          
-          setGameResult({
-            isWin: rollArgs.payout > 0n,
-            payout: rollArgs.payout,
-            currency: "ETH",
-            rolled,
-          })
-          setWatchTarget(null)
-          setFilterError(false)
-          setBetStatus("success")
-        }
-      } catch (decodeError) {
-        logDebug("processLogs", "Error decoding log:", decodeError)
-      }
-    })
-  }, [])
+  }, [watchTarget, filterError, publicClient, _processEventLogs])
 
   const resetBetState = useCallback(() => {
     setBetStatus(null)
@@ -328,7 +340,10 @@ async function _extractBetIdFromReceipt(
   )
 
   if (!placeBetEventDefinition) {
-    logDebug("_extractBetIdFromReceipt", "PlaceBet event definition not found in ABI.")
+    logDebug(
+      "_extractBetIdFromReceipt",
+      "PlaceBet event definition not found in ABI.",
+    )
     return null
   }
 
