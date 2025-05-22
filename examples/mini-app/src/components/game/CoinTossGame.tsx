@@ -1,7 +1,9 @@
-import React, { useEffect } from "react"
+import React from "react"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
 
+import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
+import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { useAccount, useBalance } from "wagmi"
 import { formatUnits, Hex, parseEther } from "viem"
@@ -9,18 +11,9 @@ import { formatUnits, Hex, parseEther } from "viem"
 import { type HistoryEntry } from "./HistorySheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 
-import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
-import { Avatar, Name } from "@coinbase/onchainkit/identity"
-
-import {
-  CASINO_GAME_TYPE,
-  CoinToss,
-  COINTOSS_FACE,
-  GenericCasinoBetParams,
-} from "@betswirl/sdk-core"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
-import { CHAIN } from "../../providers.tsx"
-import { GameFrame } from "./GameFrame.tsx"
+import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { GameFrame } from "./GameFrame"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -111,11 +104,12 @@ const mockHistoryData: HistoryEntry[] = [
 export function CoinTossGame({
   theme = "system",
   customTheme,
+  className,
   backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
   const themeSettings = { theme, customTheme, backgroundImage }
-  const { isConnected, address } = useAccount()
+  const { isConnected: isWalletConnected, address } = useAccount()
   const { data: balance } = useBalance({
     address,
   })
@@ -123,41 +117,33 @@ export function CoinTossGame({
     ? parseFloat(formatUnits(balance.value, balance.decimals))
     : 0
 
-  const { placeBet, isPlacingBet, betError, transactionHash } = usePlaceBet()
+  const tokenDecimals = balance?.decimals ?? 18
 
-  useEffect(() => {
-    if (transactionHash && !betError) {
-      const explorerUrl = CHAIN.blockExplorers?.default.url
-      const txMessage = explorerUrl
-        ? `Transaction Hash: ${transactionHash}, Link: ${explorerUrl}/tx/${transactionHash}`
-        : `Transaction Hash: ${transactionHash}`
-      console.log(`Bet placed! ${txMessage}`)
-    }
-  }, [transactionHash, betError])
+  const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet(
+    COINTOSS_FACE.HEADS,
+  )
+  const isInGameResultState = !!gameResult
 
-  const placeGameBet = async (betAmount: string) => {
-    if (!address || !isConnected || isPlacingBet) {
-      console.error(
-        "Attempted to place bet without address or connection or while placing bet.",
-      )
-      return
+  const handlePlayButtonClick = (betAmount: string) => {
+    if (betStatus === "error") {
+      resetBetState()
+      placeBet(parseEther(betAmount))
+    } else if (isInGameResultState) {
+      resetBetState()
+    } else {
+      placeBet(parseEther(betAmount))
     }
-
-    const betParams: GenericCasinoBetParams = {
-      betAmount: parseEther(betAmount),
-      game: CASINO_GAME_TYPE.COINTOSS,
-      gameEncodedInput: CoinToss.encodeInput(COINTOSS_FACE.HEADS),
-    }
-    placeBet(betParams, address as Hex)
   }
 
   return (
     <GameFrame
       {...props}
-      onPlaceBet={placeGameBet}
+      onPlayBtnClick={handlePlayButtonClick}
+      gameResult={gameResult}
+      betStatus={betStatus}
+      tokenDecimals={tokenDecimals}
       address={address as Hex}
-      isConnected={isConnected}
-      isPlacingBet={isPlacingBet}
+      isConnected={isWalletConnected}
       themeSettings={themeSettings}
       historyData={mockHistoryData}
       balance={balanceFloat}

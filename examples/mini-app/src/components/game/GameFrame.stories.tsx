@@ -113,8 +113,10 @@ const Template: Story = {
     connectWallletBtn: connectWalletBtnStub,
     address: "",
     isConnected: false,
-    isPlacingBet: false,
-    onPlaceBet: (betAmount: string) => console.log("betAmount: ", betAmount),
+    onPlayBtnClick: (betAmount: string) => console.log("betAmount: ", betAmount),
+    tokenDecimals: 18,
+    gameResult: null,
+    betStatus: null
   },
   render: (args) => (
     <GameFrame {...args} />
