@@ -15,7 +15,7 @@ pnpm loki update
 
 Run tests:
 ```shell
-pnpm loki test
+pnpm test:loki
 ```
 
 ---
