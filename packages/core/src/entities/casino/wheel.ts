@@ -59,11 +59,13 @@ export class Wheel extends WeightedGame {
       }
     });
 
-    return Array.from(uniqueMultipliers.entries()).map(([multiplier, config]) => ({
-      multiplier: Number(multiplier.toFixed(2)),
-      rawMultiplier: multiplier,
-      chanceToWin: Number(((Number(config.weight) / Number(totalWeight)) * 100).toFixed(2)),
-      color: config.color,
-    }));
+    return Array.from(uniqueMultipliers.entries())
+      .map(([multiplier, config]) => ({
+        multiplier: Number(multiplier.toFixed(2)),
+        rawMultiplier: multiplier,
+        chanceToWin: Number(((Number(config.weight) / Number(totalWeight)) * 100).toFixed(2)),
+        color: config.color,
+      }))
+      .sort((a, b) => a.rawMultiplier - b.rawMultiplier);
   }
 }
