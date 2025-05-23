@@ -1,61 +1,61 @@
-import { History, Info } from "lucide-react"
-import { ChangeEvent, useEffect, useRef, useState } from "react"
-import coinIcon from "../../assets/game/coin-background-icon.png"
-import { cn } from "../../lib/utils"
-import { Button } from "../ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { Input } from "../ui/input"
-import { Label } from "../ui/label"
+import { History, Info } from "lucide-react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import coinIcon from "../../assets/game/coin-background-icon.png";
+import { cn } from "../../lib/utils";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
-import { TokenImage } from "@coinbase/onchainkit/token"
+import { TokenImage } from "@coinbase/onchainkit/token";
 
-import { Sheet, SheetTrigger } from "../ui/sheet"
-import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
-import { InfoSheetPanel } from "./InfoSheetPanel"
-import { ETH_TOKEN } from "../../lib/tokens"
-import { GameResultWindow } from "./GameResultWindow"
-import { BetStatus, GameResultFormatted } from "../../types"
+import { ETH_TOKEN } from "../../lib/tokens";
+import { BetStatus, GameResultFormatted } from "../../types";
+import { Sheet, SheetTrigger } from "../ui/sheet";
+import { GameResultWindow } from "./GameResultWindow";
+import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel";
+import { InfoSheetPanel } from "./InfoSheetPanel";
 
 function formatBetAmount(num: number, decimals: number): string {
-  if (Number.isNaN(num)) return "0"
-  if (num === 0) return "0"
+  if (Number.isNaN(num)) return "0";
+  if (num === 0) return "0";
 
-  let s = num.toFixed(decimals)
+  let s = num.toFixed(decimals);
 
   if (s.includes(".")) {
-    s = s.replace(/\.?0+$/, "")
+    s = s.replace(/\.?0+$/, "");
   }
 
   if (s.endsWith(".")) {
-    s = s.slice(0, -1)
+    s = s.slice(0, -1);
   }
 
-  return s === "" || Number.isNaN(parseFloat(s)) ? "0" : s
+  return s === "" || Number.isNaN(Number.parseFloat(s)) ? "0" : s;
 }
 
 interface IThemeSettings {
-  theme?: "light" | "dark" | "system"
+  theme?: "light" | "dark" | "system";
   customTheme?: {
-    "--primary"?: string
-    "--play-btn-font"?: string
-    "--game-window-overlay"?: string
-  } & React.CSSProperties
-  backgroundImage: string
+    "--primary"?: string;
+    "--play-btn-font"?: string;
+    "--game-window-overlay"?: string;
+  } & React.CSSProperties;
+  backgroundImage: string;
 }
 
 interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
-  themeSettings: IThemeSettings
-  historyData: HistoryEntry[]
-  balance: number
-  connectWallletBtn: React.ReactNode
-  isConnected: boolean
-  onPlayBtnClick: (betAmount: string) => void
-  tokenDecimals: number
-  gameResult: GameResultFormatted | null
-  betStatus: BetStatus | null
+  themeSettings: IThemeSettings;
+  historyData: HistoryEntry[];
+  balance: number;
+  connectWallletBtn: React.ReactNode;
+  isConnected: boolean;
+  onPlayBtnClick: (betAmount: string) => void;
+  tokenDecimals: number;
+  gameResult: GameResultFormatted | null;
+  betStatus: BetStatus | null;
 }
 
-const STEP = 0.0001
+const STEP = 0.0001;
 
 export function GameFrame({
   themeSettings,
@@ -69,88 +69,76 @@ export function GameFrame({
   betStatus,
   ...props
 }: GameFrameProps) {
-  const [betAmount, setBetAmount] = useState("0")
-  const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
-  const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
-  const cardRef = useRef<HTMLDivElement>(null)
-  const [isMounted, setIsMounted] = useState(false)
-  const { theme } = themeSettings
+  const [betAmount, setBetAmount] = useState("0");
+  const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false);
+  const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const { theme } = themeSettings;
 
-  const themeClass = theme === "system" ? undefined : theme
+  const themeClass = theme === "system" ? undefined : theme;
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    setIsMounted(true);
+  }, []);
 
   const isBetAmountInvalid =
-    Number.isNaN(Number.parseFloat(betAmount)) ||
-    Number.parseFloat(betAmount || "0") <= 0
+    Number.isNaN(Number.parseFloat(betAmount)) || Number.parseFloat(betAmount || "0") <= 0;
 
-  const multiplier = 1.94
-  const winChance = 50
-  const parsedBetAmountForPayout = Number.parseFloat(betAmount || "0")
+  const multiplier = 1.94;
+  const winChance = 50;
+  const parsedBetAmountForPayout = Number.parseFloat(betAmount || "0");
   const targetPayout = (
-    (Number.isNaN(parsedBetAmountForPayout) ? 0 : parsedBetAmountForPayout) *
-    multiplier
-  ).toFixed(2)
-  const fee = 0
+    (Number.isNaN(parsedBetAmountForPayout) ? 0 : parsedBetAmountForPayout) * multiplier
+  ).toFixed(2);
+  const fee = 0;
 
-  const formattedBalance = balance.toFixed(4)
+  const formattedBalance = balance.toFixed(4);
 
-  const isInGameResultState = !!gameResult
-  const isBettingInProgress = betStatus === "pending"
-  const canInitiateBet =
-    isConnected && !isBetAmountInvalid && !isBettingInProgress
+  const isInGameResultState = !!gameResult;
+  const isBettingInProgress = betStatus === "pending";
+  const canInitiateBet = isConnected && !isBetAmountInvalid && !isBettingInProgress;
 
-  const isErrorState = betStatus === "error"
+  const isErrorState = betStatus === "error";
 
   const isPlayButtonDisabled: boolean = isErrorState
     ? false
     : isInGameResultState
       ? false
-      : !canInitiateBet
+      : !canInitiateBet;
 
-  let playButtonText: string
+  let playButtonText: string;
   if (isErrorState) {
-    playButtonText = "Error, try again"
+    playButtonText = "Error, try again";
   } else if (isInGameResultState) {
-    playButtonText = "Try again"
+    playButtonText = "Try again";
   } else if (isBettingInProgress) {
-    playButtonText = "Placing Bet..."
+    playButtonText = "Placing Bet...";
   } else if (!isConnected) {
-    playButtonText = "Connect Wallet"
+    playButtonText = "Connect Wallet";
   } else {
-    playButtonText = "Place Bet"
+    playButtonText = "Place Bet";
   }
 
   const handlePlayBtnClick = () => {
     if (isInGameResultState) {
-      setBetAmount("0")
+      setBetAmount("0");
     }
-    onPlayBtnClick(betAmount)
-  }
+    onPlayBtnClick(betAmount);
+  };
 
   return (
     <div
-      className={cn(
-        "cointoss-game-wrapper game-global-styles",
-        themeClass,
-        props.className,
-      )}
+      className={cn("cointoss-game-wrapper game-global-styles", themeClass, props.className)}
       style={themeSettings.customTheme as React.CSSProperties}
       {...props}
     >
       <Card
         ref={cardRef}
-        className={cn(
-          "relative overflow-hidden",
-          "bg-card text-card-foreground border",
-        )}
+        className={cn("relative overflow-hidden", "bg-card text-card-foreground border")}
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-          <CardTitle className="text-lg text-title-color font-bold">
-            CoinToss
-          </CardTitle>
+          <CardTitle className="text-lg text-title-color font-bold">CoinToss</CardTitle>
           {connectWallletBtn}
         </CardHeader>
 
@@ -164,12 +152,7 @@ export function GameFrame({
               backgroundImage: `url(${themeSettings.backgroundImage})`,
             }}
           >
-            <div
-              className={cn(
-                "absolute inset-0 rounded-[16px]",
-                "bg-game-window-overlay",
-              )}
-            ></div>
+            <div className={cn("absolute inset-0 rounded-[16px]", "bg-game-window-overlay")} />
 
             <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
               <SheetTrigger asChild>
@@ -196,10 +179,7 @@ export function GameFrame({
               )}
             </Sheet>
 
-            <Sheet
-              open={isHistorySheetOpen}
-              onOpenChange={setIsHistorySheetOpen}
-            >
+            <Sheet open={isHistorySheetOpen} onOpenChange={setIsHistorySheetOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="iconTransparent"
@@ -214,10 +194,7 @@ export function GameFrame({
                 </Button>
               </SheetTrigger>
               {isMounted && cardRef.current && (
-                <HistorySheetPanel
-                  portalContainer={cardRef.current}
-                  historyData={historyData}
-                />
+                <HistorySheetPanel portalContainer={cardRef.current} historyData={historyData} />
               )}
             </Sheet>
 
@@ -242,9 +219,7 @@ export function GameFrame({
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <div className="text-sm font-medium flex items-center">
-                <span className="text-text-on-surface-variant">
-                  Balance:&nbsp;
-                </span>
+                <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
                 <span className="font-semibold">{formattedBalance}</span>
                 <TokenImage token={ETH_TOKEN} size={16} className="ml-1" />
               </div>
@@ -264,16 +239,14 @@ export function GameFrame({
                 step={STEP}
                 value={betAmount}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setBetAmount(e.target.value)
+                  setBetAmount(e.target.value);
                 }}
                 className="relative"
                 token={{
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
                   symbol: "ETH",
                 }}
-                disabled={
-                  !isConnected || betStatus === "pending" || !!gameResult
-                }
+                disabled={!isConnected || betStatus === "pending" || !!gameResult}
               />
 
               <div className="grid grid-cols-3 gap-2">
@@ -281,15 +254,13 @@ export function GameFrame({
                   variant="secondary"
                   onClick={() => {
                     setBetAmount((prev) => {
-                      const prevNum = Number.parseFloat(prev || "0")
-                      if (Number.isNaN(prevNum) || prevNum === 0) return "0"
-                      return formatBetAmount(prevNum / 2, tokenDecimals)
-                    })
+                      const prevNum = Number.parseFloat(prev || "0");
+                      if (Number.isNaN(prevNum) || prevNum === 0) return "0";
+                      return formatBetAmount(prevNum / 2, tokenDecimals);
+                    });
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isBettingInProgress || isInGameResultState}
                 >
                   1/2
                 </Button>
@@ -297,16 +268,14 @@ export function GameFrame({
                   variant="secondary"
                   onClick={() => {
                     setBetAmount((prev) => {
-                      const oldNum = Number.parseFloat(prev || "0")
-                      const newAmount = oldNum * 2
-                      const finalAmount = Math.min(balance, newAmount)
-                      return formatBetAmount(finalAmount, tokenDecimals)
-                    })
+                      const oldNum = Number.parseFloat(prev || "0");
+                      const newAmount = oldNum * 2;
+                      const finalAmount = Math.min(balance, newAmount);
+                      return formatBetAmount(finalAmount, tokenDecimals);
+                    });
                   }}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isBettingInProgress || isInGameResultState}
                 >
                   2x
                 </Button>
@@ -314,11 +283,9 @@ export function GameFrame({
                   variant="secondary"
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   onClick={() => {
-                    setBetAmount(formattedBalance)
+                    setBetAmount(formattedBalance);
                   }}
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isBettingInProgress || isInGameResultState}
                 >
                   Max
                 </Button>
@@ -344,5 +311,5 @@ export function GameFrame({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

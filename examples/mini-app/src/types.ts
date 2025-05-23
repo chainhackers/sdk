@@ -1,14 +1,14 @@
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { COINTOSS_FACE } from "@betswirl/sdk-core";
 
 export interface GameResult {
-  isWin: boolean
-  payout: bigint
-  currency: string
-  rolled: COINTOSS_FACE
+  isWin: boolean;
+  payout: bigint;
+  currency: string;
+  rolled: COINTOSS_FACE;
 }
 
 export interface GameResultFormatted extends Omit<GameResult, "payout"> {
-  payout: number
+  payout: number;
 }
 
-export type BetStatus = "pending" | "success" | "error"
+export type BetStatus = "pending" | "success" | "error";

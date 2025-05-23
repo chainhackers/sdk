@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { GameFrame } from "./GameFrame"
-import { TokenImage } from "@coinbase/onchainkit/token"
-import { ETH_TOKEN } from "../../lib/tokens"
-import { type HistoryEntry } from "./HistorySheetPanel"
-import gameBg from "../../assets/game/game-background.png"
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { COINTOSS_FACE } from "@betswirl/sdk-core";
+import { TokenImage } from "@coinbase/onchainkit/token";
+import type { Meta, StoryObj } from "@storybook/react";
+import gameBg from "../../assets/game/game-background.png";
+import { ETH_TOKEN } from "../../lib/tokens";
+import { GameFrame } from "./GameFrame";
+import { type HistoryEntry } from "./HistorySheetPanel";
 
 const meta = {
   title: "Game/GameFrame",
@@ -20,12 +20,12 @@ const meta = {
     },
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof GameFrame>
+} satisfies Meta<typeof GameFrame>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
-const connectWalletBtnStub = <div></div>
+const connectWalletBtnStub = <div />;
 
 const mockHistoryData: HistoryEntry[] = [
   {
@@ -100,7 +100,7 @@ const mockHistoryData: HistoryEntry[] = [
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
-]
+];
 
 const Template: Story = {
   args: {
@@ -111,27 +111,26 @@ const Template: Story = {
     balance: 1.7,
     connectWallletBtn: connectWalletBtnStub,
     isConnected: false,
-    onPlayBtnClick: (betAmount: string) =>
-      console.log("betAmount: ", betAmount),
+    onPlayBtnClick: (betAmount: string) => console.log("betAmount: ", betAmount),
     tokenDecimals: 18,
     gameResult: null,
     betStatus: null,
   },
   render: (args) => <GameFrame {...args} />,
-}
+};
 
 export const WalletNotConnected: Story = {
   args: {
     ...Template.args,
   },
-}
+};
 
 export const WalletConnected: Story = {
   args: {
     ...Template.args,
     isConnected: true,
   },
-}
+};
 
 export const PlacingBet: Story = {
   args: {
@@ -139,7 +138,7 @@ export const PlacingBet: Story = {
     isConnected: true,
     betStatus: "pending",
   },
-}
+};
 
 export const ErrorBet: Story = {
   args: {
@@ -147,7 +146,7 @@ export const ErrorBet: Story = {
     isConnected: true,
     betStatus: "error",
   },
-}
+};
 
 export const Win: Story = {
   args: {
@@ -161,7 +160,7 @@ export const Win: Story = {
       rolled: COINTOSS_FACE.HEADS,
     },
   },
-}
+};
 
 export const Loss: Story = {
   args: {
@@ -175,4 +174,4 @@ export const Loss: Story = {
       rolled: COINTOSS_FACE.TAILS,
     },
   },
-}
+};

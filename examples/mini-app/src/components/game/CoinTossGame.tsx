@@ -1,29 +1,28 @@
-import React from "react"
-import coinTossBackground from "../../assets/game/game-background.png"
-import { cn } from "../../lib/utils"
+import React from "react";
+import coinTossBackground from "../../assets/game/game-background.png";
+import { cn } from "../../lib/utils";
 
-import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
-import { Avatar, Name } from "@coinbase/onchainkit/identity"
-import { TokenImage } from "@coinbase/onchainkit/token"
-import { useAccount, useBalance } from "wagmi"
-import { formatEther, formatUnits, parseEther } from "viem"
+import { Avatar, Name } from "@coinbase/onchainkit/identity";
+import { TokenImage } from "@coinbase/onchainkit/token";
+import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet";
+import { formatEther, formatUnits, parseEther } from "viem";
+import { useAccount, useBalance } from "wagmi";
 
-import { type HistoryEntry } from "./HistorySheetPanel"
-import { ETH_TOKEN } from "../../lib/tokens"
+import { ETH_TOKEN } from "../../lib/tokens";
+import { type HistoryEntry } from "./HistorySheetPanel";
 
-import { usePlaceBet } from "../../hooks/usePlaceBet"
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
-import { GameFrame } from "./GameFrame"
+import { COINTOSS_FACE } from "@betswirl/sdk-core";
+import { usePlaceBet } from "../../hooks/usePlaceBet";
+import { GameFrame } from "./GameFrame";
 
-export interface CoinTossGameProps
-  extends React.HTMLAttributes<HTMLDivElement> {
-  theme?: "light" | "dark" | "system"
+export interface CoinTossGameProps extends React.HTMLAttributes<HTMLDivElement> {
+  theme?: "light" | "dark" | "system";
   customTheme?: {
-    "--primary"?: string
-    "--play-btn-font"?: string
-    "--game-window-overlay"?: string
-  } & React.CSSProperties
-  backgroundImage?: string
+    "--primary"?: string;
+    "--play-btn-font"?: string;
+    "--game-window-overlay"?: string;
+  } & React.CSSProperties;
+  backgroundImage?: string;
 }
 
 const mockHistoryData: HistoryEntry[] = [
@@ -99,7 +98,7 @@ const mockHistoryData: HistoryEntry[] = [
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
     timestamp: "~2h ago",
   },
-]
+];
 
 export function CoinTossGame({
   theme = "system",
@@ -107,39 +106,37 @@ export function CoinTossGame({
   backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
-  const themeSettings = { theme, customTheme, backgroundImage }
-  const { isConnected: isWalletConnected, address } = useAccount()
+  const themeSettings = { theme, customTheme, backgroundImage };
+  const { isConnected: isWalletConnected, address } = useAccount();
   const { data: balance } = useBalance({
     address,
-  })
+  });
   const balanceFloat = balance
-    ? parseFloat(formatUnits(balance.value, balance.decimals))
-    : 0
+    ? Number.parseFloat(formatUnits(balance.value, balance.decimals))
+    : 0;
 
-  const tokenDecimals = balance?.decimals ?? 18
+  const tokenDecimals = balance?.decimals ?? 18;
 
-  const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet(
-    COINTOSS_FACE.HEADS,
-  )
-  const isInGameResultState = !!gameResult
+  const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet(COINTOSS_FACE.HEADS);
+  const isInGameResultState = !!gameResult;
 
   const handlePlayButtonClick = (betAmount: string) => {
     if (betStatus === "error") {
-      resetBetState()
-      placeBet(parseEther(betAmount))
+      resetBetState();
+      placeBet(parseEther(betAmount));
     } else if (isInGameResultState) {
-      resetBetState()
+      resetBetState();
     } else {
-      placeBet(parseEther(betAmount))
+      placeBet(parseEther(betAmount));
     }
-  }
+  };
 
   const gameResultFormatted = gameResult
     ? {
         ...gameResult,
         payout: Number(formatEther(gameResult.payout)),
       }
-    : null
+    : null;
 
   return (
     <GameFrame
@@ -176,5 +173,5 @@ export function CoinTossGame({
         </Wallet>
       }
     />
-  )
+  );
 }
