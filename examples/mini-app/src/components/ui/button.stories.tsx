@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Info } from "lucide-react"
 import { Button } from "./button"
-import coinHeadsIcon from "../../assets/game/coin-heads.png"
+import coinHeadsIcon from "../../assets/game/coin-heads.svg"
 
 const meta = {
   title: "UI/Button",
