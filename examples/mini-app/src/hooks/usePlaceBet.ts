@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from "react"
-import { Hex, zeroAddress, decodeEventLog, Abi } from "viem"
+import { Hex, zeroAddress, decodeEventLog } from "viem"
 import { useAccount, usePublicClient, useWriteContract } from "wagmi"
 import { useOnchainKit } from "@coinbase/onchainkit"
 import {
@@ -7,6 +7,7 @@ import {
   CasinoChainId,
   getChainlinkVrfCostFunctionData,
   getPlaceBetFunctionData,
+  getPlaceBetEventData,
   getRollEventData,
   CoinToss,
   COINTOSS_FACE,
@@ -21,7 +22,6 @@ const logger = createLogger("usePlaceBet")
 interface SubmitBetResult {
   txHash: Hex
   contractAddress: Hex
-  gameAbiForPlaceBet: Abi
 }
 
 export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
@@ -104,17 +104,19 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
         chainId,
         writeContractAsync,
       )
-      const { txHash, contractAddress, gameAbiForPlaceBet } = submitResult
+      const { txHash, contractAddress } = submitResult
 
       const betId = await _extractBetIdFromReceipt(
         txHash,
         contractAddress,
-        gameAbiForPlaceBet,
+        betParams.game,
+        chainId,
+        connectedAddress,
         publicClient,
       )
 
       if (!betId) {
-        logger.warn(
+        logger.error(
           "placeBet: Bet ID was not extracted. Roll event listener will not be started.",
         )
         setBetStatus("error")
@@ -124,7 +126,7 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
       const { data: rollEventData } = getRollEventData(
         betParams.game,
         chainId,
-        betId
+        betId,
       )
       logger.debug("placeBet: Setting up Roll event listener...")
       setWatchTarget({
@@ -208,14 +210,15 @@ async function _submitBetTransaction(
   return {
     txHash,
     contractAddress: placeBetTxData.data.to,
-    gameAbiForPlaceBet: placeBetTxData.data.abi as Abi,
   }
 }
 
 async function _extractBetIdFromReceipt(
   txHash: Hex,
   expectedContractAddress: Hex,
-  placeBetAbi: Abi,
+  gameType: CASINO_GAME_TYPE,
+  chainId: CasinoChainId,
+  receiver: Hex,
   publicClient: ReturnType<typeof usePublicClient>,
 ): Promise<bigint | null> {
   if (!publicClient) {
@@ -226,30 +229,25 @@ async function _extractBetIdFromReceipt(
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
   logger.debug("_extractBetIdFromReceipt: Receipt received.")
 
-  const placeBetEventDefinition = placeBetAbi.find(
-    (item) => item.type === "event" && item.name === "PlaceBet",
+  const { data: placeBetEventData } = getPlaceBetEventData(
+    gameType,
+    chainId,
+    receiver,
   )
-
-  if (!placeBetEventDefinition) {
-    logger.warn(
-      "_extractBetIdFromReceipt: PlaceBet event definition not found in ABI.",
-    )
-    return null
-  }
 
   for (const log of receipt.logs) {
     if (log.address.toLowerCase() !== expectedContractAddress.toLowerCase())
       continue
     const decodedLog = decodeEventLog({
-      abi: [placeBetEventDefinition],
+      abi: placeBetEventData.abi,
       data: log.data,
       topics: log.topics,
       strict: false,
     })
-    if (decodedLog.eventName === "PlaceBet") {
-      return (decodedLog.args as { id: bigint }).id
+    if (decodedLog.eventName === placeBetEventData.eventName) {
+      return (decodedLog.args as unknown as { id: bigint }).id
     }
   }
-  logger.warn("_extractBetIdFromReceipt: Bet ID not found in receipt.")
+  logger.error("_extractBetIdFromReceipt: Bet ID not found in receipt.")
   return null
 }

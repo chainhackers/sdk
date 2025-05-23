@@ -13,7 +13,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@betswirl/sdk-core": "^0.1.2-beta.2",
+    "@betswirl/sdk-core": "^0.1.2-beta.3",
     "@coinbase/onchainkit": "^0.38.13",
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-label": "^2.1.4",
