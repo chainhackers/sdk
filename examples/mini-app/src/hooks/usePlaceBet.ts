@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { Hex, zeroAddress, decodeEventLog } from "viem"
 import { useAccount, usePublicClient, useWriteContract } from "wagmi"
 import { useOnchainKit } from "@coinbase/onchainkit"
@@ -24,7 +24,7 @@ interface SubmitBetResult {
   contractAddress: Hex
 }
 
-export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
+export function usePlaceBet() {
   const { chain } = useOnchainKit()
   const chainId = chain?.id as CasinoChainId | undefined
   const publicClient = usePublicClient({ chainId })
@@ -61,95 +61,98 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
     }
   }, [watcherStatus, watcherGameResult])
 
-  const betParams = useMemo(
-    () => ({
-      game: CASINO_GAME_TYPE.COINTOSS,
-      gameEncodedInput: CoinToss.encodeInput(choice),
-      betAmount,
-    }),
-    [betAmount, choice],
+  const placeBet = useCallback(
+    async (betAmount: bigint, choice: COINTOSS_FACE) => {
+      try {
+        resetWagmiWriteContract()
+        setGameResult(null)
+        setWatchTarget(null)
+        resetWatcher()
+
+        const betParams = {
+          game: CASINO_GAME_TYPE.COINTOSS,
+          gameEncodedInput: CoinToss.encodeInput(choice),
+          betAmount,
+        }
+
+        if (
+          !publicClient ||
+          !chainId ||
+          !connectedAddress ||
+          !writeContractAsync
+        ) {
+          logger.error(
+            "placeBet: Wagmi/OnchainKit clients or address are not initialized.",
+          )
+          setBetStatus("error")
+          return
+        }
+        logger.debug("placeBet: Starting bet process:", {
+          betParams,
+          connectedAddress,
+        })
+        setBetStatus("pending")
+
+        const vrfCost = await _fetchVrfCost(
+          betParams.game,
+          chainId,
+          publicClient,
+        )
+
+        const submitResult = await _submitBetTransaction(
+          betParams,
+          connectedAddress,
+          vrfCost,
+          chainId,
+          writeContractAsync,
+        )
+        const { txHash, contractAddress } = submitResult
+
+        const betId = await _extractBetIdFromReceipt(
+          txHash,
+          contractAddress,
+          betParams.game,
+          chainId,
+          connectedAddress,
+          publicClient,
+        )
+
+        if (!betId) {
+          logger.error(
+            "placeBet: Bet ID was not extracted. Roll event listener will not be started.",
+          )
+          setBetStatus("error")
+          return
+        }
+
+        const { data: rollEventData } = getRollEventData(
+          betParams.game,
+          chainId,
+          betId,
+        )
+        logger.debug("placeBet: Setting up Roll event listener...")
+        setWatchTarget({
+          betId,
+          contractAddress,
+          gameType: betParams.game,
+          eventAbi: rollEventData.abi,
+          eventName: rollEventData.eventName,
+          eventArgs: rollEventData.args,
+        })
+      } catch (error) {
+        logger.error("placeBet: Error placing bet:", error)
+        setBetStatus("error")
+      }
+    },
+    [
+      publicClient,
+      chainId,
+      connectedAddress,
+      writeContractAsync,
+      resetWagmiWriteContract,
+      resetWatcher,
+    ],
   )
-
-  const placeBet = useCallback(async () => {
-    try {
-      resetWagmiWriteContract()
-      setGameResult(null)
-      setWatchTarget(null)
-      resetWatcher()
-
-      if (
-        !publicClient ||
-        !chainId ||
-        !connectedAddress ||
-        !writeContractAsync
-      ) {
-        logger.error(
-          "placeBet: Wagmi/OnchainKit clients or address are not initialized.",
-        )
-        setBetStatus("error")
-        return
-      }
-      logger.debug("placeBet: Starting bet process:", {
-        betParams,
-        connectedAddress,
-      })
-      setBetStatus("pending")
-
-      const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
-
-      const submitResult = await _submitBetTransaction(
-        betParams,
-        connectedAddress,
-        vrfCost,
-        chainId,
-        writeContractAsync,
-      )
-      const { txHash, contractAddress } = submitResult
-
-      const betId = await _extractBetIdFromReceipt(
-        txHash,
-        contractAddress,
-        betParams.game,
-        chainId,
-        connectedAddress,
-        publicClient,
-      )
-
-      if (!betId) {
-        logger.error(
-          "placeBet: Bet ID was not extracted. Roll event listener will not be started.",
-        )
-        setBetStatus("error")
-        return
-      }
-
-      const { data: rollEventData } = getRollEventData(
-        betParams.game,
-        chainId,
-        betId,
-      )
-      logger.debug("placeBet: Setting up Roll event listener...")
-      setWatchTarget({
-        betId,
-        contractAddress,
-        gameType: betParams.game,
-        eventAbi: rollEventData.abi,
-        eventName: rollEventData.eventName,
-        eventArgs: rollEventData.args,
-      })
-    } catch (error) {
-      logger.error("placeBet: Error placing bet:", error)
-      setBetStatus("error")
-    }
-  }, [
-    betParams,
-    publicClient,
-    chainId,
-    connectedAddress,
-    writeContractAsync,
-    resetWagmiWriteContract,
-    resetWatcher,
-  ])
 
   const resetBetState = useCallback(() => {
     setBetStatus(null)
