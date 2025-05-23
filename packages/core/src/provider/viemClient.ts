@@ -19,6 +19,10 @@ import {
   type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
   type PlaceFreebetCallbacks,
+  type PlinkoBetParams,
+  type PlinkoFreebetParams,
+  type PlinkoPlacedBet,
+  type PlinkoRolledBet,
   type RouletteBetParams,
   type RouletteFreebetParams,
   type RoulettePlacedBet,
@@ -26,6 +30,9 @@ import {
   type Token,
   WEIGHTED_CASINO_GAME_TYPES,
   type WeightedCasinoPlacedBet,
+  type WeightedGameBetParams,
+  type WeightedGameFreebetParams,
+  type WeightedGamePlacedBet,
   casinoChainById,
   getBetRequirements,
   getCasinoGameToken,
@@ -35,11 +42,16 @@ import {
   getKenoConfiguration,
   placeDiceBet,
   placeDiceFreebet,
+  placePlinkoBet,
+  placePlinkoFreebet,
   placeRouletteBet,
   placeRouletteFreebet,
+  placeWeightedGameBet,
+  placeWeightedGameFreebet,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
   waitKenoRolledBet,
+  waitPlinkoRolledBet,
   waitRolledBet,
   waitRouletteRolledBet,
 } from "..";
@@ -335,6 +347,88 @@ export class ViemBetSwirlClient extends BetSwirlClient {
         ...this.betSwirlDefaultOptions,
         ...options,
       },
+    );
+  }
+
+  async playPlinko(
+    params: PlinkoBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: PlinkoPlacedBet; receipt: TransactionReceipt }> {
+    return placePlinkoBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetPlinko(
+    params: PlinkoFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: PlinkoPlacedBet; receipt: TransactionReceipt }> {
+    return placePlinkoFreebet(
+      this.betSwirlWallet,
+      params,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async waitPlinko(
+    placedBet: PlinkoPlacedBet,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: number,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: PlinkoRolledBet; receipt: TransactionReceipt }> {
+    return waitPlinkoRolledBet(
+      this.betSwirlWallet,
+      placedBet,
+      weightedGameConfiguration,
+      houseEdge,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+    );
+  }
+
+  async playWeightedGame(
+    params: WeightedGameBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: WeightedGamePlacedBet; receipt: TransactionReceipt }> {
+    return placeWeightedGameBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetWeightedGame(
+    params: WeightedGameFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: WeightedGamePlacedBet; receipt: TransactionReceipt }> {
+    return placeWeightedGameFreebet(
+      this.betSwirlWallet,
+      params,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
     );
   }
 

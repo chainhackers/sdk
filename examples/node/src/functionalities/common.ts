@@ -23,11 +23,11 @@ import {
   Roulette,
   type RouletteChoiceInput,
   type SignedFreebet,
+  type WEIGHTED_CASINO_GAME_TYPE,
   type WeightedCasinoPlacedBet,
+  WeightedGame,
   type WeightedGameChoiceInput,
   type WeightedGameConfiguration,
-  Wheel,
-  type WheelChoiceInput,
   casinoChains,
   chainById,
   formatRawAmount,
@@ -193,23 +193,25 @@ export async function _selectInput(
       });
       break;
     }
-    // Wheel
+    // Wheel & Plinko (Weighted game)
     default: {
       input = await select({
         message: "Select a configuration",
         loop: false,
         // You could bring your own configurations here by passing customConfigurations in getChoiceInputs
-        choices: Wheel.getChoiceInputs(gameToken.chainId, gameToken.affiliateHouseEdge).map(
-          (i) => ({
-            name: `${i.label} (${i.winChancePercent
-              .map(
-                (chance, index) =>
-                  `${i.formattedNetMultiplier?.[index]}x - ${chance.toFixed(2)}% to win ${index !== i.winChancePercent.length - 1 ? "|" : ""}`,
-              )
-              .join("\n")})`,
-            value: i,
-          }),
-        ),
+        choices: WeightedGame.getChoiceInputs(
+          gameToken.chainId,
+          gameToken.game,
+          gameToken.affiliateHouseEdge,
+        ).map((i) => ({
+          name: `${i.label} (${i.winChancePercent
+            .map(
+              (chance, index) =>
+                `${i.formattedNetMultiplier?.[index]}x - ${chance.toFixed(2)}% to win ${index !== i.winChancePercent.length - 1 ? "|" : ""}`,
+            )
+            .join("\n")})`,
+          value: i,
+        })),
       });
     }
   }
@@ -482,11 +484,15 @@ export async function _placeBet(
       casinoGameToken.chainId,
     );
   }
-  // Wheel
+  // Wheel & Plinko (Weighted game)
   else {
-    const weightedGameChoice = inputChoice as WheelChoiceInput;
-    placedBetData = await wagmiBetSwirlClient.playWheel(
-      { ...commonParams, weightedGameConfig: weightedGameChoice.config },
+    const weightedGameChoice = inputChoice as WeightedGameChoiceInput;
+    placedBetData = await wagmiBetSwirlClient.playWeightedGame(
+      {
+        ...commonParams,
+        weightedGameConfig: weightedGameChoice.config,
+        game: weightedGameChoice.game as WEIGHTED_CASINO_GAME_TYPE,
+      },
       undefined,
       callbacks,
       casinoGameToken.chainId,
@@ -650,11 +656,15 @@ export async function _placeFreebet(
       callbacks,
     );
   }
-  // Wheel
+  // Wheel & Plinko (Weighted game)
   else {
-    const weightedGameChoice = inputChoice as WheelChoiceInput;
-    placedBetData = await wagmiBetSwirlClient.playFreebetWheel(
-      { ...commonParams, weightedGameConfig: weightedGameChoice.config },
+    const weightedGameChoice = inputChoice as WeightedGameChoiceInput;
+    placedBetData = await wagmiBetSwirlClient.playFreebetWeightedGame(
+      {
+        ...commonParams,
+        weightedGameConfig: weightedGameChoice.config,
+        game: weightedGameChoice.game as WEIGHTED_CASINO_GAME_TYPE,
+      },
       undefined,
       callbacks,
     );

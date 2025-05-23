@@ -28,6 +28,14 @@ import type { BetSwirlWallet } from "./wallet";
 
 import type { ApolloCache, DefaultOptions } from "@apollo/client/core/index.js";
 import type {
+  PlinkoBetParams,
+  PlinkoFreebetParams,
+  PlinkoPlacedBet,
+  WeightedGameBetParams,
+  WeightedGameFreebetParams,
+  WeightedGamePlacedBet,
+} from "../actions";
+import type {
   CoinTossBetParams,
   CoinTossFreebetParams,
   CoinTossPlacedBet,
@@ -66,6 +74,7 @@ import type {
   GAS_PRICE_TYPE,
   KenoConfiguration,
   KenoRolledBet,
+  PlinkoRolledBet,
   RouletteRolledBet,
 } from "../read";
 import type { WeightedGameConfiguration } from "../read/casino/weightedGame";
@@ -199,6 +208,37 @@ export abstract class BetSwirlClient {
     houseEdge: number,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: WheelRolledBet; receipt: TransactionReceipt }>;
+
+  abstract playPlinko(
+    params: PlinkoBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: PlinkoPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract playFreebetPlinko(
+    params: PlinkoFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: PlinkoPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract waitPlinko(
+    placedBet: PlinkoPlacedBet,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: number,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: PlinkoRolledBet; receipt: TransactionReceipt }>;
+
+  abstract playWeightedGame(
+    params: WeightedGameBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: WeightedGamePlacedBet; receipt: TransactionReceipt }>;
+
+  abstract playFreebetWeightedGame(
+    params: WeightedGameFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: WeightedGamePlacedBet; receipt: TransactionReceipt }>;
 
   /* Casino utilities */
 

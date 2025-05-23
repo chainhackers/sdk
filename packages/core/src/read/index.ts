@@ -7,7 +7,7 @@ export * from "./casino/keno";
 export * from "./casino/game";
 export * from "./casino/weightedGame";
 export * from "./casino/wheel";
-
+export * from "./casino/plinko";
 /* common */
 export * from "./common/chainlinkVrfCost";
 export * from "./common/gasPrice";

@@ -5,6 +5,7 @@ export * from "./casino/roulette";
 export * from "./casino/keno";
 export * from "./casino/game";
 export * from "./casino/wheel";
+export * from "./casino/plinko";
 export * from "./casino/weightedGame";
 
 /* Common */

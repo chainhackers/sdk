@@ -1,5 +1,14 @@
 # @betswirl/wagmi-provider
 
+## 0.1.3-beta.0
+
+### Patch Changes
+
+- Add Plinko game
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.3-beta.0
+
 ## 0.1.2
 
 ### Patch Changes

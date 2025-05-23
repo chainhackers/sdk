@@ -6,3 +6,4 @@ export * from "./casino/game";
 export * from "./casino/keno";
 export * from "./casino/weightedGame";
 export * from "./casino/wheel";
+export * from "./casino/plinko";

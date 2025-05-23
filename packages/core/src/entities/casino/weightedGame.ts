@@ -5,8 +5,10 @@ import {
   type CasinoChainId,
   type WEIGHTED_CASINO_GAME_TYPE,
   type WeightedGameConfiguration,
+  generateRandomHexColor,
   getFormattedNetMultiplier,
   weightedGameCachedConfigurations,
+  weightedGameCachedConfigurationsByGame,
 } from "../..";
 import { getNetMultiplier } from "../..";
 import { BP_VALUE } from "../../constants";
@@ -81,11 +83,12 @@ export class WeightedGame extends AbstractCasinoGame<
 
   static getChoiceInputs(
     chainId: CasinoChainId,
+    game: WEIGHTED_CASINO_GAME_TYPE,
     houseEdge?: number,
     customWeightedGameConfigs?: WeightedGameConfiguration[],
   ): WeightedGameChoiceInput[] {
     const weightedGameConfigs = [
-      ...weightedGameCachedConfigurations[chainId],
+      ...(weightedGameCachedConfigurationsByGame[game]?.[chainId] ?? []),
       ...(customWeightedGameConfigs ?? []),
     ];
     return weightedGameConfigs.map((config) => {
@@ -121,7 +124,7 @@ export class WeightedGame extends AbstractCasinoGame<
     });
   }
 
-  // Weighted game utilies
+  // Weighted game utilities
   static getWeightedGameConfigLabel(
     configId: WeightedGameConfigId,
     chainId: CasinoChainId,
@@ -132,5 +135,68 @@ export class WeightedGame extends AbstractCasinoGame<
     );
     const existingCustomConfig = customWeightedGameConfigs?.find((c) => c.configId === configId);
     return existingCachedConfig?.label ?? existingCustomConfig?.label ?? `Config #${configId}`;
+  }
+
+  /**
+   * Computes and returns the list of unique outputs for a given weighted game configuration.
+   * It is particularly useful to display all the unique possible outputs above/below the wheel in the UI.
+   *
+   * This function groups segments that have the same net multiplier (netMultiplier),
+   * sums their weights, and returns for each unique multiplier:
+   *   - the net multiplier (rounded to 2 decimals)
+   *   - the raw multiplier (before house edge)
+   *   - the chance to win this multiplier (as a percentage)
+   *   - the color associated with this segment (or a randomly generated color if not provided)
+   *
+   * @param weightedGameConfig The configuration (weights, multipliers, colors, etc.)
+   * @param houseEdge The house edge to apply for net multiplier calculation
+   * @returns An array of objects representing each unique output:
+   *   - multiplier: the net multiplier (rounded to 2 decimals)
+   *   - rawMultiplier: the raw multiplier (before house edge)
+   *   - chanceToWin: the probability of landing on this multiplier (in %)
+   *   - color: the color associated with this segment
+   *
+   * @example
+   * const outputs = Wheel.getUniqueOutputs(config, 200);
+   * // [
+   * //   { multiplier: 1.95, rawMultiplier: 19500, chanceToWin: 10.5, color: "#29384C" },
+   * //   ...
+   * // ]
+   */
+  static getUniqueOutputs(
+    weightedGameConfig: WeightedGameConfiguration,
+    houseEdge: number,
+  ): {
+    multiplier: number;
+    rawMultiplier: number;
+    chanceToWin: number;
+    color: string;
+  }[] {
+    const uniqueMultipliers = new Map<number, { color: string; weight: bigint }>();
+    const totalWeight = weightedGameConfig.weights.reduce((acc, curr) => acc + curr, 0n);
+    weightedGameConfig.multipliers.forEach((_, index) => {
+      const netMultiplier = getNetMultiplier(
+        WeightedGame.getMultiplier(weightedGameConfig, index),
+        houseEdge,
+      );
+      if (!uniqueMultipliers.has(netMultiplier)) {
+        uniqueMultipliers.set(netMultiplier, {
+          color: weightedGameConfig.colors?.[index] || generateRandomHexColor(),
+          weight: weightedGameConfig.weights[index]!,
+        });
+      } else {
+        uniqueMultipliers.get(netMultiplier)!.weight =
+          uniqueMultipliers.get(netMultiplier)!.weight + weightedGameConfig.weights[index]!;
+      }
+    });
+
+    return Array.from(uniqueMultipliers.entries())
+      .map(([multiplier, config]) => ({
+        multiplier: Number(multiplier.toFixed(2)),
+        rawMultiplier: multiplier,
+        chanceToWin: Number(((Number(config.weight) / Number(totalWeight)) * 100).toFixed(2)),
+        color: config.color,
+      }))
+      .sort((a, b) => a.rawMultiplier - b.rawMultiplier);
   }
 }

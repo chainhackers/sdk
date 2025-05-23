@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.3-beta.0
+
+### Patch Changes
+
+- Add Plinko game
+
 ## 0.1.2
 
 ### Patch Changes

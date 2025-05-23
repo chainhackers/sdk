@@ -29,7 +29,6 @@ export async function startPlaceFreebetProcess() {
     checkEnvVariables();
     // 1. Select a freebet to wager
     const selectedFreebet = await _selectFreebet();
-    console.log("selectedFreebet", selectedFreebet);
     if (!selectedFreebet) {
       console.log(
         chalk.bgYellow(
