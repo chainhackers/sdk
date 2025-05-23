@@ -57,7 +57,7 @@ export function useBetResultWatcher({
 
   const eventArgs = useMemo(() => {
     if (watchParams?.betId) {
-      return { id: BigInt(watchParams.betId) }
+      return { id: watchParams.betId }
     }
     return undefined
   }, [watchParams?.betId])
@@ -141,7 +141,7 @@ export function useBetResultWatcher({
           rolled: boolean[]
         }
 
-        if (rollArgs.id.toString() === betId) {
+        if (rollArgs.id === betId) {
           const rolledResult = _decodeRolled(rollArgs.rolled, gameType)
           const result: GameResult = {
             isWin: rollArgs.payout > 0n,
@@ -150,8 +150,8 @@ export function useBetResultWatcher({
             rolled: rolledResult,
           }
           logger.debug("processEventLogs: Bet event processed:", {
-            betId,
             ...result,
+            betId,
             txHash: log.transactionHash,
           })
           setInternalGameResult(result)
@@ -233,7 +233,7 @@ export function useBetResultWatcher({
       const logs = await publicClient.getLogs({
         address: contractAddress,
         event: eventDefinition,
-        args: { id: BigInt(betId) },
+        args: { id: betId },
         fromBlock,
         toBlock: currentBlock,
       })

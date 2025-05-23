@@ -124,7 +124,7 @@ export function usePlaceBet(betAmount: bigint, choice: COINTOSS_FACE) {
       const { data: rollEventData } = getRollEventData(
         betParams.game,
         chainId,
-        betId,
+        betId
       )
       logger.debug("placeBet: Setting up Roll event listener...")
       setWatchTarget({
@@ -217,7 +217,7 @@ async function _extractBetIdFromReceipt(
   expectedContractAddress: Hex,
   placeBetAbi: Abi,
   publicClient: ReturnType<typeof usePublicClient>,
-): Promise<string | null> {
+): Promise<bigint | null> {
   if (!publicClient) {
     logger.error("_extractBetIdFromReceipt: publicClient is undefined")
     throw new Error("publicClient is undefined")
@@ -247,7 +247,7 @@ async function _extractBetIdFromReceipt(
       strict: false,
     })
     if (decodedLog.eventName === "PlaceBet") {
-      return (decodedLog.args as { id: bigint }).id.toString()
+      return (decodedLog.args as { id: bigint }).id
     }
   }
   logger.warn("_extractBetIdFromReceipt: Bet ID not found in receipt.")

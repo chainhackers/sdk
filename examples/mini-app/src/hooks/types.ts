@@ -9,7 +9,7 @@ export interface GameResult {
 }
 
 export interface WatchTarget {
-  betId: string
+  betId: bigint
   contractAddress: Hex
   gameType: CASINO_GAME_TYPE
   eventAbi: Abi
