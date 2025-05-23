@@ -245,25 +245,20 @@ export function GameFrame({
             <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
               {multiplier.toFixed(2)} x
             </div>
-            <button
-              type="button"
+            <Button
+              variant="coinButton"
+              size="coin"
               onClick={handleCoinClick}
               disabled={!isCoinClickable}
               aria-label={`Select ${selectedSide === COINTOSS_FACE.HEADS ? "Tails" : "Heads"} side`}
-              className={cn(
-                "absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2 h-16 w-16",
-                "bg-transparent border-none p-0 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0",
-                isCoinClickable &&
-                  "cursor-pointer hover:scale-105 transition-transform focus:scale-105",
-                !isCoinClickable && "cursor-default",
-              )}
+              className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2"
             >
               <img
                 src={currentCoinIcon}
                 alt={selectedSide === COINTOSS_FACE.HEADS ? "Heads" : "Tails"}
                 className="h-16 w-16 pointer-events-none"
               />
-            </button>
+            </Button>
             <GameResultWindow
               isVisible={!!gameResult}
               isWin={gameResult?.isWin}
