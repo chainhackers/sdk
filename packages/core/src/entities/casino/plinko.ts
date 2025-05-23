@@ -20,8 +20,10 @@ export class Plinko extends WeightedGame {
    * @param houseEdge - The house edge to apply to each raw multiplier.
    *
    * @returns An array of game segments sorted in a bell-shaped order, where each segment contains:
-   *   - multiplier: the net multiplier (rounded to 2 decimals)
-   *   - rawMultiplier: the raw multiplier (before house edge)
+   *   - multiplier: the raw multiplier (before house edge, BP)
+   *   - formattedMultiplier: the raw multiplier formatted (rounded to 3 decimals)
+   *   - netMultiplier: the net multiplier (after house edge, BP)
+   *   - formattedNetMultiplier: the net multiplier formatted (rounded to 3 decimals)
    *   - chanceToWin: the probability of landing on this multiplier (in %)
    *   - color: the color associated with this segment
    */
@@ -29,25 +31,28 @@ export class Plinko extends WeightedGame {
     weightedGameConfig: WeightedGameConfiguration,
     houseEdge: number,
   ): {
-    multiplier: number;
-    rawMultiplier: number;
+    multiplier: number; // BP
+    formattedMultiplier: number;
+    netMultiplier: number; // BP
+    formattedNetMultiplier: number;
     chanceToWin: number;
     color: string;
   }[] {
     const totalWeight = weightedGameConfig.weights.reduce((acc, curr) => acc + curr, 0n);
 
     const entries = weightedGameConfig.multipliers.map((_, index) => {
-      const rawMultiplier = getNetMultiplier(
-        WeightedGame.getMultiplier(weightedGameConfig, index),
-        houseEdge,
-      );
+      const multiplier = WeightedGame.getMultiplier(weightedGameConfig, index);
 
       const weight = weightedGameConfig.weights[index]!;
       const color = weightedGameConfig.colors?.[index] || generateRandomHexColor();
 
       return {
-        multiplier: Number(rawMultiplier.toFixed(2)),
-        rawMultiplier,
+        multiplier: multiplier,
+        formattedMultiplier: WeightedGame._formatMultiplier(multiplier),
+        netMultiplier: getNetMultiplier(multiplier, houseEdge),
+        formattedNetMultiplier: WeightedGame._formatMultiplier(
+          getNetMultiplier(multiplier, houseEdge),
+        ),
         chanceToWin: Number(((Number(weight) / Number(totalWeight)) * 100).toFixed(2)),
         color,
         weight,

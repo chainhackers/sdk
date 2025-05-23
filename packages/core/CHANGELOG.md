@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.3-beta.1
+
+### Patch Changes
+
+- Update getUniqueOutputs & getSortedPlinkoOutputs
+
 ## 0.1.3-beta.0
 
 ### Patch Changes

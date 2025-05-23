@@ -7,5 +7,5 @@
     "@betswirl/sdk-core": "0.1.2",
     "@betswirl/wagmi-provider": "0.1.2"
   },
-  "changesets": ["calm-spiders-agree"]
+  "changesets": ["calm-spiders-agree", "real-weeks-study"]
 }

@@ -52,11 +52,15 @@ export class WeightedGame extends AbstractCasinoGame<
     return Number(weightedGameConfig.multipliers[position] ?? 0);
   }
 
+  protected static _formatMultiplier(multiplier: number): number {
+    return Number((multiplier / BP_VALUE).toFixed(3));
+  }
+
   static getFormattedMultiplier(
     weightedGameConfig: WeightedGameConfiguration,
     position: number,
   ): number {
-    return Number((WeightedGame.getMultiplier(weightedGameConfig, position) / BP_VALUE).toFixed(3));
+    return WeightedGame._formatMultiplier(WeightedGame.getMultiplier(weightedGameConfig, position));
   }
 
   static encodeInput(configId: WeightedGameConfigId): WeightedGameEncodedInput {
@@ -151,8 +155,10 @@ export class WeightedGame extends AbstractCasinoGame<
    * @param weightedGameConfig The configuration (weights, multipliers, colors, etc.)
    * @param houseEdge The house edge to apply for net multiplier calculation
    * @returns An array of objects representing each unique output:
-   *   - multiplier: the net multiplier (rounded to 2 decimals)
-   *   - rawMultiplier: the raw multiplier (before house edge)
+   *   - multiplier: the raw multiplier (before house edge, BP)
+   *   - formattedMultiplier: the raw multiplier formatted (rounded to 3 decimals)
+   *   - netMultiplier: the net multiplier (after house edge, BP)
+   *   - formattedNetMultiplier: the net multiplier formatted (rounded to 3 decimals)
    *   - chanceToWin: the probability of landing on this multiplier (in %)
    *   - color: the color associated with this segment
    *
@@ -167,36 +173,39 @@ export class WeightedGame extends AbstractCasinoGame<
     weightedGameConfig: WeightedGameConfiguration,
     houseEdge: number,
   ): {
-    multiplier: number;
-    rawMultiplier: number;
+    multiplier: number; // BP
+    formattedMultiplier: number;
+    netMultiplier: number; // BP
+    formattedNetMultiplier: number;
     chanceToWin: number;
     color: string;
   }[] {
     const uniqueMultipliers = new Map<number, { color: string; weight: bigint }>();
     const totalWeight = weightedGameConfig.weights.reduce((acc, curr) => acc + curr, 0n);
     weightedGameConfig.multipliers.forEach((_, index) => {
-      const netMultiplier = getNetMultiplier(
-        WeightedGame.getMultiplier(weightedGameConfig, index),
-        houseEdge,
-      );
-      if (!uniqueMultipliers.has(netMultiplier)) {
-        uniqueMultipliers.set(netMultiplier, {
+      const multiplier = WeightedGame.getMultiplier(weightedGameConfig, index);
+      if (!uniqueMultipliers.has(multiplier)) {
+        uniqueMultipliers.set(multiplier, {
           color: weightedGameConfig.colors?.[index] || generateRandomHexColor(),
           weight: weightedGameConfig.weights[index]!,
         });
       } else {
-        uniqueMultipliers.get(netMultiplier)!.weight =
-          uniqueMultipliers.get(netMultiplier)!.weight + weightedGameConfig.weights[index]!;
+        uniqueMultipliers.get(multiplier)!.weight =
+          uniqueMultipliers.get(multiplier)!.weight + weightedGameConfig.weights[index]!;
       }
     });
 
     return Array.from(uniqueMultipliers.entries())
       .map(([multiplier, config]) => ({
-        multiplier: Number(multiplier.toFixed(2)),
-        rawMultiplier: multiplier,
+        multiplier: multiplier,
+        formattedMultiplier: WeightedGame._formatMultiplier(multiplier),
+        netMultiplier: getNetMultiplier(multiplier, houseEdge),
+        formattedNetMultiplier: WeightedGame._formatMultiplier(
+          getNetMultiplier(multiplier, houseEdge),
+        ),
         chanceToWin: Number(((Number(config.weight) / Number(totalWeight)) * 100).toFixed(2)),
         color: config.color,
       }))
-      .sort((a, b) => a.rawMultiplier - b.rawMultiplier);
+      .sort((a, b) => a.multiplier - b.multiplier);
   }
 }
