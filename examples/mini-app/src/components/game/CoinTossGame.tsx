@@ -117,17 +117,17 @@ export function CoinTossGame({
 
   const tokenDecimals = balance?.decimals ?? 18;
 
-  const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet(COINTOSS_FACE.HEADS);
+  const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet();
   const isInGameResultState = !!gameResult;
 
   const handlePlayButtonClick = (betAmount: string) => {
     if (betStatus === "error") {
       resetBetState();
-      placeBet(parseEther(betAmount));
+      placeBet(parseEther(betAmount), COINTOSS_FACE.HEADS);
     } else if (isInGameResultState) {
       resetBetState();
     } else {
-      placeBet(parseEther(betAmount));
+      placeBet(parseEther(betAmount), COINTOSS_FACE.HEADS);
     }
   };
 
