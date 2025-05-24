@@ -256,7 +256,7 @@ export function GameFrame({
               <img
                 src={currentCoinIcon}
                 alt={selectedSide === COINTOSS_FACE.HEADS ? "Heads" : "Tails"}
-                className="h-16 w-16 pointer-events-none"
+                className="h-full w-auto pointer-events-none"
               />
             </Button>
             <GameResultWindow

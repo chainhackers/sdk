@@ -116,7 +116,7 @@ export const CoinButton: Story = {
       <img
         src={coinHeadsIcon}
         alt="Coin Heads"
-        className="h-16 w-16 pointer-events-none"
+        className="h-full w-auto pointer-events-none"
       />
     ),
   },
