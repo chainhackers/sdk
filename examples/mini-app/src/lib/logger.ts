@@ -1,51 +1,51 @@
 export interface Logger {
-  debug: (message: string, data?: unknown) => void
-  info: (message: string, data?: unknown) => void
-  warn: (message: string, data?: unknown) => void
-  error: (message: string, error?: Error | unknown, data?: unknown) => void
+  debug: (message: string, data?: unknown) => void;
+  info: (message: string, data?: unknown) => void;
+  warn: (message: string, data?: unknown) => void;
+  error: (message: string, error?: Error | unknown, data?: unknown) => void;
 }
 
 export function createLogger(moduleContext: string): Logger {
   const formatMessage = (level: string, message: string): string => {
-    return `[${moduleContext}] ${level.toUpperCase()}: ${message}`
-  }
+    return `[${moduleContext}] ${level.toUpperCase()}: ${message}`;
+  };
 
   return {
     debug: (message: string, data?: unknown) => {
-      const logMessage = formatMessage("debug", message)
+      const logMessage = formatMessage("debug", message);
       if (data !== undefined) {
-        console.log(logMessage, data)
+        console.log(logMessage, data);
       } else {
-        console.log(logMessage)
+        console.log(logMessage);
       }
     },
     info: (message: string, data?: unknown) => {
-      const logMessage = formatMessage("info", message)
+      const logMessage = formatMessage("info", message);
       if (data !== undefined) {
-        console.info(logMessage, data)
+        console.info(logMessage, data);
       } else {
-        console.info(logMessage)
+        console.info(logMessage);
       }
     },
     warn: (message: string, data?: unknown) => {
-      const logMessage = formatMessage("warn", message)
+      const logMessage = formatMessage("warn", message);
       if (data !== undefined) {
-        console.warn(logMessage, data)
+        console.warn(logMessage, data);
       } else {
-        console.warn(logMessage)
+        console.warn(logMessage);
       }
     },
     error: (message: string, error?: Error | unknown, data?: unknown) => {
-      const logMessage = formatMessage("error", message)
-      const paramsToLog: unknown[] = []
-      if (error !== undefined) paramsToLog.push(error)
-      if (data !== undefined) paramsToLog.push(data)
+      const logMessage = formatMessage("error", message);
+      const paramsToLog: unknown[] = [];
+      if (error !== undefined) paramsToLog.push(error);
+      if (data !== undefined) paramsToLog.push(data);
 
       if (paramsToLog.length > 0) {
-        console.error(logMessage, ...paramsToLog)
+        console.error(logMessage, ...paramsToLog);
       } else {
-        console.error(logMessage)
+        console.error(logMessage);
       }
     },
-  }
+  };
 }

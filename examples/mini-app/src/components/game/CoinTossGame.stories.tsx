@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { CoinTossGame } from "./CoinTossGame"
-import gameBg from "../../assets/game/game-background-1.png"
-import { AppProviders } from "../../../src/providers"
+import type { Meta, StoryObj } from "@storybook/react";
+import { AppProviders } from "../../../src/providers";
+import gameBg from "../../assets/game/game-background-1.png";
+import { CoinTossGame } from "./CoinTossGame";
 
 const meta = {
   title: "Game/CoinTossGame",
@@ -52,21 +52,21 @@ const meta = {
       accept: "image/*",
     },
   },
-} satisfies Meta<typeof CoinTossGame>
+} satisfies Meta<typeof CoinTossGame>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 const Template: Story = {
   render: (args) => <CoinTossGame {...args} />,
-}
+};
 
 export const LightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
   },
-}
+};
 
 export const DarkTheme: Story = {
   ...Template,
@@ -76,14 +76,14 @@ export const DarkTheme: Story = {
   parameters: {
     backgrounds: { default: "dark" },
   },
-}
+};
 
 export const SystemTheme: Story = {
   ...Template,
   args: {
     theme: "system",
   },
-}
+};
 
 export const CustomTheme1: Story = {
   ...Template,
@@ -95,7 +95,7 @@ export const CustomTheme1: Story = {
       "--game-window-overlay": "oklch(0 0 0 / 40%)",
     } as React.CSSProperties,
   },
-}
+};
 
 export const CustomTheme2: Story = {
   ...Template,
@@ -108,4 +108,4 @@ export const CustomTheme2: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg,
   },
-}
+};

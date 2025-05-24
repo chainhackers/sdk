@@ -1,10 +1,9 @@
-import React from "react"
-import type { Preview, Decorator } from "@storybook/react"
-import "../src/index.css"
+import type { Decorator, Preview } from "@storybook/react";
+import "../src/index.css";
 
 const withAppProviders: Decorator = (StoryComponent) => {
-  return <StoryComponent />
-}
+  return <StoryComponent />;
+};
 
 const preview: Preview = {
   parameters: {
@@ -16,6 +15,6 @@ const preview: Preview = {
     },
   },
   decorators: [withAppProviders],
-}
+};
 
-export default preview
+export default preview;
