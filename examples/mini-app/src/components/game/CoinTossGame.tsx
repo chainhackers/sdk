@@ -121,14 +121,17 @@ export function CoinTossGame({
   const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet()
   const isInGameResultState = !!gameResult
 
-  const handlePlayButtonClick = (betAmount: string) => {
+  const handlePlayButtonClick = (
+    betAmount: string,
+    selectedSide: COINTOSS_FACE,
+  ) => {
     if (betStatus === "error") {
       resetBetState()
-      placeBet(parseEther(betAmount), COINTOSS_FACE.HEADS)
+      placeBet(parseEther(betAmount), selectedSide)
     } else if (isInGameResultState) {
       resetBetState()
     } else {
-      placeBet(parseEther(betAmount), COINTOSS_FACE.HEADS)
+      placeBet(parseEther(betAmount), selectedSide)
     }
   }
 

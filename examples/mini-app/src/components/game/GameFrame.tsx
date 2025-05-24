@@ -1,7 +1,9 @@
 import { History, Info } from "lucide-react"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
-import coinIcon from "../../assets/game/coin-background-icon.png"
+import coinHeadsIcon from "../../assets/game/coin-heads.svg"
+import coinTailsIcon from "../../assets/game/coin-tails.svg"
 import { cn } from "../../lib/utils"
+import { COINTOSS_FACE } from "@betswirl/sdk-core"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
@@ -49,7 +51,7 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   balance: number
   connectWallletBtn: React.ReactNode
   isConnected: boolean
-  onPlayBtnClick: (betAmount: string) => void
+  onPlayBtnClick: (betAmount: string, selectedSide: COINTOSS_FACE) => void
   tokenDecimals: number
   gameResult: GameResultFormatted | null
   betStatus: BetStatus | null
@@ -72,6 +74,9 @@ export function GameFrame({
   const [betAmount, setBetAmount] = useState("0")
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
+  const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
+    COINTOSS_FACE.HEADS,
+  )
   const cardRef = useRef<HTMLDivElement>(null)
   const [isMounted, setIsMounted] = useState(false)
   const { theme } = themeSettings
@@ -126,9 +131,25 @@ export function GameFrame({
   const handlePlayBtnClick = () => {
     if (isInGameResultState) {
       setBetAmount("0")
+      setSelectedSide(COINTOSS_FACE.HEADS)
     }
-    onPlayBtnClick(betAmount)
+    onPlayBtnClick(betAmount, selectedSide)
   }
+
+  const handleCoinClick = () => {
+    if (!isConnected || betStatus === "pending" || !!gameResult) {
+      return
+    }
+    setSelectedSide((prevSide) =>
+      prevSide === COINTOSS_FACE.HEADS
+        ? COINTOSS_FACE.TAILS
+        : COINTOSS_FACE.HEADS,
+    )
+  }
+
+  const currentCoinIcon =
+    selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
+  const isCoinClickable = isConnected && betStatus !== "pending" && !gameResult
 
   return (
     <div
@@ -224,11 +245,20 @@ export function GameFrame({
             <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
               {multiplier.toFixed(2)} x
             </div>
-            <img
-              src={coinIcon}
-              alt="Coin"
-              className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2 h-16 w-16"
-            />
+            <Button
+              variant="coinButton"
+              size="coin"
+              onClick={handleCoinClick}
+              disabled={!isCoinClickable}
+              aria-label={`Select ${selectedSide === COINTOSS_FACE.HEADS ? "Tails" : "Heads"} side`}
+              className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2"
+            >
+              <img
+                src={currentCoinIcon}
+                alt={selectedSide === COINTOSS_FACE.HEADS ? "Heads" : "Tails"}
+                className="h-full w-auto pointer-events-none"
+              />
+            </Button>
             <GameResultWindow
               isVisible={!!gameResult}
               isWin={gameResult?.isWin}
