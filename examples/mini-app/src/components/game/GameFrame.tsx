@@ -282,6 +282,10 @@ export function GameFrame({
                 type="number"
                 placeholder="0"
                 min={0}
+                // Note: The real maximum is set by CoinTossGame and operates on the balance amount in bigint.
+                // Converting formattedBalance to a float here may lose precision for large values;
+                // however, a bigint-compatible approach is not required here because the actual maximum, if enforced,
+                // is handled by CoinTossGame using the balance amount as bigint.
                 max={Number.parseFloat(formattedBalance)}
                 step={STEP}
                 value={formattedBetAmount}
