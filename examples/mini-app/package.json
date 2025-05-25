@@ -7,8 +7,6 @@
   },
   "version": "0.0.2",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -16,10 +14,12 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:loki": "pnpm loki test --chromeTolerance 1",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
-    "@chainhackers/sdk-core": "^0.1.1",
+    "@betswirl/sdk-core": "^0.1.2-beta.3",
     "@coinbase/onchainkit": "^0.38.13",
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-label": "^2.1.4",
@@ -31,6 +31,7 @@
     "@tanstack/react-query": "^5.75.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "loki": "^0.35.1",
     "lucide-react": "^0.503.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -42,13 +43,12 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^3",
     "@eslint/js": "^9.22.0",
-    "@storybook/addon-essentials": "^8.6.12",
-    "@storybook/addon-onboarding": "^8.6.12",
-    "@storybook/blocks": "^8.6.12",
-    "@storybook/experimental-addon-test": "^8.6.12",
-    "@storybook/react": "^8.6.12",
-    "@storybook/react-vite": "^8.6.12",
-    "@storybook/test": "^8.6.12",
+    "@storybook/addon-essentials": "8.2.9",
+    "@storybook/addon-onboarding": "8.2.9",
+    "@storybook/blocks": "8.2.9",
+    "@storybook/react": "8.2.9",
+    "@storybook/react-vite": "8.2.9",
+    "@storybook/test": "8.2.9",
     "@types/node": "^22.15.3",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
@@ -70,6 +70,23 @@
     "vitest": "^3.1.2"
   },
   "eslintConfig": {
-    "extends": ["plugin:storybook/recommended"]
+    "extends": [
+      "plugin:storybook/recommended"
+    ]
+  },
+  "loki": {
+    "configurations": {
+      "chrome.laptop": {
+        "target": "chrome.docker",
+        "width": 1366,
+        "height": 768,
+        "deviceScaleFactor": 1,
+        "mobile": false
+      },
+      "chrome.iphone7": {
+        "target": "chrome.docker",
+        "preset": "iPhone 7"
+      }
+    }
   }
 }

@@ -16,9 +16,11 @@ const meta = {
   },
   tags: ["autodocs"],
   argTypes: {
-    result: {
-      control: "radio",
-      options: ["win", "loss", "pending"],
+    isVisible: {
+      control: "boolean",
+    },
+    isWin: {
+      control: "boolean",
     },
     amount: {
       control: "number",
@@ -37,9 +39,9 @@ type Story = StoryObj<typeof meta>
 
 const Template: Story = {
   args: {
-    result: "win",
+    isVisible: false,
     amount: 0.094,
-    payout: 1.094,
+    rolled: "HEADS",
     currency: "ETH",
   },
   render: (args) => (
@@ -52,10 +54,10 @@ const Template: Story = {
 export const WinLight: Story = {
   ...Template,
   args: {
-    result: "win",
-    amount: 0.094,
+    ...Template.args,
+    isVisible: true,
+    isWin: true,
     payout: 1.094,
-    currency: "ETH",
   },
   render: (args) => (
     <div className="light">
@@ -69,10 +71,11 @@ export const WinLight: Story = {
 export const LossLight: Story = {
   ...Template,
   args: {
-    result: "loss",
-    amount: 0.094,
+    ...Template.args,
+    isVisible: true,
+    isWin: false,
     payout: 0,
-    currency: "ETH",
+    rolled: "TAILS",
   },
   render: (args) => (
     <div className="light">
@@ -89,10 +92,10 @@ export const WinDark: Story = {
     backgrounds: { default: "dark" },
   },
   args: {
-    result: "win",
-    amount: 0.094,
+    ...Template.args,
+    isVisible: true,
+    isWin: true,
     payout: 1.094,
-    currency: "ETH",
   },
   render: (args) => (
     <div className="dark">
@@ -109,10 +112,11 @@ export const LossDark: Story = {
     backgrounds: { default: "dark" },
   },
   args: {
-    result: "loss",
-    amount: 0.094,
+    ...Template.args,
+    isVisible: true,
+    isWin: false,
     payout: 0,
-    currency: "ETH",
+    rolled: "TAILS",
   },
   render: (args) => (
     <div className="dark">
