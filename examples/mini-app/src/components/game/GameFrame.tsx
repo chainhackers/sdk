@@ -3,7 +3,7 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import coinHeadsIcon from "../../assets/game/coin-heads.svg"
 import coinTailsIcon from "../../assets/game/coin-tails.svg"
 import { cn } from "../../lib/utils"
-import { COINTOSS_FACE, formatRawAmount } from "@betswirl/sdk-core"
+import { COINTOSS_FACE, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
@@ -92,6 +92,7 @@ export function GameFrame({
   const fee = 0
 
   const formattedBalance = formatRawAmount(balance, tokenDecimals)
+  const formattedBetAmount = betAmount == undefined ? "" : formatRawAmount(betAmount, tokenDecimals, FORMAT_TYPE.PRECISE)
 
   const isInGameResultState = !!gameResult
   const isBettingInProgress = betStatus === "pending"
@@ -281,9 +282,9 @@ export function GameFrame({
                 type="number"
                 placeholder="0"
                 min={0}
-                max={Number.parseFloat(formatRawAmount(balance))}
+                max={Number.parseFloat(formattedBalance)}
                 step={STEP}
-                value={betAmount === undefined ? "" : formatRawAmount(betAmount, tokenDecimals)}
+                value={formattedBetAmount}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   const inputValue = e.target.value
                   
