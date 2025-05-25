@@ -22,6 +22,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-full",
         iconTransparent:
           "bg-secondary/20 text-secondary-foreground hover:bg-secondary/30 rounded-full border border-transparent-button-border",
+        coinButton:
+          "bg-transparent border-none p-0 outline-none focus:outline-none focus:ring-0 focus:ring-offset-0 hover:scale-104 transition-transform disabled:hover:scale-100 disabled:cursor-default disabled:opacity-90",
       },
       size: {
         default: "h-[42px] w-[120px]",
@@ -29,6 +31,7 @@ const buttonVariants = cva(
         lg: "h-12 rounded-md px-8 text-base font-bold",
         icon: "h-10 w-10",
         iconRound: "h-7 w-7",
+        coin: "h-[68px] w-[68px]",
       },
     },
     defaultVariants: {
