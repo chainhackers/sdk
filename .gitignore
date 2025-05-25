@@ -21,3 +21,4 @@ tsconfig.tsbuildinfo
 
 # subgraph type generation
 **/subgraphs/**/documents/**/*.ts
+.npmrc

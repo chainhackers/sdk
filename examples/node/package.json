@@ -17,8 +17,8 @@
   "license": "ISC",
   "dependencies": {
     "@apollo/client": "^3.12.11",
-    "@chainhackers/sdk-core": "^0.1.1",
-    "@chainhackers/wagmi-provider": "^0.1.1",
+    "@betswirl/sdk-core": "^0.1.2-beta.3",
+    "@betswirl/wagmi-provider": "^0.1.1",
     "@inquirer/prompts": "^7.3.1",
     "@wagmi/core": "^2.16.3",
     "viem": "^2.29.2"
