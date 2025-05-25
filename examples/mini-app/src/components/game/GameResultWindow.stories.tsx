@@ -41,7 +41,7 @@ type Story = StoryObj<typeof meta>
 const Template: Story = {
   args: {
     isVisible: false,
-    amount: parseUnits("0.094", 18),
+    amount: parseUnits("1.1234567", 18),
     rolled: "HEADS",
     currency: "ETH",
   },
@@ -58,7 +58,7 @@ export const WinLight: Story = {
     ...Template.args,
     isVisible: true,
     isWin: true,
-    payout: parseUnits("1.094", 18),
+    payout: parseUnits("1.1234567", 18) * 194n / 100n,
   },
   render: (args) => (
     <div className="light">
@@ -96,7 +96,7 @@ export const WinDark: Story = {
     ...Template.args,
     isVisible: true,
     isWin: true,
-    payout: parseUnits("1.094", 18),
+    payout: parseUnits("1.1234567", 18) * 194n / 100n,
   },
   render: (args) => (
     <div className="dark">

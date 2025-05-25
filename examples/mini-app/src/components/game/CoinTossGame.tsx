@@ -14,7 +14,7 @@ import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 
-const MULTIPLIER = 1970n
+const MULTIPLIER = 1940n
 const PRECISION = 10000n
 
 export interface CoinTossGameProps
