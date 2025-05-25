@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b2598ec6-8123-44dc-bcd7-e32076e7de76" name="Changes" comment="merge main">
+      <change afterPath="$PROJECT_DIR$/examples/node/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/node/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/examples/node/package.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2xGD7nUEkXVGfSwUNj2SFkNNQCe" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "27-prepare-mini-app-for-publication",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/anastasia/dev/chainhackers/repomix/sdk",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "prettierjs.PrettierConfiguration.Package": "/home/anastasia/dev/chainhackers/sdk/examples/mini-app/node_modules/prettier",
+    "ts.external.directory.path": "/home/anastasia/dev/chainhackers/sdk/examples/mini-app/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/examples/mini-app" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-WS-251.23774.424" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b2598ec6-8123-44dc-bcd7-e32076e7de76" name="Changes" comment="" />
+      <created>1747555352238</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1747555352238</updated>
+      <workItem from="1747555355365" duration="1092000" />
+      <workItem from="1747559488276" duration="5508000" />
+      <workItem from="1747567408151" duration="13760000" />
+      <workItem from="1747589942778" duration="1416000" />
+      <workItem from="1747594948013" duration="120000" />
+      <workItem from="1747642602072" duration="295000" />
+      <workItem from="1747642954433" duration="5342000" />
+      <workItem from="1748115866709" duration="11572000" />
+      <workItem from="1748193521427" duration="654000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="chore: publish wagmi and ui" />
+    <MESSAGE value="chore: publish wagmi and ui #27" />
+    <MESSAGE value="merge main" />
+    <option name="LAST_COMMIT_MESSAGE" value="merge main" />
+  </component>
+</project>
