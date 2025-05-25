@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
 
@@ -6,7 +6,6 @@ import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { useAccount, useBalance } from "wagmi"
-import { formatEther, formatUnits, parseEther } from "viem"
 
 import { type HistoryEntry } from "./HistorySheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
@@ -14,6 +13,9 @@ import { ETH_TOKEN } from "../../lib/tokens"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
+
+const MULTIPLIER = 1970n
+const PRECISION = 10000n
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -112,35 +114,51 @@ export function CoinTossGame({
   const { data: balance } = useBalance({
     address,
   })
-  const balanceFloat = balance
-    ? parseFloat(formatUnits(balance.value, balance.decimals))
-    : 0
-
   const tokenDecimals = balance?.decimals ?? 18
+
+  const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
 
   const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet()
   const isInGameResultState = !!gameResult
 
-  const handlePlayButtonClick = (
-    betAmount: string,
-    selectedSide: COINTOSS_FACE,
-  ) => {
-    if (betStatus === "error") {
+  const targetPayoutAmount = betAmount && betAmount > 0n
+    ? (betAmount * MULTIPLIER) / PRECISION
+    : 0n
+
+  const handlePlayButtonClick = (selectedSide: COINTOSS_FACE) => {
+    if (betStatus === "error" || isInGameResultState) {
       resetBetState()
-      placeBet(parseEther(betAmount), selectedSide)
-    } else if (isInGameResultState) {
-      resetBetState()
-    } else {
-      placeBet(parseEther(betAmount), selectedSide)
+    }
+    
+    if (isWalletConnected && betAmount && betAmount > 0n) {
+      placeBet(betAmount, selectedSide)
     }
   }
 
-  const gameResultFormatted = gameResult
-    ? {
-        ...gameResult,
-        payout: Number(formatEther(gameResult.payout)),
-      }
-    : null
+  const handleHalfBet = () => {
+    const currentAmount = betAmount ?? 0n
+    if (currentAmount > 0n) {
+      setBetAmount(currentAmount / 2n)
+    }
+  }
+
+  const handleDoubleBet = () => {
+    const currentAmount = betAmount ?? 0n
+    const doubledAmount = currentAmount * 2n
+    // Only limit to balance if connected
+    if (isWalletConnected) {
+      const maxAmount = balance?.value ?? 0n
+      setBetAmount(doubledAmount > maxAmount ? maxAmount : doubledAmount)
+    } else {
+      setBetAmount(doubledAmount)
+    }
+  }
+
+  const handleMaxBet = () => {
+    if (isWalletConnected) {
+      setBetAmount(balance?.value ?? 0n)
+    }
+  }
 
   return (
     <GameFrame
@@ -150,8 +168,14 @@ export function CoinTossGame({
       tokenDecimals={tokenDecimals}
       themeSettings={themeSettings}
       isConnected={isWalletConnected}
-      balance={balanceFloat}
-      gameResult={gameResultFormatted}
+      balance={balance?.value ?? 0n}
+      betAmount={betAmount}
+      setBetAmount={setBetAmount}
+      targetPayoutAmount={targetPayoutAmount}
+      onHalfBet={handleHalfBet}
+      onDoubleBet={handleDoubleBet}
+      onMaxBet={handleMaxBet}
+      gameResult={gameResult}
       betStatus={betStatus}
       connectWallletBtn={
         <Wallet>

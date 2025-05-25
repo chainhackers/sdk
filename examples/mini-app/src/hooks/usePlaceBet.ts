@@ -71,7 +71,7 @@ export function usePlaceBet() {
 
         const betParams = {
           game: CASINO_GAME_TYPE.COINTOSS,
-          gameEncodedInput: CoinToss.encodeInput(choice),
+          gameEncodedInput: CoinToss.encodeInput(String(choice).toLowerCase()),
           betAmount,
         }
 

@@ -3,6 +3,7 @@ import lossIcon from "../../assets/game/game-result/loss-icon.svg"
 import winBgWebp from "../../assets/game/game-result/win-bg.webp"
 import lossBgWebp from "../../assets/game/game-result/loss-bg.webp"
 import { useEffect } from "react"
+import { formatRawAmount } from "@betswirl/sdk-core"
 
 const images = {
   win: {
@@ -18,8 +19,8 @@ const images = {
 interface GameResultWindowProps {
   isWin?: boolean
   isVisible: boolean
-  amount: number
-  payout?: number
+  amount: bigint
+  payout?: bigint
   currency: string
   rolled: string
   className?: string
@@ -29,7 +30,7 @@ export function GameResultWindow({
   isWin = false,
   isVisible,
   amount,
-  payout = 0,
+  payout = 0n,
   currency,
   rolled,
   className,
@@ -74,7 +75,7 @@ export function GameResultWindow({
         </div>
         <p className="text-[16px] leading-[150%] font-bold">
           {sign}
-          {amount}
+          {formatRawAmount(amount)}
           <span className="uppercase"> {currency}</span>
         </p>
         <p className="text-[14px] leading-[157%] font-semibold">

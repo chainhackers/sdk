@@ -1,13 +1,15 @@
 import { History, Info } from "lucide-react"
-import { ChangeEvent, useEffect, useRef, useState } from "react"
+import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import coinHeadsIcon from "../../assets/game/coin-heads.svg"
 import coinTailsIcon from "../../assets/game/coin-tails.svg"
 import { cn } from "../../lib/utils"
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { COINTOSS_FACE, formatRawAmount } from "@betswirl/sdk-core"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
+import { parseUnits } from "viem"
+import Decimal from "decimal.js"
 
 import { TokenImage } from "@coinbase/onchainkit/token"
 
@@ -16,24 +18,7 @@ import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { GameResultWindow } from "./GameResultWindow"
-import { BetStatus, GameResultFormatted } from "../../types"
-
-function formatBetAmount(num: number, decimals: number): string {
-  if (Number.isNaN(num)) return "0"
-  if (num === 0) return "0"
-
-  let s = num.toFixed(decimals)
-
-  if (s.includes(".")) {
-    s = s.replace(/\.?0+$/, "")
-  }
-
-  if (s.endsWith(".")) {
-    s = s.slice(0, -1)
-  }
-
-  return s === "" || Number.isNaN(parseFloat(s)) ? "0" : s
-}
+import { BetStatus, GameResult } from "../../types"
 
 interface IThemeSettings {
   theme?: "light" | "dark" | "system"
@@ -48,13 +33,19 @@ interface IThemeSettings {
 interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   themeSettings: IThemeSettings
   historyData: HistoryEntry[]
-  balance: number
+  balance: bigint
   connectWallletBtn: React.ReactNode
   isConnected: boolean
-  onPlayBtnClick: (betAmount: string, selectedSide: COINTOSS_FACE) => void
+  onPlayBtnClick: (selectedSide: COINTOSS_FACE) => void
   tokenDecimals: number
-  gameResult: GameResultFormatted | null
+  gameResult: GameResult | null
   betStatus: BetStatus | null
+  betAmount: bigint | undefined
+  setBetAmount: (amount: bigint | undefined) => void
+  targetPayoutAmount: bigint
+  onHalfBet: () => void
+  onDoubleBet: () => void
+  onMaxBet: () => void
 }
 
 const STEP = 0.0001
@@ -69,9 +60,15 @@ export function GameFrame({
   tokenDecimals,
   gameResult,
   betStatus,
+  betAmount,
+  setBetAmount,
+  targetPayoutAmount,
+  onHalfBet,
+  onDoubleBet,
+  onMaxBet,
   ...props
 }: GameFrameProps) {
-  const [betAmount, setBetAmount] = useState("0")
+  const [betAmountError, setBetAmountError] = useState<string | null>(null)
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
   const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
@@ -87,25 +84,19 @@ export function GameFrame({
     setIsMounted(true)
   }, [])
 
-  const isBetAmountInvalid =
-    Number.isNaN(Number.parseFloat(betAmount)) ||
-    Number.parseFloat(betAmount || "0") <= 0
+  const isBetAmountValid = betAmount && betAmount > 0n
 
   const multiplier = 1.94
   const winChance = 50
-  const parsedBetAmountForPayout = Number.parseFloat(betAmount || "0")
-  const targetPayout = (
-    (Number.isNaN(parsedBetAmountForPayout) ? 0 : parsedBetAmountForPayout) *
-    multiplier
-  ).toFixed(2)
+  const targetPayout = formatRawAmount(targetPayoutAmount, tokenDecimals)
   const fee = 0
 
-  const formattedBalance = balance.toFixed(4)
+  const formattedBalance = formatRawAmount(balance, tokenDecimals)
 
   const isInGameResultState = !!gameResult
   const isBettingInProgress = betStatus === "pending"
   const canInitiateBet =
-    isConnected && !isBetAmountInvalid && !isBettingInProgress
+    isConnected && isBetAmountValid && !isBettingInProgress
 
   const isErrorState = betStatus === "error"
 
@@ -130,10 +121,10 @@ export function GameFrame({
 
   const handlePlayBtnClick = () => {
     if (isInGameResultState) {
-      setBetAmount("0")
+      setBetAmount(0n)
       setSelectedSide(COINTOSS_FACE.HEADS)
     }
-    onPlayBtnClick(betAmount, selectedSide)
+    onPlayBtnClick(selectedSide)
   }
 
   const handleCoinClick = () => {
@@ -262,7 +253,7 @@ export function GameFrame({
             <GameResultWindow
               isVisible={!!gameResult}
               isWin={gameResult?.isWin}
-              amount={Number(betAmount)}
+              amount={betAmount || 0n}
               payout={gameResult?.payout}
               currency="ETH"
               rolled={gameResult?.rolled || ""}
@@ -290,11 +281,33 @@ export function GameFrame({
                 type="number"
                 placeholder="0"
                 min={0}
-                max={balance}
+                max={Number.parseFloat(formatRawAmount(balance))}
                 step={STEP}
-                value={betAmount}
+                value={betAmount === undefined ? "" : formatRawAmount(betAmount, tokenDecimals)}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setBetAmount(e.target.value)
+                  const inputValue = e.target.value
+                  
+                  if (inputValue === "") {
+                    setBetAmount(undefined)
+                    setBetAmountError(null)
+                    return
+                  }
+                  
+                  try {
+                    new Decimal(inputValue)
+                    
+                    try {
+                      const weiValue = parseUnits(inputValue, tokenDecimals)
+                      setBetAmount(weiValue)
+                      setBetAmountError(null)
+                    } catch {
+                      setBetAmount(undefined)
+                      setBetAmountError("Invalid number format")
+                    }
+                  } catch {
+                    setBetAmount(undefined)
+                    setBetAmountError("Invalid decimal number")
+                  }
                 }}
                 className="relative"
                 token={{
@@ -305,17 +318,14 @@ export function GameFrame({
                   !isConnected || betStatus === "pending" || !!gameResult
                 }
               />
+              {betAmountError && (
+                <div className="text-red-500 text-xs mt-1">{betAmountError}</div>
+              )}
 
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   variant="secondary"
-                  onClick={() => {
-                    setBetAmount((prev) => {
-                      const prevNum = Number.parseFloat(prev || "0")
-                      if (Number.isNaN(prevNum) || prevNum === 0) return "0"
-                      return formatBetAmount(prevNum / 2, tokenDecimals)
-                    })
-                  }}
+                  onClick={onHalfBet}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   disabled={
                     !isConnected || isBettingInProgress || isInGameResultState
@@ -325,14 +335,7 @@ export function GameFrame({
                 </Button>
                 <Button
                   variant="secondary"
-                  onClick={() => {
-                    setBetAmount((prev) => {
-                      const oldNum = Number.parseFloat(prev || "0")
-                      const newAmount = oldNum * 2
-                      const finalAmount = Math.min(balance, newAmount)
-                      return formatBetAmount(finalAmount, tokenDecimals)
-                    })
-                  }}
+                  onClick={onDoubleBet}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   disabled={
                     !isConnected || isBettingInProgress || isInGameResultState
@@ -343,9 +346,7 @@ export function GameFrame({
                 <Button
                   variant="secondary"
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  onClick={() => {
-                    setBetAmount(formattedBalance)
-                  }}
+                  onClick={onMaxBet}
                   disabled={
                     !isConnected || isBettingInProgress || isInGameResultState
                   }
