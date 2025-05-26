@@ -12,9 +12,20 @@ export default defineConfig({
     },
   },
   build: {
+    lib: {
+      entry: path.resolve(__dirname, "src/index.ts"),
+      name: "ChainhackersUI",
+      formats: ["es", "cjs"],
+      fileName: (format) => `index.${format === "es" ? "mjs" : "js"}`,
+    },
     rollupOptions: {
+      external: ["react", "react-dom"],
       output: {
-        assetFileNames: "assets/[name].[ext]", // Save file names and structure
+        globals: {
+          react: "React",
+          "react-dom": "ReactDOM",
+        },
+        assetFileNames: "assets/[name].[ext]",
       },
     },
   },

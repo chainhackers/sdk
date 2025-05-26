@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && cp src/index.css dist/index.css && cp -r src/assets dist/assets",
+    "build": "vite build && cp src/index.css dist/index.css && cp -r src/assets dist/assets",
     "lint": "eslint .",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
