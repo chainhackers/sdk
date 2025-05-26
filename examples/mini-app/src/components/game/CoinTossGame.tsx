@@ -4,12 +4,10 @@ import { cn } from "../../lib/utils"
 
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
-import { TokenImage } from "@coinbase/onchainkit/token"
-import { useAccount, useBalance } from "wagmi"
+import { useAccount } from "wagmi"
+import { useGameHistory } from "../../hooks/useGameHistory"
+import { useBalance } from "wagmi"
 import { formatEther, formatUnits, parseEther } from "viem"
-
-import { type HistoryEntry } from "./HistorySheetPanel"
-import { ETH_TOKEN } from "../../lib/tokens"
 
 import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
@@ -26,81 +24,6 @@ export interface CoinTossGameProps
   backgroundImage?: string
 }
 
-const mockHistoryData: HistoryEntry[] = [
-  {
-    id: "1",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: "1.94675",
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~24h ago",
-  },
-  {
-    id: "2",
-    status: "Won bet",
-    multiplier: 1.2,
-    payoutAmount: 0.2,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "3",
-    status: "Busted",
-    multiplier: 1.94,
-    payoutAmount: 1.94,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "4",
-    status: "Won bet",
-    multiplier: 1.946,
-    payoutAmount: 2.453,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "5",
-    status: "Busted",
-    multiplier: 1.94,
-    payoutAmount: 1.94,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "6",
-    status: "Won bet",
-    multiplier: 1.946,
-    payoutAmount: 2.453,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "7",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "8",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "9",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-]
-
 export function CoinTossGame({
   theme = "system",
   customTheme,
@@ -109,6 +32,7 @@ export function CoinTossGame({
 }: CoinTossGameProps) {
   const themeSettings = { theme, customTheme, backgroundImage }
   const { isConnected: isWalletConnected, address } = useAccount()
+  const { gameHistory } = useGameHistory(address)
   const { data: balance } = useBalance({
     address,
   })
@@ -146,7 +70,7 @@ export function CoinTossGame({
     <GameFrame
       {...props}
       onPlayBtnClick={handlePlayButtonClick}
-      historyData={mockHistoryData}
+      historyData={gameHistory}
       tokenDecimals={tokenDecimals}
       themeSettings={themeSettings}
       isConnected={isWalletConnected}
