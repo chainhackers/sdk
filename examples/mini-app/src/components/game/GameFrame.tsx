@@ -3,7 +3,7 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import coinHeadsIcon from "../../assets/game/coin-heads.svg"
 import coinTailsIcon from "../../assets/game/coin-tails.svg"
 import { cn } from "../../lib/utils"
-import { COINTOSS_FACE, formatRawAmount } from "@betswirl/sdk-core"
+import { COINTOSS_FACE, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
@@ -71,6 +71,8 @@ export function GameFrame({
   const [betAmountError, setBetAmountError] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState<string>("")
   const [isValidInput, setIsValidInput] = useState<boolean>(true)
+  const [isUserTyping, setIsUserTyping] = useState<boolean>(false)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
   const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
@@ -84,19 +86,28 @@ export function GameFrame({
 
   useEffect(() => {
     setIsMounted(true)
+    
+    // Cleanup timeout on unmount
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
   }, [])
 
-  // Sync inputValue with external betAmount changes from buttons
+  // Sync inputValue with external betAmount changes from buttons (but not when user is typing)
   useEffect(() => {
+    if (isUserTyping) return
+    
     if (betAmount === undefined) {
       setInputValue("")
       setIsValidInput(true)
     } else {
-      const formatted = formatRawAmount(betAmount, tokenDecimals)
+      const formatted = formatRawAmount(betAmount, tokenDecimals, FORMAT_TYPE.PRECISE)
       setInputValue(formatted)
       setIsValidInput(true)
     }
-  }, [betAmount, tokenDecimals])
+  }, [betAmount, tokenDecimals, isUserTyping])
 
   const isBetAmountValid = betAmount && betAmount > 0n
 
@@ -306,6 +317,17 @@ export function GameFrame({
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   const newInputValue = e.target.value
                   setInputValue(newInputValue)
+                  setIsUserTyping(true)
+                  
+                  // Clear existing timeout
+                  if (typingTimeoutRef.current) {
+                    clearTimeout(typingTimeoutRef.current)
+                  }
+                  
+                  // Set new timeout to stop typing state after 1 second
+                  typingTimeoutRef.current = setTimeout(() => {
+                    setIsUserTyping(false)
+                  }, 1000)
                   
                   if (newInputValue === "") {
                     setBetAmount(undefined)
