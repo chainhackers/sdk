@@ -202,7 +202,7 @@ export function GameFrame({
                   size="iconRound"
                   className={cn(
                     "absolute top-2 right-2 z-5",
-                    "text-white border border-border-stroke bg-neutral-background",
+                    "text-white border border-border-stroke",
                     isHistorySheetOpen && "text-primary border-primary",
                   )}
                 >
