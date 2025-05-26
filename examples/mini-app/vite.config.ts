@@ -12,22 +12,53 @@ export default defineConfig({
     },
   },
   build: {
-    emptyOutDir: false,
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
       name: "ChainhackersUI",
-      formats: ["es", "cjs"],
       fileName: (format) => `index.${format === "es" ? "mjs" : "js"}`,
     },
     rollupOptions: {
-      external: ["react", "react-dom"],
+      external: [
+        "react",
+        "react-dom",
+        "@betswirl/sdk-core",
+        "@coinbase/onchainkit",
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-label",
+        "@radix-ui/react-popover",
+        "@radix-ui/react-scroll-area",
+        "@radix-ui/react-slider",
+        "@radix-ui/react-slot",
+        "@tailwindcss/vite",
+        "@tanstack/react-query",
+        "class-variance-authority",
+        "clsx",
+        "loki",
+        "lucide-react",
+        "tailwind-merge",
+        "tailwindcss",
+        "tw-animate-css",
+        "viem",
+        "wagmi",
+      ],
       output: {
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
         },
-        assetFileNames: "assets/[name].[ext]",
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith(".css")) {
+            return "index.css";
+          }
+          // Copy assets to dist/assets/ preserving structure
+          return "assets/[name][extname]";
+        },
+        // Transform asset paths in components
+        entryFileNames: "index.[format].js",
+        chunkFileNames: "chunks/[name].[format].js",
       },
     },
+    emptyOutDir: false,
+    copyPublicDir: false, // Disable automatic publicDir copying
   },
 })
