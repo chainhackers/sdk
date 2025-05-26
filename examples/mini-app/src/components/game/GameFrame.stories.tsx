@@ -111,7 +111,8 @@ const Template: Story = {
     balance: 1.7,
     connectWallletBtn: connectWalletBtnStub,
     isConnected: false,
-    onPlayBtnClick: (betAmount: string) => console.log("betAmount: ", betAmount),
+    onPlayBtnClick: (betAmount: string, selectedSide: COINTOSS_FACE) =>
+      console.log("betAmount: ", betAmount, "selectedSide: ", selectedSide),
     tokenDecimals: 18,
     gameResult: null,
     betStatus: null,

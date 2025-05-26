@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Info } from "lucide-react";
+import coinHeadsIcon from "../../assets/game/coin-heads.svg";
 import { Button } from "./button";
 
 const meta = {
@@ -21,11 +22,12 @@ const meta = {
         "link",
         "iconRound",
         "iconTransparent",
+        "coinButton",
       ],
     },
     size: {
       control: "select",
-      options: ["default", "sm", "lg", "icon", "iconRound"],
+      options: ["default", "sm", "lg", "icon", "iconRound", "coin"],
     },
     disabled: { control: "boolean" },
   },
@@ -103,6 +105,16 @@ export const IconTransparent: Story = {
     variant: "iconTransparent",
     size: "iconRound",
     children: <Info className="h-4 w-4" />,
+  },
+};
+
+export const CoinButton: Story = {
+  args: {
+    variant: "coinButton",
+    size: "coin",
+    children: (
+      <img src={coinHeadsIcon} alt="Coin Heads" className="h-full w-auto pointer-events-none" />
+    ),
   },
 };
 
