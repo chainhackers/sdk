@@ -15,7 +15,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
       name: "ChainhackersUI",
-      fileName: (format) => `index.${format === "es" ? "mjs" : "js"}`,
+      formats: ["es", "cjs"],
     },
     rollupOptions: {
       external: [
@@ -41,22 +41,34 @@ export default defineConfig({
         "viem",
         "wagmi",
       ],
-      output: {
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
+      output: [
+        {
+          format: "es",
+          entryFileNames: "index.mjs",
+          chunkFileNames: "chunks/[name].js",
+          assetFileNames: (assetInfo) => {
+            if (assetInfo.name && assetInfo.name.endsWith(".css")) {
+              return "index.css";
+            }
+            return "assets/[name][extname]";
+          },
         },
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name && assetInfo.name.endsWith(".css")) {
-            return "index.css";
-          }
-          // Copy assets to dist/assets/ preserving structure
-          return "assets/[name][extname]";
+        {
+          format: "cjs",
+          entryFileNames: "index.js",
+          chunkFileNames: "chunks/[name].js",
+          assetFileNames: (assetInfo) => {
+            if (assetInfo.name && assetInfo.name.endsWith(".css")) {
+              return "index.css";
+            }
+            return "assets/[name][extname]";
+          },
+          globals: {
+            react: "React",
+            "react-dom": "ReactDOM",
+          },
         },
-        // Transform asset paths in components
-        entryFileNames: "index.[format].js",
-        chunkFileNames: "chunks/[name].[format].js",
-      },
+      ],
     },
     emptyOutDir: false,
     copyPublicDir: false, // Disable automatic publicDir copying
