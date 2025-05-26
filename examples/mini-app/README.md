@@ -58,3 +58,27 @@ export default tseslint.config({
 ```shell
 setfacl -R -m u:dev-components:rwx /var/www/betswirl-sdk/
 ```
+
+## Running Mini-App from SDK
+
+If you have downloaded the SDK library and want to run the test mini-app:
+
+1. Navigate to the mini-app folder:
+```shell
+cd examples/mini-app
+```
+
+2. Install dependencies (ignore workspace):
+```shell
+pnpm install --ignore-workspace
+```
+
+3. Start Storybook:
+```shell
+pnpm storybook
+```
+
+4. Open in browser:
+```
+Local: http://localhost:6006/
+```
