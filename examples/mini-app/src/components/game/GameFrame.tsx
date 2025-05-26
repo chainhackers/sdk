@@ -3,7 +3,7 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import coinHeadsIcon from "../../assets/game/coin-heads.svg"
 import coinTailsIcon from "../../assets/game/coin-tails.svg"
 import { cn } from "../../lib/utils"
-import { COINTOSS_FACE, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
+import { COINTOSS_FACE, formatRawAmount } from "@betswirl/sdk-core"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
@@ -69,6 +69,8 @@ export function GameFrame({
   ...props
 }: GameFrameProps) {
   const [betAmountError, setBetAmountError] = useState<string | null>(null)
+  const [inputValue, setInputValue] = useState<string>("")
+  const [isValidInput, setIsValidInput] = useState<boolean>(true)
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
   const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
@@ -84,6 +86,18 @@ export function GameFrame({
     setIsMounted(true)
   }, [])
 
+  // Sync inputValue with external betAmount changes from buttons
+  useEffect(() => {
+    if (betAmount === undefined) {
+      setInputValue("")
+      setIsValidInput(true)
+    } else {
+      const formatted = formatRawAmount(betAmount, tokenDecimals)
+      setInputValue(formatted)
+      setIsValidInput(true)
+    }
+  }, [betAmount, tokenDecimals])
+
   const isBetAmountValid = betAmount && betAmount > 0n
 
   const multiplier = 1.94
@@ -92,7 +106,6 @@ export function GameFrame({
   const fee = 0
 
   const formattedBalance = formatRawAmount(balance, tokenDecimals)
-  const formattedBetAmount = betAmount == undefined ? "" : formatRawAmount(betAmount, tokenDecimals, FORMAT_TYPE.PRECISE)
 
   const isInGameResultState = !!gameResult
   const isBettingInProgress = betStatus === "pending"
@@ -123,6 +136,7 @@ export function GameFrame({
   const handlePlayBtnClick = () => {
     if (isInGameResultState) {
       setBetAmount(0n)
+      setInputValue("")
       setSelectedSide(COINTOSS_FACE.HEADS)
     }
     onPlayBtnClick(selectedSide)
@@ -288,33 +302,39 @@ export function GameFrame({
                 // is handled by CoinTossGame using the balance amount as bigint.
                 max={Number.parseFloat(formattedBalance)}
                 step={STEP}
-                value={formattedBetAmount}
+                value={inputValue}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const inputValue = e.target.value
+                  const newInputValue = e.target.value
+                  setInputValue(newInputValue)
                   
-                  if (inputValue === "") {
+                  if (newInputValue === "") {
                     setBetAmount(undefined)
+                    setIsValidInput(true)
                     setBetAmountError(null)
                     return
                   }
                   
                   try {
-                    new Decimal(inputValue)
+                    new Decimal(newInputValue)
                     
                     try {
-                      const weiValue = parseUnits(inputValue, tokenDecimals)
+                      const weiValue = parseUnits(newInputValue, tokenDecimals)
                       setBetAmount(weiValue)
+                      setIsValidInput(true)
                       setBetAmountError(null)
                     } catch {
-                      setBetAmount(undefined)
-                      setBetAmountError("Invalid number format")
+                      setIsValidInput(false)
+                      setBetAmountError(null)
                     }
                   } catch {
-                    setBetAmount(undefined)
-                    setBetAmountError("Invalid decimal number")
+                    setIsValidInput(false)
+                    setBetAmountError(null)
                   }
                 }}
-                className="relative"
+                className={cn(
+                  "relative",
+                  !isValidInput && "[&_input]:text-muted-foreground"
+                )}
                 token={{
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
                   symbol: "ETH",
