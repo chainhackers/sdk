@@ -5,7 +5,7 @@
     "url": "https://github.com/chainhackers/sdk.git",
     "directory": "examples/mini-app"
   },
-  "version": "0.0.6",
+  "version": "0.0.8",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp src/index.css dist/index.css && cp -r src/assets dist/assets",
+    "build": "tsc -b && vite build && cp src/index.css dist/index.css && cp -r src/assets dist/assets",
     "lint": "eslint .",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
