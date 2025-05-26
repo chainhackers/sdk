@@ -45,7 +45,7 @@ export default defineConfig({
         {
           format: "es",
           entryFileNames: "index.mjs",
-          chunkFileNames: "chunks/[name].js",
+          chunkFileNames: "chunks/[name].mjs",
           assetFileNames: (assetInfo) => {
             if (assetInfo.name && assetInfo.name.endsWith(".css")) {
               return "index.css";
@@ -62,10 +62,6 @@ export default defineConfig({
               return "index.css";
             }
             return "assets/[name][extname]";
-          },
-          globals: {
-            react: "React",
-            "react-dom": "ReactDOM",
           },
         },
       ],
