@@ -32,7 +32,7 @@ export function CoinTossGame({
 }: CoinTossGameProps) {
   const themeSettings = { theme, customTheme, backgroundImage }
   const { isConnected: isWalletConnected, address } = useAccount()
-  const { gameHistory } = useGameHistory(address)
+  const { gameHistory, refreshHistory } = useGameHistory(address)
   const { data: balance } = useBalance({
     address,
   })
@@ -77,6 +77,7 @@ export function CoinTossGame({
       balance={balanceFloat}
       gameResult={gameResultFormatted}
       betStatus={betStatus}
+      onHistoryOpen={refreshHistory}
       connectWallletBtn={
         <Wallet>
           <ConnectWallet

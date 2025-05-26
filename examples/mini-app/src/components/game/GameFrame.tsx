@@ -55,6 +55,7 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   tokenDecimals: number
   gameResult: GameResultFormatted | null
   betStatus: BetStatus | null
+  onHistoryOpen: () => void
 }
 
 const STEP = 0.0001
@@ -69,6 +70,7 @@ export function GameFrame({
   tokenDecimals,
   gameResult,
   betStatus,
+  onHistoryOpen,
   ...props
 }: GameFrameProps) {
   const [betAmount, setBetAmount] = useState("0")
@@ -147,6 +149,13 @@ export function GameFrame({
     )
   }
 
+  const handleHistoryOpen = (open: boolean) => {
+    if (open) {
+      onHistoryOpen()
+    }
+    setIsHistorySheetOpen(open)
+  }
+
   const currentCoinIcon =
     selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
   const isCoinClickable = isConnected && betStatus !== "pending" && !gameResult
@@ -217,10 +226,7 @@ export function GameFrame({
               )}
             </Sheet>
 
-            <Sheet
-              open={isHistorySheetOpen}
-              onOpenChange={setIsHistorySheetOpen}
-            >
+            <Sheet open={isHistorySheetOpen} onOpenChange={handleHistoryOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="iconTransparent"
