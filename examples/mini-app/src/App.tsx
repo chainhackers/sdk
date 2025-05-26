@@ -1,8 +1,8 @@
-import "./App.css"
-import { CoinTossGame } from "./components/game/CoinTossGame"
+import "./App.css";
+import { CoinTossGame } from "./components/game/CoinTossGame";
 
 function App() {
-  return <CoinTossGame />
+  return <CoinTossGame />;
 }
 
-export default App
+export default App;

@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { GameResultWindow } from "./GameResultWindow"
+import type { Meta, StoryObj } from "@storybook/react";
+import { GameResultWindow } from "./GameResultWindow";
 
 const meta = {
   title: "Game/GameResultWindow",
@@ -32,10 +32,10 @@ const meta = {
       control: "text",
     },
   },
-} satisfies Meta<typeof GameResultWindow>
+} satisfies Meta<typeof GameResultWindow>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 const Template: Story = {
   args: {
@@ -49,7 +49,7 @@ const Template: Story = {
       <GameResultWindow {...args} />
     </div>
   ),
-}
+};
 
 export const WinLight: Story = {
   ...Template,
@@ -66,7 +66,7 @@ export const WinLight: Story = {
       </div>
     </div>
   ),
-}
+};
 
 export const LossLight: Story = {
   ...Template,
@@ -84,7 +84,7 @@ export const LossLight: Story = {
       </div>
     </div>
   ),
-}
+};
 
 export const WinDark: Story = {
   ...Template,
@@ -104,7 +104,7 @@ export const WinDark: Story = {
       </div>
     </div>
   ),
-}
+};
 
 export const LossDark: Story = {
   ...Template,
@@ -125,4 +125,4 @@ export const LossDark: Story = {
       </div>
     </div>
   ),
-}
+};

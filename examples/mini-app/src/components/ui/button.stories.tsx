@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { Info } from "lucide-react"
-import { Button } from "./button"
-import coinHeadsIcon from "../../assets/game/coin-heads.svg"
+import type { Meta, StoryObj } from "@storybook/react";
+import { Info } from "lucide-react";
+import coinHeadsIcon from "../../assets/game/coin-heads.svg";
+import { Button } from "./button";
 
 const meta = {
   title: "UI/Button",
@@ -37,52 +37,52 @@ const meta = {
     disabled: false,
     children: "Button Text",
   },
-} satisfies Meta<typeof Button>
+} satisfies Meta<typeof Button>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
     variant: "default",
     children: "Default Button",
   },
-}
+};
 
 export const Secondary: Story = {
   args: {
     variant: "secondary",
     children: "Secondary Button",
   },
-}
+};
 
 export const Destructive: Story = {
   args: {
     variant: "destructive",
     children: "Destructive Button",
   },
-}
+};
 
 export const Outline: Story = {
   args: {
     variant: "outline",
     children: "Outline Button",
   },
-}
+};
 
 export const Ghost: Story = {
   args: {
     variant: "ghost",
     children: "Ghost Button",
   },
-}
+};
 
 export const Link: Story = {
   args: {
     variant: "link",
     children: "Link Button",
   },
-}
+};
 
 export const Icon: Story = {
   args: {
@@ -90,7 +90,7 @@ export const Icon: Story = {
     size: "icon",
     children: <Info className="h-4 w-4" />,
   },
-}
+};
 
 export const IconRound: Story = {
   args: {
@@ -98,7 +98,7 @@ export const IconRound: Story = {
     size: "iconRound",
     children: <Info className="h-4 w-4" />,
   },
-}
+};
 
 export const IconTransparent: Story = {
   args: {
@@ -106,25 +106,21 @@ export const IconTransparent: Story = {
     size: "iconRound",
     children: <Info className="h-4 w-4" />,
   },
-}
+};
 
 export const CoinButton: Story = {
   args: {
     variant: "coinButton",
     size: "coin",
     children: (
-      <img
-        src={coinHeadsIcon}
-        alt="Coin Heads"
-        className="h-full w-auto pointer-events-none"
-      />
+      <img src={coinHeadsIcon} alt="Coin Heads" className="h-full w-auto pointer-events-none" />
     ),
   },
-}
+};
 
 export const Disabled: Story = {
   args: {
     disabled: true,
     children: "Disabled Button",
   },
-}
+};

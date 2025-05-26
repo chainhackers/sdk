@@ -1,8 +1,8 @@
-import winIcon from "../../assets/game/game-result/win-icon.svg"
-import lossIcon from "../../assets/game/game-result/loss-icon.svg"
-import winBgWebp from "../../assets/game/game-result/win-bg.webp"
-import lossBgWebp from "../../assets/game/game-result/loss-bg.webp"
-import { useEffect } from "react"
+import { useEffect } from "react";
+import lossBgWebp from "../../assets/game/game-result/loss-bg.webp";
+import lossIcon from "../../assets/game/game-result/loss-icon.svg";
+import winBgWebp from "../../assets/game/game-result/win-bg.webp";
+import winIcon from "../../assets/game/game-result/win-icon.svg";
 
 const images = {
   win: {
@@ -13,16 +13,16 @@ const images = {
     bg: lossBgWebp,
     icon: lossIcon,
   },
-} as const
+} as const;
 
 interface GameResultWindowProps {
-  isWin?: boolean
-  isVisible: boolean
-  amount: number
-  payout?: number
-  currency: string
-  rolled: string
-  className?: string
+  isWin?: boolean;
+  isVisible: boolean;
+  amount: number;
+  payout?: number;
+  currency: string;
+  rolled: string;
+  className?: string;
 }
 
 export function GameResultWindow({
@@ -34,24 +34,24 @@ export function GameResultWindow({
   rolled,
   className,
 }: GameResultWindowProps) {
-  const resultType = isWin ? "win" : "loss"
-  const currentImages = images[resultType]
-  const sign = isWin ? "+" : "-"
+  const resultType = isWin ? "win" : "loss";
+  const currentImages = images[resultType];
+  const sign = isWin ? "+" : "-";
 
   useEffect(() => {
     const preloadImg = (imgSrc: string) => {
-      const img = new Image()
-      img.src = imgSrc
-    }
+      const img = new Image();
+      img.src = imgSrc;
+    };
 
-    Object.values(images).forEach(({ bg, icon }) => {
-      preloadImg(bg)
-      preloadImg(icon)
-    })
-  }, [])
+    for (const image of Object.values(images)) {
+      preloadImg(image.bg);
+      preloadImg(image.icon);
+    }
+  }, []);
 
   if (!isVisible) {
-    return null
+    return null;
   }
 
   return (
@@ -66,11 +66,7 @@ export function GameResultWindow({
 
       <div className="flex flex-col items-center gap-[8px] text-center relative">
         <div className="w-[48px] h-[44px] flex items-center justify-center bg-game-result-icon-bg relative rounded-[6px]">
-          <img
-            className="absolute"
-            src={currentImages.icon}
-            alt={`${resultType} icon`}
-          />
+          <img className="absolute" src={currentImages.icon} alt={`${resultType} icon`} />
         </div>
         <p className="text-[16px] leading-[150%] font-bold">
           {sign}
@@ -81,10 +77,8 @@ export function GameResultWindow({
           Payout: {payout}
           <span className="uppercase"> {currency}</span>
         </p>
-        <p className="text-[12px] leading-[167%] font-medium uppercase">
-          Draw: {rolled}
-        </p>
+        <p className="text-[12px] leading-[167%] font-medium uppercase">Draw: {rolled}</p>
       </div>
     </div>
-  )
+  );
 }
