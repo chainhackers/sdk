@@ -50,9 +50,10 @@ export const useGameHistory = (userAddress: string | undefined) => {
   const { chainId } = useAccount()
 
   const fetchHistoryLogic = useCallback(async () => {
-    if (!userAddress) {
+    if (!userAddress || !chainId) {
       setGameHistory([])
       setIsLoading(false)
+      logger.error("No user address or chain id", { userAddress, chainId })
       return
     }
 
