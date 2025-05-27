@@ -5,11 +5,15 @@ import {
   OrderDirection,
   CasinoBet,
   CasinoChainId,
+  formatRawAmount,
+  FORMAT_TYPE,
 } from "@betswirl/sdk-core"
-import { formatUnits } from "viem"
 import { useAccount } from "wagmi"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { ETH_TOKEN } from "../lib/tokens"
+import { createLogger } from "../lib/logger"
+
+const logger = createLogger("useGameHistory")
 
 export interface HistoryEntry {
   id: string
@@ -61,8 +65,8 @@ export const useGameHistory = (userAddress: string | undefined) => {
         {
           bettor: userAddress.toLowerCase() as `0x${string}`,
         },
-        1,
-        5,
+        undefined,
+        undefined,
         { key: Bet_OrderBy.BetTimestamp, order: OrderDirection.Desc },
       )
 
@@ -73,14 +77,13 @@ export const useGameHistory = (userAddress: string | undefined) => {
       const formattedHistory: HistoryEntry[] = (result.bets || []).map(
         (bet: CasinoBet) => ({
           id: bet.id.toString(),
-          status:
-            bet.isWin === undefined
-              ? "Busted"
-              : bet.isWin
-                ? "Won bet"
-                : "Busted",
+          status: bet.isWin ? "Won bet" : "Busted",
           multiplier: bet.formattedPayoutMultiplier ?? 0,
-          payoutAmount: formatUnits(bet.payout ?? 0n, bet.token.decimals),
+          payoutAmount: formatRawAmount(
+            bet.payout ?? 0n,
+            bet.token.decimals,
+            FORMAT_TYPE.MINIFY,
+          ),
           payoutCurrencyIcon: React.createElement(TokenImage, {
             token: ETH_TOKEN,
             size: 14,
@@ -90,6 +93,7 @@ export const useGameHistory = (userAddress: string | undefined) => {
       )
 
       setGameHistory(formattedHistory)
+      logger.info("Game history fetched", { formattedHistory })
     } catch (e) {
       setError(
         e instanceof Error ? e : new Error("Failed to fetch game history"),
