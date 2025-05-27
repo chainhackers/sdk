@@ -1,15 +1,15 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { GameFrame } from "./GameFrame"
-import { TokenImage } from "@coinbase/onchainkit/token"
-import { ETH_TOKEN } from "../../lib/tokens"
-import { type HistoryEntry } from "./HistorySheetPanel"
-import gameBg from "../../assets/game/game-background.png"
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { TokenImage } from "@coinbase/onchainkit/token"
+import type { Meta, StoryObj } from "@storybook/react"
 import { parseUnits } from "viem"
+import gameBg from "../../assets/game/game-background.png"
+import { ETH_TOKEN } from "../../lib/tokens"
+import { GameFrame } from "./GameFrame"
+import { type HistoryEntry } from "./HistorySheetPanel"
 
 BigInt.prototype.toJSON = function () {
-  return this.toString();
-};
+  return this.toString()
+}
 
 const meta = {
   title: "Game/GameFrame",
@@ -30,7 +30,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const connectWalletBtnStub = <div></div>
+const connectWalletBtnStub = <div />
 
 const mockHistoryData: HistoryEntry[] = [
   {
@@ -116,18 +116,17 @@ const Template: Story = {
     balance: 1123456n * 10n ** 12n,
     connectWallletBtn: connectWalletBtnStub,
     isConnected: false,
-    onPlayBtnClick: (selectedSide: COINTOSS_FACE) =>
-      console.log("selectedSide: ", selectedSide),
+    onPlayBtnClick: (selectedSide: COINTOSS_FACE) => console.log("selectedSide: ", selectedSide),
     tokenDecimals: 18,
     gameResult: null,
     betStatus: null,
 
     betAmount: parseUnits("0.1234567", 18),
     setBetAmount: (betAmount?: bigint) => console.log("betAmount: ", betAmount),
-    targetPayoutAmount: parseUnits("0.1234567", 18) * 194n / 100n,
+    targetPayoutAmount: (parseUnits("0.1234567", 18) * 194n) / 100n,
     onHalfBet: () => console.log("onHalfBet"),
     onDoubleBet: () => console.log("onDoubleBet"),
-    onMaxBet: () => console.log("onMaxBet")
+    onMaxBet: () => console.log("onMaxBet"),
   },
   render: (args) => <GameFrame {...args} />,
 }
@@ -168,7 +167,7 @@ export const Win: Story = {
     betStatus: "success",
     gameResult: {
       isWin: true,
-      payout: parseUnits("0.1234567", 18) * 194n / 100n,
+      payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
       currency: "ETH",
       rolled: COINTOSS_FACE.HEADS,
     },
@@ -182,7 +181,7 @@ export const Loss: Story = {
     betStatus: "success",
     gameResult: {
       isWin: false,
-      payout: parseUnits("0.1234567", 18) * 194n / 100n,
+      payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
       currency: "ETH",
       rolled: COINTOSS_FACE.TAILS,
     },

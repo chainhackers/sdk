@@ -1,24 +1,24 @@
+import { COINTOSS_FACE, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
+import Decimal from "decimal.js"
 import { History, Info } from "lucide-react"
 import React, { ChangeEvent, useEffect, useRef, useState } from "react"
+import { parseUnits } from "viem"
 import coinHeadsIcon from "../../assets/game/coin-heads.svg"
 import coinTailsIcon from "../../assets/game/coin-tails.svg"
 import { cn } from "../../lib/utils"
-import { COINTOSS_FACE, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
-import { parseUnits } from "viem"
-import Decimal from "decimal.js"
 
 import { TokenImage } from "@coinbase/onchainkit/token"
 
+import { ETH_TOKEN } from "../../lib/tokens"
+import { BetStatus, GameResult } from "../../types"
 import { Sheet, SheetTrigger } from "../ui/sheet"
+import { GameResultWindow } from "./GameResultWindow"
 import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
-import { ETH_TOKEN } from "../../lib/tokens"
-import { GameResultWindow } from "./GameResultWindow"
-import { BetStatus, GameResult } from "../../types"
 
 interface IThemeSettings {
   theme?: "light" | "dark" | "system"
@@ -75,9 +75,7 @@ export function GameFrame({
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
-  const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
-    COINTOSS_FACE.HEADS,
-  )
+  const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(COINTOSS_FACE.HEADS)
   const cardRef = useRef<HTMLDivElement>(null)
   const [isMounted, setIsMounted] = useState(false)
   const { theme } = themeSettings
@@ -86,7 +84,7 @@ export function GameFrame({
 
   useEffect(() => {
     setIsMounted(true)
-    
+
     // Cleanup timeout on unmount
     return () => {
       if (typingTimeoutRef.current) {
@@ -98,7 +96,7 @@ export function GameFrame({
   // Sync inputValue with external betAmount changes from buttons (but not when user is typing)
   useEffect(() => {
     if (isUserTyping) return
-    
+
     if (betAmount === undefined) {
       setInputValue("")
       setIsValidInput(true)
@@ -120,8 +118,7 @@ export function GameFrame({
 
   const isInGameResultState = !!gameResult
   const isBettingInProgress = betStatus === "pending"
-  const canInitiateBet =
-    isConnected && isBetAmountValid && !isBettingInProgress
+  const canInitiateBet = isConnected && isBetAmountValid && !isBettingInProgress
 
   const isErrorState = betStatus === "error"
 
@@ -158,37 +155,25 @@ export function GameFrame({
       return
     }
     setSelectedSide((prevSide) =>
-      prevSide === COINTOSS_FACE.HEADS
-        ? COINTOSS_FACE.TAILS
-        : COINTOSS_FACE.HEADS,
+      prevSide === COINTOSS_FACE.HEADS ? COINTOSS_FACE.TAILS : COINTOSS_FACE.HEADS,
     )
   }
 
-  const currentCoinIcon =
-    selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
+  const currentCoinIcon = selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
   const isCoinClickable = isConnected && betStatus !== "pending" && !gameResult
 
   return (
     <div
-      className={cn(
-        "cointoss-game-wrapper game-global-styles",
-        themeClass,
-        props.className,
-      )}
+      className={cn("cointoss-game-wrapper game-global-styles", themeClass, props.className)}
       style={themeSettings.customTheme as React.CSSProperties}
       {...props}
     >
       <Card
         ref={cardRef}
-        className={cn(
-          "relative overflow-hidden",
-          "bg-card text-card-foreground border",
-        )}
+        className={cn("relative overflow-hidden", "bg-card text-card-foreground border")}
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-          <CardTitle className="text-lg text-title-color font-bold">
-            CoinToss
-          </CardTitle>
+          <CardTitle className="text-lg text-title-color font-bold">CoinToss</CardTitle>
           {connectWallletBtn}
         </CardHeader>
 
@@ -202,12 +187,7 @@ export function GameFrame({
               backgroundImage: `url(${themeSettings.backgroundImage})`,
             }}
           >
-            <div
-              className={cn(
-                "absolute inset-0 rounded-[16px]",
-                "bg-game-window-overlay",
-              )}
-            ></div>
+            <div className={cn("absolute inset-0 rounded-[16px]", "bg-game-window-overlay")} />
 
             <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
               <SheetTrigger asChild>
@@ -234,10 +214,7 @@ export function GameFrame({
               )}
             </Sheet>
 
-            <Sheet
-              open={isHistorySheetOpen}
-              onOpenChange={setIsHistorySheetOpen}
-            >
+            <Sheet open={isHistorySheetOpen} onOpenChange={setIsHistorySheetOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="iconTransparent"
@@ -252,10 +229,7 @@ export function GameFrame({
                 </Button>
               </SheetTrigger>
               {isMounted && cardRef.current && (
-                <HistorySheetPanel
-                  portalContainer={cardRef.current}
-                  historyData={historyData}
-                />
+                <HistorySheetPanel portalContainer={cardRef.current} historyData={historyData} />
               )}
             </Sheet>
 
@@ -289,9 +263,7 @@ export function GameFrame({
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <div className="text-sm font-medium flex items-center">
-                <span className="text-text-on-surface-variant">
-                  Balance:&nbsp;
-                </span>
+                <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
                 <span className="font-semibold">{formattedBalance}</span>
                 <TokenImage token={ETH_TOKEN} size={16} className="ml-1" />
               </div>
@@ -318,27 +290,27 @@ export function GameFrame({
                   const newInputValue = e.target.value
                   setInputValue(newInputValue)
                   setIsUserTyping(true)
-                  
+
                   // Clear existing timeout
                   if (typingTimeoutRef.current) {
                     clearTimeout(typingTimeoutRef.current)
                   }
-                  
+
                   // Set new timeout to stop typing state after 1 second
                   typingTimeoutRef.current = setTimeout(() => {
                     setIsUserTyping(false)
                   }, 1000)
-                  
+
                   if (newInputValue === "") {
                     setBetAmount(undefined)
                     setIsValidInput(true)
                     setBetAmountError(null)
                     return
                   }
-                  
+
                   try {
                     new Decimal(newInputValue)
-                    
+
                     try {
                       const weiValue = parseUnits(newInputValue, tokenDecimals)
                       setBetAmount(weiValue)
@@ -353,30 +325,21 @@ export function GameFrame({
                     setBetAmountError(null)
                   }
                 }}
-                className={cn(
-                  "relative",
-                  !isValidInput && "[&_input]:text-muted-foreground"
-                )}
+                className={cn("relative", !isValidInput && "[&_input]:text-muted-foreground")}
                 token={{
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
                   symbol: "ETH",
                 }}
-                disabled={
-                  !isConnected || betStatus === "pending" || !!gameResult
-                }
+                disabled={!isConnected || betStatus === "pending" || !!gameResult}
               />
-              {betAmountError && (
-                <div className="text-red-500 text-xs mt-1">{betAmountError}</div>
-              )}
+              {betAmountError && <div className="text-red-500 text-xs mt-1">{betAmountError}</div>}
 
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   variant="secondary"
                   onClick={onHalfBet}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isBettingInProgress || isInGameResultState}
                 >
                   1/2
                 </Button>
@@ -384,9 +347,7 @@ export function GameFrame({
                   variant="secondary"
                   onClick={onDoubleBet}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isBettingInProgress || isInGameResultState}
                 >
                   2x
                 </Button>
@@ -394,9 +355,7 @@ export function GameFrame({
                   variant="secondary"
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   onClick={onMaxBet}
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isBettingInProgress || isInGameResultState}
                 >
                   Max
                 </Button>

@@ -1,21 +1,21 @@
-import { useState, useCallback, useEffect } from "react"
-import { Hex, zeroAddress, decodeEventLog } from "viem"
-import { useAccount, usePublicClient, useWriteContract } from "wagmi"
-import { useOnchainKit } from "@coinbase/onchainkit"
 import {
-  GenericCasinoBetParams,
-  CasinoChainId,
-  getChainlinkVrfCostFunctionData,
-  getPlaceBetFunctionData,
-  getPlaceBetEventData,
-  getRollEventData,
-  CoinToss,
-  COINTOSS_FACE,
   CASINO_GAME_TYPE,
+  COINTOSS_FACE,
+  CasinoChainId,
+  CoinToss,
+  GenericCasinoBetParams,
+  getChainlinkVrfCostFunctionData,
+  getPlaceBetEventData,
+  getPlaceBetFunctionData,
+  getRollEventData,
 } from "@betswirl/sdk-core"
-import { useBetResultWatcher } from "./useBetResultWatcher"
-import type { GameResult, WatchTarget } from "./types"
+import { useOnchainKit } from "@coinbase/onchainkit"
+import { useCallback, useEffect, useState } from "react"
+import { Hex, decodeEventLog, zeroAddress } from "viem"
+import { useAccount, usePublicClient, useWriteContract } from "wagmi"
 import { createLogger } from "../lib/logger"
+import type { GameResult, WatchTarget } from "./types"
+import { useBetResultWatcher } from "./useBetResultWatcher"
 
 const logger = createLogger("usePlaceBet")
 
@@ -29,12 +29,9 @@ export function usePlaceBet() {
   const chainId = chain?.id as CasinoChainId | undefined
   const publicClient = usePublicClient({ chainId })
   const { address: connectedAddress } = useAccount()
-  const { writeContractAsync, reset: resetWagmiWriteContract } =
-    useWriteContract()
+  const { writeContractAsync, reset: resetWagmiWriteContract } = useWriteContract()
 
-  const [betStatus, setBetStatus] = useState<
-    "pending" | "success" | "error" | null
-  >(null)
+  const [betStatus, setBetStatus] = useState<"pending" | "success" | "error" | null>(null)
   const [gameResult, setGameResult] = useState<GameResult | null>(null)
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
 
@@ -75,15 +72,8 @@ export function usePlaceBet() {
           betAmount,
         }
 
-        if (
-          !publicClient ||
-          !chainId ||
-          !connectedAddress ||
-          !writeContractAsync
-        ) {
-          logger.error(
-            "placeBet: Wagmi/OnchainKit clients or address are not initialized.",
-          )
+        if (!publicClient || !chainId || !connectedAddress || !writeContractAsync) {
+          logger.error("placeBet: Wagmi/OnchainKit clients or address are not initialized.")
           setBetStatus("error")
           return
         }
@@ -93,11 +83,7 @@ export function usePlaceBet() {
         })
         setBetStatus("pending")
 
-        const vrfCost = await _fetchVrfCost(
-          betParams.game,
-          chainId,
-          publicClient,
-        )
+        const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
 
         const submitResult = await _submitBetTransaction(
           betParams,
@@ -125,11 +111,7 @@ export function usePlaceBet() {
           return
         }
 
-        const { data: rollEventData } = getRollEventData(
-          betParams.game,
-          chainId,
-          betId,
-        )
+        const { data: rollEventData } = getRollEventData(betParams.game, chainId, betId)
         logger.debug("placeBet: Setting up Roll event listener...")
         setWatchTarget({
           betId,
@@ -174,12 +156,7 @@ async function _fetchVrfCost(
     throw new Error("publicClient is undefined")
   }
   logger.debug("_fetchVrfCost: Getting VRF cost...")
-  const vrfCostFunctionData = getChainlinkVrfCostFunctionData(
-    gameType,
-    zeroAddress,
-    1,
-    chainId,
-  )
+  const vrfCostFunctionData = getChainlinkVrfCostFunctionData(gameType, zeroAddress, 1, chainId)
   const vrfCost = (await publicClient.readContract({
     address: vrfCostFunctionData.data.to,
     abi: vrfCostFunctionData.data.abi,
@@ -198,10 +175,7 @@ async function _submitBetTransaction(
   writeContractAsync: ReturnType<typeof useWriteContract>["writeContractAsync"],
 ): Promise<SubmitBetResult> {
   logger.debug("_submitBetTransaction: Preparing and sending transaction...")
-  const placeBetTxData = getPlaceBetFunctionData(
-    { ...betParams, receiver },
-    chainId,
-  )
+  const placeBetTxData = getPlaceBetFunctionData({ ...betParams, receiver }, chainId)
   const txHash = await writeContractAsync({
     abi: placeBetTxData.data.abi,
     address: placeBetTxData.data.to,
@@ -232,15 +206,10 @@ async function _extractBetIdFromReceipt(
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
   logger.debug("_extractBetIdFromReceipt: Receipt received.")
 
-  const { data: placeBetEventData } = getPlaceBetEventData(
-    gameType,
-    chainId,
-    receiver,
-  )
+  const { data: placeBetEventData } = getPlaceBetEventData(gameType, chainId, receiver)
 
   for (const log of receipt.logs) {
-    if (log.address.toLowerCase() !== expectedContractAddress.toLowerCase())
-      continue
+    if (log.address.toLowerCase() !== expectedContractAddress.toLowerCase()) continue
     const decodedLog = decodeEventLog({
       abi: placeBetEventData.abi,
       data: log.data,

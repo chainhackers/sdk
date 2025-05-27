@@ -11,10 +11,7 @@ interface PanelStoryWrapperProps {
   theme?: "light" | "dark" | "system"
 }
 
-const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({
-  children,
-  theme = "system",
-}) => {
+const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme = "system" }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isMounted, setIsMounted] = useState(false)
 
@@ -39,8 +36,7 @@ const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({
         <p>Preparing story...</p>
       )}
       <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-muted-foreground text-center">
-        This is a mock card container. <br /> Click the button to open the
-        panel.
+        This is a mock card container. <br /> Click the button to open the panel.
       </p>
     </div>
   )

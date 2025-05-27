@@ -1,22 +1,19 @@
+import { TokenImage } from "@coinbase/onchainkit/token"
 import type { Meta, StoryObj } from "@storybook/react"
 import { History as HistoryIcon } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
+import { ETH_TOKEN } from "../../lib/tokens"
 import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
-import { TokenImage } from "@coinbase/onchainkit/token"
-import { ETH_TOKEN } from "../../lib/tokens"
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode
   theme?: "light" | "dark" | "system"
 }
 
-const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({
-  children,
-  theme = "system",
-}) => {
+const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme = "system" }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isMounted, setIsMounted] = useState(false)
 
@@ -41,8 +38,7 @@ const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({
         <p>Preparing story...</p>
       )}
       <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-muted-foreground text-center">
-        This is a mock card container. <br /> Click the button to open the
-        panel.
+        This is a mock card container. <br /> Click the button to open the panel.
       </p>
     </div>
   )
@@ -101,10 +97,7 @@ const HistorySheetWithWrapper = ({
               <HistoryIcon className="h-4 w-4" />
             </Button>
           </SheetTrigger>
-          <HistorySheetPanel
-            portalContainer={portalContainer}
-            historyData={historyData}
-          />
+          <HistorySheetPanel portalContainer={portalContainer} historyData={historyData} />
         </Sheet>
       )}
     </PanelStoryWrapper>
