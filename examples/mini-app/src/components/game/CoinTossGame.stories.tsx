@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { CoinTossGame } from "./CoinTossGame"
 import gameBg from "../../assets/game/game-background-1.png"
-import { AppProviders } from "../../../src/providers"
+import { AppProviders } from "../../providers"
 
 const meta = {
   title: "Game/CoinTossGame",
