@@ -34,7 +34,7 @@ export const Default: Story = {
     placeholder: "0",
     value: "10.5",
     token: {
-      icon: <TokenImage token={ETH_TOKEN} size={16} className="mr-1" />,
+      icon: <TokenImage token={ETH_TOKEN} size={18} className="mr-1" />,
       symbol: "ETH",
     },
   },
@@ -46,7 +46,7 @@ export const Disabled: Story = {
     placeholder: "0",
     value: "10.5",
     token: {
-      icon: <TokenImage token={ETH_TOKEN} size={16} className="mr-1" />,
+      icon: <TokenImage token={ETH_TOKEN} size={18} className="mr-1" />,
       symbol: "ETH",
     },
     disabled: true,

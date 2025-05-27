@@ -302,7 +302,7 @@ export function GameFrame({
                   Balance:&nbsp;
                 </span>
                 <span className="font-semibold">{formattedBalance}</span>
-                <TokenImage token={ETH_TOKEN} size={16} className="ml-1" />
+                <TokenImage token={ETH_TOKEN} size={18} className="ml-1" />
               </div>
 
               <Label
@@ -367,7 +367,7 @@ export function GameFrame({
                   !isValidInput && "[&_input]:text-muted-foreground",
                 )}
                 token={{
-                  icon: <TokenImage token={ETH_TOKEN} size={16} />,
+                  icon: <TokenImage token={ETH_TOKEN} size={18} />,
                   symbol: "ETH",
                 }}
                 disabled={

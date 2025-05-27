@@ -7,6 +7,7 @@ import {
   CasinoChainId,
   formatRawAmount,
   FORMAT_TYPE,
+  CASINO_GAME_TYPE,
 } from "@betswirl/sdk-core"
 import { useAccount } from "wagmi"
 import { TokenImage } from "@coinbase/onchainkit/token"
@@ -48,7 +49,10 @@ function formatRelativeTime(timestampSecs: number): string {
   return `~${diffInDays}d ago`
 }
 
-export const useGameHistory = (userAddress: string | undefined) => {
+export const useGameHistory = (
+  gameType: CASINO_GAME_TYPE,
+  userAddress?: `0x${string}`,
+) => {
   const [gameHistory, setGameHistory] = useState<HistoryEntry[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | null>(null)
@@ -70,6 +74,7 @@ export const useGameHistory = (userAddress: string | undefined) => {
         { chainId: chainId as CasinoChainId },
         {
           bettor: userAddress.toLowerCase() as `0x${string}`,
+          game: gameType,
         },
         undefined,
         undefined,
@@ -94,7 +99,7 @@ export const useGameHistory = (userAddress: string | undefined) => {
           ),
           payoutCurrencyIcon: React.createElement(TokenImage, {
             token: ETH_TOKEN,
-            size: 14,
+            size: 18,
           }),
           timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
         }),
@@ -109,7 +114,7 @@ export const useGameHistory = (userAddress: string | undefined) => {
     } finally {
       setIsLoading(false)
     }
-  }, [userAddress, chainId])
+  }, [userAddress, chainId, gameType])
 
   useEffect(() => {
     fetchHistoryLogic()

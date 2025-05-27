@@ -8,7 +8,7 @@ import { useGameHistory } from "../../hooks/useGameHistory"
 import { useAccount, useBalance } from "wagmi"
 
 import { usePlaceBet } from "../../hooks/usePlaceBet"
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 
 const MULTIPLIER = 1940n
@@ -33,7 +33,10 @@ export function CoinTossGame({
 }: CoinTossGameProps) {
   const themeSettings = { theme, customTheme, backgroundImage }
   const { isConnected: isWalletConnected, address } = useAccount()
-  const { gameHistory, refreshHistory } = useGameHistory(address)
+  const { gameHistory, refreshHistory } = useGameHistory(
+    CASINO_GAME_TYPE.COINTOSS,
+    address,
+  )
   const { data: balance } = useBalance({
     address,
   })
