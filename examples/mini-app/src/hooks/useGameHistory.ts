@@ -15,9 +15,14 @@ import { createLogger } from "../lib/logger"
 
 const logger = createLogger("useGameHistory")
 
+enum HistoryEntryStatus {
+  WonBet = "Won bet",
+  Busted = "Busted",
+}
+
 export interface HistoryEntry {
   id: string
-  status: "Won bet" | "Busted"
+  status: HistoryEntryStatus
   multiplier: number | string
   payoutAmount: number | string
   payoutCurrencyIcon: React.ReactElement
@@ -78,7 +83,9 @@ export const useGameHistory = (userAddress: string | undefined) => {
       const formattedHistory: HistoryEntry[] = (result.bets || []).map(
         (bet: CasinoBet) => ({
           id: bet.id.toString(),
-          status: bet.isWin ? "Won bet" : "Busted",
+          status: bet.isWin
+            ? HistoryEntryStatus.WonBet
+            : HistoryEntryStatus.Busted,
           multiplier: bet.formattedPayoutMultiplier ?? 0,
           payoutAmount: formatRawAmount(
             bet.payout ?? 0n,
