@@ -1,11 +1,22 @@
 import type { Abi, Hex } from "viem"
-import type { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
+import type {
+  CASINO_GAME_TYPE,
+  COINTOSS_FACE,
+  DiceNumber,
+} from "@betswirl/sdk-core"
 
-export interface GameResult {
+export interface CoinTossGameResult {
   isWin: boolean
   payout: bigint
   currency: string
   rolled: COINTOSS_FACE
+}
+
+export interface DiceGameResult {
+  isWin: boolean
+  payout: bigint
+  currency: string
+  rolled: DiceNumber
 }
 
 export interface WatchTarget {

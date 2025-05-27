@@ -11,7 +11,6 @@ import { type HistoryEntry } from "./HistorySheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 
 import { GameFrame } from "./GameFrame"
-import { DiceNumber } from "@betswirl/sdk-core"
 import { useDicePlaceBet } from "../../hooks/useDicePlaceBet"
 
 const MULTIPLIER = 1940n
@@ -102,7 +101,7 @@ const mockHistoryData: HistoryEntry[] = [
   },
 ]
 
-export function CoinTossGame({
+export function DiceGame({
   theme = "system",
   customTheme,
   backgroundImage = diceBackground,
@@ -124,13 +123,13 @@ export function CoinTossGame({
   const targetPayoutAmount =
     betAmount && betAmount > 0n ? (betAmount * MULTIPLIER) / PRECISION : 0n
 
-  const handlePlayButtonClick = (selected: DiceNumber) => {
+  const handlePlayButtonClick = () => {
     if (betStatus === "error" || isInGameResultState) {
       resetBetState()
     }
 
     if (isWalletConnected && betAmount && betAmount > 0n) {
-      placeDiceBet(betAmount, selected)
+      placeDiceBet(betAmount, 1)
     }
   }
 

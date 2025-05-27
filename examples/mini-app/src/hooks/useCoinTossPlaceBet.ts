@@ -13,8 +13,8 @@ import {
   COINTOSS_FACE,
   CASINO_GAME_TYPE,
 } from "@betswirl/sdk-core"
-import { useBetResultWatcher } from "./useBetResultWatcher"
-import type { GameResult, WatchTarget } from "./types"
+import { useCoinTossBetResultWatcher } from "./useCoinTossBetResultWatcher"
+import type { CoinTossGameResult, WatchTarget } from "./types"
 import { createLogger } from "../lib/logger"
 
 const logger = createLogger("usePlaceBet")
@@ -35,14 +35,14 @@ export function useCoinTossPlaceBet() {
   const [betStatus, setBetStatus] = useState<
     "pending" | "success" | "error" | null
   >(null)
-  const [gameResult, setGameResult] = useState<GameResult | null>(null)
+  const [gameResult, setGameResult] = useState<CoinTossGameResult | null>(null)
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
 
   const {
     gameResult: watcherGameResult,
     status: watcherStatus,
     reset: resetWatcher,
-  } = useBetResultWatcher({
+  } = useCoinTossBetResultWatcher({
     watchParams: watchTarget,
     publicClient,
     enabled: !!watchTarget,

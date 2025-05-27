@@ -16,7 +16,7 @@ import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { GameResultWindow } from "./GameResultWindow"
-import { BetStatus, GameResult } from "../../types"
+import { BetStatus, CoinTossResult, DiceResult } from "../../types"
 
 interface IThemeSettings {
   theme?: "light" | "dark" | "system"
@@ -35,7 +35,7 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   connectWallletBtn: React.ReactNode
   isConnected: boolean
   tokenDecimals: number
-  gameResult: GameResult | null
+  gameResult: CoinTossResult | DiceResult | null
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   setBetAmount: (amount: bigint | undefined) => void
@@ -249,7 +249,7 @@ export function GameFrame({
               amount={betAmount || 0n}
               payout={gameResult?.payout}
               currency="ETH"
-              rolled={gameResult?.rolled || ""}
+              rolled={gameResult?.rolled.toString() || ""}
             />
           </div>
 

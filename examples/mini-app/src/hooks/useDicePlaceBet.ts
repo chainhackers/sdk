@@ -13,8 +13,8 @@ import {
   DiceNumber,
   Dice,
 } from "@betswirl/sdk-core"
-import { useBetResultWatcher } from "./useBetResultWatcher"
-import type { GameResult, WatchTarget } from "./types"
+import { useDiceBetResultWatcher } from "./useDiceBetResultWatcher"
+import type { DiceGameResult, WatchTarget } from "./types"
 import { createLogger } from "../lib/logger"
 
 const logger = createLogger("usePlaceBet")
@@ -35,14 +35,14 @@ export function useDicePlaceBet() {
   const [betStatus, setBetStatus] = useState<
     "pending" | "success" | "error" | null
   >(null)
-  const [gameResult, setGameResult] = useState<GameResult | null>(null)
+  const [gameResult, setGameResult] = useState<DiceGameResult | null>(null)
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
 
   const {
     gameResult: watcherGameResult,
     status: watcherStatus,
     reset: resetWatcher,
-  } = useBetResultWatcher({
+  } = useDiceBetResultWatcher({
     watchParams: watchTarget,
     publicClient,
     enabled: !!watchTarget,
