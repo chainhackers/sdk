@@ -2,28 +2,28 @@ import { useState, useCallback, useEffect, useMemo } from "react"
 import type { Log, AbiEvent } from "viem"
 import { decodeEventLog } from "viem"
 import { usePublicClient, useWatchContractEvent } from "wagmi"
-import { CASINO_GAME_TYPE, COINTOSS_FACE, CoinToss } from "@betswirl/sdk-core"
-import type { GameResult, WatchTarget } from "./types"
+import { Dice, DiceNumber } from "@betswirl/sdk-core"
+import type { DiceGameResult, WatchTarget } from "./types"
 import { createLogger } from "../lib/logger"
 
-const logger = createLogger("useBetResultWatcher")
+const logger = createLogger("useDiceBetResultWatcher")
 
-interface UseBetResultWatcherProps {
+interface UseDiceBetResultWatcherProps {
   watchParams: WatchTarget | null
   publicClient: ReturnType<typeof usePublicClient> | null
   enabled: boolean
 }
 
-type BetResultWatcherStatus =
+type DiceBetResultWatcherStatus =
   | "idle"
   | "listening"
   | "fallback_listening"
   | "success"
   | "error"
 
-interface BetResultWatcherOutput {
-  gameResult: GameResult | null
-  status: BetResultWatcherStatus
+interface DiceBetResultWatcherOutput {
+  gameResult: DiceGameResult | null
+  status: DiceBetResultWatcherStatus
   error: Error | null
   reset: () => void
 }
@@ -31,27 +31,14 @@ interface BetResultWatcherOutput {
 const POLLING_INTERVAL = 2500
 const PRIMARY_WATCHER_TIMEOUT = 30000
 
-function _decodeRolled(
-  rolled: boolean[],
-  game: CASINO_GAME_TYPE,
-): COINTOSS_FACE {
-  switch (game) {
-    case CASINO_GAME_TYPE.COINTOSS:
-      return CoinToss.decodeRolled(rolled[0])
-    default:
-      logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
-      throw new Error(`Unsupported game type for decoding roll: ${game}`)
-  }
-}
-
-export function useBetResultWatcher({
+export function useDiceBetResultWatcher({
   watchParams,
   publicClient,
   enabled,
-}: UseBetResultWatcherProps): BetResultWatcherOutput {
+}: UseDiceBetResultWatcherProps): DiceBetResultWatcherOutput {
   const [internalGameResult, setInternalGameResult] =
-    useState<GameResult | null>(null)
-  const [status, setStatus] = useState<BetResultWatcherStatus>("idle")
+    useState<DiceGameResult | null>(null)
+  const [status, setStatus] = useState<DiceBetResultWatcherStatus>("idle")
   const [error, setError] = useState<Error | null>(null)
   const [filterErrorOccurred, setFilterErrorOccurred] = useState<boolean>(false)
 
@@ -119,7 +106,7 @@ export function useBetResultWatcher({
 
   const processEventLogs = useCallback(
     (logs: readonly Log[], currentWatchParams: WatchTarget) => {
-      const { betId, gameType, eventAbi, eventName } = currentWatchParams
+      const { betId, eventAbi, eventName } = currentWatchParams
       logger.debug(
         `processEventLogs: Processing ${logs.length} logs for betId ${betId}`,
         { eventName },
@@ -138,12 +125,12 @@ export function useBetResultWatcher({
         const rollArgs = decodedRollLog.args as unknown as {
           id: bigint
           payout: bigint
-          rolled: boolean[]
+          rolled: DiceNumber
         }
 
         if (rollArgs.id === betId) {
-          const rolledResult = _decodeRolled(rollArgs.rolled, gameType)
-          const result: GameResult = {
+          const rolledResult = Dice.decodeRolled(rollArgs.rolled)
+          const result: DiceGameResult = {
             isWin: rollArgs.payout > 0n,
             payout: rollArgs.payout,
             currency: "ETH",

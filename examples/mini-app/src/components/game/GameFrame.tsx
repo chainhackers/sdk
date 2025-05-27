@@ -1,9 +1,7 @@
 import { History, Info } from "lucide-react"
 import React, { ChangeEvent, useEffect, useRef, useState } from "react"
-import coinHeadsIcon from "../../assets/game/coin-heads.svg"
-import coinTailsIcon from "../../assets/game/coin-tails.svg"
 import { cn } from "../../lib/utils"
-import { COINTOSS_FACE, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
+import { FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
@@ -18,7 +16,7 @@ import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { GameResultWindow } from "./GameResultWindow"
-import { BetStatus, GameResult } from "../../types"
+import { BetStatus, CoinTossResult, DiceResult } from "../../types"
 
 interface IThemeSettings {
   theme?: "light" | "dark" | "system"
@@ -36,9 +34,8 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   balance: bigint
   connectWallletBtn: React.ReactNode
   isConnected: boolean
-  onPlayBtnClick: (selectedSide: COINTOSS_FACE) => void
   tokenDecimals: number
-  gameResult: GameResult | null
+  gameResult: CoinTossResult | DiceResult | null
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   setBetAmount: (amount: bigint | undefined) => void
@@ -46,6 +43,8 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   onHalfBet: () => void
   onDoubleBet: () => void
   onMaxBet: () => void
+  onPlayBtnClick: () => void
+  gameControls?: React.ReactNode
 }
 
 const STEP = 0.0001
@@ -56,7 +55,6 @@ export function GameFrame({
   balance,
   connectWallletBtn,
   isConnected,
-  onPlayBtnClick,
   tokenDecimals,
   gameResult,
   betStatus,
@@ -66,6 +64,8 @@ export function GameFrame({
   onHalfBet,
   onDoubleBet,
   onMaxBet,
+  onPlayBtnClick,
+  gameControls,
   ...props
 }: GameFrameProps) {
   const [betAmountError, setBetAmountError] = useState<string | null>(null)
@@ -75,9 +75,6 @@ export function GameFrame({
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
-  const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
-    COINTOSS_FACE.HEADS,
-  )
   const cardRef = useRef<HTMLDivElement>(null)
   const [isMounted, setIsMounted] = useState(false)
   const { theme } = themeSettings
@@ -86,7 +83,7 @@ export function GameFrame({
 
   useEffect(() => {
     setIsMounted(true)
-    
+
     // Cleanup timeout on unmount
     return () => {
       if (typingTimeoutRef.current) {
@@ -98,12 +95,16 @@ export function GameFrame({
   // Sync inputValue with external betAmount changes from buttons (but not when user is typing)
   useEffect(() => {
     if (isUserTyping) return
-    
+
     if (betAmount === undefined) {
       setInputValue("")
       setIsValidInput(true)
     } else {
-      const formatted = formatRawAmount(betAmount, tokenDecimals, FORMAT_TYPE.PRECISE)
+      const formatted = formatRawAmount(
+        betAmount,
+        tokenDecimals,
+        FORMAT_TYPE.PRECISE,
+      )
       setInputValue(formatted)
       setIsValidInput(true)
     }
@@ -111,7 +112,6 @@ export function GameFrame({
 
   const isBetAmountValid = betAmount && betAmount > 0n
 
-  const multiplier = 1.94
   const winChance = 50
   const targetPayout = formatRawAmount(targetPayoutAmount, tokenDecimals)
   const fee = 0
@@ -120,8 +120,7 @@ export function GameFrame({
 
   const isInGameResultState = !!gameResult
   const isBettingInProgress = betStatus === "pending"
-  const canInitiateBet =
-    isConnected && isBetAmountValid && !isBettingInProgress
+  const canInitiateBet = isConnected && isBetAmountValid && !isBettingInProgress
 
   const isErrorState = betStatus === "error"
 
@@ -148,25 +147,9 @@ export function GameFrame({
     if (isInGameResultState) {
       setBetAmount(0n)
       setInputValue("")
-      setSelectedSide(COINTOSS_FACE.HEADS)
     }
-    onPlayBtnClick(selectedSide)
+    onPlayBtnClick()
   }
-
-  const handleCoinClick = () => {
-    if (!isConnected || betStatus === "pending" || !!gameResult) {
-      return
-    }
-    setSelectedSide((prevSide) =>
-      prevSide === COINTOSS_FACE.HEADS
-        ? COINTOSS_FACE.TAILS
-        : COINTOSS_FACE.HEADS,
-    )
-  }
-
-  const currentCoinIcon =
-    selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
-  const isCoinClickable = isConnected && betStatus !== "pending" && !gameResult
 
   return (
     <div
@@ -259,30 +242,14 @@ export function GameFrame({
               )}
             </Sheet>
 
-            <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
-              {multiplier.toFixed(2)} x
-            </div>
-            <Button
-              variant="coinButton"
-              size="coin"
-              onClick={handleCoinClick}
-              disabled={!isCoinClickable}
-              aria-label={`Select ${selectedSide === COINTOSS_FACE.HEADS ? "Tails" : "Heads"} side`}
-              className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2"
-            >
-              <img
-                src={currentCoinIcon}
-                alt={selectedSide === COINTOSS_FACE.HEADS ? "Heads" : "Tails"}
-                className="h-full w-auto pointer-events-none"
-              />
-            </Button>
+            {gameControls}
             <GameResultWindow
               isVisible={!!gameResult}
               isWin={gameResult?.isWin}
               amount={betAmount || 0n}
               payout={gameResult?.payout}
               currency="ETH"
-              rolled={gameResult?.rolled || ""}
+              rolled={gameResult?.rolled.toString() || ""}
             />
           </div>
 
@@ -318,27 +285,27 @@ export function GameFrame({
                   const newInputValue = e.target.value
                   setInputValue(newInputValue)
                   setIsUserTyping(true)
-                  
+
                   // Clear existing timeout
                   if (typingTimeoutRef.current) {
                     clearTimeout(typingTimeoutRef.current)
                   }
-                  
+
                   // Set new timeout to stop typing state after 1 second
                   typingTimeoutRef.current = setTimeout(() => {
                     setIsUserTyping(false)
                   }, 1000)
-                  
+
                   if (newInputValue === "") {
                     setBetAmount(undefined)
                     setIsValidInput(true)
                     setBetAmountError(null)
                     return
                   }
-                  
+
                   try {
                     new Decimal(newInputValue)
-                    
+
                     try {
                       const weiValue = parseUnits(newInputValue, tokenDecimals)
                       setBetAmount(weiValue)
@@ -355,7 +322,7 @@ export function GameFrame({
                 }}
                 className={cn(
                   "relative",
-                  !isValidInput && "[&_input]:text-muted-foreground"
+                  !isValidInput && "[&_input]:text-muted-foreground",
                 )}
                 token={{
                   icon: <TokenImage token={ETH_TOKEN} size={16} />,
@@ -366,7 +333,9 @@ export function GameFrame({
                 }
               />
               {betAmountError && (
-                <div className="text-red-500 text-xs mt-1">{betAmountError}</div>
+                <div className="text-red-500 text-xs mt-1">
+                  {betAmountError}
+                </div>
               )}
 
               <div className="grid grid-cols-3 gap-2">

@@ -13,8 +13,8 @@ import {
   COINTOSS_FACE,
   CASINO_GAME_TYPE,
 } from "@betswirl/sdk-core"
-import { useBetResultWatcher } from "./useBetResultWatcher"
-import type { GameResult, WatchTarget } from "./types"
+import { useCoinTossBetResultWatcher } from "./useCoinTossBetResultWatcher"
+import type { CoinTossGameResult, WatchTarget } from "./types"
 import { createLogger } from "../lib/logger"
 
 const logger = createLogger("usePlaceBet")
@@ -24,7 +24,7 @@ interface SubmitBetResult {
   contractAddress: Hex
 }
 
-export function usePlaceBet() {
+export function useCoinTossPlaceBet() {
   const { chain } = useOnchainKit()
   const chainId = chain?.id as CasinoChainId | undefined
   const publicClient = usePublicClient({ chainId })
@@ -35,14 +35,14 @@ export function usePlaceBet() {
   const [betStatus, setBetStatus] = useState<
     "pending" | "success" | "error" | null
   >(null)
-  const [gameResult, setGameResult] = useState<GameResult | null>(null)
+  const [gameResult, setGameResult] = useState<CoinTossGameResult | null>(null)
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
 
   const {
     gameResult: watcherGameResult,
     status: watcherStatus,
     reset: resetWatcher,
-  } = useBetResultWatcher({
+  } = useCoinTossBetResultWatcher({
     watchParams: watchTarget,
     publicClient,
     enabled: !!watchTarget,
@@ -61,7 +61,7 @@ export function usePlaceBet() {
     }
   }, [watcherStatus, watcherGameResult])
 
-  const placeBet = useCallback(
+  const placeCoinTossBet = useCallback(
     async (betAmount: bigint, choice: COINTOSS_FACE) => {
       try {
         resetWagmiWriteContract()
@@ -161,7 +161,7 @@ export function usePlaceBet() {
     resetWatcher()
   }, [resetWatcher])
 
-  return { placeBet, betStatus, gameResult, resetBetState }
+  return { placeCoinTossBet, betStatus, gameResult, resetBetState }
 }
 
 async function _fetchVrfCost(
