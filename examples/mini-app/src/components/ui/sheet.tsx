@@ -144,6 +144,12 @@ const SheetBottomPanelContent = React.forwardRef<
     )}
     {...props}
   >
+    <SheetPrimitive.Title className="sr-only">
+      Panel Content
+    </SheetPrimitive.Title>
+    <SheetPrimitive.Description className="sr-only">
+      Bottom panel content
+    </SheetPrimitive.Description>
     {children}
     <SheetPrimitive.Close
       className={cn(
