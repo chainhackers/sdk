@@ -132,7 +132,7 @@ export function DiceGame({
     }
 
     if (isWalletConnected && betAmount && betAmount > 0n) {
-      placeDiceBet(betAmount, 1)
+      placeDiceBet(betAmount, selectedNumber)
     }
   }
 
