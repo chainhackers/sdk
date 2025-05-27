@@ -71,6 +71,7 @@ export async function fetchTokens(
   const apolloClient = new ApolloClient({
     uri: getGraphqlEndpoint(client),
     cache: client.cache ?? defaultSubgraphCasinoClient.cache,
+    defaultOptions: client.defaultOptions ?? defaultSubgraphCasinoClient.defaultOptions,
   });
 
   const variables: TokensQueryVariables = {

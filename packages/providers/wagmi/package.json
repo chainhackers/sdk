@@ -1,7 +1,7 @@
 {
   "name": "@betswirl/wagmi-provider",
   "description": "Wagmi client & wallet for Betswirl core SDK",
-  "version": "0.1.3-beta.2",
+  "version": "0.1.3-beta.3",
   "license": "MIT",
   "repository": {
     "type": "git",

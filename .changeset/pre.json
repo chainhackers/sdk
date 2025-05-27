@@ -7,5 +7,10 @@
     "@betswirl/sdk-core": "0.1.2",
     "@betswirl/wagmi-provider": "0.1.2"
   },
-  "changesets": ["calm-spiders-agree", "legal-garlics-carry", "real-weeks-study"]
+  "changesets": [
+    "calm-spiders-agree",
+    "legal-garlics-carry",
+    "real-weeks-study",
+    "upset-loops-sink"
+  ]
 }
