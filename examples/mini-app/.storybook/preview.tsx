@@ -13,6 +13,11 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    options: {
+      storySort: {
+        order: ['Game', ['CoinTossGame', '*']],
+      },
+    },
   },
   decorators: [withAppProviders],
 }
