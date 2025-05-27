@@ -12,6 +12,8 @@ import { ETH_TOKEN } from "../../lib/tokens"
 
 import { GameFrame } from "./GameFrame"
 import { useDicePlaceBet } from "../../hooks/useDicePlaceBet"
+import { DiceGameControls } from "./DiceGameControls"
+import { DiceNumber } from "@betswirl/sdk-core"
 
 const MULTIPLIER = 1940n
 const PRECISION = 10000n
@@ -115,6 +117,7 @@ export function DiceGame({
   const tokenDecimals = balance?.decimals ?? 18
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
+  const [selectedNumber, setSelectedNumber] = useState<DiceNumber>(1)
 
   const { placeDiceBet, betStatus, gameResult, resetBetState } =
     useDicePlaceBet()
@@ -158,6 +161,10 @@ export function DiceGame({
     }
   }
 
+  const handleNumberChange = (value: number) => {
+    setSelectedNumber(value as DiceNumber)
+  }
+
   return (
     <GameFrame
       {...props}
@@ -197,6 +204,13 @@ export function DiceGame({
             </div>
           </ConnectWallet>
         </Wallet>
+      }
+      gameControls={
+        <DiceGameControls
+          selectedNumber={selectedNumber}
+          onNumberChange={handleNumberChange}
+          multiplier={1.94}
+        />
       }
     />
   )
