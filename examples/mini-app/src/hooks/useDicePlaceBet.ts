@@ -9,9 +9,9 @@ import {
   getPlaceBetFunctionData,
   getPlaceBetEventData,
   getRollEventData,
-  CoinToss,
-  COINTOSS_FACE,
   CASINO_GAME_TYPE,
+  DiceNumber,
+  Dice,
 } from "@betswirl/sdk-core"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import type { GameResult, WatchTarget } from "./types"
@@ -24,7 +24,7 @@ interface SubmitBetResult {
   contractAddress: Hex
 }
 
-export function usePlaceBet() {
+export function useDicePlaceBet() {
   const { chain } = useOnchainKit()
   const chainId = chain?.id as CasinoChainId | undefined
   const publicClient = usePublicClient({ chainId })
@@ -61,8 +61,8 @@ export function usePlaceBet() {
     }
   }, [watcherStatus, watcherGameResult])
 
-  const placeBet = useCallback(
-    async (betAmount: bigint, choice: COINTOSS_FACE) => {
+  const placeDiceBet = useCallback(
+    async (betAmount: bigint, choice: DiceNumber) => {
       try {
         resetWagmiWriteContract()
         setGameResult(null)
@@ -70,8 +70,8 @@ export function usePlaceBet() {
         resetWatcher()
 
         const betParams = {
-          game: CASINO_GAME_TYPE.COINTOSS,
-          gameEncodedInput: CoinToss.encodeInput(choice),
+          game: CASINO_GAME_TYPE.DICE,
+          gameEncodedInput: Dice.encodeInput(choice),
           betAmount,
         }
 
@@ -161,7 +161,7 @@ export function usePlaceBet() {
     resetWatcher()
   }, [resetWatcher])
 
-  return { placeBet, betStatus, gameResult, resetBetState }
+  return { placeDiceBet, betStatus, gameResult, resetBetState }
 }
 
 async function _fetchVrfCost(

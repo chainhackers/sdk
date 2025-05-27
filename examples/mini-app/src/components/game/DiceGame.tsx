@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import coinTossBackground from "../../assets/game/game-background.png"
+import diceBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
 
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
@@ -10,16 +10,14 @@ import { useAccount, useBalance } from "wagmi"
 import { type HistoryEntry } from "./HistorySheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
 
-import { useCoinTossPlaceBet } from "../../hooks/useCoinTossPlaceBet"
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
-import { CoinTossGameControls } from "./CoinTossGameControls"
+import { DiceNumber } from "@betswirl/sdk-core"
+import { useDicePlaceBet } from "../../hooks/useDicePlaceBet"
 
 const MULTIPLIER = 1940n
 const PRECISION = 10000n
 
-export interface CoinTossGameProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface DiceGameProps extends React.HTMLAttributes<HTMLDivElement> {
   theme?: "light" | "dark" | "system"
   customTheme?: {
     "--primary"?: string
@@ -107,9 +105,9 @@ const mockHistoryData: HistoryEntry[] = [
 export function CoinTossGame({
   theme = "system",
   customTheme,
-  backgroundImage = coinTossBackground,
+  backgroundImage = diceBackground,
   ...props
-}: CoinTossGameProps) {
+}: DiceGameProps) {
   const themeSettings = { theme, customTheme, backgroundImage }
   const { isConnected: isWalletConnected, address } = useAccount()
   const { data: balance } = useBalance({
@@ -118,38 +116,22 @@ export function CoinTossGame({
   const tokenDecimals = balance?.decimals ?? 18
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
-  const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
-    COINTOSS_FACE.HEADS,
-  )
 
-  const { placeCoinTossBet, betStatus, gameResult, resetBetState } =
-    useCoinTossPlaceBet()
+  const { placeDiceBet, betStatus, gameResult, resetBetState } =
+    useDicePlaceBet()
   const isInGameResultState = !!gameResult
-  const isCoinClickable =
-    isWalletConnected && betStatus !== "pending" && isInGameResultState
 
   const targetPayoutAmount =
     betAmount && betAmount > 0n ? (betAmount * MULTIPLIER) / PRECISION : 0n
 
-  const handlePlayButtonClick = () => {
+  const handlePlayButtonClick = (selected: DiceNumber) => {
     if (betStatus === "error" || isInGameResultState) {
       resetBetState()
     }
 
     if (isWalletConnected && betAmount && betAmount > 0n) {
-      placeCoinTossBet(betAmount, selectedSide)
+      placeDiceBet(betAmount, selected)
     }
-  }
-
-  const handleCoinClick = () => {
-    if (!isCoinClickable) {
-      return
-    }
-    setSelectedSide((prevSide) =>
-      prevSide === COINTOSS_FACE.HEADS
-        ? COINTOSS_FACE.TAILS
-        : COINTOSS_FACE.HEADS,
-    )
   }
 
   const handleHalfBet = () => {
@@ -216,14 +198,6 @@ export function CoinTossGame({
             </div>
           </ConnectWallet>
         </Wallet>
-      }
-      gameControls={
-        <CoinTossGameControls
-          selectedSide={selectedSide}
-          onCoinClick={handleCoinClick}
-          isCoinClickable={isCoinClickable}
-          multiplier={1.94}
-        />
       }
     />
   )
