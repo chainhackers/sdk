@@ -50,9 +50,7 @@ export function CoinTossGame({
   const handlePlayButtonClick = (selectedSide: COINTOSS_FACE) => {
     if (betStatus === "error" || isInGameResultState) {
       resetBetState()
-    }
-
-    if (isWalletConnected && betAmount && betAmount > 0n) {
+    } else if (isWalletConnected && betAmount && betAmount > 0n) {
       placeBet(betAmount, selectedSide)
     }
   }
