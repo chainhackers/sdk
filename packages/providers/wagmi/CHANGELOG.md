@@ -1,5 +1,14 @@
 # @betswirl/wagmi-provider
 
+## 0.1.3
+
+### Patch Changes
+
+- [`76197b5`](https://github.com/BetSwirl/sdk/commit/76197b5e5b89c82730d48dd2c79681d2b3d86703) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Add Plinko game
+
+- Updated dependencies [[`76197b5`](https://github.com/BetSwirl/sdk/commit/76197b5e5b89c82730d48dd2c79681d2b3d86703), [`4056f6a`](https://github.com/BetSwirl/sdk/commit/4056f6a242ac5d438cbc90d9a686e06cc245d39e), [`c33ac72`](https://github.com/BetSwirl/sdk/commit/c33ac72cfdbe252b601874f431c02f6e15e4094e), [`addc6f8`](https://github.com/BetSwirl/sdk/commit/addc6f8fa63da599895e106e76a7de5271e2d841)]:
+  - @betswirl/sdk-core@0.1.3
+
 ## 0.1.3-beta.3
 
 ### Patch Changes
