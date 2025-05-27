@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.3-beta.2
+
+### Patch Changes
+
+- Force Deploy
+
 ## 0.1.3-beta.1
 
 ### Patch Changes
