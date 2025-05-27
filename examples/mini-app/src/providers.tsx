@@ -1,9 +1,9 @@
-import { type ReactNode } from "react"
 import { OnchainKitProvider } from "@coinbase/onchainkit"
-import { base } from "wagmi/chains"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { type ReactNode } from "react"
 import { http, type Hex } from "viem"
-import { createConfig, WagmiProvider } from "wagmi"
+import { WagmiProvider, createConfig } from "wagmi"
+import { base } from "wagmi/chains"
 import { BettingConfigProvider } from "./context/BettingConfigContext.tsx"
 
 const CHAIN = base
@@ -37,9 +37,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
             },
           }}
         >
-          <BettingConfigProvider value={{ affiliate }}>
-            {children}
-          </BettingConfigProvider>
+          <BettingConfigProvider value={{ affiliate }}>{children}</BettingConfigProvider>
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

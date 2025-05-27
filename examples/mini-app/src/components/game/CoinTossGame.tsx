@@ -2,23 +2,22 @@ import React, { useState } from "react"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
 
-import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { TokenImage } from "@coinbase/onchainkit/token"
+import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { useAccount, useBalance } from "wagmi"
 
-import { type HistoryEntry } from "./HistorySheetPanel"
 import { ETH_TOKEN } from "../../lib/tokens"
+import { type HistoryEntry } from "./HistorySheetPanel"
 
-import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { GameFrame } from "./GameFrame"
 
 const MULTIPLIER = 1940n
 const PRECISION = 10000n
 
-export interface CoinTossGameProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface CoinTossGameProps extends React.HTMLAttributes<HTMLDivElement> {
   theme?: "light" | "dark" | "system"
   customTheme?: {
     "--primary"?: string
@@ -121,15 +120,13 @@ export function CoinTossGame({
   const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet()
   const isInGameResultState = !!gameResult
 
-  const targetPayoutAmount = betAmount && betAmount > 0n
-    ? (betAmount * MULTIPLIER) / PRECISION
-    : 0n
+  const targetPayoutAmount = betAmount && betAmount > 0n ? (betAmount * MULTIPLIER) / PRECISION : 0n
 
   const handlePlayButtonClick = (selectedSide: COINTOSS_FACE) => {
     if (betStatus === "error" || isInGameResultState) {
       resetBetState()
     }
-    
+
     if (isWalletConnected && betAmount && betAmount > 0n) {
       placeBet(betAmount, selectedSide)
     }

@@ -9,18 +9,15 @@ const Slider = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SliderPrimitive.Root
     ref={ref}
-    className={cn(
-      "relative flex w-full touch-none select-none items-center",
-      className,
-    )}
+    className={cn("relative flex w-full touch-none select-none items-center", className)}
     {...props}
   >
     <SliderPrimitive.Track className="relative h-2.5 w-full grow overflow-hidden rounded-full bg-green-500">
       <SliderPrimitive.Range className="absolute h-full bg-red-500" />
     </SliderPrimitive.Track>
-    {(props.value ?? props.defaultValue ?? []).map((_, index) => (
+    {(props.value ?? props.defaultValue ?? []).map((value) => (
       <SliderPrimitive.Thumb
-        key={index}
+        key={`slider-thumb-${value}`}
         className={cn(
           "block h-5 w-5 rounded-full border-0",
           "bg-green-500",

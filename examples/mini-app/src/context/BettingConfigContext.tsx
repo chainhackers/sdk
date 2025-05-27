@@ -7,9 +7,5 @@ export const BettingConfigProvider = ({
   value: BettingConfig
   children: React.ReactNode
 }) => {
-  return (
-    <BettingConfigContext.Provider value={value}>
-      {children}
-    </BettingConfigContext.Provider>
-  )
+  return <BettingConfigContext.Provider value={value}>{children}</BettingConfigContext.Provider>
 }

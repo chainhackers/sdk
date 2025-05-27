@@ -34,10 +34,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-function SliderWithState({
-  defaultValue,
-  ...args
-}: React.ComponentProps<typeof Slider>) {
+function SliderWithState({ defaultValue, ...args }: React.ComponentProps<typeof Slider>) {
   const [value, setValue] = useState(defaultValue || [50])
 
   return (
