@@ -9,13 +9,13 @@ import {
   getPlaceBetFunctionData,
   getRollEventData,
 } from "@betswirl/sdk-core"
-import { useOnchainKit } from "@coinbase/onchainkit"
 import { useCallback, useEffect, useState } from "react"
 import { Hex, decodeEventLog, zeroAddress } from "viem"
 import { useAccount, usePublicClient, useWriteContract } from "wagmi"
 import { createLogger } from "../lib/logger"
 import type { GameResult, WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
+import { useChain } from "../context/chainContext"
 
 const logger = createLogger("usePlaceBet")
 
@@ -25,9 +25,8 @@ interface SubmitBetResult {
 }
 
 export function usePlaceBet() {
-  const { chain } = useOnchainKit()
-  const chainId = chain?.id as CasinoChainId | undefined
-  const publicClient = usePublicClient({ chainId })
+  const { appChainId } = useChain()
+  const publicClient = usePublicClient({ chainId: appChainId })
   const { address: connectedAddress } = useAccount()
   const { writeContractAsync, reset: resetWagmiWriteContract } = useWriteContract()
 
@@ -72,7 +71,7 @@ export function usePlaceBet() {
           betAmount,
         }
 
-        if (!publicClient || !chainId || !connectedAddress || !writeContractAsync) {
+        if (!publicClient || !appChainId || !connectedAddress || !writeContractAsync) {
           logger.error("placeBet: Wagmi/OnchainKit clients or address are not initialized.")
           setBetStatus("error")
           return
@@ -83,13 +82,13 @@ export function usePlaceBet() {
         })
         setBetStatus("pending")
 
-        const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
+        const vrfCost = await _fetchVrfCost(betParams.game, appChainId, publicClient)
 
         const submitResult = await _submitBetTransaction(
           betParams,
           connectedAddress,
           vrfCost,
-          chainId,
+          appChainId,
           writeContractAsync,
         )
         const { txHash, contractAddress } = submitResult
@@ -98,7 +97,7 @@ export function usePlaceBet() {
           txHash,
           contractAddress,
           betParams.game,
-          chainId,
+          appChainId,
           connectedAddress,
           publicClient,
         )
@@ -111,7 +110,7 @@ export function usePlaceBet() {
           return
         }
 
-        const { data: rollEventData } = getRollEventData(betParams.game, chainId, betId)
+        const { data: rollEventData } = getRollEventData(betParams.game, appChainId, betId)
         logger.debug("placeBet: Setting up Roll event listener...")
         setWatchTarget({
           betId,
@@ -128,7 +127,7 @@ export function usePlaceBet() {
     },
     [
       publicClient,
-      chainId,
+      appChainId,
       connectedAddress,
       writeContractAsync,
       resetWagmiWriteContract,

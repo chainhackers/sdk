@@ -4,7 +4,7 @@ import { type ReactNode } from "react"
 import { http, type Hex } from "viem"
 import { WagmiProvider, createConfig } from "wagmi"
 import { base } from "wagmi/chains"
-import { BettingConfigProvider } from "./context/BettingConfigContext.tsx"
+import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
 
 const CHAIN = base
 
@@ -37,7 +37,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
             },
           }}
         >
-          <BettingConfigProvider value={{ affiliate }}>{children}</BettingConfigProvider>
+          <BetSwirlSDKProvider initialChainId={CHAIN.id} affiliate={affiliate}>
+            {children}
+          </BetSwirlSDKProvider>
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
