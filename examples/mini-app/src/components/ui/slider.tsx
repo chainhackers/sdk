@@ -19,26 +19,22 @@ function Slider({
 }: React.ComponentProps<typeof SliderPrimitive.Root>) {
   const initialValues = React.useMemo(() => {
     if (value !== undefined) {
-      return Array.isArray(value) ? value : [value];
+      return Array.isArray(value) ? value : [value]
     }
     if (defaultValue !== undefined) {
-      return Array.isArray(defaultValue) ? defaultValue : [defaultValue];
+      return Array.isArray(defaultValue) ? defaultValue : [defaultValue]
     }
-    return [min];
-  }, [value, defaultValue, min]);
+    return [min]
+  }, [value, defaultValue, min])
 
-  const [internalValues, setInternalValues] = React.useState<number[]>(initialValues);
-
-  React.useEffect(() => {
-    if (value !== undefined) {
-      setInternalValues(Array.isArray(value) ? value : [value]);
-    }
-  }, [value]);
+  const [internalValues, setInternalValues] =
+    React.useState<number[]>(initialValues)
+  const [isDragging, setIsDragging] = React.useState(false)
 
   const handleValueChange = (newValues: number[]) => {
-    setInternalValues(newValues);
-    onValueChange?.(newValues);
-  };
+    setInternalValues(newValues)
+    onValueChange?.(newValues)
+  }
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -49,6 +45,8 @@ function Slider({
         min={min}
         max={max}
         onValueChange={handleValueChange}
+        onPointerDown={() => setIsDragging(true)}
+        onPointerUp={() => setIsDragging(false)}
         inverted={true}
         className={cn(
           "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
@@ -70,7 +68,7 @@ function Slider({
           />
         </SliderPrimitive.Track>
         {internalValues.map((currentValue, index) => (
-          <Tooltip key={index}>
+          <Tooltip key={index} open={isDragging || undefined}>
             <TooltipTrigger asChild>
               <SliderPrimitive.Thumb
                 data-slot="slider-thumb"
@@ -79,14 +77,14 @@ function Slider({
                 )}
               />
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-[#E5E7EB]/80">
               <p>{Math.round(currentValue)}</p>
             </TooltipContent>
           </Tooltip>
         ))}
       </SliderPrimitive.Root>
     </TooltipProvider>
-  );
+  )
 }
 
 export { Slider }
