@@ -53,18 +53,17 @@ function formatRelativeTime(timestampSecs: number): string {
 
 export const useGameHistory = (
   gameType: CASINO_GAME_TYPE,
-  userAddress?: `0x${string}`,
 ) => {
   const [gameHistory, setGameHistory] = useState<HistoryEntry[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | null>(null)
-  const { chainId } = useAccount()
+  const { chainId, address } = useAccount()
 
   const fetchHistoryLogic = useCallback(async () => {
-    if (!userAddress || !chainId) {
+    if (!address || !chainId) {
       setGameHistory([])
       setIsLoading(false)
-      logger.error("No user address or chain id", { userAddress, chainId })
+      logger.error("No user address or chain id", { address, chainId })
       return
     }
 
@@ -75,7 +74,7 @@ export const useGameHistory = (
       const result = await fetchBets(
         { chainId: chainId as CasinoChainId },
         {
-          bettor: toLowerCase(userAddress),
+          bettor: toLowerCase(address),
           game: gameType,
         },
         undefined,
@@ -87,7 +86,7 @@ export const useGameHistory = (
         throw result.error
       }
 
-      const formattedHistory: HistoryEntry[] = (result.bets || []).map(
+      const formattedHistory: HistoryEntry[] = result.bets.map(
         (bet: CasinoBet) => ({
           id: bet.id.toString(),
           status: bet.isWin
@@ -119,7 +118,7 @@ export const useGameHistory = (
     } finally {
       setIsLoading(false)
     }
-  }, [userAddress, chainId, gameType])
+  }, [address, chainId, gameType])
 
   useEffect(() => {
     fetchHistoryLogic()

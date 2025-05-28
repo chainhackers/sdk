@@ -35,7 +35,6 @@ export function CoinTossGame({
   const { isConnected: isWalletConnected, address } = useAccount()
   const { gameHistory, refreshHistory } = useGameHistory(
     CASINO_GAME_TYPE.COINTOSS,
-    address,
   )
   const { data: balance } = useBalance({
     address,
