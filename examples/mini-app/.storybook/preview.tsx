@@ -15,7 +15,7 @@ const preview: Preview = {
     },
     options: {
       storySort: {
-        order: ['Game', ['CoinTossGame', '*']],
+        order: ["Game", ["CoinTossGame", "*"]],
       },
     },
   },

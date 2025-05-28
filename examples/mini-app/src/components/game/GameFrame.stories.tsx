@@ -38,7 +38,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: "1.94675",
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~24h ago",
   },
   {
@@ -46,7 +46,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.2,
     payoutAmount: 0.2,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -54,7 +54,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.94,
     payoutAmount: 1.94,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -62,7 +62,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.946,
     payoutAmount: 2.453,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -70,7 +70,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.94,
     payoutAmount: 1.94,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -78,7 +78,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.946,
     payoutAmount: 2.453,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -86,7 +86,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -94,7 +94,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -102,7 +102,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
 ]
@@ -120,7 +120,7 @@ const Template: Story = {
     tokenDecimals: 18,
     gameResult: null,
     betStatus: null,
-
+    onHistoryOpen: () => console.log("onHistoryOpen"),
     betAmount: parseUnits("0.1234567", 18),
     setBetAmount: (betAmount?: bigint) => console.log("betAmount: ", betAmount),
     targetPayoutAmount: (parseUnits("0.1234567", 18) * 194n) / 100n,

@@ -40,6 +40,7 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   tokenDecimals: number
   gameResult: GameResult | null
   betStatus: BetStatus | null
+  onHistoryOpen: () => void
   betAmount: bigint | undefined
   setBetAmount: (amount: bigint | undefined) => void
   targetPayoutAmount: bigint
@@ -60,6 +61,7 @@ export function GameFrame({
   tokenDecimals,
   gameResult,
   betStatus,
+  onHistoryOpen,
   betAmount,
   setBetAmount,
   targetPayoutAmount,
@@ -159,6 +161,13 @@ export function GameFrame({
     )
   }
 
+  const handleHistoryOpen = (open: boolean) => {
+    if (open) {
+      onHistoryOpen()
+    }
+    setIsHistorySheetOpen(open)
+  }
+
   const currentCoinIcon = selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
   const isCoinClickable = isConnected && betStatus !== "pending" && !gameResult
 
@@ -214,7 +223,7 @@ export function GameFrame({
               )}
             </Sheet>
 
-            <Sheet open={isHistorySheetOpen} onOpenChange={setIsHistorySheetOpen}>
+            <Sheet open={isHistorySheetOpen} onOpenChange={handleHistoryOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="iconTransparent"
@@ -265,7 +274,7 @@ export function GameFrame({
               <div className="text-sm font-medium flex items-center">
                 <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
                 <span className="font-semibold">{formattedBalance}</span>
-                <TokenImage token={ETH_TOKEN} size={16} className="ml-1" />
+                <TokenImage token={ETH_TOKEN} size={18} className="ml-1" />
               </div>
 
               <Label
@@ -327,7 +336,7 @@ export function GameFrame({
                 }}
                 className={cn("relative", !isValidInput && "[&_input]:text-muted-foreground")}
                 token={{
-                  icon: <TokenImage token={ETH_TOKEN} size={16} />,
+                  icon: <TokenImage token={ETH_TOKEN} size={18} />,
                   symbol: "ETH",
                 }}
                 disabled={!isConnected || betStatus === "pending" || !!gameResult}
