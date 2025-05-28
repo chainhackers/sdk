@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import gameBgCustom1 from "../../assets/game/game-background-custom1.jpg"
-import gameBgCustom2 from "../../assets/game/game-background-1.png"
-import gameBgLight from "../../assets/game/game-background-light.jpg"
-import gameBgDark from "../../assets/game/game-background-dark.jpg"
+import gameBg1 from "../../assets/game/game-background-1.jpg"
+import gameBg2 from "../../assets/game/game-background-2.jpg"
+import gameBg3 from "../../assets/game/game-background-3.jpg"
+import gameBg4 from "../../assets/game/game-background-4.jpg"
 import { AppProviders } from "../../providers"
 import { CoinTossGame } from "./CoinTossGame"
 
@@ -68,7 +68,6 @@ export const LightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
-    backgroundImage: gameBgLight,
   },
 }
 
@@ -76,7 +75,7 @@ export const DarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
-    backgroundImage: gameBgDark,
+    backgroundImage: gameBg2,
   },
   parameters: {
     backgrounds: { default: "dark" },
@@ -87,6 +86,7 @@ export const SystemTheme: Story = {
   ...Template,
   args: {
     theme: "system",
+    backgroundImage: gameBg4,
   },
 }
 
@@ -97,9 +97,8 @@ export const CustomTheme1: Story = {
     customTheme: {
       "--primary": "#4dae52",
       "--play-btn-font": "#1B5E20",
-      "--game-window-overlay": "transparent",
     } as React.CSSProperties,
-    backgroundImage: gameBgCustom1,
+    backgroundImage: gameBg1,
   },
 }
 
@@ -108,10 +107,9 @@ export const CustomTheme2: Story = {
   args: {
     theme: "light",
     customTheme: {
-      "--primary": "#6AB3D3",
+      "--primary": "rgb(239 185 1)",
       "--play-btn-font": "#ffffff",
-      "--game-window-overlay": "transparent",
     } as React.CSSProperties,
-    backgroundImage: gameBgCustom2,
+    backgroundImage: gameBg3,
   },
 }

@@ -1,8 +1,5 @@
 import React, { useState } from "react"
-import coinTossBackgroundLight from "../../assets/game/game-background-light.jpg"
-import coinTossBackgroundDark from "../../assets/game/game-background-dark.jpg"
-import coinTossBackgroundCustom1 from "../../assets/game/game-background-custom1.jpg"
-import coinTossBackgroundCustom2 from "../../assets/game/game-background-1.png"
+import coinTossBackground from "../../assets/game/game-background.jpg"
 import { cn } from "../../lib/utils"
 
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
@@ -108,31 +105,10 @@ const mockHistoryData: HistoryEntry[] = [
 export function CoinTossGame({
   theme = "system",
   customTheme,
-  backgroundImage,
+  backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
-  // Выбираем фон в зависимости от темы и кастомных настроек
-  let defaultBackground;
-  
-  // Определяем фон по теме и настройкам
-  if (theme === "dark") {
-    defaultBackground = coinTossBackgroundDark;
-  } else if (customTheme) {
-    // Кастомные темы
-    if (customTheme["--primary"] === "#4dae52") {
-      defaultBackground = coinTossBackgroundCustom1;
-    } else if (customTheme["--primary"] === "#6AB3D3") {
-      defaultBackground = coinTossBackgroundCustom2;
-    } else {
-      defaultBackground = coinTossBackgroundLight;
-    }
-  } else {
-    defaultBackground = coinTossBackgroundLight;
-  }
-  
-  // Пользователь может переопределить фон
-  const actualBackground = backgroundImage || defaultBackground;
-  const themeSettings = { theme, customTheme, backgroundImage: actualBackground }
+  const themeSettings = { theme, customTheme, backgroundImage }
   const { isConnected: isWalletConnected, address } = useAccount()
   const { data: balance } = useBalance({
     address,
