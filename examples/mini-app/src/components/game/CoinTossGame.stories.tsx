@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import gameBg from "../../assets/game/game-background-1.png"
+import gameBgCustom1 from "../../assets/game/game-background-custom1.jpg"
+import gameBgCustom2 from "../../assets/game/game-background-1.png"
+import gameBgLight from "../../assets/game/game-background-light.jpg"
+import gameBgDark from "../../assets/game/game-background-dark.jpg"
 import { AppProviders } from "../../providers"
 import { CoinTossGame } from "./CoinTossGame"
 
@@ -65,6 +68,7 @@ export const LightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
+    backgroundImage: gameBgLight,
   },
 }
 
@@ -72,6 +76,7 @@ export const DarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    backgroundImage: gameBgDark,
   },
   parameters: {
     backgrounds: { default: "dark" },
@@ -92,8 +97,9 @@ export const CustomTheme1: Story = {
     customTheme: {
       "--primary": "#4dae52",
       "--play-btn-font": "#1B5E20",
-      "--game-window-overlay": "oklch(0 0 0 / 40%)",
+      "--game-window-overlay": "transparent",
     } as React.CSSProperties,
+    backgroundImage: gameBgCustom1,
   },
 }
 
@@ -104,8 +110,8 @@ export const CustomTheme2: Story = {
     customTheme: {
       "--primary": "#6AB3D3",
       "--play-btn-font": "#ffffff",
-      "--game-window-overlay": "oklch(0 0 0 / 10%)",
+      "--game-window-overlay": "transparent",
     } as React.CSSProperties,
-    backgroundImage: gameBg,
+    backgroundImage: gameBgCustom2,
   },
 }

@@ -102,6 +102,7 @@
     --border: oklch(0.93 0.0058 264.53);
     --input: oklch(0.16 0.02 269.69 / 10%);
     --ring: transparent;
+    --game-background: url('./assets/game/game-background-light.png');
 
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
@@ -117,7 +118,7 @@
     --text-on-surface-variant: oklch(0.61 0.014 271.18);
     --text-on-surface: oklch(0.34 0.0139 235.28);
     --border-stroke: var(--light-stroke);
-    --game-window-overlay: oklch(0 0 0 / 40%);
+    --game-window-overlay: transparent;
     --play-btn-font: var(--white);
 
     --game-win: oklch(0.71 0.1322 165.92);
@@ -165,6 +166,7 @@
     --text-on-surface-variant: var(--dark-on-surface-variant);
     --text-on-surface: oklch(0.93 0.0058 264.53);
     --border-stroke: var(--dark-stroke);
+    --game-window-overlay: transparent;
     --play-btn-font: var(--white);
 
     --game-win: oklch(0.78 0.1418 166.22);
