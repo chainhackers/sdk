@@ -14,6 +14,7 @@ import { useAccount } from "wagmi"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { ETH_TOKEN } from "../lib/tokens"
 import { createLogger } from "../lib/logger"
+import { toLowerCase } from "../lib/utils"
 
 const logger = createLogger("useGameHistory")
 
@@ -74,7 +75,7 @@ export const useGameHistory = (
       const result = await fetchBets(
         { chainId: chainId as CasinoChainId },
         {
-          bettor: userAddress.toLowerCase() as `0x${string}`,
+          bettor: toLowerCase(userAddress),
           game: gameType,
         },
         undefined,
