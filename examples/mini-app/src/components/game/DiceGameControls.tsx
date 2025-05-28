@@ -30,8 +30,11 @@ export function DiceGameControls({
             step={1}
             className="w-full"
           />
-          <div className="flex justify-between text-xs text-white/50 mt-1">
+          <div className="flex justify-between text-xs text-[#E5E7EB]/80 mt-1">
             <span>1</span>
+            <span>25</span>
+            <span>50</span>
+            <span>75</span>
             <span>99</span>
           </div>
         </div>
