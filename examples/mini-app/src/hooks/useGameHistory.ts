@@ -8,6 +8,7 @@ import {
   formatRawAmount,
   FORMAT_TYPE,
   CASINO_GAME_TYPE,
+  formatAmount,
 } from "@betswirl/sdk-core"
 import { useAccount } from "wagmi"
 import { TokenImage } from "@coinbase/onchainkit/token"
@@ -91,9 +92,12 @@ export const useGameHistory = (
           status: bet.isWin
             ? HistoryEntryStatus.WonBet
             : HistoryEntryStatus.Busted,
-          multiplier: bet.formattedPayoutMultiplier ?? 0,
+          multiplier: formatAmount(
+            bet.formattedPayoutMultiplier,
+            FORMAT_TYPE.MINIFY,
+          ),
           payoutAmount: formatRawAmount(
-            bet.payout ?? 0n,
+            bet.payout,
             bet.token.decimals,
             FORMAT_TYPE.MINIFY,
           ),
