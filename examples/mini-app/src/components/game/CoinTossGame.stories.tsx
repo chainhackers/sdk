@@ -6,6 +6,7 @@ import gameBg4 from "../../assets/game/game-background-4.jpg"
 import gameBg5 from "../../assets/game/game-background-5.png"
 import gameBg6 from "../../assets/game/game-background-6.jpg"
 import gameBg7 from "../../assets/game/game-background-7.png"
+import gameBg8 from "../../assets/game/game-background-8.jpg"
 import { AppProviders } from "../../providers"
 import { CoinTossGame } from "./CoinTossGame"
 
@@ -150,5 +151,17 @@ export const CustomTheme5: Story = {
       "--play-btn-font": "#ffffff",
     } as React.CSSProperties,
     backgroundImage: gameBg7,
+  },
+}
+
+export const CustomTheme6: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    customTheme: {
+      "--primary": "rgb(44 52 51)",
+      "--play-btn-font": "rgb(171 181 171)",
+    } as React.CSSProperties,
+    backgroundImage: gameBg8,
   },
 }
