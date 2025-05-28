@@ -29,6 +29,7 @@ export function DiceGameControls({
             max={99}
             step={1}
             className="w-full"
+            invertFill={true}
           />
         </div>
         <div className="flex justify-between items-center text-[12px] text-[#E5E7EB]/80 w-[188px] h-[20px] pl-3 pr-2">

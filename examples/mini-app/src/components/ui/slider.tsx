@@ -8,6 +8,11 @@ import {
   TooltipTrigger,
 } from "./tooltip"
 
+interface SliderProps
+  extends React.ComponentProps<typeof SliderPrimitive.Root> {
+  invertFill?: boolean
+}
+
 function Slider({
   className,
   defaultValue,
@@ -15,8 +20,9 @@ function Slider({
   min = 0,
   max = 100,
   onValueChange,
+  invertFill = false,
   ...props
-}: React.ComponentProps<typeof SliderPrimitive.Root>) {
+}: SliderProps) {
   const initialValues = React.useMemo(() => {
     if (value !== undefined) {
       return Array.isArray(value) ? value : [value]
@@ -37,10 +43,15 @@ function Slider({
     onValueChange?.(newValues)
   }
 
+  // Calculate current value percentage for inverted fill
+  const currentValue = value?.[0] ?? internalValues[0] ?? min
+  const valuePercent = ((currentValue - min) / (max - min)) * 100
+
   return (
     <TooltipProvider delayDuration={0}>
       <SliderPrimitive.Root
         data-slot="slider"
+        data-invert-fill={invertFill}
         defaultValue={defaultValue}
         value={value}
         min={min}
@@ -50,6 +61,14 @@ function Slider({
         onPointerUp={() => setIsDragging(false)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        style={
+          invertFill
+            ? ({
+                "--slider-range-left": `${valuePercent}%`,
+                "--slider-range-right": "0%",
+              } as React.CSSProperties)
+            : undefined
+        }
         className={cn(
           "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col cursor-pointer",
           className,
