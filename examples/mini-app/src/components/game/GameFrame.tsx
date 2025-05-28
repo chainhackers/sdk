@@ -77,9 +77,7 @@ export function GameFrame({
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
-  const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
-    COINTOSS_FACE.HEADS,
-  )
+  const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(COINTOSS_FACE.HEADS)
   const cardRef = useRef<HTMLDivElement>(null)
   const [isMounted, setIsMounted] = useState(false)
   const { theme } = themeSettings
@@ -105,11 +103,7 @@ export function GameFrame({
       setInputValue("")
       setIsValidInput(true)
     } else {
-      const formatted = formatRawAmount(
-        betAmount,
-        tokenDecimals,
-        FORMAT_TYPE.PRECISE,
-      )
+      const formatted = formatRawAmount(betAmount, tokenDecimals, FORMAT_TYPE.PRECISE)
       setInputValue(formatted)
       setIsValidInput(true)
     }
@@ -163,9 +157,7 @@ export function GameFrame({
       return
     }
     setSelectedSide((prevSide) =>
-      prevSide === COINTOSS_FACE.HEADS
-        ? COINTOSS_FACE.TAILS
-        : COINTOSS_FACE.HEADS,
+      prevSide === COINTOSS_FACE.HEADS ? COINTOSS_FACE.TAILS : COINTOSS_FACE.HEADS,
     )
   }
 
@@ -176,31 +168,21 @@ export function GameFrame({
     setIsHistorySheetOpen(open)
   }
 
-  const currentCoinIcon =
-    selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
+  const currentCoinIcon = selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
   const isCoinClickable = isConnected && betStatus !== "pending" && !gameResult
 
   return (
     <div
-      className={cn(
-        "cointoss-game-wrapper game-global-styles",
-        themeClass,
-        props.className,
-      )}
+      className={cn("cointoss-game-wrapper game-global-styles", themeClass, props.className)}
       style={themeSettings.customTheme as React.CSSProperties}
       {...props}
     >
       <Card
         ref={cardRef}
-        className={cn(
-          "relative overflow-hidden",
-          "bg-card text-card-foreground border",
-        )}
+        className={cn("relative overflow-hidden", "bg-card text-card-foreground border")}
       >
         <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-          <CardTitle className="text-lg text-title-color font-bold">
-            CoinToss
-          </CardTitle>
+          <CardTitle className="text-lg text-title-color font-bold">CoinToss</CardTitle>
           {connectWallletBtn}
         </CardHeader>
 
@@ -214,12 +196,7 @@ export function GameFrame({
               backgroundImage: `url(${themeSettings.backgroundImage})`,
             }}
           >
-            <div
-              className={cn(
-                "absolute inset-0 rounded-[16px]",
-                "bg-game-window-overlay",
-              )}
-            />
+            <div className={cn("absolute inset-0 rounded-[16px]", "bg-game-window-overlay")} />
 
             <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
               <SheetTrigger asChild>
@@ -261,10 +238,7 @@ export function GameFrame({
                 </Button>
               </SheetTrigger>
               {isMounted && cardRef.current && (
-                <HistorySheetPanel
-                  portalContainer={cardRef.current}
-                  historyData={historyData}
-                />
+                <HistorySheetPanel portalContainer={cardRef.current} historyData={historyData} />
               )}
             </Sheet>
 
@@ -298,9 +272,7 @@ export function GameFrame({
           <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <div className="text-sm font-medium flex items-center">
-                <span className="text-text-on-surface-variant">
-                  Balance:&nbsp;
-                </span>
+                <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
                 <span className="font-semibold">{formattedBalance}</span>
                 <TokenImage token={ETH_TOKEN} size={18} className="ml-1" />
               </div>
@@ -362,32 +334,21 @@ export function GameFrame({
                     setBetAmountError(null)
                   }
                 }}
-                className={cn(
-                  "relative",
-                  !isValidInput && "[&_input]:text-muted-foreground",
-                )}
+                className={cn("relative", !isValidInput && "[&_input]:text-muted-foreground")}
                 token={{
                   icon: <TokenImage token={ETH_TOKEN} size={18} />,
                   symbol: "ETH",
                 }}
-                disabled={
-                  !isConnected || betStatus === "pending" || !!gameResult
-                }
+                disabled={!isConnected || betStatus === "pending" || !!gameResult}
               />
-              {betAmountError && (
-                <div className="text-red-500 text-xs mt-1">
-                  {betAmountError}
-                </div>
-              )}
+              {betAmountError && <div className="text-red-500 text-xs mt-1">{betAmountError}</div>}
 
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   variant="secondary"
                   onClick={onHalfBet}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isBettingInProgress || isInGameResultState}
                 >
                   1/2
                 </Button>
@@ -395,9 +356,7 @@ export function GameFrame({
                   variant="secondary"
                   onClick={onDoubleBet}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isBettingInProgress || isInGameResultState}
                 >
                   2x
                 </Button>
@@ -405,9 +364,7 @@ export function GameFrame({
                   variant="secondary"
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   onClick={onMaxBet}
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isBettingInProgress || isInGameResultState}
                 >
                   Max
                 </Button>

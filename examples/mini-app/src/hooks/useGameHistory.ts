@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useCallback } from "react"
 import {
-  fetchBets,
   Bet_OrderBy,
-  OrderDirection,
+  CASINO_GAME_TYPE,
   CasinoBet,
   CasinoChainId,
-  formatRawAmount,
   FORMAT_TYPE,
-  CASINO_GAME_TYPE,
+  OrderDirection,
+  fetchBets,
   formatAmount,
+  formatRawAmount,
 } from "@betswirl/sdk-core"
-import { useAccount } from "wagmi"
 import { TokenImage } from "@coinbase/onchainkit/token"
-import { ETH_TOKEN } from "../lib/tokens"
+import React, { useState, useEffect, useCallback } from "react"
+import { useAccount } from "wagmi"
 import { createLogger } from "../lib/logger"
+import { ETH_TOKEN } from "../lib/tokens"
 import { toLowerCase } from "../lib/utils"
 
 const logger = createLogger("useGameHistory")
@@ -51,9 +51,7 @@ function formatRelativeTime(timestampSecs: number): string {
   return `~${diffInDays}d ago`
 }
 
-export const useGameHistory = (
-  gameType: CASINO_GAME_TYPE,
-) => {
+export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
   const [gameHistory, setGameHistory] = useState<HistoryEntry[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | null>(null)
@@ -86,35 +84,22 @@ export const useGameHistory = (
         throw result.error
       }
 
-      const formattedHistory: HistoryEntry[] = result.bets.map(
-        (bet: CasinoBet) => ({
-          id: bet.id.toString(),
-          status: bet.isWin
-            ? HistoryEntryStatus.WonBet
-            : HistoryEntryStatus.Busted,
-          multiplier: formatAmount(
-            bet.formattedPayoutMultiplier,
-            FORMAT_TYPE.MINIFY,
-          ),
-          payoutAmount: formatRawAmount(
-            bet.payout,
-            bet.token.decimals,
-            FORMAT_TYPE.MINIFY,
-          ),
-          payoutCurrencyIcon: React.createElement(TokenImage, {
-            token: ETH_TOKEN,
-            size: 18,
-          }),
-          timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
+      const formattedHistory: HistoryEntry[] = result.bets.map((bet: CasinoBet) => ({
+        id: bet.id.toString(),
+        status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
+        multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
+        payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
+        payoutCurrencyIcon: React.createElement(TokenImage, {
+          token: ETH_TOKEN,
+          size: 18,
         }),
-      )
+        timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
+      }))
 
       setGameHistory(formattedHistory)
       logger.info("Game history fetched", { formattedHistory })
     } catch (e) {
-      setError(
-        e instanceof Error ? e : new Error("Failed to fetch game history"),
-      )
+      setError(e instanceof Error ? e : new Error("Failed to fetch game history"))
     } finally {
       setIsLoading(false)
     }
