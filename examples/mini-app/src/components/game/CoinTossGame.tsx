@@ -6,16 +6,20 @@ import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { useAccount, useBalance } from "wagmi"
 
-import { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  chainById,
+  chainNativeCurrencyToToken,
+  COINTOSS_FACE,
+} from "@betswirl/sdk-core"
 import { useGameHistory } from "../../hooks/useGameHistory"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { GameFrame } from "./GameFrame"
 import { formatGwei } from "viem"
+import { useChain } from "../../context/chainContext"
 
-const MULTIPLIER = 1940n
-const PRECISION = 10000n
-
-export interface CoinTossGameProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CoinTossGameProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   theme?: "light" | "dark" | "system"
   customTheme?: {
     "--primary"?: string
@@ -33,18 +37,26 @@ export function CoinTossGame({
 }: CoinTossGameProps) {
   const themeSettings = { theme, customTheme, backgroundImage }
   const { isConnected: isWalletConnected, address } = useAccount()
-  const { gameHistory, refreshHistory } = useGameHistory(CASINO_GAME_TYPE.COINTOSS)
+  const { gameHistory, refreshHistory } = useGameHistory(
+    CASINO_GAME_TYPE.COINTOSS,
+  )
   const { data: balance } = useBalance({
     address,
   })
-  const tokenDecimals = balance?.decimals ?? 18
+  const { appChainId } = useChain()
+  const token = chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
 
-  const { placeBet, betStatus, gameResult, resetBetState, formattedVrfFees, gasPrice } = usePlaceBet()
+  const {
+    placeBet,
+    betStatus,
+    gameResult,
+    resetBetState,
+    formattedVrfFees,
+    gasPrice,
+  } = usePlaceBet()
   const isInGameResultState = !!gameResult
-
-  const targetPayoutAmount = betAmount && betAmount > 0n ? (betAmount * MULTIPLIER) / PRECISION : 0n
 
   const handlePlayButtonClick = (selectedSide: COINTOSS_FACE) => {
     if (betStatus === "error" || isInGameResultState) {
@@ -84,13 +96,12 @@ export function CoinTossGame({
       {...props}
       onPlayBtnClick={handlePlayButtonClick}
       historyData={gameHistory}
-      tokenDecimals={tokenDecimals}
+      token={token}
       themeSettings={themeSettings}
       isConnected={isWalletConnected}
       balance={balance?.value ?? 0n}
       betAmount={betAmount}
       setBetAmount={setBetAmount}
-      targetPayoutAmount={targetPayoutAmount}
       onHalfBet={handleHalfBet}
       onDoubleBet={handleDoubleBet}
       onMaxBet={handleMaxBet}

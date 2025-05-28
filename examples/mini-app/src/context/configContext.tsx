@@ -12,7 +12,7 @@ export const useBettingConfig = () => {
   const configContext = useContext(ConfigContext) as ConfigContextValue
   if (!configContext)
     throw new Error("useBettingConfig must be used inside ConfigProvider")
-  return ConfigContext
+  return configContext
 }
 
 export type ConfigProviderProps = {
