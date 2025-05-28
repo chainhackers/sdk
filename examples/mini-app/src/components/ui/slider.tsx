@@ -30,6 +30,7 @@ function Slider({
   const [internalValues, setInternalValues] =
     React.useState<number[]>(initialValues)
   const [isDragging, setIsDragging] = React.useState(false)
+  const [isFocused, setIsFocused] = React.useState(false)
 
   const handleValueChange = (newValues: number[]) => {
     setInternalValues(newValues)
@@ -47,6 +48,8 @@ function Slider({
         onValueChange={handleValueChange}
         onPointerDown={() => setIsDragging(true)}
         onPointerUp={() => setIsDragging(false)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         inverted={true}
         className={cn(
           "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
@@ -68,12 +71,12 @@ function Slider({
           />
         </SliderPrimitive.Track>
         {internalValues.map((currentValue, index) => (
-          <Tooltip key={index} open={isDragging || undefined}>
+          <Tooltip key={index} open={isDragging || isFocused}>
             <TooltipTrigger asChild>
               <SliderPrimitive.Thumb
                 data-slot="slider-thumb"
                 className={cn(
-                  "block size-[14px] rounded-full bg-primary hover:bg-violet3 focus:shadow-[0_0_0_14px] focus:shadow-primary/20 focus:outline-none z-10",
+                  "block size-[14px] rounded-full bg-primary transition-all duration-200 ease-in-out hover:bg-violet3 hover:shadow-[0_0_0_14px] hover:shadow-primary/20 focus:shadow-[0_0_0_14px] focus:shadow-primary/20 focus:outline-none z-10 cursor-pointer",
                 )}
               />
             </TooltipTrigger>
