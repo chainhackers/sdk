@@ -48,7 +48,6 @@ export function useGasPrice(props: UseGasPriceProps = {}) {
         queryKey: ['/gas-price', appChain.id],
         queryFn,
         refetchOnWindowFocus: false,
-        refetchInterval: 5000,
         ...query,
     })
 

@@ -133,6 +133,8 @@ const Template: Story = {
     onHalfBet: () => console.log("onHalfBet"),
     onDoubleBet: () => console.log("onDoubleBet"),
     onMaxBet: () => console.log("onMaxBet"),
+    vrfFees: 0.0001,
+    gasPrice: 34.2123,
   },
   render: (args) => <GameFrame {...args} />,
 }

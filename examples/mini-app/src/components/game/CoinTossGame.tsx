@@ -10,6 +10,7 @@ import { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
 import { useGameHistory } from "../../hooks/useGameHistory"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { GameFrame } from "./GameFrame"
+import { formatGwei } from "viem"
 
 const MULTIPLIER = 1940n
 const PRECISION = 10000n
@@ -40,7 +41,7 @@ export function CoinTossGame({
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
 
-  const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet()
+  const { placeBet, betStatus, gameResult, resetBetState, formattedVrfFees, gasPrice } = usePlaceBet()
   const isInGameResultState = !!gameResult
 
   const targetPayoutAmount = betAmount && betAmount > 0n ? (betAmount * MULTIPLIER) / PRECISION : 0n
@@ -96,6 +97,8 @@ export function CoinTossGame({
       gameResult={gameResult}
       betStatus={betStatus}
       onHistoryOpen={refreshHistory}
+      vrfFees={formattedVrfFees}
+      gasPrice={formatGwei(gasPrice)}
       connectWallletBtn={
         <Wallet>
           <ConnectWallet

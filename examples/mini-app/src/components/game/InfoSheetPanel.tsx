@@ -1,12 +1,14 @@
+import { chainById } from "@betswirl/sdk-core"
+import { useChain } from "../../context/chainContext"
 import { cn } from "../../lib/utils"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 
 interface InfoSheetPanelProps {
   portalContainer: HTMLElement
   winChance: number
-  rngFee: number | string
+  rngFee: number | string // formatted
   targetPayout: string
-  gasPrice: string
+  gasPrice: number | string // gwei formatted
 }
 
 export function InfoSheetPanel({
@@ -16,10 +18,13 @@ export function InfoSheetPanel({
   targetPayout,
   gasPrice,
 }: InfoSheetPanelProps) {
+  const { appChainId } = useChain()
   return (
     <SheetPortal container={portalContainer}>
       <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
-      <SheetBottomPanelContent className={cn("!h-auto !max-h-[70%]", "p-5 sm:p-6")}>
+      <SheetBottomPanelContent
+        className={cn("!h-auto !max-h-[70%]", "p-5 sm:p-6")}
+      >
         <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm font-medium text-text-on-surface-variant">
           <div>
             <p>Win chance:</p>
@@ -27,7 +32,9 @@ export function InfoSheetPanel({
           </div>
           <div>
             <p>RNG fee:</p>
-            <p className="text-text-on-surface">{rngFee} ETH</p>
+            <p className="text-text-on-surface">
+              {rngFee} {chainById[appChainId].nativeCurrency.symbol}
+            </p>
           </div>
           <div>
             <p>Target payout:</p>
@@ -35,7 +42,7 @@ export function InfoSheetPanel({
           </div>
           <div>
             <p>Gas price:</p>
-            <p className="text-text-on-surface">{gasPrice}</p>
+            <p className="text-text-on-surface">{gasPrice} gwei</p>
           </div>
         </div>
       </SheetBottomPanelContent>

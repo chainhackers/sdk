@@ -4,18 +4,20 @@ import {
   CasinoChainId,
   CoinToss,
   GenericCasinoBetParams,
-  getChainlinkVrfCostFunctionData,
+  chainById,
+  chainNativeCurrencyToToken,
   getPlaceBetEventData,
   getPlaceBetFunctionData,
   getRollEventData,
 } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useState } from "react"
-import { Hex, decodeEventLog, zeroAddress } from "viem"
+import { Hex, decodeEventLog } from "viem"
 import { useAccount, usePublicClient, useWriteContract } from "wagmi"
 import { createLogger } from "../lib/logger"
 import type { GameResult, WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import { useChain } from "../context/chainContext"
+import { useEstimateVRFFees } from "./useEstimateVRFFees"
 
 const logger = createLogger("usePlaceBet")
 
@@ -29,7 +31,11 @@ export function usePlaceBet() {
   const publicClient = usePublicClient({ chainId: appChainId })
   const { address: connectedAddress } = useAccount()
   const { writeContractAsync, reset: resetWagmiWriteContract } = useWriteContract()
-
+  const { vrfFees, wagmiHook: estimateVrfFeesWagmiHook, formattedVrfFees, gasPrice } = useEstimateVRFFees({
+    game: CASINO_GAME_TYPE.COINTOSS,
+    token: chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency), // TODO make this token dynamic when the token list is integrated
+    betCount: 1, // TODO make this number dynamic when multi betting is integrated
+  })
   const [betStatus, setBetStatus] = useState<"pending" | "success" | "error" | null>(null)
   const [gameResult, setGameResult] = useState<GameResult | null>(null)
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
@@ -82,12 +88,16 @@ export function usePlaceBet() {
         })
         setBetStatus("pending")
 
-        const vrfCost = await _fetchVrfCost(betParams.game, appChainId, publicClient)
+        await estimateVrfFeesWagmiHook.refetch()
+
+        logger.debug("placeBet: VRF cost refetched:", formattedVrfFees)
+
 
         const submitResult = await _submitBetTransaction(
           betParams,
           connectedAddress,
-          vrfCost,
+          vrfFees,
+          gasPrice,
           appChainId,
           writeContractAsync,
         )
@@ -132,6 +142,7 @@ export function usePlaceBet() {
       writeContractAsync,
       resetWagmiWriteContract,
       resetWatcher,
+      vrfFees
     ],
   )
 
@@ -142,34 +153,14 @@ export function usePlaceBet() {
     resetWatcher()
   }, [resetWatcher])
 
-  return { placeBet, betStatus, gameResult, resetBetState }
-}
-
-async function _fetchVrfCost(
-  gameType: CASINO_GAME_TYPE,
-  chainId: CasinoChainId,
-  publicClient: ReturnType<typeof usePublicClient>,
-): Promise<bigint> {
-  if (!publicClient) {
-    logger.error("_fetchVrfCost: publicClient is undefined")
-    throw new Error("publicClient is undefined")
-  }
-  logger.debug("_fetchVrfCost: Getting VRF cost...")
-  const vrfCostFunctionData = getChainlinkVrfCostFunctionData(gameType, zeroAddress, 1, chainId)
-  const vrfCost = (await publicClient.readContract({
-    address: vrfCostFunctionData.data.to,
-    abi: vrfCostFunctionData.data.abi,
-    functionName: vrfCostFunctionData.data.functionName,
-    args: vrfCostFunctionData.data.args,
-  })) as bigint
-  logger.debug("_fetchVrfCost: VRF cost received:", vrfCost?.toString())
-  return vrfCost
+  return { placeBet, betStatus, gameResult, resetBetState, vrfFees, gasPrice, formattedVrfFees }
 }
 
 async function _submitBetTransaction(
   betParams: GenericCasinoBetParams,
   receiver: Hex,
   vrfCost: bigint,
+  gasPrice: bigint,
   chainId: CasinoChainId,
   writeContractAsync: ReturnType<typeof useWriteContract>["writeContractAsync"],
 ): Promise<SubmitBetResult> {
@@ -181,6 +172,7 @@ async function _submitBetTransaction(
     functionName: placeBetTxData.data.functionName,
     args: placeBetTxData.data.args,
     value: placeBetTxData.extraData.getValue(betParams.betAmount + vrfCost),
+    gasPrice,
   })
   logger.debug("_submitBetTransaction: Transaction sent, hash:", txHash)
   return {
