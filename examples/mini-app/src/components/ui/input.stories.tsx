@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react"
 import { TokenImage } from "@coinbase/onchainkit/token"
+import type { Meta, StoryObj } from "@storybook/react"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { Input } from "./input"
 

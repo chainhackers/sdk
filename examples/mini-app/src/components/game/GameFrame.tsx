@@ -1,24 +1,24 @@
+import { COINTOSS_FACE, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
+import Decimal from "decimal.js"
 import { History, Info } from "lucide-react"
 import React, { ChangeEvent, useEffect, useRef, useState } from "react"
+import { parseUnits } from "viem"
 import coinHeadsIcon from "../../assets/game/coin-heads.svg"
 import coinTailsIcon from "../../assets/game/coin-tails.svg"
 import { cn } from "../../lib/utils"
-import { COINTOSS_FACE, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
-import { parseUnits } from "viem"
-import Decimal from "decimal.js"
 
 import { TokenImage } from "@coinbase/onchainkit/token"
 
+import { ETH_TOKEN } from "../../lib/tokens"
+import { BetStatus, GameResult } from "../../types"
 import { Sheet, SheetTrigger } from "../ui/sheet"
+import { GameResultWindow } from "./GameResultWindow"
 import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
-import { ETH_TOKEN } from "../../lib/tokens"
-import { GameResultWindow } from "./GameResultWindow"
-import { BetStatus, GameResult } from "../../types"
 
 interface IThemeSettings {
   theme?: "light" | "dark" | "system"
@@ -219,7 +219,7 @@ export function GameFrame({
                 "absolute inset-0 rounded-[16px]",
                 "bg-game-window-overlay",
               )}
-            ></div>
+            />
 
             <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
               <SheetTrigger asChild>

@@ -2,14 +2,14 @@ import React, { useState } from "react"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
 
-import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
-import { useGameHistory } from "../../hooks/useGameHistory"
+import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { useAccount, useBalance } from "wagmi"
 
-import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
+import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { GameFrame } from "./GameFrame"
+import { useGameHistory } from "../../hooks/useGameHistory"
 
 const MULTIPLIER = 1940n
 const PRECISION = 10000n

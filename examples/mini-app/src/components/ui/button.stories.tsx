@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Info } from "lucide-react"
-import { Button } from "./button"
 import coinHeadsIcon from "../../assets/game/coin-heads.svg"
+import { Button } from "./button"
 
 const meta = {
   title: "UI/Button",
@@ -113,11 +113,7 @@ export const CoinButton: Story = {
     variant: "coinButton",
     size: "coin",
     children: (
-      <img
-        src={coinHeadsIcon}
-        alt="Coin Heads"
-        className="h-full w-auto pointer-events-none"
-      />
+      <img src={coinHeadsIcon} alt="Coin Heads" className="h-full w-auto pointer-events-none" />
     ),
   },
 }

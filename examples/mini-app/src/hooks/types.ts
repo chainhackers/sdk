@@ -1,5 +1,5 @@
-import type { Abi, Hex } from "viem"
 import type { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
+import type { Abi, Hex } from "viem"
 
 export interface GameResult {
   isWin: boolean

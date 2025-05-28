@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { GameResultWindow } from "./GameResultWindow"
 import { parseUnits } from "viem"
+import { GameResultWindow } from "./GameResultWindow"
 
 const meta = {
   title: "Game/GameResultWindow",
@@ -58,7 +58,7 @@ export const WinLight: Story = {
     ...Template.args,
     isVisible: true,
     isWin: true,
-    payout: parseUnits("1.1234567", 18) * 194n / 100n,
+    payout: (parseUnits("1.1234567", 18) * 194n) / 100n,
   },
   render: (args) => (
     <div className="light">
@@ -96,7 +96,7 @@ export const WinDark: Story = {
     ...Template.args,
     isVisible: true,
     isWin: true,
-    payout: parseUnits("1.1234567", 18) * 194n / 100n,
+    payout: (parseUnits("1.1234567", 18) * 194n) / 100n,
   },
   render: (args) => (
     <div className="dark">

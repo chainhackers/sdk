@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { GameFrame } from "./GameFrame"
-import { TokenImage } from "@coinbase/onchainkit/token"
-import { ETH_TOKEN } from "../../lib/tokens"
-import { type HistoryEntry } from "./HistorySheetPanel"
-import gameBg from "../../assets/game/game-background.png"
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { TokenImage } from "@coinbase/onchainkit/token"
+import type { Meta, StoryObj } from "@storybook/react"
 import { parseUnits } from "viem"
+import gameBg from "../../assets/game/game-background.png"
+import { ETH_TOKEN } from "../../lib/tokens"
+import { GameFrame } from "./GameFrame"
+import { type HistoryEntry } from "./HistorySheetPanel"
 
 BigInt.prototype.toJSON = function () {
   return this.toString()
@@ -30,7 +30,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const connectWalletBtnStub = <div></div>
+const connectWalletBtnStub = <div />
 
 const mockHistoryData: HistoryEntry[] = [
   {
@@ -116,8 +116,7 @@ const Template: Story = {
     balance: 1123456n * 10n ** 12n,
     connectWallletBtn: connectWalletBtnStub,
     isConnected: false,
-    onPlayBtnClick: (selectedSide: COINTOSS_FACE) =>
-      console.log("selectedSide: ", selectedSide),
+    onPlayBtnClick: (selectedSide: COINTOSS_FACE) => console.log("selectedSide: ", selectedSide),
     tokenDecimals: 18,
     gameResult: null,
     betStatus: null,

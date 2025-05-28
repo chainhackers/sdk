@@ -7,8 +7,7 @@ export interface TokenInfo {
   symbol: string
 }
 
-export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix"> {
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix"> {
   token?: TokenInfo
 }
 
@@ -17,12 +16,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const hasTokenInfo = token && (token.icon || token.symbol)
 
     return (
-      <div
-        className={cn(
-          "relative flex h-12 w-full items-center text-sm",
-          className,
-        )}
-      >
+      <div className={cn("relative flex h-12 w-full items-center text-sm", className)}>
         <input
           type={type}
           data-slot="input"
