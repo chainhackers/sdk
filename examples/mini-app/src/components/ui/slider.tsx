@@ -51,7 +51,7 @@ function Slider({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         className={cn(
-          "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
+          "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col cursor-pointer",
           className,
         )}
         {...props}
@@ -59,13 +59,13 @@ function Slider({
         <SliderPrimitive.Track
           data-slot="slider-track"
           className={cn(
-            "bg-primary relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
+            " bg-[#090C15]/10 relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
           )}
         >
           <SliderPrimitive.Range
             data-slot="slider-range"
             className={cn(
-              "bg-muted absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
+              "bg-primary  absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
             )}
           />
         </SliderPrimitive.Track>
@@ -75,7 +75,7 @@ function Slider({
               <SliderPrimitive.Thumb
                 data-slot="slider-thumb"
                 className={cn(
-                  "block size-[14px] rounded-full bg-primary transition-all duration-200 ease-in-out hover:bg-violet3 hover:shadow-[0_0_0_14px] hover:shadow-primary/20 focus:shadow-[0_0_0_14px] focus:shadow-primary/20 focus:outline-none z-10 cursor-pointer",
+                  "block size-[14px] rounded-full bg-primary transition-all duration-200 ease-in-out hover:bg-violet3 hover:shadow-[0_0_0_7px] hover:shadow-primary/20 focus:shadow-[0_0_0_7px] focus:shadow-primary/20 focus:outline-none z-10",
                 )}
               />
             </TooltipTrigger>
