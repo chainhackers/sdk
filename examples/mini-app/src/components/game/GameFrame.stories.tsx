@@ -7,6 +7,12 @@ import { ETH_TOKEN } from "../../lib/tokens"
 import { GameFrame } from "./GameFrame"
 import { type HistoryEntry } from "./HistorySheetPanel"
 
+declare global {
+  interface BigInt {
+    toJSON(): string
+  }
+}
+
 BigInt.prototype.toJSON = function () {
   return this.toString()
 }
