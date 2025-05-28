@@ -1,7 +1,8 @@
 import type { Decorator, Preview } from "@storybook/react"
+import React from "react"
 import "../src/index.css"
 
-const withAppProviders: Decorator = (StoryComponent) => {
+const withAppProviders: Decorator = (StoryComponent: React.ComponentType) => {
   return <StoryComponent />
 }
 
@@ -15,7 +16,7 @@ const preview: Preview = {
     },
     options: {
       storySort: {
-        order: ['Game', ['CoinTossGame', '*']],
+        order: ["Game", ["CoinTossGame", "*"]],
       },
     },
   },

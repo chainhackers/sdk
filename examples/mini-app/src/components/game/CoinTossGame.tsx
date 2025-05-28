@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import coinTossBackground from "../../assets/game/game-background.png"
+import coinTossBackground from "../../assets/game/game-background.jpg"
 import { cn } from "../../lib/utils"
 
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
