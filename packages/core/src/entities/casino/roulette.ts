@@ -1,3 +1,6 @@
+import { encodeAbiParameters } from "viem";
+import { parseAbiParameters } from "viem";
+import type { EncodeAbiParametersReturnType } from "viem/_types/utils/abi/encodeAbiParameters";
 import { BP_VALUE } from "../../constants";
 import { CASINO_GAME_TYPE } from "../../data/casino";
 import { getFormattedNetMultiplier, getNetMultiplier } from "../../utils/bet";
@@ -115,6 +118,10 @@ export class Roulette extends AbstractCasinoGame<
       }, "");
     // 5. Transform the binary numbers to a number
     return Number.parseInt(binaryNumbers, 2);
+  }
+
+  static encodeAbiParametersInput(numbers: RouletteNumber[]): EncodeAbiParametersReturnType {
+    return encodeAbiParameters(parseAbiParameters("uint40"), [Roulette.encodeInput(numbers)]);
   }
 
   static decodeInput(encodedNumbers: RouletteEncodedInput | string): RouletteNumber[] {

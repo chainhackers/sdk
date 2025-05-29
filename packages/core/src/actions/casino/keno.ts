@@ -9,14 +9,22 @@ import type { BetSwirlWallet } from "../../provider";
 import type { KenoConfiguration } from "../../read";
 import {
   type CasinoBetParams,
+  type CasinoFreebetParams,
   type CasinoPlaceBetOptions,
   type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
+  type PlaceFreebetCallbacks,
   getPlacedBetFromReceipt,
   placeBet,
+  placeFreebet,
 } from "./game";
 
-export interface KenoParams extends CasinoBetParams {
+export interface KenoBetParams extends CasinoBetParams {
+  balls: KenoBall[];
+  kenoConfig: KenoConfiguration;
+}
+
+export interface KenoFreebetParams extends CasinoFreebetParams {
   balls: KenoBall[];
   kenoConfig: KenoConfiguration;
 }
@@ -29,7 +37,7 @@ export interface KenoPlacedBet extends NormalCasinoPlacedBet {
 
 export async function placeKenoBet(
   wallet: BetSwirlWallet,
-  kenoParams: KenoParams,
+  kenoParams: KenoBetParams,
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks,
 ): Promise<{ placedBet: KenoPlacedBet; receipt: TransactionReceipt }> {
@@ -60,6 +68,44 @@ export async function placeKenoBet(
     );
   }
   return { placedBet: kenoPlacedBet, receipt };
+}
+
+export async function placeKenoFreebet(
+  wallet: BetSwirlWallet,
+  kenoParams: KenoFreebetParams,
+  options?: CasinoPlaceBetOptions,
+  callbacks?: PlaceFreebetCallbacks,
+): Promise<{ placedFreebet: KenoPlacedBet; receipt: TransactionReceipt }> {
+  const { placedFreebet, receipt } = await placeFreebet(
+    wallet,
+    {
+      game: CASINO_GAME_TYPE.KENO,
+      gameEncodedAbiParametersInput: Keno.encodeAbiParametersInput(
+        kenoParams.balls,
+        kenoParams.kenoConfig,
+      ),
+      ...kenoParams,
+    },
+    options,
+    callbacks,
+  );
+  const kenoPlacedFreebet = await getKenoPlacedBetFromReceipt(
+    wallet,
+    receipt,
+    placedFreebet.chainId,
+    placedFreebet.token,
+  );
+  if (!kenoPlacedFreebet) {
+    throw new TransactionError(
+      "Keno PlaceBet event not found",
+      ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
+      {
+        hash: receipt.transactionHash,
+        chainId: placedFreebet.chainId,
+      },
+    );
+  }
+  return { placedFreebet: kenoPlacedFreebet, receipt };
 }
 
 export async function getKenoPlacedBetFromReceipt(

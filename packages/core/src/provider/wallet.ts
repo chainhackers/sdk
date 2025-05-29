@@ -6,7 +6,7 @@ import type {
   TransactionReceipt,
   PublicClient as ViemPublicClient,
 } from "viem";
-import type { BetSwirlEventData, BetSwirlFunctionData } from "../interfaces";
+import type { BetSwirlExtendedEventData, BetSwirlFunctionData } from "../interfaces";
 
 export abstract class BetSwirlWallet {
   abstract getChainId(): number;
@@ -32,7 +32,7 @@ export abstract class BetSwirlWallet {
   abstract getTransactionReceipt(txHash: Hash): Promise<TransactionReceipt>;
 
   abstract watchContractEvent<
-    TEventData extends BetSwirlEventData<Abi, string, Record<string, any>>,
+    TEventData extends BetSwirlExtendedEventData<Abi, string, Record<string, any>>,
   >(eventData: TEventData): () => void;
 
   abstract writeContract<TFunctionData extends BetSwirlFunctionData<Abi, string, readonly any[]>>(

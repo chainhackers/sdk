@@ -8,6 +8,10 @@ Feel free to reach us via [Discord](https://discord.gg/4BxtJV7fbZ) or [Telegram]
 
 
 ## General
+
+### Dictionary
+We highly suggest you to read the [dictionary](/documentation/dictionary.md) to familiarize yourself with the terms used in the protocol before to start using it.
+
 ### Networks
 - **Arbitrum**
 - **Avalanche**
@@ -29,6 +33,7 @@ All our mainnets contracts have the same address on each network:
 - **Dice** `0xAa4D2931a9fE14c3dec8AC3f12923Cbb535C0e5f`
 - **Roulette** `0x6678e3B4AB2a8C8Cdd068F132C21293CcBda33cb`
 - **Keno** `0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89`
+- **Weighted game(Wheel)** `0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b`
 
 => You can find more info and the deployed testnet contracts [here](https://github.com/BetSwirl/sdk/blob/main/packages/core/src/data/casino.ts)
   

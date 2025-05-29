@@ -1,3 +1,6 @@
+import { encodeAbiParameters } from "viem";
+import type { EncodeAbiParametersReturnType } from "viem";
+import { parseAbiParameters } from "viem";
 import { BP_VALUE } from "../../constants";
 import { CASINO_GAME_TYPE } from "../../data/casino";
 import { getFormattedNetMultiplier, getNetMultiplier } from "../../utils/bet";
@@ -137,6 +140,10 @@ export class Dice extends AbstractCasinoGame<
 
   static encodeInput(cap: DiceNumber | string): DiceEncodedInput {
     return Number(cap) as DiceEncodedInput;
+  }
+
+  static encodeAbiParametersInput(cap: DiceNumber | string): EncodeAbiParametersReturnType {
+    return encodeAbiParameters(parseAbiParameters("uint8"), [Dice.encodeInput(cap)]);
   }
 
   static decodeInput(encodedCap: DiceEncodedInput | string): DiceNumber {

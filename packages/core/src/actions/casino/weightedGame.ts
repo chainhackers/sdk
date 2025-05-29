@@ -17,14 +17,22 @@ import type { BetSwirlWallet } from "../../provider";
 import type { WeightedGameConfiguration } from "../../read";
 import {
   type CasinoBetParams,
+  type CasinoFreebetParams,
   type CasinoPlaceBetOptions,
   type PlaceBetCallbacks,
+  type PlaceFreebetCallbacks,
   type WeightedCasinoPlacedBet,
   getPlacedBetFromReceipt,
   placeBet,
+  placeFreebet,
 } from "./game";
 
-export interface WeightedGameParams extends CasinoBetParams {
+export interface WeightedGameBetParams extends CasinoBetParams {
+  weightedGameConfig: WeightedGameConfiguration;
+  game: WEIGHTED_CASINO_GAME_TYPE;
+}
+
+export interface WeightedGameFreebetParams extends CasinoFreebetParams {
   weightedGameConfig: WeightedGameConfiguration;
   game: WEIGHTED_CASINO_GAME_TYPE;
 }
@@ -37,7 +45,7 @@ export interface WeightedGamePlacedBet extends WeightedCasinoPlacedBet {
 
 export async function placeWeightedGameBet(
   wallet: BetSwirlWallet,
-  weightedGameParams: WeightedGameParams,
+  weightedGameParams: WeightedGameBetParams,
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks,
 ): Promise<{ placedBet: WeightedGamePlacedBet; receipt: TransactionReceipt }> {
@@ -68,6 +76,43 @@ export async function placeWeightedGameBet(
     );
   }
   return { placedBet: weightedGamePlacedBet, receipt };
+}
+
+export async function placeWeightedGameFreebet(
+  wallet: BetSwirlWallet,
+  weightedGameParams: WeightedGameFreebetParams,
+  options?: CasinoPlaceBetOptions,
+  callbacks?: PlaceFreebetCallbacks,
+): Promise<{ placedFreebet: WeightedGamePlacedBet; receipt: TransactionReceipt }> {
+  const { placedFreebet, receipt } = await placeFreebet(
+    wallet,
+    {
+      gameEncodedAbiParametersInput: WeightedGame.encodeAbiParametersInput(
+        weightedGameParams.weightedGameConfig.configId,
+      ),
+      ...weightedGameParams,
+    },
+    options,
+    callbacks,
+  );
+  const weightedGamePlacedFreebet = await getWeightedGamePlacedBetFromReceipt(
+    wallet,
+    receipt,
+    placedFreebet.chainId,
+    weightedGameParams.game,
+    placedFreebet.token,
+  );
+  if (!weightedGamePlacedFreebet) {
+    throw new TransactionError(
+      `${labelCasinoGameByType[weightedGameParams.game]} PlaceBet event not found`,
+      ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
+      {
+        hash: receipt.transactionHash,
+        chainId: placedFreebet.chainId,
+      },
+    );
+  }
+  return { placedFreebet: weightedGamePlacedFreebet, receipt };
 }
 
 export async function getWeightedGamePlacedBetFromReceipt(
