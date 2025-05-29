@@ -117,7 +117,7 @@ export function DiceGame({
   const tokenDecimals = balance?.decimals ?? 18
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
-  const [selectedNumber, setSelectedNumber] = useState<DiceNumber>(1)
+  const [selectedNumber, setSelectedNumber] = useState<DiceNumber>(20)
 
   const { placeDiceBet, betStatus, gameResult, resetBetState } =
     useDicePlaceBet()
