@@ -16,10 +16,7 @@ interface BettingPanelProps {
   tokenDecimals: number
   betStatus: BetStatus | null
   betAmount: bigint | undefined
-  setBetAmount: (amount: bigint | undefined) => void
-  onHalfBet: () => void
-  onDoubleBet: () => void
-  onMaxBet: () => void
+  onBetAmountChange: (amount: bigint | undefined) => void
   onPlayBtnClick: () => void
 }
 
@@ -31,10 +28,7 @@ export function BettingPanel({
   tokenDecimals,
   betStatus,
   betAmount,
-  setBetAmount,
-  onHalfBet,
-  onDoubleBet,
-  onMaxBet,
+  onBetAmountChange,
   onPlayBtnClick,
 }: BettingPanelProps) {
   const [betAmountError, setBetAmountError] = useState<string | null>(null)
@@ -99,10 +93,36 @@ export function BettingPanel({
 
   const handlePlayBtnClick = () => {
     if (isInGameResultState) {
-      setBetAmount(0n)
+      onBetAmountChange(undefined)
       setInputValue("")
     }
     onPlayBtnClick()
+  }
+
+  const handleHalfBet = () => {
+    const currentAmount = betAmount ?? 0n
+    if (currentAmount > 0n) {
+      const halfAmount = currentAmount / 2n
+      onBetAmountChange(halfAmount)
+    }
+  }
+
+  const handleDoubleBet = () => {
+    const currentAmount = betAmount ?? 0n
+    const doubledAmount = currentAmount * 2n
+    if (isConnected) {
+      const maxAmount = balance
+      const finalAmount = doubledAmount > maxAmount ? maxAmount : doubledAmount
+      onBetAmountChange(finalAmount)
+    } else {
+      onBetAmountChange(doubledAmount)
+    }
+  }
+
+  const handleMaxBet = () => {
+    if (isConnected) {
+      onBetAmountChange(balance)
+    }
   }
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -119,7 +139,7 @@ export function BettingPanel({
     }, 1000)
 
     if (newInputValue === "") {
-      setBetAmount(undefined)
+      onBetAmountChange(undefined)
       setIsValidInput(true)
       setBetAmountError(null)
       return
@@ -130,7 +150,7 @@ export function BettingPanel({
 
       try {
         const weiValue = parseUnits(newInputValue, tokenDecimals)
-        setBetAmount(weiValue)
+        onBetAmountChange(weiValue)
         setIsValidInput(true)
         setBetAmountError(null)
       } catch {
@@ -184,7 +204,7 @@ export function BettingPanel({
         <div className="grid grid-cols-3 gap-2">
           <Button
             variant="secondary"
-            onClick={onHalfBet}
+            onClick={handleHalfBet}
             className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
             disabled={isInputDisabled}
           >
@@ -192,7 +212,7 @@ export function BettingPanel({
           </Button>
           <Button
             variant="secondary"
-            onClick={onDoubleBet}
+            onClick={handleDoubleBet}
             className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
             disabled={isInputDisabled}
           >
@@ -201,7 +221,7 @@ export function BettingPanel({
           <Button
             variant="secondary"
             className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-            onClick={onMaxBet}
+            onClick={handleMaxBet}
             disabled={isInputDisabled}
           >
             Max

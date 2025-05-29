@@ -136,29 +136,8 @@ export function DiceGame({
     }
   }
 
-  const handleHalfBet = () => {
-    const currentAmount = betAmount ?? 0n
-    if (currentAmount > 0n) {
-      setBetAmount(currentAmount / 2n)
-    }
-  }
-
-  const handleDoubleBet = () => {
-    const currentAmount = betAmount ?? 0n
-    const doubledAmount = currentAmount * 2n
-    // Only limit to balance if connected
-    if (isWalletConnected) {
-      const maxAmount = balance?.value ?? 0n
-      setBetAmount(doubledAmount > maxAmount ? maxAmount : doubledAmount)
-    } else {
-      setBetAmount(doubledAmount)
-    }
-  }
-
-  const handleMaxBet = () => {
-    if (isWalletConnected) {
-      setBetAmount(balance?.value ?? 0n)
-    }
+  const handleBetAmountChange = (amount: bigint | undefined) => {
+    setBetAmount(amount)
   }
 
   const handleNumberChange = (value: number) => {
@@ -175,11 +154,8 @@ export function DiceGame({
       isConnected={isWalletConnected}
       balance={balance?.value ?? 0n}
       betAmount={betAmount}
-      setBetAmount={setBetAmount}
       targetPayoutAmount={targetPayoutAmount}
-      onHalfBet={handleHalfBet}
-      onDoubleBet={handleDoubleBet}
-      onMaxBet={handleMaxBet}
+      onBetAmountChange={handleBetAmountChange}
       gameResult={gameResult}
       betStatus={betStatus}
       connectWallletBtn={

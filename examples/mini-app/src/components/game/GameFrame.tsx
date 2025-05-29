@@ -31,11 +31,8 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   gameResult: CoinTossResult | DiceResult | null
   betStatus: BetStatus | null
   betAmount: bigint | undefined
-  setBetAmount: (amount: bigint | undefined) => void
   targetPayoutAmount: bigint
-  onHalfBet: () => void
-  onDoubleBet: () => void
-  onMaxBet: () => void
+  onBetAmountChange: (amount: bigint | undefined) => void
   onPlayBtnClick: () => void
   gameControls?: React.ReactNode
 }
@@ -50,11 +47,8 @@ export function GameFrame({
   gameResult,
   betStatus,
   betAmount,
-  setBetAmount,
   targetPayoutAmount,
-  onHalfBet,
-  onDoubleBet,
-  onMaxBet,
+  onBetAmountChange,
   onPlayBtnClick,
   gameControls,
   ...props
@@ -183,10 +177,7 @@ export function GameFrame({
             tokenDecimals={tokenDecimals}
             betStatus={betStatus}
             betAmount={betAmount}
-            setBetAmount={setBetAmount}
-            onHalfBet={onHalfBet}
-            onDoubleBet={onDoubleBet}
-            onMaxBet={onMaxBet}
+            onBetAmountChange={onBetAmountChange}
             onPlayBtnClick={onPlayBtnClick}
           />
         </CardContent>

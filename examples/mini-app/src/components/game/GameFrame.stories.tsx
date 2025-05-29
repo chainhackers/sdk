@@ -7,10 +7,6 @@ import gameBg from "../../assets/game/game-background.png"
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
 import { parseUnits } from "viem"
 
-BigInt.prototype.toJSON = function () {
-  return this.toString();
-};
-
 const meta = {
   title: "Game/GameFrame",
   component: GameFrame,
@@ -116,18 +112,15 @@ const Template: Story = {
     balance: 1123456n * 10n ** 12n,
     connectWallletBtn: connectWalletBtnStub,
     isConnected: false,
-    onPlayBtnClick: (selectedSide: COINTOSS_FACE) =>
-      console.log("selectedSide: ", selectedSide),
+    onPlayBtnClick: () => console.log("onPlayBtnClick"),
     tokenDecimals: 18,
     gameResult: null,
     betStatus: null,
 
     betAmount: parseUnits("0.1234567", 18),
-    setBetAmount: (betAmount?: bigint) => console.log("betAmount: ", betAmount),
-    targetPayoutAmount: parseUnits("0.1234567", 18) * 194n / 100n,
-    onHalfBet: () => console.log("onHalfBet"),
-    onDoubleBet: () => console.log("onDoubleBet"),
-    onMaxBet: () => console.log("onMaxBet")
+    targetPayoutAmount: (parseUnits("0.1234567", 18) * 194n) / 100n,
+    onBetAmountChange: (amount: bigint | undefined) =>
+      console.log("onBetAmountChange: ", amount),
   },
   render: (args) => <GameFrame {...args} />,
 }
@@ -168,7 +161,7 @@ export const Win: Story = {
     betStatus: "success",
     gameResult: {
       isWin: true,
-      payout: parseUnits("0.1234567", 18) * 194n / 100n,
+      payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
       currency: "ETH",
       rolled: COINTOSS_FACE.HEADS,
     },
@@ -182,7 +175,7 @@ export const Loss: Story = {
     betStatus: "success",
     gameResult: {
       isWin: false,
-      payout: parseUnits("0.1234567", 18) * 194n / 100n,
+      payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
       currency: "ETH",
       rolled: COINTOSS_FACE.TAILS,
     },
