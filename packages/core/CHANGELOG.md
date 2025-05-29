@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.4-beta.0
+
+### Patch Changes
+
+- Add fetchLeaderboard, fetchLeaderboards, fetchAffilliateLeaderboard & fetchAffiliateLeaderboards
+
 ## 0.1.3
 
 ### Patch Changes

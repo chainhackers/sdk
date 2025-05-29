@@ -34,3 +34,7 @@ A bankroll provider is a person who own their own bankroll in the BetSwirl proto
 A bankroll provider can also be an affiliate, meaning they can earn up to 50% commission when a bet is placed with their token on their frontend. 
 
 A bankroll provider can also create freebet campaigns and leaderboards if they are whitelisted by BetSwirl team. Please reach us via [Discord](https://discord.gg/4BxtJV7fbZ) or [Telegram](https://t.me/betswirl) if you want to become a bankroll provider. 
+
+### 8. Leaderboard
+
+A leaderboard is a time-limited ranking where players who score the most points can win prizes. Each leaderboard has its own rules and can be created by affiliates or bankroll providers. Leaderboards are updated every hour, but it is possible to take a bet into account more quickly by making a POST request to the api.

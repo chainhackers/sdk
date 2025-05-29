@@ -58,13 +58,20 @@ import type {
 import type { WheelBetParams, WheelFreebetParams, WheelPlacedBet } from "../actions/casino/wheel";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
 import {
+  type AffiliateLeaderboardWithClaimDetails,
   type ChainId,
   FREEBET_CAMPAIGN_STATUS,
   type FreebetCampaign,
+  LEADERBOARD_STATUS,
+  type Leaderboard,
   type SignedFreebet,
+  fetchAffiliateLeaderboard,
+  fetchAffiliateLeaderboards,
   fetchFreebetCampaign,
   fetchFreebetCampaigns,
   fetchFreebets,
+  fetchLeaderboard,
+  fetchLeaderboards,
 } from "../data";
 import type {
   CasinoRolledBet,
@@ -393,5 +400,62 @@ export abstract class BetSwirlClient {
 
   async fetchFreebetCampaign(id: number): Promise<FreebetCampaign | null> {
     return fetchFreebetCampaign(id, Boolean(this.betSwirlDefaultOptions.api?.testMode));
+  }
+
+  async fetchLeaderboards(
+    limit = 10,
+    offset = 0,
+    playerAddress?: Address,
+    affiliate?: Address,
+    chainId?: ChainId,
+    withExternalBankrollLeaderboards = false,
+    endDateDirection?: "asc" | "desc",
+    statuses?: LEADERBOARD_STATUS[],
+  ): Promise<{ leaderboards: Leaderboard[]; total: number; offset: number; limit: number }> {
+    return fetchLeaderboards(
+      limit,
+      offset,
+      playerAddress,
+      affiliate,
+      chainId,
+      withExternalBankrollLeaderboards,
+      endDateDirection,
+      statuses,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
+    );
+  }
+
+  async fetchLeaderboard(id: number, playerAddress?: Address): Promise<Leaderboard | null> {
+    return fetchLeaderboard(id, playerAddress, Boolean(this.betSwirlDefaultOptions.api?.testMode));
+  }
+
+  async fetchAffiliateLeaderboards(
+    affiliate: Address,
+    limit = 10,
+    offset = 0,
+    chainId?: ChainId,
+    endDateDirection?: "asc" | "desc",
+    statuses?: LEADERBOARD_STATUS[],
+  ): Promise<{
+    leaderboards: AffiliateLeaderboardWithClaimDetails[];
+    total: number;
+    offset: number;
+    limit: number;
+  }> {
+    return fetchAffiliateLeaderboards(
+      affiliate,
+      limit,
+      offset,
+      chainId,
+      endDateDirection,
+      statuses,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
+    );
+  }
+
+  async fetchAffiliateLeaderboard(
+    id: number,
+  ): Promise<AffiliateLeaderboardWithClaimDetails | null> {
+    return fetchAffiliateLeaderboard(id, Boolean(this.betSwirlDefaultOptions.api?.testMode));
   }
 }

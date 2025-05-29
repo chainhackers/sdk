@@ -4,3 +4,4 @@ export * from "./tokens";
 export * from "./subgraphs/protocol";
 export * from "./api/freebet/campaigns";
 export * from "./api/freebet/bets";
+export * from "./api/leaderboard/leaderboards";
