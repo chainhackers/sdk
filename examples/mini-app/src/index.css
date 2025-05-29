@@ -223,12 +223,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
-  /* Inverted slider fill styles */
-  [data-invert-fill="true"] [data-slot="slider-range"] {
-    left: var(--slider-range-left) !important;
-    right: var(--slider-range-right) !important;
-  }
 }
 
 @layer components {

@@ -8,9 +8,20 @@ import {
   TooltipTrigger,
 } from "./tooltip"
 
-interface SliderProps
-  extends React.ComponentProps<typeof SliderPrimitive.Root> {
-  invertFill?: boolean
+function getAdjustedPercentage(
+  value: number,
+  min: number,
+  max: number,
+): number {
+  const basePercentage = ((value - min) / (max - min)) * 100
+
+  if (basePercentage <= 5) {
+    return basePercentage + (5 - basePercentage) * 0.3
+  }
+  if (basePercentage >= 95) {
+    return basePercentage - (basePercentage - 95) * 0.3
+  }
+  return basePercentage
 }
 
 function Slider({
@@ -20,9 +31,8 @@ function Slider({
   min = 0,
   max = 100,
   onValueChange,
-  invertFill = false,
   ...props
-}: SliderProps) {
+}: React.ComponentProps<typeof SliderPrimitive.Root>) {
   const initialValues = React.useMemo(() => {
     if (value !== undefined) {
       return Array.isArray(value) ? value : [value]
@@ -43,15 +53,13 @@ function Slider({
     onValueChange?.(newValues)
   }
 
-  // Calculate current value percentage for inverted fill
-  const currentValue = value?.[0] ?? internalValues[0] ?? min
-  const valuePercent = ((currentValue - min) / (max - min)) * 100
+  const currentValue = internalValues[0] ?? min
+  const percentage = getAdjustedPercentage(currentValue, min, max)
 
   return (
     <TooltipProvider delayDuration={0}>
       <SliderPrimitive.Root
         data-slot="slider"
-        data-invert-fill={invertFill}
         defaultValue={defaultValue}
         value={value}
         min={min}
@@ -61,14 +69,6 @@ function Slider({
         onPointerUp={() => setIsDragging(false)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        style={
-          invertFill
-            ? ({
-                "--slider-range-left": `${valuePercent}%`,
-                "--slider-range-right": "0%",
-              } as React.CSSProperties)
-            : undefined
-        }
         className={cn(
           "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col cursor-pointer",
           className,
@@ -78,14 +78,18 @@ function Slider({
         <SliderPrimitive.Track
           data-slot="slider-track"
           className={cn(
-            " bg-[#090C15]/10 relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
+            "bg-[#090C15]/10 relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
           )}
         >
+          <div
+            className="bg-primary absolute h-full right-0"
+            style={{
+              width: `${100 - percentage}%`,
+            }}
+          />
           <SliderPrimitive.Range
             data-slot="slider-range"
-            className={cn(
-              "bg-primary  absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
-            )}
+            className="opacity-0 absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
           />
         </SliderPrimitive.Track>
         {internalValues.map((currentValue, index) => (
