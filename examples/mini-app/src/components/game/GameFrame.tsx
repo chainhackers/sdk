@@ -159,28 +159,37 @@ export function GameFrame({
   ) */
   const formattedBalance = formatRawAmount(balance, token.decimals)
 
-  const isInGameResultState = !!gameResult
-  const isBettingInProgress = betStatus === "pending"
+  const isBetSuccees = betStatus === "success"
+  // Redundant with isWaiting from usePlaceBet
+  const isWaiting =
+    betStatus === "loading" ||
+    betStatus === "pending" ||
+    betStatus === "rolling"
+  const isError =
+    betStatus === "error" ||
+    betStatus === "waiting-error" ||
+    betStatus === "internal-error"
+
   const canInitiateBet =
-    isConnected && areChainsSynced && isBetAmountValid && !isBettingInProgress
+    isConnected && areChainsSynced && isBetAmountValid && !isWaiting
 
-  const isErrorState = betStatus === "error"
-
-  const isPlayButtonDisabled: boolean = isErrorState
-    ? false
-    : isInGameResultState
-    ? false
-    : !canInitiateBet
+  const isPlayButtonDisabled: boolean = isError || isWaiting || !canInitiateBet
 
   let playButtonText: string
-  if (isErrorState) {
+  if (isError) {
     playButtonText = "Error, try again"
-  } else if (isInGameResultState) {
+  } else if (isBetSuccees) {
     playButtonText = "Try again"
-  } else if (isBettingInProgress) {
+  } else if (betStatus === "pending") {
     playButtonText = "Placing Bet..."
+  } else if (betStatus === "loading") {
+    playButtonText = "Loading Bet..."
+  } else if (betStatus === "rolling") {
+    playButtonText = "Bet rolling..."
   } else if (!isConnected) {
     playButtonText = "Connect Wallet"
+  } else if (!areChainsSynced) {
+    playButtonText = "Switch chain"
   } else {
     playButtonText = "Place Bet"
   }
@@ -199,7 +208,7 @@ export function GameFrame({
   }
 
   const handlePlayBtnClick = () => {
-    if (isInGameResultState) {
+    if (isBetSuccees) {
       setBetAmount(0n)
       setInputValue("")
       setSelectedSide(COINTOSS_FACE.HEADS)
@@ -437,9 +446,7 @@ export function GameFrame({
                   variant="secondary"
                   onClick={onHalfBet}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isWaiting || !isBetAmountValid}
                 >
                   1/2
                 </Button>
@@ -447,9 +454,7 @@ export function GameFrame({
                   variant="secondary"
                   onClick={onDoubleBet}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isWaiting || !isBetAmountValid}
                 >
                   2x
                 </Button>
@@ -457,9 +462,7 @@ export function GameFrame({
                   variant="secondary"
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
                   onClick={onMaxBet}
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isWaiting || !isBetAmountValid}
                 >
                   Max
                 </Button>
@@ -475,7 +478,7 @@ export function GameFrame({
                 "rounded-[16px]",
                 "text-play-btn-font",
               )}
-              variant={isErrorState ? "destructive" : "default"}
+              variant={isError ? "destructive" : "default"}
               onClick={handlePlayBtnClick}
               disabled={isPlayButtonDisabled}
             >

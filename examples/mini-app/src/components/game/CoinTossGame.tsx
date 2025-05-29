@@ -55,7 +55,7 @@ export function CoinTossGame({
     resetBetState,
     formattedVrfFees,
     gasPrice,
-  } = usePlaceBet()
+  } = usePlaceBet(CASINO_GAME_TYPE.COINTOSS)
   const isInGameResultState = !!gameResult
 
   const handlePlayButtonClick = (selectedSide: COINTOSS_FACE) => {

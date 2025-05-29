@@ -15,4 +15,4 @@ export interface GameResult {
   rolled: COINTOSS_FACE
 }
 
-export type BetStatus = "pending" | "success" | "error"
+export type BetStatus = "loading" | "pending" | "success" | "rolling" | "error" | "waiting-error" | "internal-error" | null
