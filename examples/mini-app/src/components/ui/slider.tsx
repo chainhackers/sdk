@@ -31,6 +31,7 @@ function Slider({
   min = 0,
   max = 100,
   onValueChange,
+  disabled,
   ...props
 }: React.ComponentProps<typeof SliderPrimitive.Root>) {
   const initialValues = React.useMemo(() => {
@@ -64,6 +65,7 @@ function Slider({
         value={value}
         min={min}
         max={max}
+        disabled={disabled}
         onValueChange={handleValueChange}
         onPointerDown={() => setIsDragging(true)}
         onPointerUp={() => setIsDragging(false)}
@@ -82,7 +84,10 @@ function Slider({
           )}
         >
           <div
-            className="bg-primary absolute h-full right-0"
+            className={cn(
+              "absolute h-full right-0",
+              disabled ? "bg-slider-disabled" : "bg-primary",
+            )}
             style={{
               width: `${100 - percentage}%`,
             }}
@@ -98,12 +103,17 @@ function Slider({
               <SliderPrimitive.Thumb
                 data-slot="slider-thumb"
                 className={cn(
-                  "block size-[14px] rounded-full bg-primary transition-all duration-200 ease-in-out hover:bg-violet3 hover:shadow-[0_0_0_7px] hover:shadow-primary/20 focus:shadow-[0_0_0_7px] focus:shadow-primary/20 focus:outline-none z-10",
+                  "block size-[14px] rounded-full transition-all duration-200 ease-in-out focus:outline-none z-10",
+                  disabled
+                    ? "bg-slider-disabled hover:shadow-[0_0_0_7px] hover:shadow-slider-disabled-shadow focus:shadow-[0_0_0_7px] focus:shadow-slider-disabled-shadow"
+                    : "bg-primary hover:bg-violet3 hover:shadow-[0_0_0_7px] hover:shadow-primary/20 focus:shadow-[0_0_0_7px] focus:shadow-primary/20",
                 )}
               />
             </TooltipTrigger>
             <TooltipContent className="bg-[#E5E7EB]/80">
-              <p>{Math.round(currentValue)}</p>
+              <p className={cn(disabled ? "text-slider-disabled-tooltip" : "")}>
+                {Math.round(currentValue)}
+              </p>
             </TooltipContent>
           </Tooltip>
         ))}
