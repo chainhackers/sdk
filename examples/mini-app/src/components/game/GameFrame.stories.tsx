@@ -5,7 +5,27 @@ import { ETH_TOKEN } from "../../lib/tokens"
 import { type HistoryEntry } from "./HistorySheetPanel"
 import gameBg from "../../assets/game/game-background.png"
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
-import { parseUnits } from "viem"
+import type { ComponentProps } from "react"
+
+type GameFrameProps = ComponentProps<typeof GameFrame>
+
+type StoryArgs = Omit<
+  GameFrameProps,
+  "balance" | "betAmount" | "targetPayoutAmount" | "gameResult"
+> & {
+  balance: string
+  betAmount: string | undefined
+  targetPayoutAmount: string
+  gameResult:
+    | (Omit<NonNullable<GameFrameProps["gameResult"]>, "payout"> & {
+        payout: string
+      })
+    | null
+}
+
+const MOCK_BALANCE = "1123456000000000000" // 1.123456 ETH
+const MOCK_BET_AMOUNT = "123456700000000000" // 0.1234567 ETH
+const MOCK_TARGET_PAYOUT = "239505998000000000" // 0.239505998 ETH
 
 const meta = {
   title: "Game/GameFrame",
@@ -24,7 +44,7 @@ const meta = {
 } satisfies Meta<typeof GameFrame>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<StoryArgs>
 
 const connectWalletBtnStub = <div></div>
 
@@ -109,20 +129,36 @@ const Template: Story = {
       backgroundImage: gameBg,
     },
     historyData: mockHistoryData,
-    balance: 1123456n * 10n ** 12n,
+    balance: MOCK_BALANCE,
     connectWallletBtn: connectWalletBtnStub,
     isConnected: false,
     onPlayBtnClick: () => console.log("onPlayBtnClick"),
     tokenDecimals: 18,
     gameResult: null,
     betStatus: null,
-
-    betAmount: parseUnits("0.1234567", 18),
-    targetPayoutAmount: (parseUnits("0.1234567", 18) * 194n) / 100n,
+    betAmount: MOCK_BET_AMOUNT,
+    targetPayoutAmount: MOCK_TARGET_PAYOUT,
     onBetAmountChange: (amount: bigint | undefined) =>
-      console.log("onBetAmountChange: ", amount),
+      console.log("onBetAmountChange: ", amount?.toString()),
   },
-  render: (args) => <GameFrame {...args} />,
+  render: (args) => {
+    const gameResult = args.gameResult
+      ? ({
+          ...args.gameResult,
+          payout: BigInt(args.gameResult.payout),
+        } as GameFrameProps["gameResult"])
+      : null
+
+    return (
+      <GameFrame
+        {...args}
+        balance={BigInt(args.balance)}
+        betAmount={args.betAmount ? BigInt(args.betAmount) : undefined}
+        targetPayoutAmount={BigInt(args.targetPayoutAmount)}
+        gameResult={gameResult}
+      />
+    )
+  },
 }
 
 export const WalletNotConnected: Story = {
@@ -161,7 +197,7 @@ export const Win: Story = {
     betStatus: "success",
     gameResult: {
       isWin: true,
-      payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
+      payout: MOCK_TARGET_PAYOUT,
       currency: "ETH",
       rolled: COINTOSS_FACE.HEADS,
     },
@@ -175,7 +211,7 @@ export const Loss: Story = {
     betStatus: "success",
     gameResult: {
       isWin: false,
-      payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
+      payout: MOCK_TARGET_PAYOUT,
       currency: "ETH",
       rolled: COINTOSS_FACE.TAILS,
     },
