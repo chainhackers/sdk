@@ -1,4 +1,4 @@
-import type { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
+import type { CASINO_GAME_TYPE } from "@betswirl/sdk-core"
 import type { Abi, Hex } from "viem"
 
 export interface WatchTarget {
