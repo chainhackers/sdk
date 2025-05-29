@@ -6,15 +6,15 @@ import coinTailsIcon from "../../assets/game/coin-tails.svg"
 interface CoinTossGameControlsProps {
   selectedSide: COINTOSS_FACE
   onCoinClick: () => void
-  isCoinClickable: boolean
   multiplier: number
+  isDisabled: boolean
 }
 
 export function CoinTossGameControls({
   selectedSide,
   onCoinClick,
-  isCoinClickable,
   multiplier,
+  isDisabled,
 }: CoinTossGameControlsProps) {
   const currentCoinIcon =
     selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
@@ -28,7 +28,7 @@ export function CoinTossGameControls({
         variant="coinButton"
         size="coin"
         onClick={onCoinClick}
-        disabled={!isCoinClickable}
+        disabled={isDisabled}
         aria-label={`Select ${selectedSide === COINTOSS_FACE.HEADS ? "Tails" : "Heads"} side`}
         className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2"
       >

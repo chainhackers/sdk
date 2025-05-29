@@ -4,12 +4,14 @@ interface DiceGameControlsProps {
   selectedNumber: number
   onNumberChange: (value: number) => void
   multiplier: number
+  isDisabled: boolean
 }
 
 export function DiceGameControls({
   selectedNumber,
   onNumberChange,
   multiplier,
+  isDisabled,
 }: DiceGameControlsProps) {
   const handleSliderChange = (values: number[]) => {
     onNumberChange(values[0])
@@ -28,6 +30,7 @@ export function DiceGameControls({
             min={1}
             max={99}
             step={1}
+            disabled={isDisabled}
             className="w-full"
           />
         </div>

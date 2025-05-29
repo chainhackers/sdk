@@ -125,8 +125,8 @@ export function CoinTossGame({
   const { placeCoinTossBet, betStatus, gameResult, resetBetState } =
     useCoinTossPlaceBet()
   const isInGameResultState = !!gameResult
-  const isCoinClickable =
-    isWalletConnected && betStatus !== "pending" && isInGameResultState
+  const isControlsDisabled =
+    !isWalletConnected || betStatus === "pending" || isInGameResultState
 
   const targetPayoutAmount =
     betAmount && betAmount > 0n ? (betAmount * MULTIPLIER) / PRECISION : 0n
@@ -142,7 +142,7 @@ export function CoinTossGame({
   }
 
   const handleCoinClick = () => {
-    if (!isCoinClickable) {
+    if (isControlsDisabled) {
       return
     }
     setSelectedSide((prevSide) =>
@@ -197,8 +197,8 @@ export function CoinTossGame({
         <CoinTossGameControls
           selectedSide={selectedSide}
           onCoinClick={handleCoinClick}
-          isCoinClickable={isCoinClickable}
           multiplier={1.94}
+          isDisabled={isControlsDisabled}
         />
       }
     />

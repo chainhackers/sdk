@@ -122,6 +122,8 @@ export function DiceGame({
   const { placeDiceBet, betStatus, gameResult, resetBetState } =
     useDicePlaceBet()
   const isInGameResultState = !!gameResult
+  const isControlsDisabled =
+    !isWalletConnected || betStatus === "pending" || isInGameResultState
 
   const targetPayoutAmount =
     betAmount && betAmount > 0n ? (betAmount * MULTIPLIER) / PRECISION : 0n
@@ -186,6 +188,7 @@ export function DiceGame({
           selectedNumber={selectedNumber}
           onNumberChange={handleNumberChange}
           multiplier={1.94}
+          isDisabled={isControlsDisabled}
         />
       }
     />
