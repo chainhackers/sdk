@@ -181,7 +181,6 @@ export function GameFrame({
             balance={balance}
             isConnected={isConnected}
             tokenDecimals={tokenDecimals}
-            gameResult={gameResult}
             betStatus={betStatus}
             betAmount={betAmount}
             setBetAmount={setBetAmount}

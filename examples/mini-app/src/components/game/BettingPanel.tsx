@@ -8,13 +8,12 @@ import { parseUnits } from "viem"
 import Decimal from "decimal.js"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import { ETH_TOKEN } from "../../lib/tokens"
-import { BetStatus, CoinTossResult, DiceResult } from "../../types"
+import { BetStatus } from "../../types"
 
 interface BettingPanelProps {
   balance: bigint
   isConnected: boolean
   tokenDecimals: number
-  gameResult: CoinTossResult | DiceResult | null
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   setBetAmount: (amount: bigint | undefined) => void
@@ -30,7 +29,6 @@ export function BettingPanel({
   balance,
   isConnected,
   tokenDecimals,
-  gameResult,
   betStatus,
   betAmount,
   setBetAmount,
@@ -72,7 +70,7 @@ export function BettingPanel({
 
   const isBetAmountValid = betAmount && betAmount > 0n
   const formattedBalance = formatRawAmount(balance, tokenDecimals)
-  const isInGameResultState = !!gameResult
+  const isInGameResultState = betStatus === "success"
   const isBettingInProgress = betStatus === "pending"
   const canInitiateBet = isConnected && isBetAmountValid && !isBettingInProgress
   const isErrorState = betStatus === "error"
@@ -82,6 +80,9 @@ export function BettingPanel({
     : isInGameResultState
       ? false
       : !canInitiateBet
+
+  const isInputDisabled =
+    !isConnected || isBettingInProgress || isInGameResultState
 
   let playButtonText: string
   if (isErrorState) {
@@ -174,7 +175,7 @@ export function BettingPanel({
             icon: <TokenImage token={ETH_TOKEN} size={16} />,
             symbol: "ETH",
           }}
-          disabled={!isConnected || betStatus === "pending" || !!gameResult}
+          disabled={isInputDisabled}
         />
         {betAmountError && (
           <div className="text-red-500 text-xs mt-1">{betAmountError}</div>
@@ -185,9 +186,7 @@ export function BettingPanel({
             variant="secondary"
             onClick={onHalfBet}
             className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-            disabled={
-              !isConnected || isBettingInProgress || isInGameResultState
-            }
+            disabled={isInputDisabled}
           >
             1/2
           </Button>
@@ -195,9 +194,7 @@ export function BettingPanel({
             variant="secondary"
             onClick={onDoubleBet}
             className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-            disabled={
-              !isConnected || isBettingInProgress || isInGameResultState
-            }
+            disabled={isInputDisabled}
           >
             2x
           </Button>
@@ -205,9 +202,7 @@ export function BettingPanel({
             variant="secondary"
             className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
             onClick={onMaxBet}
-            disabled={
-              !isConnected || isBettingInProgress || isInGameResultState
-            }
+            disabled={isInputDisabled}
           >
             Max
           </Button>
