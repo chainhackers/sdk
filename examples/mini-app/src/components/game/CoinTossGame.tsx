@@ -8,15 +8,16 @@ import { useAccount, useBalance } from "wagmi"
 
 import {
   CASINO_GAME_TYPE,
-  chainById,
-  chainNativeCurrencyToToken,
   COINTOSS_FACE,
+  BP_VALUE,
+  CoinToss,
 } from "@betswirl/sdk-core"
 import { useGameHistory } from "../../hooks/useGameHistory"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { GameFrame } from "./GameFrame"
-import { formatGwei } from "viem"
+import { CoinTossGameControls } from "./CoinTossGameControls"
 import { useChain } from "../../context/chainContext"
+import { formatGwei } from "viem"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -43,10 +44,12 @@ export function CoinTossGame({
   const { data: balance } = useBalance({
     address,
   })
-  const { appChainId } = useChain()
-  const token = chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
+  const { areChainsSynced } = useChain()
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
+  const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
+    COINTOSS_FACE.HEADS,
+  )
 
   const {
     placeBet,
@@ -58,7 +61,7 @@ export function CoinTossGame({
   } = usePlaceBet(CASINO_GAME_TYPE.COINTOSS)
   const isInGameResultState = !!gameResult
 
-  const handlePlayButtonClick = (selectedSide: COINTOSS_FACE) => {
+  const handlePlayButtonClick = () => {
     if (betStatus === "error" || isInGameResultState) {
       resetBetState()
     } else if (isWalletConnected && betAmount && betAmount > 0n) {
@@ -66,50 +69,61 @@ export function CoinTossGame({
     }
   }
 
-  const handleHalfBet = () => {
-    const currentAmount = betAmount ?? 0n
-    if (currentAmount > 0n) {
-      setBetAmount(currentAmount / 2n)
+  const handleCoinClick = () => {
+    if (!isWalletConnected || betStatus === "pending" || !!gameResult) {
+      return
     }
+    setSelectedSide((prevSide) =>
+      prevSide === COINTOSS_FACE.HEADS
+        ? COINTOSS_FACE.TAILS
+        : COINTOSS_FACE.HEADS,
+    )
   }
 
-  const handleDoubleBet = () => {
-    const currentAmount = betAmount ?? 0n
-    const doubledAmount = currentAmount * 2n
-    // Only limit to balance if connected
-    if (isWalletConnected) {
-      const maxAmount = balance?.value ?? 0n
-      setBetAmount(doubledAmount > maxAmount ? maxAmount : doubledAmount)
-    } else {
-      setBetAmount(doubledAmount)
-    }
+  const handleBetAmountChange = (amount: bigint | undefined) => {
+    setBetAmount(amount)
   }
 
-  const handleMaxBet = () => {
-    if (isWalletConnected) {
-      setBetAmount(balance?.value ?? 0n)
-    }
-  }
+  const tokenDecimals = balance?.decimals ?? 18
+  const grossMultiplier = CoinToss.getMultiplier(selectedSide)
+  const targetPayoutAmount =
+    betAmount && betAmount > 0n
+      ? (betAmount * BigInt(grossMultiplier)) / BigInt(BP_VALUE)
+      : 0n
+  const multiplier = Number(
+    Number(
+      (1000000000000000000n * BigInt(grossMultiplier)) / BigInt(BP_VALUE),
+    ) / 1e18,
+  ).toFixed(2)
+  const isCoinClickable =
+    isWalletConnected && betStatus !== "pending" && !gameResult
 
   return (
     <GameFrame
       {...props}
       onPlayBtnClick={handlePlayButtonClick}
       historyData={gameHistory}
-      token={token}
       themeSettings={themeSettings}
       isConnected={isWalletConnected}
       balance={balance?.value ?? 0n}
       betAmount={betAmount}
-      setBetAmount={setBetAmount}
-      onHalfBet={handleHalfBet}
-      onDoubleBet={handleDoubleBet}
-      onMaxBet={handleMaxBet}
+      onBetAmountChange={handleBetAmountChange}
+      tokenDecimals={tokenDecimals}
+      targetPayoutAmount={targetPayoutAmount}
       gameResult={gameResult}
       betStatus={betStatus}
       onHistoryOpen={refreshHistory}
       vrfFees={formattedVrfFees}
       gasPrice={formatGwei(gasPrice)}
+      areChainsSynced={areChainsSynced}
+      gameControls={
+        <CoinTossGameControls
+          selectedSide={selectedSide}
+          onCoinClick={handleCoinClick}
+          multiplier={multiplier}
+          isDisabled={!isCoinClickable}
+        />
+      }
       connectWallletBtn={
         <Wallet>
           <ConnectWallet
