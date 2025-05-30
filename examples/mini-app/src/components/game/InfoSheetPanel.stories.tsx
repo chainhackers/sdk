@@ -5,6 +5,7 @@ import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { InfoSheetPanel } from "./InfoSheetPanel"
+import { chainByKey, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode
@@ -76,6 +77,7 @@ const InfoSheetWithWrapper = ({
             rngFee={rngFee}
             targetPayout={targetPayout}
             gasPrice={gasPrice}
+            token={chainNativeCurrencyToToken(chainByKey.base.nativeCurrency)}
           />
         </Sheet>
       )}

@@ -8,3 +8,6 @@ export const DEFAULT_PAGE = 1;
 export const DEFAULT_ITEMS_PER_PAGE = 25;
 export const GAS_TOKEN_ADDRESS = zeroAddress;
 export const BETSWIRL_BASE_URL = "https://betswirl.com";
+
+export const BETSWIRL_API_URL = "https://api.betswirl.com/api";
+export const BETWIRL_TEST_API_URL = "https://api-dev.betswirl.com/api";

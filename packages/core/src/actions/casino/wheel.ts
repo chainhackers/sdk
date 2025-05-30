@@ -5,23 +5,44 @@ import type { BetSwirlWallet } from "../../provider";
 import type { WeightedGameConfiguration } from "../../read";
 import { type CasinoPlaceBetOptions, type PlaceBetCallbacks } from "./game";
 import {
-  type WeightedGameParams,
+  type WeightedGameBetParams,
+  type WeightedGameFreebetParams,
   type WeightedGamePlacedBet,
   getWeightedGamePlacedBetFromReceipt,
   placeWeightedGameBet,
+  placeWeightedGameFreebet,
 } from "./weightedGame";
 
-export interface WheelParams extends Omit<WeightedGameParams, "game"> {}
+export interface WheelBetParams extends Omit<WeightedGameBetParams, "game"> {}
+
+export interface WheelFreebetParams extends Omit<WeightedGameFreebetParams, "game"> {}
 
 export interface WheelPlacedBet extends WeightedGamePlacedBet {}
 
 export async function placeWheelBet(
   wallet: BetSwirlWallet,
-  wheelParams: WheelParams,
+  wheelParams: WheelBetParams,
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks,
 ): Promise<{ placedBet: WheelPlacedBet; receipt: TransactionReceipt }> {
   return await placeWeightedGameBet(
+    wallet,
+    {
+      ...wheelParams,
+      game: CASINO_GAME_TYPE.WHEEL,
+    },
+    options,
+    callbacks,
+  );
+}
+
+export async function placeWheelFreebet(
+  wallet: BetSwirlWallet,
+  wheelParams: WheelFreebetParams,
+  options?: CasinoPlaceBetOptions,
+  callbacks?: PlaceBetCallbacks,
+): Promise<{ placedFreebet: WheelPlacedBet; receipt: TransactionReceipt }> {
+  return await placeWeightedGameFreebet(
     wallet,
     {
       ...wheelParams,

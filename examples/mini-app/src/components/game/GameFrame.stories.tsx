@@ -1,4 +1,8 @@
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import {
+  chainByKey,
+  chainNativeCurrencyToToken,
+  COINTOSS_FACE,
+} from "@betswirl/sdk-core"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import type { Meta, StoryObj } from "@storybook/react"
 import { parseUnits } from "viem"
@@ -122,17 +126,19 @@ const Template: Story = {
     balance: 1123456n * 10n ** 12n,
     connectWallletBtn: connectWalletBtnStub,
     isConnected: false,
-    onPlayBtnClick: (selectedSide: COINTOSS_FACE) => console.log("selectedSide: ", selectedSide),
-    tokenDecimals: 18,
+    onPlayBtnClick: (selectedSide: COINTOSS_FACE) =>
+      console.log("selectedSide: ", selectedSide),
     gameResult: null,
     betStatus: null,
+    token: chainNativeCurrencyToToken(chainByKey.base.nativeCurrency),
     onHistoryOpen: () => console.log("onHistoryOpen"),
     betAmount: parseUnits("0.1234567", 18),
     setBetAmount: (betAmount?: bigint) => console.log("betAmount: ", betAmount),
-    targetPayoutAmount: (parseUnits("0.1234567", 18) * 194n) / 100n,
     onHalfBet: () => console.log("onHalfBet"),
     onDoubleBet: () => console.log("onDoubleBet"),
     onMaxBet: () => console.log("onMaxBet"),
+    vrfFees: 0.0001,
+    gasPrice: 34.2123,
   },
   render: (args) => <GameFrame {...args} />,
 }

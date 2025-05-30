@@ -12,14 +12,21 @@ import type { Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
 import {
   type CasinoBetParams,
+  type CasinoFreebetParams,
   type CasinoPlaceBetOptions,
   type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
+  type PlaceFreebetCallbacks,
   getPlacedBetFromReceipt,
   placeBet,
+  placeFreebet,
 } from "./game";
 
-export interface CoinTossParams extends CasinoBetParams {
+export interface CoinTossBetParams extends CasinoBetParams {
+  face: COINTOSS_FACE;
+}
+
+export interface CoinTossFreebetParams extends CasinoFreebetParams {
   face: COINTOSS_FACE;
 }
 
@@ -31,7 +38,7 @@ export interface CoinTossPlacedBet extends NormalCasinoPlacedBet {
 
 export async function placeCoinTossBet(
   wallet: BetSwirlWallet,
-  coinTossParams: CoinTossParams,
+  coinTossParams: CoinTossBetParams,
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks,
 ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
@@ -62,6 +69,41 @@ export async function placeCoinTossBet(
     );
   }
   return { placedBet: coinTossPlacedBet, receipt };
+}
+
+export async function placeCoinTossFreebet(
+  wallet: BetSwirlWallet,
+  coinTossParams: CoinTossFreebetParams,
+  options?: CasinoPlaceBetOptions,
+  callbacks?: PlaceFreebetCallbacks,
+): Promise<{ placedFreebet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
+  const { placedFreebet, receipt } = await placeFreebet(
+    wallet,
+    {
+      game: CASINO_GAME_TYPE.COINTOSS,
+      gameEncodedAbiParametersInput: CoinToss.encodeAbiParametersInput(coinTossParams.face),
+      ...coinTossParams,
+    },
+    options,
+    callbacks,
+  );
+  const coinTossPlacedFreebet = await getCoinTossPlacedBetFromReceipt(
+    wallet,
+    receipt,
+    placedFreebet.chainId,
+    placedFreebet.token,
+  );
+  if (!coinTossPlacedFreebet) {
+    throw new TransactionError(
+      "CoinToss PlaceBet event not found",
+      ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
+      {
+        hash: receipt.transactionHash,
+        chainId: placedFreebet.chainId,
+      },
+    );
+  }
+  return { placedFreebet: coinTossPlacedFreebet, receipt };
 }
 
 export async function getCoinTossPlacedBetFromReceipt(
