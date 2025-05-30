@@ -11,3 +11,6 @@ export * from "./casino/plinko";
 /* common */
 export * from "./common/chainlinkVrfCost";
 export * from "./common/gasPrice";
+
+/* leaderboard */
+export * from "./leaderboard/leaderboard";

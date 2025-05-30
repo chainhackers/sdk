@@ -57,6 +57,7 @@ import type {
 } from "../actions/casino/roulette";
 import type { WheelBetParams, WheelFreebetParams, WheelPlacedBet } from "../actions/casino/wheel";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
+import type { LeaderboardClaimRewardsResult } from "../actions/leaderboard/leaderboard";
 import {
   type AffiliateLeaderboardWithClaimDetails,
   type ChainId,
@@ -278,6 +279,20 @@ export abstract class BetSwirlClient {
   abstract getWeighedGameConfiguration(
     configId: number | string,
   ): Promise<WeightedGameConfiguration>;
+
+  /* Leaderboard utilities */
+
+  abstract getClaimableAmount(
+    leaderboardOnChainId: number | bigint,
+    playerAddress: Address,
+    chainId?: ChainId,
+  ): Promise<bigint>;
+
+  abstract claimLeaderboardRewards(
+    leaderboard: Leaderboard,
+    receiver: Address,
+    onClaimPending?: (tx: Hash, result: LeaderboardClaimRewardsResult) => void | Promise<void>,
+  ): Promise<{ receipt: TransactionReceipt; result: LeaderboardClaimRewardsResult }>;
 
   /* Subgraph queries */
 

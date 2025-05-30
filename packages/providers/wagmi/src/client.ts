@@ -24,6 +24,8 @@ import type {
   KenoFreebetParams,
   KenoPlacedBet,
   KenoRolledBet,
+  Leaderboard,
+  LeaderboardClaimRewardsResult,
   NormalCasinoPlacedBet,
   PlaceBetCallbacks,
   PlaceFreebetCallbacks,
@@ -50,11 +52,13 @@ import {
   BetSwirlClient,
   WEIGHTED_CASINO_GAME_TYPES,
   casinoChainById,
+  claimLeaderboardRewards,
   getBetRequirements,
   getCasinoGameToken,
   getCasinoGames,
   getCasinoTokens,
   getChainlinkVrfCost,
+  getClaimableAmount,
   getKenoConfiguration,
   getWeightedGameConfiguration,
   placeCoinTossBet,
@@ -80,7 +84,7 @@ import {
   waitWheelRolledBet,
 } from "@betswirl/sdk-core";
 import { type Config as WagmiConfig, switchChain } from "@wagmi/core";
-import type { Hex, TransactionReceipt } from "viem";
+import type { Address, Hash, Hex, TransactionReceipt } from "viem";
 import { WagmiBetSwirlWallet } from "./wallet";
 
 export class WagmiBetSwirlClient extends BetSwirlClient {
@@ -525,6 +529,33 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   ): Promise<WeightedGameConfiguration> {
     await this._switchChain(chainId);
     return getWeightedGameConfiguration(this.betSwirlWallet, configId);
+  }
+
+  /* Leaderboard utilities */
+
+  async getClaimableAmount(
+    leaderboardOnChainId: number | bigint,
+    playerAddress: Address,
+    chainId: ChainId,
+  ): Promise<bigint> {
+    await this._switchChain(chainId);
+    return getClaimableAmount(this.betSwirlWallet, leaderboardOnChainId, playerAddress, chainId);
+  }
+
+  async claimLeaderboardRewards(
+    leaderboard: Leaderboard,
+    receiver: Address,
+    onClaimPending?: (tx: Hash, result: LeaderboardClaimRewardsResult) => void | Promise<void>,
+  ): Promise<{ receipt: TransactionReceipt; result: LeaderboardClaimRewardsResult }> {
+    await this._switchChain(leaderboard.chainId);
+
+    return claimLeaderboardRewards(
+      this.betSwirlWallet,
+      leaderboard,
+      receiver,
+      this.betSwirlDefaultOptions.pollingInterval,
+      onClaimPending,
+    );
   }
 
   /* Private */

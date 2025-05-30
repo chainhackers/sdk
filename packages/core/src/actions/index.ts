@@ -11,3 +11,6 @@ export * from "./casino/weightedGame";
 /* Common */
 export * from "./common/approve";
 export * from "../read/common/tokenMetadata";
+
+/* Leaderboard */
+export * from "./leaderboard/leaderboard";

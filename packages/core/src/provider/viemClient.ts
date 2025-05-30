@@ -1,4 +1,4 @@
-import type { Hex, PublicClient, TransactionReceipt, WalletClient } from "viem";
+import type { Address, Hash, Hex, PublicClient, TransactionReceipt, WalletClient } from "viem";
 import {
   type BetRequirements,
   type BetSwirlClientOptions,
@@ -39,6 +39,7 @@ import {
   getCasinoGames,
   getCasinoTokens,
   getChainlinkVrfCost,
+  getClaimableAmount,
   getKenoConfiguration,
   placeDiceBet,
   placeDiceFreebet,
@@ -75,7 +76,11 @@ import {
   placeWheelBet,
   placeWheelFreebet,
 } from "../actions/casino/wheel";
-import type { CASINO_GAME_TYPE } from "../data";
+import {
+  type LeaderboardClaimRewardsResult,
+  claimLeaderboardRewards,
+} from "../actions/leaderboard/leaderboard";
+import type { CASINO_GAME_TYPE, ChainId, Leaderboard } from "../data";
 import {
   type WeightedGameConfiguration,
   getWeightedGameConfiguration,
@@ -487,6 +492,30 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   async getWeighedGameConfiguration(configId: number | string): Promise<WeightedGameConfiguration> {
     return getWeightedGameConfiguration(this.betSwirlWallet, configId);
+  }
+
+  /* Leaderboard utilities */
+
+  async getClaimableAmount(
+    leaderboardOnChainId: number | bigint,
+    playerAddress: Address,
+    chainId: ChainId,
+  ): Promise<bigint> {
+    return getClaimableAmount(this.betSwirlWallet, leaderboardOnChainId, playerAddress, chainId);
+  }
+
+  async claimLeaderboardRewards(
+    leaderboard: Leaderboard,
+    receiver: Address,
+    onClaimPending?: (tx: Hash, result: LeaderboardClaimRewardsResult) => void | Promise<void>,
+  ): Promise<{ receipt: TransactionReceipt; result: LeaderboardClaimRewardsResult }> {
+    return claimLeaderboardRewards(
+      this.betSwirlWallet,
+      leaderboard,
+      receiver,
+      this.betSwirlDefaultOptions.pollingInterval,
+      onClaimPending,
+    );
   }
 
   /* Private */

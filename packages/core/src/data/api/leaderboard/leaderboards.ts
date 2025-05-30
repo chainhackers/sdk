@@ -209,7 +209,7 @@ export type LeaderboardClaimDetails = {
   formattedAffiliateClaimableAmount: string;
 };
 
-export type GetLeaderboardsResponse = {
+export type GetLeaderboardsRawResponse = {
   leaderboards: RawCompleteLeaderboard[];
   total: number;
   offset: number;
@@ -265,10 +265,6 @@ export const fetchLeaderboards = async (
         params.append("statuses", status);
       }
     }
-    console.log(
-      "colin",
-      `${getBetSwirlApiUrl(testMode)}/public/v1/leaderboards?${params.toString()}`,
-    );
     const res = await fetch(
       `${getBetSwirlApiUrl(testMode)}/public/v1/leaderboards?${params.toString()}`,
     );
@@ -276,7 +272,7 @@ export const fetchLeaderboards = async (
       throw new Error(`Status ${res.status}: ${res.statusText}`);
     }
 
-    const response: GetLeaderboardsResponse = await res.json();
+    const response: GetLeaderboardsRawResponse = await res.json();
     return {
       leaderboards: response.leaderboards.map((leaderboard) => _formatRawLeaderboard(leaderboard)),
       total: response.total,
@@ -294,7 +290,7 @@ export const fetchLeaderboards = async (
   }
 };
 
-export type GetAffiliateLeaderboardsResponse = {
+export type GetAffiliateLeaderboardsRawResponse = {
   leaderboards: RawAffiliateCompleteLeaderboardWithClaimDetails[];
   total: number;
   offset: number;
@@ -351,7 +347,7 @@ export const fetchAffiliateLeaderboards = async (
       throw new Error(`Status ${res.status}: ${res.statusText}`);
     }
 
-    const response: GetAffiliateLeaderboardsResponse = await res.json();
+    const response: GetAffiliateLeaderboardsRawResponse = await res.json();
     return {
       leaderboards: response.leaderboards.map((leaderboard) =>
         _formatRawAffiliateLeaderboard(leaderboard),
@@ -371,7 +367,7 @@ export const fetchAffiliateLeaderboards = async (
   }
 };
 
-export type GetLeaderboardResponse = RawCompleteLeaderboard | null;
+export type GetLeaderboardRawResponse = RawCompleteLeaderboard | null;
 
 /**
  * Fetches leaderboard by id from the Betswirl API
@@ -398,7 +394,7 @@ export const fetchLeaderboard = async (
       throw new Error(`Status ${res.status}: ${res.statusText}`);
     }
 
-    const response: GetLeaderboardResponse = await res.json();
+    const response: GetLeaderboardRawResponse = await res.json();
     return response ? _formatRawLeaderboard(response) : null;
   } catch (error) {
     console.error("An error occured while fetching the leaderboard", error);
@@ -406,7 +402,7 @@ export const fetchLeaderboard = async (
   }
 };
 
-export type GetAffiliateLeaderboardResponse =
+export type GetAffiliateLeaderboardRawResponse =
   RawAffiliateCompleteLeaderboardWithClaimDetails | null;
 
 /**
@@ -426,7 +422,7 @@ export const fetchAffiliateLeaderboard = async (
       throw new Error(`Status ${res.status}: ${res.statusText}`);
     }
 
-    const response: GetAffiliateLeaderboardResponse = await res.json();
+    const response: GetAffiliateLeaderboardRawResponse = await res.json();
     return response ? _formatRawAffiliateLeaderboard(response) : null;
   } catch (error) {
     console.error("An error occured while fetching the affiliate leaderboard", error);
@@ -543,7 +539,6 @@ const _formatRawLeaderboard = (leaderboard: RawCompleteLeaderboard): Leaderboard
 const _formatRawAffiliateLeaderboard = (
   leaderboard: RawAffiliateCompleteLeaderboardWithClaimDetails,
 ): AffiliateLeaderboardWithClaimDetails => {
-  console.log("colin", leaderboard);
   return {
     ..._formatRawLeaderboard(leaderboard),
     creationTxnHash: leaderboard.creation_tx,
