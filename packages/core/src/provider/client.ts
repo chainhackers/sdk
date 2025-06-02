@@ -35,6 +35,7 @@ import type {
   WeightedGameFreebetParams,
   WeightedGamePlacedBet,
 } from "../actions";
+import { refreshLeaderboardsWithBets } from "../actions/api/leaderboard/leaderboards";
 import type {
   CoinTossBetParams,
   CoinTossFreebetParams,
@@ -64,6 +65,7 @@ import {
   FREEBET_CAMPAIGN_STATUS,
   type FreebetCampaign,
   LEADERBOARD_STATUS,
+  LEADERBOARD_TYPE,
   type Leaderboard,
   type SignedFreebet,
   fetchAffiliateLeaderboard,
@@ -88,7 +90,6 @@ import type {
 import type { WeightedGameConfiguration } from "../read/casino/weightedGame";
 import type { WheelRolledBet } from "../read/casino/wheel";
 import { FORMAT_TYPE, getCasinoChainId } from "../utils";
-
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;
   gasPrice?: bigint;
@@ -472,5 +473,18 @@ export abstract class BetSwirlClient {
     id: number,
   ): Promise<AffiliateLeaderboardWithClaimDetails | null> {
     return fetchAffiliateLeaderboard(id, Boolean(this.betSwirlDefaultOptions.api?.testMode));
+  }
+
+  async refreshLeaderboardsWithBets(
+    betIds: string[],
+    chainId: ChainId,
+    betType: LEADERBOARD_TYPE,
+  ): Promise<boolean> {
+    return refreshLeaderboardsWithBets(
+      betIds,
+      chainId,
+      betType,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
+    );
   }
 }

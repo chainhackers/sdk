@@ -1,5 +1,27 @@
 # @betswirl/wagmi-provider
 
+## 0.1.4
+
+### Patch Changes
+
+- Add refreshLeaderboardsWithBets
+
+- [`c3143f9`](https://github.com/BetSwirl/sdk/commit/c3143f99ccd603a860ae33148c619e30521d2b58) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Add getClaimableAmount & claimLeaderboardRewards
+
+- Updated dependencies [[`66d6845`](https://github.com/BetSwirl/sdk/commit/66d6845ecce25ad4cbcfb2c4d504b041e09ec2eb), [`c3143f9`](https://github.com/BetSwirl/sdk/commit/c3143f99ccd603a860ae33148c619e30521d2b58)]:
+  - @betswirl/sdk-core@0.1.4
+
+## 0.1.4-beta.1
+
+### Patch Changes
+
+- Add refreshLeaderboardsWithBets
+
+- [`c3143f9`](https://github.com/BetSwirl/sdk/commit/c3143f99ccd603a860ae33148c619e30521d2b58) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Add getClaimableAmount & claimLeaderboardRewards
+
+- Updated dependencies [[`c3143f9`](https://github.com/BetSwirl/sdk/commit/c3143f99ccd603a860ae33148c619e30521d2b58)]:
+  - @betswirl/sdk-core@0.1.4-beta.1
+
 ## 0.1.4-beta.0
 
 ### Patch Changes

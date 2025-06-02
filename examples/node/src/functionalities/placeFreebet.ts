@@ -16,6 +16,7 @@ import {
   _getBetRequirements,
   _getTokenInfo,
   _placeFreebet,
+  _refreshLeaderboardsWithBet,
   _selectFreebet,
   _selectGame,
   _selectInput,
@@ -85,6 +86,9 @@ export async function startPlaceFreebetProcess() {
     } else {
       await _waitRoll(placedFreebet as NormalCasinoPlacedBet);
     }
+
+    // 10. [OPTIONAL] Refresh leaderboards manually with the placed freebet
+    await _refreshLeaderboardsWithBet(placedFreebet.id, selectedGame.chainId);
   } catch (error) {
     if (error instanceof BetSwirlError) {
       console.error(

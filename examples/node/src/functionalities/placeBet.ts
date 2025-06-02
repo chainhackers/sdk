@@ -11,6 +11,7 @@ import { checkEnvVariables } from "../../utils";
 import {
   _getTokenInfo,
   _placeBet,
+  _refreshLeaderboardsWithBet,
   _selectBetAmount,
   _selectBetCount,
   _selectChain,
@@ -64,6 +65,9 @@ export async function startPlaceBetProcess() {
     } else {
       await _waitRoll(placedBet as NormalCasinoPlacedBet);
     }
+
+    // 11. [OPTIONAL] Refresh leaderboards manually with the placed bet
+    await _refreshLeaderboardsWithBet(placedBet.id, selectedChain.id);
   } catch (error) {
     if (error instanceof BetSwirlError) {
       console.error(

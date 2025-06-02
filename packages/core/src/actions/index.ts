@@ -14,3 +14,4 @@ export * from "../read/common/tokenMetadata";
 
 /* Leaderboard */
 export * from "./leaderboard/leaderboard";
+export * from "./api/leaderboard/leaderboards";

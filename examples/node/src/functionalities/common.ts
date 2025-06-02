@@ -18,6 +18,7 @@ import {
   GAS_PRICE_TYPE,
   Keno,
   type KenoChoiceInput,
+  LEADERBOARD_TYPE,
   type NormalCasinoPlacedBet,
   type NormalGameChoiceInput,
   Roulette,
@@ -57,6 +58,10 @@ export async function _selectChain(): Promise<CasinoChain> {
     chainId: selectedChain.id,
     affiliate: process.env.AFFILIATE_ADDRESS as Hex,
     gasPriceType: GAS_PRICE_TYPE.FAST,
+    // testMode to true to use the staging API.
+    api: {
+      testMode: true,
+    },
   });
   return selectedChain;
 }
@@ -290,6 +295,20 @@ function _displayRolledBet(rolledBet: CasinoRolledBet) {
         commonMessage,
       ),
     );
+  }
+}
+
+export async function _refreshLeaderboardsWithBet(betId: string | bigint, chainId: CasinoChainId) {
+  console.log(chalk.blue(`Refreshing leaderboards with bet #${betId}...`));
+  const isSuccess = await wagmiBetSwirlClient.refreshLeaderboardsWithBets(
+    [String(betId)],
+    chainId,
+    LEADERBOARD_TYPE.CASINO,
+  );
+  if (isSuccess) {
+    console.log(chalk.green(`Leaderboards refreshed with bet #${betId} successfully!`));
+  } else {
+    console.log(chalk.red(`Failed to refresh leaderboards with bet #${betId}`));
   }
 }
 
