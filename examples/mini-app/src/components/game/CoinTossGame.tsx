@@ -37,6 +37,7 @@ export function CoinTossGame({
     gasPrice,
     targetPayoutAmount,
     multiplier,
+    isInGameResultState,
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
@@ -44,8 +45,15 @@ export function CoinTossGame({
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
 
+  const isControlsDisabled =
+    !isWalletConnected ||
+    betStatus === "pending" ||
+    betStatus === "loading" ||
+    betStatus === "rolling" ||
+    isInGameResultState
+
   const handleCoinClick = () => {
-    if (!isWalletConnected || betStatus === "pending" || !!gameResult) {
+    if (isControlsDisabled) {
       return
     }
     setSelectedSide(
@@ -54,9 +62,6 @@ export function CoinTossGame({
         : COINTOSS_FACE.HEADS) as typeof selectedSide,
     )
   }
-
-  const isCoinClickable =
-    isWalletConnected && betStatus !== "pending" && !gameResult
 
   return (
     <GameFrame
@@ -81,7 +86,7 @@ export function CoinTossGame({
           selectedSide={selectedSide}
           onCoinClick={handleCoinClick}
           multiplier={multiplier}
-          isDisabled={!isCoinClickable}
+          isDisabled={isControlsDisabled}
         />
       }
       connectWallletBtn={<GameConnectWallet />}

@@ -46,11 +46,18 @@ export function DiceGame({
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
 
   const handleNumberChange = (value: number) => {
+    if (isControlsDisabled) {
+      return
+    }
     setSelectedNumber(value as DiceNumber)
   }
 
   const isControlsDisabled =
-    !isWalletConnected || betStatus === "pending" || isInGameResultState
+    !isWalletConnected ||
+    betStatus === "pending" ||
+    betStatus === "loading" ||
+    betStatus === "rolling" ||
+    isInGameResultState
 
   return (
     <GameFrame
