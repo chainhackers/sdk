@@ -11,12 +11,15 @@ import {
   COINTOSS_FACE,
   BP_VALUE,
   CoinToss,
+  chainById,
+  chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
 import { useGameHistory } from "../../hooks/useGameHistory"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
 import { GameFrame } from "./GameFrame"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { useChain } from "../../context/chainContext"
+import { useHouseEdge } from "../../hooks/useHouseEdge"
 import { formatGwei } from "viem"
 
 export interface CoinTossGameProps
@@ -44,7 +47,12 @@ export function CoinTossGame({
   const { data: balance } = useBalance({
     address,
   })
-  const { areChainsSynced } = useChain()
+  const { areChainsSynced, appChainId } = useChain()
+
+  const { houseEdge } = useHouseEdge({
+    game: CASINO_GAME_TYPE.COINTOSS,
+    token: chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
+  })
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
   const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
@@ -86,14 +94,27 @@ export function CoinTossGame({
 
   const tokenDecimals = balance?.decimals ?? 18
   const grossMultiplier = CoinToss.getMultiplier(selectedSide)
+
+  function getFees(payout: bigint) {
+    return (payout * BigInt(houseEdge)) / BigInt(BP_VALUE)
+  }
+
+  function getGrossPayout(amount: bigint, numBets: number) {
+    return (
+      (amount * BigInt(numBets) * BigInt(grossMultiplier)) / BigInt(BP_VALUE)
+    )
+  }
+
+  function getNetPayout(amount: bigint, numBets: number) {
+    const grossPayout = getGrossPayout(amount, numBets)
+    return grossPayout - getFees(grossPayout)
+  }
+
   const targetPayoutAmount =
-    betAmount && betAmount > 0n
-      ? (betAmount * BigInt(grossMultiplier)) / BigInt(BP_VALUE)
-      : 0n
+    betAmount && betAmount > 0n ? getNetPayout(betAmount, 1) : 0n
+
   const multiplier = Number(
-    Number(
-      (1000000000000000000n * BigInt(grossMultiplier)) / BigInt(BP_VALUE),
-    ) / 1e18,
+    Number(getNetPayout(1000000000000000000n, 1)) / 1e18,
   ).toFixed(2)
   const isCoinClickable =
     isWalletConnected && betStatus !== "pending" && !gameResult
