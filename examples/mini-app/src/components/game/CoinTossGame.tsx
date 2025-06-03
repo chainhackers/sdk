@@ -1,25 +1,14 @@
-import React, { useState } from "react"
+import React from "react"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
 
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
-import { useAccount, useBalance } from "wagmi"
 
-import {
-  CASINO_GAME_TYPE,
-  COINTOSS_FACE,
-  chainById,
-  chainNativeCurrencyToToken,
-} from "@betswirl/sdk-core"
-import { useGameHistory } from "../../hooks/useGameHistory"
-import { usePlaceBet } from "../../hooks/usePlaceBet"
+import { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 import { CoinTossGameControls } from "./CoinTossGameControls"
-import { useChain } from "../../context/chainContext"
-import { useHouseEdge } from "../../hooks/useHouseEdge"
-import { formatGwei } from "viem"
-import { useGameCalculations } from "../../hooks/useGameCalculations"
+import { useGameLogic } from "../../hooks/useGameLogic"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -38,67 +27,46 @@ export function CoinTossGame({
   backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
-  const themeSettings = { theme, customTheme, backgroundImage }
-  const { isConnected: isWalletConnected, address } = useAccount()
-  const { gameHistory, refreshHistory } = useGameHistory(
-    CASINO_GAME_TYPE.COINTOSS,
-  )
-  const { data: balance } = useBalance({
-    address,
+  const gameLogic = useGameLogic({
+    gameType: CASINO_GAME_TYPE.COINTOSS,
+    defaultSelection: COINTOSS_FACE.HEADS,
+    backgroundImage,
   })
-  const { areChainsSynced, appChainId } = useChain()
-
-  const { houseEdge } = useHouseEdge({
-    game: CASINO_GAME_TYPE.COINTOSS,
-    token: chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
-  })
-
-  const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
-  const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
-    COINTOSS_FACE.HEADS,
-  )
 
   const {
-    placeBet,
+    isWalletConnected,
+    balance,
+    tokenDecimals,
+    areChainsSynced,
+    gameHistory,
+    refreshHistory,
+    betAmount,
+    selection: selectedSide,
+    setSelection: setSelectedSide,
     betStatus,
     gameResult,
-    resetBetState,
     formattedVrfFees,
     gasPrice,
-  } = usePlaceBet(CASINO_GAME_TYPE.COINTOSS)
-  const isInGameResultState = !!gameResult
+    targetPayoutAmount,
+    multiplier,
+    themeSettings: baseThemeSettings,
+    handlePlayButtonClick,
+    handleBetAmountChange,
+  } = gameLogic
 
-  const handlePlayButtonClick = () => {
-    if (betStatus === "error" || isInGameResultState) {
-      resetBetState()
-    } else if (isWalletConnected && betAmount && betAmount > 0n) {
-      placeBet(betAmount, selectedSide)
-    }
-  }
+  const themeSettings = { ...baseThemeSettings, theme, customTheme }
 
   const handleCoinClick = () => {
     if (!isWalletConnected || betStatus === "pending" || !!gameResult) {
       return
     }
-    setSelectedSide((prevSide) =>
-      prevSide === COINTOSS_FACE.HEADS
+    setSelectedSide(
+      (selectedSide === COINTOSS_FACE.HEADS
         ? COINTOSS_FACE.TAILS
-        : COINTOSS_FACE.HEADS,
+        : COINTOSS_FACE.HEADS) as typeof selectedSide,
     )
   }
 
-  const handleBetAmountChange = (amount: bigint | undefined) => {
-    setBetAmount(amount)
-  }
-
-  const tokenDecimals = balance?.decimals ?? 18
-
-  const { targetPayoutAmount, multiplier } = useGameCalculations({
-    gameType: CASINO_GAME_TYPE.COINTOSS,
-    selection: selectedSide,
-    houseEdge,
-    betAmount,
-  })
   const isCoinClickable =
     isWalletConnected && betStatus !== "pending" && !gameResult
 
@@ -109,7 +77,7 @@ export function CoinTossGame({
       historyData={gameHistory}
       themeSettings={themeSettings}
       isConnected={isWalletConnected}
-      balance={balance?.value ?? 0n}
+      balance={balance}
       betAmount={betAmount}
       onBetAmountChange={handleBetAmountChange}
       tokenDecimals={tokenDecimals}
@@ -118,7 +86,7 @@ export function CoinTossGame({
       betStatus={betStatus}
       onHistoryOpen={refreshHistory}
       vrfFees={formattedVrfFees}
-      gasPrice={formatGwei(gasPrice)}
+      gasPrice={gasPrice}
       areChainsSynced={areChainsSynced}
       gameControls={
         <CoinTossGameControls

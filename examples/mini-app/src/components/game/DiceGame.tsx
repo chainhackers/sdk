@@ -1,25 +1,14 @@
-import React, { useState } from "react"
+import React from "react"
 import diceBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
 
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
-import { useAccount, useBalance } from "wagmi"
 
-import {
-  CASINO_GAME_TYPE,
-  DiceNumber,
-  chainById,
-  chainNativeCurrencyToToken,
-} from "@betswirl/sdk-core"
-import { useGameHistory } from "../../hooks/useGameHistory"
-import { usePlaceBet } from "../../hooks/usePlaceBet"
+import { CASINO_GAME_TYPE, DiceNumber } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 import { DiceGameControls } from "./DiceGameControls"
-import { useChain } from "../../context/chainContext"
-import { useHouseEdge } from "../../hooks/useHouseEdge"
-import { formatGwei } from "viem"
-import { useGameCalculations } from "../../hooks/useGameCalculations"
+import { useGameLogic } from "../../hooks/useGameLogic"
 
 export interface DiceGameProps extends React.HTMLAttributes<HTMLDivElement> {
   theme?: "light" | "dark" | "system"
@@ -37,56 +26,40 @@ export function DiceGame({
   backgroundImage = diceBackground,
   ...props
 }: DiceGameProps) {
-  const themeSettings = { theme, customTheme, backgroundImage }
-  const { isConnected: isWalletConnected, address } = useAccount()
-  const { gameHistory, refreshHistory } = useGameHistory(CASINO_GAME_TYPE.DICE)
-  const { data: balance } = useBalance({
-    address,
+  const gameLogic = useGameLogic({
+    gameType: CASINO_GAME_TYPE.DICE,
+    defaultSelection: 50 as DiceNumber,
+    backgroundImage,
   })
-  const { areChainsSynced, appChainId } = useChain()
-
-  const { houseEdge } = useHouseEdge({
-    game: CASINO_GAME_TYPE.DICE,
-    token: chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
-  })
-
-  const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
-  const [selectedNumber, setSelectedNumber] = useState<DiceNumber>(50)
 
   const {
-    placeBet,
+    isWalletConnected,
+    balance,
+    tokenDecimals,
+    areChainsSynced,
+    gameHistory,
+    refreshHistory,
+    betAmount,
+    selection: selectedNumber,
+    setSelection: setSelectedNumber,
     betStatus,
     gameResult,
-    resetBetState,
     formattedVrfFees,
     gasPrice,
-  } = usePlaceBet(CASINO_GAME_TYPE.DICE)
-  const isInGameResultState = !!gameResult
+    targetPayoutAmount,
+    multiplier,
+    isInGameResultState,
+    themeSettings: baseThemeSettings,
+    handlePlayButtonClick,
+    handleBetAmountChange,
+  } = gameLogic
 
-  const handlePlayButtonClick = () => {
-    if (betStatus === "error" || isInGameResultState) {
-      resetBetState()
-    } else if (isWalletConnected && betAmount && betAmount > 0n) {
-      placeBet(betAmount, selectedNumber)
-    }
-  }
+  const themeSettings = { ...baseThemeSettings, theme, customTheme }
 
   const handleNumberChange = (value: number) => {
     setSelectedNumber(value as DiceNumber)
   }
 
-  const handleBetAmountChange = (amount: bigint | undefined) => {
-    setBetAmount(amount)
-  }
-
-  const tokenDecimals = balance?.decimals ?? 18
-
-  const { targetPayoutAmount, multiplier } = useGameCalculations({
-    gameType: CASINO_GAME_TYPE.DICE,
-    selection: selectedNumber,
-    houseEdge,
-    betAmount,
-  })
   const isControlsDisabled =
     !isWalletConnected || betStatus === "pending" || isInGameResultState
 
@@ -97,7 +70,7 @@ export function DiceGame({
       historyData={gameHistory}
       themeSettings={themeSettings}
       isConnected={isWalletConnected}
-      balance={balance?.value ?? 0n}
+      balance={balance}
       betAmount={betAmount}
       onBetAmountChange={handleBetAmountChange}
       tokenDecimals={tokenDecimals}
@@ -106,7 +79,7 @@ export function DiceGame({
       betStatus={betStatus}
       onHistoryOpen={refreshHistory}
       vrfFees={formattedVrfFees}
-      gasPrice={formatGwei(gasPrice)}
+      gasPrice={gasPrice}
       areChainsSynced={areChainsSynced}
       gameControls={
         <DiceGameControls
