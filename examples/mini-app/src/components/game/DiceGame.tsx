@@ -1,13 +1,10 @@
 import React from "react"
 import diceBackground from "../../assets/game/game-background.png"
-import { cn } from "../../lib/utils"
-
-import { Avatar, Name } from "@coinbase/onchainkit/identity"
-import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 
 import { CASINO_GAME_TYPE, DiceNumber } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 import { DiceGameControls } from "./DiceGameControls"
+import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { useGameLogic } from "../../hooks/useGameLogic"
 
 export interface DiceGameProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -89,29 +86,7 @@ export function DiceGame({
           isDisabled={isControlsDisabled}
         />
       }
-      connectWallletBtn={
-        <Wallet>
-          <ConnectWallet
-            className={cn(
-              "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-              "bg-neutral-background",
-              "rounded-[12px]",
-              "border border-border-stroke",
-              "px-3 py-1.5 h-[44px]",
-              "text-primary",
-            )}
-            disconnectedLabel="Connect"
-          >
-            <div className="flex items-center">
-              <Avatar
-                className="h-7 w-7 mr-2"
-                address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9"
-              />
-              <Name className="text-title-color" />
-            </div>
-          </ConnectWallet>
-        </Wallet>
-      }
+      connectWallletBtn={<GameConnectWallet />}
     />
   )
 }
