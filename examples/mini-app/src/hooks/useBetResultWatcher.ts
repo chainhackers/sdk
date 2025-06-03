@@ -81,13 +81,10 @@ function _decodeRolled(
         return CoinToss.decodeRolled(rolled[0])
       }
       throw new Error(
-        `Invalid rolled data for COINTOSS: expected boolean array`,
+        `Invalid rolled data for COINTOSS: expected boolean array, got ${rolled}`,
       )
     case CASINO_GAME_TYPE.DICE:
-      if (typeof rolled === "number") {
-        return rolled as DiceNumber
-      }
-      throw new Error(`Invalid rolled data for DICE: expected number`)
+      return rolled as DiceNumber
     default:
       logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
       throw new Error(`Unsupported game type for decoding roll: ${game}`)
