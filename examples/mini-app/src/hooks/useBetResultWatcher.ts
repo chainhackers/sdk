@@ -29,11 +29,16 @@ interface BetResultWatcherOutput {
   reset: () => void
 }
 
+interface DecodedEventLog {
+  eventName: string
+  args: readonly unknown[]
+}
+
 const POLLING_INTERVAL = 2500
 const PRIMARY_WATCHER_TIMEOUT = 30000
 
 function _extractEventData(
-  decodedRollLog: any,
+  decodedRollLog: DecodedEventLog,
   gameType: CASINO_GAME_TYPE,
 ): { rolledData: boolean[] | DiceNumber; payout: bigint; id: bigint } {
   switch (gameType) {
@@ -180,10 +185,11 @@ export function useBetResultWatcher({
           strict: false,
         })
 
+        if (!decodedRollLog.eventName || !decodedRollLog.args) continue
         if (decodedRollLog.eventName !== eventName) continue
 
         const { rolledData, payout, id } = _extractEventData(
-          decodedRollLog,
+          decodedRollLog as unknown as DecodedEventLog,
           gameType,
         )
 

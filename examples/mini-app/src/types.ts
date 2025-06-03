@@ -26,6 +26,8 @@ export type GameChoice = COINTOSS_FACE | DiceNumber
 
 export type GameRolledResult = COINTOSS_FACE | DiceNumber
 
+export type GameEncodedInput = boolean | DiceNumber
+
 export interface GameResult {
   isWin: boolean
   payout: bigint

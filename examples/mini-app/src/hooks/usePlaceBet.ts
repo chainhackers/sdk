@@ -25,11 +25,14 @@ import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import { useChain } from "../context/chainContext"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
-import { BetStatus, GameResult, GameChoice } from "../types"
+import { BetStatus, GameResult, GameChoice, GameEncodedInput } from "../types"
 
 const logger = createLogger("usePlaceBet")
 
-function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): any {
+function _encodeGameInput(
+  choice: GameChoice,
+  game: CASINO_GAME_TYPE,
+): GameEncodedInput {
   switch (game) {
     case CASINO_GAME_TYPE.COINTOSS:
       return CoinToss.encodeInput(choice as COINTOSS_FACE)
