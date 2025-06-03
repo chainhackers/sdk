@@ -180,7 +180,7 @@ export function GameFrame({
               amount={betAmount || 0n}
               payout={gameResult?.payout}
               currency="ETH"
-              rolled={gameResult?.rolled || ""}
+              rolled={gameResult?.rolled.toString() || ""}
             />
           </div>
 
