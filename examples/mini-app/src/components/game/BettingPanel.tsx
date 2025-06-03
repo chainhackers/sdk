@@ -66,7 +66,7 @@ export function BettingPanel({
 
   const isBetAmountValid = betAmount && betAmount > 0n
   const formattedBalance = formatRawAmount(balance, tokenDecimals)
-  
+
   const isBetSuccees = betStatus === "success"
   const isWaiting =
     betStatus === "loading" ||
@@ -80,7 +80,9 @@ export function BettingPanel({
   const canInitiateBet =
     isConnected && areChainsSynced && isBetAmountValid && !isWaiting
 
-  const isPlayButtonDisabled: boolean = isError || isWaiting || !canInitiateBet
+  const isInputDisabled = !isConnected || isWaiting || isBetSuccees
+
+  const isPlayButtonDisabled: boolean = isWaiting || !canInitiateBet
 
   let playButtonText: string
   if (isError) {
@@ -205,9 +207,7 @@ export function BettingPanel({
             icon: <TokenImage token={ETH_TOKEN} size={18} />,
             symbol: "ETH",
           }}
-          disabled={
-            !isConnected || betStatus === "pending" || isBetSuccees
-          }
+          disabled={isInputDisabled}
         />
         {betAmountError && (
           <div className="text-red-500 text-xs mt-1">{betAmountError}</div>
@@ -218,7 +218,7 @@ export function BettingPanel({
             variant="secondary"
             onClick={handleHalfBet}
             className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-            disabled={!isConnected || isWaiting || !isBetAmountValid}
+            disabled={isInputDisabled || !isBetAmountValid}
           >
             1/2
           </Button>
@@ -226,7 +226,7 @@ export function BettingPanel({
             variant="secondary"
             onClick={handleDoubleBet}
             className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-            disabled={!isConnected || isWaiting || !isBetAmountValid}
+            disabled={isInputDisabled || !isBetAmountValid}
           >
             2x
           </Button>
@@ -234,7 +234,7 @@ export function BettingPanel({
             variant="secondary"
             className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
             onClick={handleMaxBet}
-            disabled={!isConnected || isWaiting || !isBetAmountValid}
+            disabled={isInputDisabled || !isBetAmountValid}
           >
             Max
           </Button>
