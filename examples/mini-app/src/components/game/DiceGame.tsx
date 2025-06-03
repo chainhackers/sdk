@@ -9,7 +9,6 @@ import { useAccount, useBalance } from "wagmi"
 import {
   CASINO_GAME_TYPE,
   DiceNumber,
-  BP_VALUE,
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
@@ -20,6 +19,7 @@ import { DiceGameControls } from "./DiceGameControls"
 import { useChain } from "../../context/chainContext"
 import { useHouseEdge } from "../../hooks/useHouseEdge"
 import { formatGwei } from "viem"
+import { useGameCalculations } from "../../hooks/useGameCalculations"
 
 export interface DiceGameProps extends React.HTMLAttributes<HTMLDivElement> {
   theme?: "light" | "dark" | "system"
@@ -81,29 +81,12 @@ export function DiceGame({
 
   const tokenDecimals = balance?.decimals ?? 18
 
-  const grossMultiplier = Math.floor((100 / (100 - selectedNumber)) * 10000)
-
-  function getFees(payout: bigint) {
-    return (payout * BigInt(houseEdge)) / BigInt(BP_VALUE)
-  }
-
-  function getGrossPayout(amount: bigint, numBets: number) {
-    return (
-      (amount * BigInt(numBets) * BigInt(grossMultiplier)) / BigInt(BP_VALUE)
-    )
-  }
-
-  function getNetPayout(amount: bigint, numBets: number) {
-    const grossPayout = getGrossPayout(amount, numBets)
-    return grossPayout - getFees(grossPayout)
-  }
-
-  const targetPayoutAmount =
-    betAmount && betAmount > 0n ? getNetPayout(betAmount, 1) : 0n
-
-  const multiplier = Number(
-    Number(getNetPayout(1000000000000000000n, 1)) / 1e18,
-  ).toFixed(2)
+  const { targetPayoutAmount, multiplier } = useGameCalculations({
+    gameType: CASINO_GAME_TYPE.DICE,
+    selection: selectedNumber,
+    houseEdge,
+    betAmount,
+  })
   const isControlsDisabled =
     !isWalletConnected || betStatus === "pending" || isInGameResultState
 

@@ -9,8 +9,6 @@ import { useAccount, useBalance } from "wagmi"
 import {
   CASINO_GAME_TYPE,
   COINTOSS_FACE,
-  BP_VALUE,
-  CoinToss,
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
@@ -21,6 +19,7 @@ import { CoinTossGameControls } from "./CoinTossGameControls"
 import { useChain } from "../../context/chainContext"
 import { useHouseEdge } from "../../hooks/useHouseEdge"
 import { formatGwei } from "viem"
+import { useGameCalculations } from "../../hooks/useGameCalculations"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -93,29 +92,13 @@ export function CoinTossGame({
   }
 
   const tokenDecimals = balance?.decimals ?? 18
-  const grossMultiplier = CoinToss.getMultiplier(selectedSide)
 
-  function getFees(payout: bigint) {
-    return (payout * BigInt(houseEdge)) / BigInt(BP_VALUE)
-  }
-
-  function getGrossPayout(amount: bigint, numBets: number) {
-    return (
-      (amount * BigInt(numBets) * BigInt(grossMultiplier)) / BigInt(BP_VALUE)
-    )
-  }
-
-  function getNetPayout(amount: bigint, numBets: number) {
-    const grossPayout = getGrossPayout(amount, numBets)
-    return grossPayout - getFees(grossPayout)
-  }
-
-  const targetPayoutAmount =
-    betAmount && betAmount > 0n ? getNetPayout(betAmount, 1) : 0n
-
-  const multiplier = Number(
-    Number(getNetPayout(1000000000000000000n, 1)) / 1e18,
-  ).toFixed(2)
+  const { targetPayoutAmount, multiplier } = useGameCalculations({
+    gameType: CASINO_GAME_TYPE.COINTOSS,
+    selection: selectedSide,
+    houseEdge,
+    betAmount,
+  })
   const isCoinClickable =
     isWalletConnected && betStatus !== "pending" && !gameResult
 
