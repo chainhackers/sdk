@@ -1,5 +1,6 @@
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
 import { Button } from "../ui/button"
+import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import coinHeadsIcon from "../../assets/game/coin-heads.svg"
 import coinTailsIcon from "../../assets/game/coin-tails.svg"
 
@@ -21,9 +22,7 @@ export function CoinTossGameControls({
 
   return (
     <>
-      <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
-        {multiplier} x
-      </div>
+      <GameMultiplierDisplay multiplier={multiplier} />
       <Button
         variant="coinButton"
         size="coin"

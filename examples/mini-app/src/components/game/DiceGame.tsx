@@ -1,21 +1,13 @@
-import React from "react"
 import diceBackground from "../../assets/game/game-background.png"
 
 import { CASINO_GAME_TYPE, DiceNumber } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 import { DiceGameControls } from "./DiceGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
+import { BaseGameProps } from "./shared/BaseGameProps"
 import { useGameLogic } from "../../hooks/useGameLogic"
 
-export interface DiceGameProps extends React.HTMLAttributes<HTMLDivElement> {
-  theme?: "light" | "dark" | "system"
-  customTheme?: {
-    "--primary"?: string
-    "--play-btn-font"?: string
-    "--game-window-overlay"?: string
-  } & React.CSSProperties
-  backgroundImage?: string
-}
+export interface DiceGameProps extends BaseGameProps {}
 
 export function DiceGame({
   theme = "system",

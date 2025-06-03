@@ -1,22 +1,13 @@
-import React from "react"
 import coinTossBackground from "../../assets/game/game-background.png"
 
 import { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
+import { BaseGameProps } from "./shared/BaseGameProps"
 import { useGameLogic } from "../../hooks/useGameLogic"
 
-export interface CoinTossGameProps
-  extends React.HTMLAttributes<HTMLDivElement> {
-  theme?: "light" | "dark" | "system"
-  customTheme?: {
-    "--primary"?: string
-    "--play-btn-font"?: string
-    "--game-window-overlay"?: string
-  } & React.CSSProperties
-  backgroundImage?: string
-}
+export interface CoinTossGameProps extends BaseGameProps {}
 
 export function CoinTossGame({
   theme = "system",
