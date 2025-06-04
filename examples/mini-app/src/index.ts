@@ -1,3 +1,5 @@
+import "./index.css";
+
 export * from "./hooks/usePlaceBet";
 export * from "./hooks/useBetResultWatcher";
 export * from "./components/game/CoinTossGame";
