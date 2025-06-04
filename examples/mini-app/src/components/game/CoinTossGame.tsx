@@ -4,7 +4,7 @@ import { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
-import { BaseGameProps } from "./shared/BaseGameProps"
+import { BaseGameProps } from "./shared/types"
 import { useGameLogic } from "../../hooks/useGameLogic"
 
 export interface CoinTossGameProps extends BaseGameProps {}

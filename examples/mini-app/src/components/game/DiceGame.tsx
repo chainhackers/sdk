@@ -4,7 +4,7 @@ import { CASINO_GAME_TYPE, DiceNumber } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 import { DiceGameControls } from "./DiceGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
-import { BaseGameProps } from "./shared/BaseGameProps"
+import { BaseGameProps } from "./shared/types"
 import { useGameLogic } from "../../hooks/useGameLogic"
 
 export interface DiceGameProps extends BaseGameProps {}
