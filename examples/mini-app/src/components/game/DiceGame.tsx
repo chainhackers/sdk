@@ -68,7 +68,7 @@ export function DiceGame({
       />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
-          winChance={50}
+          winChance={100 - selectedNumber}
           rngFee={formattedVrfFees}
           targetPayout={targetPayoutAmount.toString()}
           gasPrice={gasPrice}

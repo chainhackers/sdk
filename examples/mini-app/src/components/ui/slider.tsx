@@ -110,7 +110,7 @@ function Slider({
                 )}
               />
             </TooltipTrigger>
-            <TooltipContent className="bg-[#E5E7EB]/80">
+            <TooltipContent className="bg-muted/80">
               <p className={cn(disabled ? "text-slider-disabled-tooltip" : "")}>
                 {Math.round(currentValue)}
               </p>
