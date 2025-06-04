@@ -1,6 +1,11 @@
 import coinTossBackground from "../../assets/game/game-background.png"
 
-import { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  COINTOSS_FACE,
+  FORMAT_TYPE,
+  formatRawAmount,
+} from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -74,7 +79,11 @@ export function CoinTossGame({
         <GameFrame.InfoButton
           winChance={50}
           rngFee={formattedVrfFees}
-          targetPayout={targetPayoutAmount.toString()}
+          targetPayout={formatRawAmount(
+            targetPayoutAmount,
+            tokenDecimals,
+            FORMAT_TYPE.PRECISE,
+          )}
           gasPrice={gasPrice}
           tokenDecimals={tokenDecimals}
           nativeCurrencySymbol={nativeCurrencySymbol}

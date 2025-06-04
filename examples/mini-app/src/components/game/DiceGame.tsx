@@ -1,6 +1,11 @@
 import diceBackground from "../../assets/game/game-background.png"
 
-import { CASINO_GAME_TYPE, DiceNumber } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  DiceNumber,
+  FORMAT_TYPE,
+  formatRawAmount,
+} from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
 import { DiceGameControls } from "./DiceGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -70,7 +75,11 @@ export function DiceGame({
         <GameFrame.InfoButton
           winChance={100 - selectedNumber}
           rngFee={formattedVrfFees}
-          targetPayout={targetPayoutAmount.toString()}
+          targetPayout={formatRawAmount(
+            targetPayoutAmount,
+            tokenDecimals,
+            FORMAT_TYPE.PRECISE,
+          )}
           gasPrice={gasPrice}
           tokenDecimals={tokenDecimals}
           nativeCurrencySymbol={nativeCurrencySymbol}
