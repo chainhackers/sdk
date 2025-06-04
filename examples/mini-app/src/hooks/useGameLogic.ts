@@ -43,6 +43,7 @@ interface UseGameLogicResult<T extends GameSelection> {
   targetPayoutAmount: bigint
   multiplier: string
   isInGameResultState: boolean
+  nativeCurrencySymbol: string
   themeSettings: {
     theme: "light" | "dark" | "system"
     customTheme?: {
@@ -93,6 +94,7 @@ export function useGameLogic<T extends GameSelection>({
 
   const isInGameResultState = !!gameResult
   const tokenDecimals = balance?.decimals ?? 18
+  const nativeCurrencySymbol = chainById[appChainId].nativeCurrency.symbol
 
   const themeSettings = {
     theme: "system" as const,
@@ -132,6 +134,7 @@ export function useGameLogic<T extends GameSelection>({
     targetPayoutAmount,
     multiplier,
     isInGameResultState,
+    nativeCurrencySymbol,
     themeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,

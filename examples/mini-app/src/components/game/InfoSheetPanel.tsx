@@ -1,5 +1,4 @@
-import { chainById, Token } from "@betswirl/sdk-core"
-import { useChain } from "../../context/chainContext"
+import { Token } from "@betswirl/sdk-core"
 import { cn } from "../../lib/utils"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 
@@ -10,6 +9,7 @@ interface InfoSheetPanelProps {
   targetPayout: number | string // formatted
   gasPrice: number | string // gwei formatted
   token: Token
+  nativeCurrencySymbol: string
 }
 
 export function InfoSheetPanel({
@@ -19,8 +19,8 @@ export function InfoSheetPanel({
   targetPayout,
   gasPrice,
   token,
+  nativeCurrencySymbol,
 }: InfoSheetPanelProps) {
-  const { appChainId } = useChain()
   return (
     <SheetPortal container={portalContainer}>
       <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
@@ -35,7 +35,7 @@ export function InfoSheetPanel({
           <div>
             <p>RNG fee:</p>
             <p className="text-text-on-surface">
-              {rngFee} {chainById[appChainId].nativeCurrency.symbol}
+              {rngFee} {nativeCurrencySymbol}
             </p>
           </div>
           <div>

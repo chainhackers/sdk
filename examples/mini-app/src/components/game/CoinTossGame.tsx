@@ -38,6 +38,7 @@ export function CoinTossGame({
     targetPayoutAmount,
     multiplier,
     isInGameResultState,
+    nativeCurrencySymbol,
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
@@ -64,32 +65,48 @@ export function CoinTossGame({
   }
 
   return (
-    <GameFrame
-      {...props}
-      onPlayBtnClick={handlePlayButtonClick}
-      historyData={gameHistory}
-      themeSettings={themeSettings}
-      isConnected={isWalletConnected}
-      balance={balance}
-      betAmount={betAmount}
-      onBetAmountChange={handleBetAmountChange}
-      tokenDecimals={tokenDecimals}
-      targetPayoutAmount={targetPayoutAmount}
-      gameResult={gameResult}
-      betStatus={betStatus}
-      onHistoryOpen={refreshHistory}
-      vrfFees={formattedVrfFees}
-      gasPrice={gasPrice}
-      areChainsSynced={areChainsSynced}
-      gameControls={
-        <CoinTossGameControls
-          selectedSide={selectedSide}
-          onCoinClick={handleCoinClick}
-          multiplier={multiplier}
-          isDisabled={isControlsDisabled}
+    <GameFrame themeSettings={themeSettings} {...props}>
+      <GameFrame.Header
+        title="CoinToss"
+        connectWalletButton={<GameConnectWallet />}
+      />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={formattedVrfFees}
+          targetPayout={targetPayoutAmount.toString()}
+          gasPrice={gasPrice}
+          tokenDecimals={tokenDecimals}
+          nativeCurrencySymbol={nativeCurrencySymbol}
         />
-      }
-      connectWallletBtn={<GameConnectWallet />}
-    />
+        <GameFrame.HistoryButton
+          historyData={gameHistory}
+          onHistoryOpen={refreshHistory}
+        />
+        <GameFrame.GameControls>
+          <CoinTossGameControls
+            selectedSide={selectedSide}
+            onCoinClick={handleCoinClick}
+            multiplier={multiplier}
+            isDisabled={isControlsDisabled}
+          />
+        </GameFrame.GameControls>
+        <GameFrame.ResultWindow
+          gameResult={gameResult}
+          betAmount={betAmount}
+          currency="ETH"
+        />
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={balance}
+        isConnected={isWalletConnected}
+        tokenDecimals={tokenDecimals}
+        betStatus={betStatus}
+        betAmount={betAmount}
+        onBetAmountChange={handleBetAmountChange}
+        onPlayBtnClick={handlePlayButtonClick}
+        areChainsSynced={areChainsSynced}
+      />
+    </GameFrame>
   )
 }

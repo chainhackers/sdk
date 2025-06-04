@@ -1,6 +1,6 @@
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
 import { TokenImage } from "@coinbase/onchainkit/token"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta } from "@storybook/react"
 import { parseUnits } from "viem"
 import gameBg from "../../assets/game/game-background.png"
 import { ETH_TOKEN } from "../../lib/tokens"
@@ -34,9 +34,6 @@ const meta = {
 } satisfies Meta<typeof GameFrame>
 
 export default meta
-type Story = StoryObj<typeof meta>
-
-const connectWalletBtnStub = <div />
 
 const mockHistoryData: HistoryEntry[] = [
   {
@@ -63,139 +60,174 @@ const mockHistoryData: HistoryEntry[] = [
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
-  {
-    id: "4",
-    status: "Won bet",
-    multiplier: 1.946,
-    payoutAmount: 2.453,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "5",
-    status: "Busted",
-    multiplier: 1.94,
-    payoutAmount: 1.94,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "6",
-    status: "Won bet",
-    multiplier: 1.946,
-    payoutAmount: 2.453,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "7",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "8",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "9",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
-    timestamp: "~2h ago",
-  },
 ]
 
-const Template: Story = {
-  args: {
-    themeSettings: {
-      backgroundImage: gameBg,
-    },
-    historyData: mockHistoryData,
-    balance: 1123456n * 10n ** 12n,
-    connectWallletBtn: connectWalletBtnStub,
-    isConnected: false,
-    onPlayBtnClick: () => console.log("Play button clicked"),
-    gameResult: null,
-    betStatus: null,
-    onHistoryOpen: () => console.log("onHistoryOpen"),
-    betAmount: parseUnits("0.1234567", 18),
-    onBetAmountChange: (betAmount?: bigint) =>
-      console.log("betAmount: ", betAmount),
-    tokenDecimals: 18,
-    targetPayoutAmount: (parseUnits("0.1234567", 18) * 194n) / 100n,
-    vrfFees: 0.0001,
-    gasPrice: 34.2123,
-    areChainsSynced: true,
-    gameControls: (
-      <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
-        1.94 x
-      </div>
-    ),
-  },
-  render: (args) => <GameFrame {...args} />,
+export const WalletNotConnected = {
+  render: () => (
+    <GameFrame themeSettings={{ backgroundImage: gameBg }}>
+      <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={0.0001}
+          targetPayout={(
+            (parseUnits("0.1234567", 18) * 194n) /
+            100n
+          ).toString()}
+          gasPrice={34.2123}
+          tokenDecimals={18}
+          nativeCurrencySymbol="ETH"
+        />
+        <GameFrame.HistoryButton
+          historyData={mockHistoryData}
+          onHistoryOpen={() => console.log("History opened")}
+        />
+        <GameFrame.GameControls>
+          <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
+            1.94 x
+          </div>
+        </GameFrame.GameControls>
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={1123456n * 10n ** 12n}
+        isConnected={false}
+        tokenDecimals={18}
+        betStatus={null}
+        betAmount={parseUnits("0.1234567", 18)}
+        onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
+        onPlayBtnClick={() => console.log("Play clicked")}
+        areChainsSynced={true}
+      />
+    </GameFrame>
+  ),
 }
 
-export const WalletNotConnected: Story = {
-  args: {
-    ...Template.args,
-  },
+export const WalletConnected = {
+  render: () => (
+    <GameFrame themeSettings={{ backgroundImage: gameBg }}>
+      <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={0.0001}
+          targetPayout={(
+            (parseUnits("0.1234567", 18) * 194n) /
+            100n
+          ).toString()}
+          gasPrice={34.2123}
+          tokenDecimals={18}
+          nativeCurrencySymbol="ETH"
+        />
+        <GameFrame.HistoryButton
+          historyData={mockHistoryData}
+          onHistoryOpen={() => console.log("History opened")}
+        />
+        <GameFrame.GameControls>
+          <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
+            1.94 x
+          </div>
+        </GameFrame.GameControls>
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={1123456n * 10n ** 12n}
+        isConnected={true}
+        tokenDecimals={18}
+        betStatus={null}
+        betAmount={parseUnits("0.1234567", 18)}
+        onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
+        onPlayBtnClick={() => console.log("Play clicked")}
+        areChainsSynced={true}
+      />
+    </GameFrame>
+  ),
 }
 
-export const WalletConnected: Story = {
-  args: {
-    ...Template.args,
-    isConnected: true,
-  },
+export const PlacingBet = {
+  render: () => (
+    <GameFrame themeSettings={{ backgroundImage: gameBg }}>
+      <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={0.0001}
+          targetPayout={(
+            (parseUnits("0.1234567", 18) * 194n) /
+            100n
+          ).toString()}
+          gasPrice={34.2123}
+          tokenDecimals={18}
+          nativeCurrencySymbol="ETH"
+        />
+        <GameFrame.HistoryButton
+          historyData={mockHistoryData}
+          onHistoryOpen={() => console.log("History opened")}
+        />
+        <GameFrame.GameControls>
+          <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
+            1.94 x
+          </div>
+        </GameFrame.GameControls>
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={1123456n * 10n ** 12n}
+        isConnected={true}
+        tokenDecimals={18}
+        betStatus="pending"
+        betAmount={parseUnits("0.1234567", 18)}
+        onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
+        onPlayBtnClick={() => console.log("Play clicked")}
+        areChainsSynced={true}
+      />
+    </GameFrame>
+  ),
 }
 
-export const PlacingBet: Story = {
-  args: {
-    ...Template.args,
-    isConnected: true,
-    betStatus: "pending",
-  },
-}
-
-export const ErrorBet: Story = {
-  args: {
-    ...Template.args,
-    isConnected: true,
-    betStatus: "error",
-  },
-}
-
-export const Win: Story = {
-  args: {
-    ...Template.args,
-    isConnected: true,
-    betStatus: "success",
-    gameResult: {
-      isWin: true,
-      payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
-      currency: "ETH",
-      rolled: COINTOSS_FACE.HEADS,
-    },
-  },
-}
-
-export const Loss: Story = {
-  args: {
-    ...Template.args,
-    isConnected: true,
-    betStatus: "success",
-    gameResult: {
-      isWin: false,
-      payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
-      currency: "ETH",
-      rolled: COINTOSS_FACE.TAILS,
-    },
-  },
+export const Win = {
+  render: () => (
+    <GameFrame themeSettings={{ backgroundImage: gameBg }}>
+      <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={0.0001}
+          targetPayout={(
+            (parseUnits("0.1234567", 18) * 194n) /
+            100n
+          ).toString()}
+          gasPrice={34.2123}
+          tokenDecimals={18}
+          nativeCurrencySymbol="ETH"
+        />
+        <GameFrame.HistoryButton
+          historyData={mockHistoryData}
+          onHistoryOpen={() => console.log("History opened")}
+        />
+        <GameFrame.GameControls>
+          <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
+            1.94 x
+          </div>
+        </GameFrame.GameControls>
+        <GameFrame.ResultWindow
+          gameResult={{
+            isWin: true,
+            payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
+            currency: "ETH",
+            rolled: COINTOSS_FACE.HEADS,
+          }}
+          betAmount={parseUnits("0.1234567", 18)}
+          currency="ETH"
+        />
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={1123456n * 10n ** 12n}
+        isConnected={true}
+        tokenDecimals={18}
+        betStatus="success"
+        betAmount={parseUnits("0.1234567", 18)}
+        onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
+        onPlayBtnClick={() => console.log("Play clicked")}
+        areChainsSynced={true}
+      />
+    </GameFrame>
+  ),
 }
