@@ -90,7 +90,7 @@ export function DiceGame({
         <GameFrame.ResultWindow
           gameResult={gameResult}
           betAmount={betAmount}
-          currency="ETH"
+          currency={nativeCurrencySymbol}
         />
       </GameFrame.GameArea>
       <GameFrame.BettingSection

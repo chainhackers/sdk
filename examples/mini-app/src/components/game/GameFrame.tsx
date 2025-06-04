@@ -229,7 +229,7 @@ function HistoryButton({ historyData, onHistoryOpen }: HistoryButtonProps) {
           variant="iconTransparent"
           size="iconRound"
           className={cn(
-            "absolute top-2 right-2 z-5",
+            "absolute top-2 right-2 z-[5]",
             "text-white border border-border-stroke bg-neutral-background",
             isHistorySheetOpen && "text-primary border-primary",
           )}

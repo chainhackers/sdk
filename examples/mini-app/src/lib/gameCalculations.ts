@@ -1,5 +1,7 @@
 import { BP_VALUE } from "@betswirl/sdk-core"
 
+const ONE_ETHER = 1000000000000000000n
+
 export interface GameCalculationParams {
   houseEdge: number
   grossMultiplier: number
@@ -52,8 +54,7 @@ export function formatMultiplier(
   params: GameCalculationParams,
   decimals: number = 2,
 ): string {
-  const oneEther = 1000000000000000000n
-  const netPayout = getNetPayout(oneEther, 1, params)
+  const netPayout = getNetPayout(ONE_ETHER, 1, params)
   return Number(Number(netPayout) / 1e18).toFixed(decimals)
 }
 
