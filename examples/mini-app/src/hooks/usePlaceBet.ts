@@ -119,6 +119,13 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
     }
   }, [watcherStatus, watcherGameResult])
 
+  const resetBetState = useCallback(() => {
+    wagerWriteHook.reset()
+    setGameResult(null)
+    setWatchTarget(null)
+    resetWatcher()
+  }, [resetWatcher])
+
   const placeBet = useCallback(
     async (betAmount: bigint, choice: GameChoice) => {
       resetBetState()
@@ -160,13 +167,16 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
       )
     },
     [
+      game,
+      resetBetState,
       publicClient,
       appChainId,
       connectedAddress,
       wagerWriteHook.writeContract,
-      wagerWriteHook.reset,
-      resetWatcher,
+      estimateVrfFeesWagmiHook.refetch,
+      formattedVrfFees,
       vrfFees,
+      gasPrice,
     ],
   )
 
@@ -223,13 +233,6 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
       waitRoll()
     }
   }, [wagerWaitingHook.isSuccess])
-
-  const resetBetState = useCallback(() => {
-    wagerWriteHook.reset()
-    setGameResult(null)
-    setWatchTarget(null)
-    resetWatcher()
-  }, [resetWatcher])
 
   return {
     placeBet,
