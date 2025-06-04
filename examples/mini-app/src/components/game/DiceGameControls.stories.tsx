@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { fn } from "@storybook/test"
 import { useState } from "react"
 import { DiceGameControls } from "./DiceGameControls"
 
@@ -50,23 +49,12 @@ const meta = {
       },
     },
   },
-  args: {
-    selectedNumber: 50,
-    multiplier: 1.94,
-    isDisabled: false,
-    onNumberChange: fn(),
-  },
-  decorators: [
-    (Story) => (
-      <div className="relative w-[400px] h-[200px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta<typeof DiceGameControls>
 
 export default meta
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta> & {
+  args?: Partial<React.ComponentProps<typeof DiceGameControls>>
+}
 
 function InteractiveDiceGameControls({
   initialSelectedNumber = 50,
@@ -95,74 +83,122 @@ function InteractiveDiceGameControls({
   )
 }
 
+function StaticDiceGameControls({
+  selectedNumber = 50,
+  multiplier = 1.94,
+  isDisabled = false,
+}: {
+  selectedNumber?: number
+  multiplier?: number
+  isDisabled?: boolean
+}) {
+  return (
+    <div className="relative w-[400px] h-[200px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
+      <DiceGameControls
+        selectedNumber={selectedNumber}
+        onNumberChange={() => {}}
+        multiplier={multiplier}
+        isDisabled={isDisabled}
+      />
+    </div>
+  )
+}
+
 export const Default: Story = {
   name: "Default (50)",
-  args: {},
+  render: () => <InteractiveDiceGameControls initialSelectedNumber={50} />,
+  args: {} as any,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default slider position at 50. Drag the slider to see real-time updates.",
+      },
+    },
+  },
 }
 
 export const MinimumValue: Story = {
   name: "Minimum Value (1)",
-  args: {
-    selectedNumber: 1,
+  render: () => <InteractiveDiceGameControls initialSelectedNumber={1} />,
+  args: {} as any,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Slider at minimum value (1). Drag to see how it behaves at the edge.",
+      },
+    },
   },
 }
 
 export const LowValue: Story = {
   name: "Low Value (25)",
-  args: {
-    selectedNumber: 25,
+  render: () => <InteractiveDiceGameControls initialSelectedNumber={25} />,
+  args: {} as any,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Slider at low value (25). Interactive slider with real-time feedback.",
+      },
+    },
   },
 }
 
 export const HighValue: Story = {
   name: "High Value (75)",
-  args: {
-    selectedNumber: 75,
+  render: () => <InteractiveDiceGameControls initialSelectedNumber={75} />,
+  args: {} as any,
+  parameters: {
+    docs: {
+      description: {
+        story: "Slider at high value (75). Drag to see smooth interaction.",
+      },
+    },
   },
 }
 
 export const MaximumValue: Story = {
   name: "Maximum Value (99)",
-  args: {
-    selectedNumber: 99,
+  render: () => <InteractiveDiceGameControls initialSelectedNumber={99} />,
+  args: {} as any,
+  parameters: {
+    docs: {
+      description: {
+        story: "Slider at maximum value (99). Test edge behavior by dragging.",
+      },
+    },
   },
 }
 
 export const DisabledLow: Story = {
   name: "Disabled (Low Value)",
-  args: {
-    selectedNumber: 20,
-    isDisabled: true,
+  render: () => (
+    <StaticDiceGameControls selectedNumber={20} isDisabled={true} />
+  ),
+  args: {} as any,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Disabled slider at low value (20). Slider cannot be moved when disabled.",
+      },
+    },
   },
 }
 
 export const DisabledHigh: Story = {
   name: "Disabled (High Value)",
-  args: {
-    selectedNumber: 80,
-    isDisabled: true,
-  },
-}
-
-export const Interactive: Story = {
-  name: "Interactive",
-  render: (args) => (
-    <InteractiveDiceGameControls
-      initialSelectedNumber={args.selectedNumber}
-      multiplier={args.multiplier}
-      isDisabled={args.isDisabled}
-    />
+  render: () => (
+    <StaticDiceGameControls selectedNumber={80} isDisabled={true} />
   ),
-  args: {
-    selectedNumber: 65,
-    multiplier: 2.5,
-    isDisabled: false,
-  },
+  args: {} as any,
   parameters: {
     docs: {
       description: {
         story:
-          "Move the slider to change the selected number. The component state updates in real-time as you drag the slider.",
+          "Disabled slider at high value (80). Shows disabled state styling.",
       },
     },
   },
