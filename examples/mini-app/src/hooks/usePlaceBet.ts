@@ -63,12 +63,12 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
 
   const betStatus: BetStatus = useMemo(() => {
     if (internalError) return "internal-error"
-    else if (wagerWriteHook.error) return "error"
-    else if (wagerWaitingHook.error) return "waiting-error"
-    else if (wagerWriteHook.isPending) return "pending"
-    else if (wagerWaitingHook.isLoading) return "loading"
-    else if (isRolling) return "rolling"
-    else if (gameResult) return "success"
+    if (wagerWriteHook.error) return "error"
+    if (wagerWaitingHook.error) return "waiting-error"
+    if (wagerWriteHook.isPending) return "pending"
+    if (wagerWaitingHook.isLoading) return "loading"
+    if (isRolling) return "rolling"
+    if (gameResult) return "success"
     return null
   }, [
     internalError,
@@ -116,7 +116,7 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
     setGameResult(null)
     setWatchTarget(null)
     resetWatcher()
-  }, [resetWatcher])
+  }, [resetWatcher, wagerWriteHook.reset])
 
   const placeBet = useCallback(
     async (betAmount: bigint, choice: GameChoice) => {
@@ -212,7 +212,14 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
       }
       waitRoll()
     }
-  }, [wagerWaitingHook.isSuccess])
+  }, [
+    wagerWaitingHook.isSuccess,
+    wagerWriteHook.data,
+    game,
+    appChainId,
+    connectedAddress,
+    publicClient,
+  ])
 
   return {
     placeBet,

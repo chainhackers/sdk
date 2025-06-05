@@ -25,7 +25,7 @@ function Slider({
   disabled,
   ...props
 }: React.ComponentProps<typeof SliderPrimitive.Root>) {
-  const initialValues = React.useMemo(() => {
+  const getInitialValues = (): number[] => {
     if (value !== undefined) {
       return Array.isArray(value) ? value : [value]
     }
@@ -33,19 +33,34 @@ function Slider({
       return Array.isArray(defaultValue) ? defaultValue : [defaultValue]
     }
     return [min]
-  }, [value, defaultValue, min])
+  }
 
-  const [internalValues, setInternalValues] = React.useState<number[]>(initialValues)
+  const [internalValues, setInternalValues] = React.useState<number[]>(getInitialValues)
   const [isDragging, setIsDragging] = React.useState(false)
   const [isFocused, setIsFocused] = React.useState(false)
 
+  React.useEffect(() => {
+    if (value !== undefined) {
+      const newPropValues = Array.isArray(value) ? value : [value]
+
+      if (
+        newPropValues.length !== internalValues.length ||
+        newPropValues.some((v, i) => v !== internalValues[i])
+      ) {
+        setInternalValues(newPropValues)
+      }
+    }
+  }, [value, internalValues])
+
   const handleValueChange = (newValues: number[]) => {
-    setInternalValues(newValues)
+    if (value === undefined) {
+      setInternalValues(newValues)
+    }
     onValueChange?.(newValues)
   }
 
-  const currentValue = internalValues[0] ?? min
-  const percentage = getAdjustedPercentage(currentValue, min, max)
+  const currentTrackValue = internalValues[0] ?? min
+  const percentage = getAdjustedPercentage(currentTrackValue, min, max)
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -87,7 +102,8 @@ function Slider({
             className="opacity-0 absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
           />
         </SliderPrimitive.Track>
-        {internalValues.map((currentValue, index) => (
+        {internalValues.map((currentSliderValue, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: Slider thumbs are positionally keyed; arity fixed post-mount.
           <Tooltip key={index} open={isDragging || isFocused}>
             <TooltipTrigger asChild>
               <SliderPrimitive.Thumb
@@ -102,7 +118,7 @@ function Slider({
             </TooltipTrigger>
             <TooltipContent className="bg-muted/80">
               <p className={cn(disabled ? "text-slider-disabled-tooltip" : "")}>
-                {Math.round(currentValue)}
+                {Math.round(currentSliderValue)}
               </p>
             </TooltipContent>
           </Tooltip>

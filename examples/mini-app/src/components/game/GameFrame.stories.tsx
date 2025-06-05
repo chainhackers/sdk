@@ -124,7 +124,7 @@ export const CoinTossWalletNotConnected: Story = {
   args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
-      <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
+      <GameFrame.Header title="CoinToss" connectWalletButton={undefined} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}
@@ -160,7 +160,7 @@ export const CoinTossWalletConnected: Story = {
   args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
-      <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
+      <GameFrame.Header title="CoinToss" connectWalletButton={undefined} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}
@@ -196,7 +196,7 @@ export const CoinTossPlacingBet: Story = {
   args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
-      <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
+      <GameFrame.Header title="CoinToss" connectWalletButton={undefined} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}
@@ -232,7 +232,7 @@ export const CoinTossWin: Story = {
   args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
-      <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
+      <GameFrame.Header title="CoinToss" connectWalletButton={undefined} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}
@@ -278,7 +278,7 @@ export const CoinTossLoss: Story = {
   args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
-      <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
+      <GameFrame.Header title="CoinToss" connectWalletButton={undefined} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}
@@ -324,7 +324,7 @@ export const DiceWalletNotConnected: Story = {
   args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
-      <GameFrame.Header title="Dice" connectWalletButton={<></>} />
+      <GameFrame.Header title="Dice" connectWalletButton={undefined} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}
@@ -360,7 +360,7 @@ export const DiceWalletConnected: Story = {
   args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
-      <GameFrame.Header title="Dice" connectWalletButton={<></>} />
+      <GameFrame.Header title="Dice" connectWalletButton={undefined} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}
@@ -396,7 +396,7 @@ export const DicePlacingBet: Story = {
   args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
-      <GameFrame.Header title="Dice" connectWalletButton={<></>} />
+      <GameFrame.Header title="Dice" connectWalletButton={undefined} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}
@@ -432,7 +432,7 @@ export const DiceWin: Story = {
   args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
-      <GameFrame.Header title="Dice" connectWalletButton={<></>} />
+      <GameFrame.Header title="Dice" connectWalletButton={undefined} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}
@@ -478,7 +478,7 @@ export const DiceLoss: Story = {
   args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
-      <GameFrame.Header title="Dice" connectWalletButton={<></>} />
+      <GameFrame.Header title="Dice" connectWalletButton={undefined} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}

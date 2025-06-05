@@ -1,5 +1,5 @@
 import { CasinoChain, CasinoChainId, casinoChainById, casinoChainIds } from "@betswirl/sdk-core"
-import React, { useState, useContext, createContext, useEffect, useMemo } from "react"
+import React, { useState, useContext, createContext, useEffect, useMemo, useCallback } from "react"
 import { type Chain } from "viem"
 import { useSwitchChain } from "wagmi"
 import { useAccount } from "wagmi"
@@ -35,14 +35,17 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
   // Allow to know if the connected wallet chain and the app chain are the same
   const areChainsSynced = useMemo(() => walletChainId === appChainId, [walletChainId, appChainId])
 
-  const switchAppChain = (chainId: CasinoChainId) => {
-    // @Kinco advice: Here for example you could save the chain id in cookies to save user preferences
+  const switchAppChain = useCallback(
+    (chainId: CasinoChainId) => {
+      // @Kinco advice: Here for example you could save the chain id in cookies to save user preferences
 
-    // Try to switch the wallet chain
-    switchWalletChain({ chainId })
+      // Try to switch the wallet chain
+      switchWalletChain({ chainId })
 
-    setAppChainId(chainId)
-  }
+      setAppChainId(chainId)
+    },
+    [switchWalletChain],
+  )
 
   const appChain = useMemo(() => casinoChainById[appChainId], [appChainId])
 
@@ -52,7 +55,7 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
     if (walletChainId && casinoChainIds.includes(walletChainId as CasinoChainId)) {
       switchAppChain(walletChainId as CasinoChainId)
     }
-  }, [walletChainId])
+  }, [walletChainId, switchAppChain])
 
   const context: ChainContextValue = {
     appChain,
