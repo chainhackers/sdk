@@ -35,7 +35,7 @@ function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncod
   }
 }
 
-export function usePlaceBet(game: CASINO_GAME_TYPE) {
+export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void) {
   const { appChainId } = useChain()
   const publicClient = usePublicClient({ chainId: appChainId })
   const { address: connectedAddress } = useAccount()
@@ -105,11 +105,13 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
       logger.debug("watcher: Bet resolved: SUCCESS", {
         gameResult: watcherGameResult,
       })
+
+      refetchBalance()
     } else if (watcherStatus === "error") {
       setInternalError("watcher error")
       logger.debug("watcher: Bet resolved: ERROR from watcher")
     }
-  }, [watcherStatus, watcherGameResult])
+  }, [watcherStatus, watcherGameResult, refetchBalance])
 
   const resetBetState = useCallback(() => {
     wagerWriteHook.reset()
@@ -207,8 +209,8 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
           eventName: rollEventData.eventName,
           eventArgs: rollEventData.args,
         })
-        // TODO refetch balance
-        // TODO refetch allowance
+
+        refetchBalance()
       }
       waitRoll()
     }
@@ -219,6 +221,7 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
     appChainId,
     connectedAddress,
     publicClient,
+    refetchBalance,
   ])
 
   return {

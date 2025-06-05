@@ -31,6 +31,7 @@ interface UseGameLogicResult<T extends GameSelection> {
   areChainsSynced: boolean
   gameHistory: HistoryEntry[]
   refreshHistory: () => void
+  refetchBalance: () => void
   betAmount: bigint | undefined
   setBetAmount: (amount: bigint | undefined) => void
   selection: T
@@ -65,7 +66,7 @@ export function useGameLogic<T extends GameSelection>({
 }: UseGameLogicProps<T>): UseGameLogicResult<T> {
   const { isConnected: isWalletConnected, address } = useAccount()
   const { gameHistory, refreshHistory } = useGameHistory(gameType)
-  const { data: balance } = useBalance({ address })
+  const { data: balance, refetch: refetchBalance } = useBalance({ address })
   const { areChainsSynced, appChainId } = useChain()
 
   const { houseEdge } = useHouseEdge({
@@ -77,7 +78,7 @@ export function useGameLogic<T extends GameSelection>({
   const [selection, setSelection] = useState<T>(defaultSelection)
 
   const { placeBet, betStatus, gameResult, resetBetState, formattedVrfFees, gasPrice } =
-    usePlaceBet(gameType)
+    usePlaceBet(gameType, refetchBalance)
 
   const { targetPayoutAmount, multiplier } = useGameCalculations({
     gameType,
@@ -116,6 +117,7 @@ export function useGameLogic<T extends GameSelection>({
     areChainsSynced,
     gameHistory,
     refreshHistory,
+    refetchBalance,
     betAmount,
     setBetAmount,
     selection,
