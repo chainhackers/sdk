@@ -1,16 +1,11 @@
 import diceBackground from "../../assets/game/game-background.png"
 
-import {
-  CASINO_GAME_TYPE,
-  DiceNumber,
-  FORMAT_TYPE,
-  formatRawAmount,
-} from "@betswirl/sdk-core"
-import { GameFrame } from "./GameFrame"
+import { CASINO_GAME_TYPE, DiceNumber, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
+import { useGameLogic } from "../../hooks/useGameLogic"
 import { DiceGameControls } from "./DiceGameControls"
+import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
-import { useGameLogic } from "../../hooks/useGameLogic"
 
 export interface DiceGameProps extends BaseGameProps {}
 
@@ -67,27 +62,17 @@ export function DiceGame({
 
   return (
     <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header
-        title="Dice"
-        connectWalletButton={<GameConnectWallet />}
-      />
+      <GameFrame.Header title="Dice" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={100 - selectedNumber}
           rngFee={formattedVrfFees}
-          targetPayout={formatRawAmount(
-            targetPayoutAmount,
-            tokenDecimals,
-            FORMAT_TYPE.PRECISE,
-          )}
+          targetPayout={formatRawAmount(targetPayoutAmount, tokenDecimals, FORMAT_TYPE.PRECISE)}
           gasPrice={gasPrice}
           tokenDecimals={tokenDecimals}
           nativeCurrencySymbol={nativeCurrencySymbol}
         />
-        <GameFrame.HistoryButton
-          historyData={gameHistory}
-          onHistoryOpen={refreshHistory}
-        />
+        <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
         <GameFrame.GameControls>
           <DiceGameControls
             selectedNumber={selectedNumber}

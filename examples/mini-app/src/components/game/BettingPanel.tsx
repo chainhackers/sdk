@@ -1,14 +1,14 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react"
-import { cn } from "../../lib/utils"
 import { FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
+import { TokenImage } from "@coinbase/onchainkit/token"
+import Decimal from "decimal.js"
+import { ChangeEvent, useEffect, useRef, useState } from "react"
+import { parseUnits } from "viem"
+import { ETH_TOKEN } from "../../lib/tokens"
+import { cn } from "../../lib/utils"
+import { BetStatus } from "../../types"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
-import { parseUnits } from "viem"
-import Decimal from "decimal.js"
-import { TokenImage } from "@coinbase/onchainkit/token"
-import { ETH_TOKEN } from "../../lib/tokens"
-import { BetStatus } from "../../types"
 
 interface BettingPanelProps {
   balance: bigint
@@ -54,11 +54,7 @@ export function BettingPanel({
       setInputValue("")
       setIsValidInput(true)
     } else {
-      const formatted = formatRawAmount(
-        betAmount,
-        tokenDecimals,
-        FORMAT_TYPE.PRECISE,
-      )
+      const formatted = formatRawAmount(betAmount, tokenDecimals, FORMAT_TYPE.PRECISE)
       setInputValue(formatted)
       setIsValidInput(true)
     }
@@ -68,17 +64,11 @@ export function BettingPanel({
   const formattedBalance = formatRawAmount(balance, tokenDecimals)
 
   const isBetSuccees = betStatus === "success"
-  const isWaiting =
-    betStatus === "loading" ||
-    betStatus === "pending" ||
-    betStatus === "rolling"
+  const isWaiting = betStatus === "loading" || betStatus === "pending" || betStatus === "rolling"
   const isError =
-    betStatus === "error" ||
-    betStatus === "waiting-error" ||
-    betStatus === "internal-error"
+    betStatus === "error" || betStatus === "waiting-error" || betStatus === "internal-error"
 
-  const canInitiateBet =
-    isConnected && areChainsSynced && isBetAmountValid && !isWaiting
+  const canInitiateBet = isConnected && areChainsSynced && isBetAmountValid && !isWaiting
 
   const isInputDisabled = !isConnected || isWaiting || isBetSuccees
 
@@ -199,19 +189,14 @@ export function BettingPanel({
           step={STEP}
           value={inputValue}
           onChange={handleInputChange}
-          className={cn(
-            "relative",
-            !isValidInput && "[&_input]:text-muted-foreground",
-          )}
+          className={cn("relative", !isValidInput && "[&_input]:text-muted-foreground")}
           token={{
             icon: <TokenImage token={ETH_TOKEN} size={18} />,
             symbol: "ETH",
           }}
           disabled={isInputDisabled}
         />
-        {betAmountError && (
-          <div className="text-red-500 text-xs mt-1">{betAmountError}</div>
-        )}
+        {betAmountError && <div className="text-red-500 text-xs mt-1">{betAmountError}</div>}
 
         <div className="grid grid-cols-3 gap-2">
           <Button
@@ -243,13 +228,7 @@ export function BettingPanel({
 
       <Button
         size="lg"
-        className={cn(
-          "w-full",
-          "border-0",
-          "font-bold",
-          "rounded-[16px]",
-          "text-play-btn-font",
-        )}
+        className={cn("w-full", "border-0", "font-bold", "rounded-[16px]", "text-play-btn-font")}
         variant={isError ? "destructive" : "default"}
         onClick={handlePlayBtnClick}
         disabled={isPlayButtonDisabled}

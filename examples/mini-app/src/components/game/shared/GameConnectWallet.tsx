@@ -1,6 +1,6 @@
-import { cn } from "../../../lib/utils"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
 import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
+import { cn } from "../../../lib/utils"
 
 export function GameConnectWallet() {
   return (
@@ -17,10 +17,7 @@ export function GameConnectWallet() {
         disconnectedLabel="Connect"
       >
         <div className="flex items-center">
-          <Avatar
-            className="h-7 w-7 mr-2"
-            address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9"
-          />
+          <Avatar className="h-7 w-7 mr-2" address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9" />
           <Name className="text-title-color" />
         </div>
       </ConnectWallet>

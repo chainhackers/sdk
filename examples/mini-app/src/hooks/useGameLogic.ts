@@ -1,6 +1,3 @@
-import React, { useState } from "react"
-import { useAccount, useBalance } from "wagmi"
-import { formatGwei } from "viem"
 import {
   CASINO_GAME_TYPE,
   COINTOSS_FACE,
@@ -8,12 +5,15 @@ import {
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
-import { useGameHistory, HistoryEntry } from "./useGameHistory"
-import { usePlaceBet } from "./usePlaceBet"
+import React, { useState } from "react"
+import { formatGwei } from "viem"
+import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
-import { useHouseEdge } from "./useHouseEdge"
-import { useGameCalculations } from "./useGameCalculations"
 import { BetStatus, GameResult } from "../types"
+import { useGameCalculations } from "./useGameCalculations"
+import { HistoryEntry, useGameHistory } from "./useGameHistory"
+import { useHouseEdge } from "./useHouseEdge"
+import { usePlaceBet } from "./usePlaceBet"
 
 type GameSelection = COINTOSS_FACE | DiceNumber
 
@@ -76,14 +76,8 @@ export function useGameLogic<T extends GameSelection>({
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
   const [selection, setSelection] = useState<T>(defaultSelection)
 
-  const {
-    placeBet,
-    betStatus,
-    gameResult,
-    resetBetState,
-    formattedVrfFees,
-    gasPrice,
-  } = usePlaceBet(gameType)
+  const { placeBet, betStatus, gameResult, resetBetState, formattedVrfFees, gasPrice } =
+    usePlaceBet(gameType)
 
   const { targetPayoutAmount, multiplier } = useGameCalculations({
     gameType,

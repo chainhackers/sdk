@@ -111,8 +111,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Default slider position at 50. Drag the slider to see real-time updates.",
+        story: "Default slider position at 50. Drag the slider to see real-time updates.",
       },
     },
   },
@@ -125,8 +124,7 @@ export const MinimumValue: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Slider at minimum value (1). Drag to see how it behaves at the edge.",
+        story: "Slider at minimum value (1). Drag to see how it behaves at the edge.",
       },
     },
   },
@@ -139,8 +137,7 @@ export const LowValue: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Slider at low value (25). Interactive slider with real-time feedback.",
+        story: "Slider at low value (25). Interactive slider with real-time feedback.",
       },
     },
   },
@@ -174,15 +171,12 @@ export const MaximumValue: Story = {
 
 export const DisabledLow: Story = {
   name: "Disabled (Low Value)",
-  render: () => (
-    <StaticDiceGameControls selectedNumber={20} isDisabled={true} />
-  ),
+  render: () => <StaticDiceGameControls selectedNumber={20} isDisabled={true} />,
   args: {} as any,
   parameters: {
     docs: {
       description: {
-        story:
-          "Disabled slider at low value (20). Slider cannot be moved when disabled.",
+        story: "Disabled slider at low value (20). Slider cannot be moved when disabled.",
       },
     },
   },
@@ -190,15 +184,12 @@ export const DisabledLow: Story = {
 
 export const DisabledHigh: Story = {
   name: "Disabled (High Value)",
-  render: () => (
-    <StaticDiceGameControls selectedNumber={80} isDisabled={true} />
-  ),
+  render: () => <StaticDiceGameControls selectedNumber={80} isDisabled={true} />,
   args: {} as any,
   parameters: {
     docs: {
       description: {
-        story:
-          "Disabled slider at high value (80). Shows disabled state styling.",
+        story: "Disabled slider at high value (80). Shows disabled state styling.",
       },
     },
   },

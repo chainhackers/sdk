@@ -14,25 +14,17 @@ import {
 } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Hex, decodeEventLog } from "viem"
-import {
-  useAccount,
-  usePublicClient,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi"
+import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
+import { useChain } from "../context/chainContext"
 import { createLogger } from "../lib/logger"
+import { BetStatus, GameChoice, GameEncodedInput, GameResult } from "../types"
 import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
-import { useChain } from "../context/chainContext"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
-import { BetStatus, GameResult, GameChoice, GameEncodedInput } from "../types"
 
 const logger = createLogger("usePlaceBet")
 
-function _encodeGameInput(
-  choice: GameChoice,
-  game: CASINO_GAME_TYPE,
-): GameEncodedInput {
+function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncodedInput {
   switch (game) {
     case CASINO_GAME_TYPE.COINTOSS:
       return CoinToss.encodeInput(choice as COINTOSS_FACE)
@@ -136,15 +128,8 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
         betAmount,
       }
 
-      if (
-        !publicClient ||
-        !appChainId ||
-        !connectedAddress ||
-        !wagerWriteHook.writeContract
-      ) {
-        logger.error(
-          "placeBet: Wagmi/OnchainKit clients or address are not initialized.",
-        )
+      if (!publicClient || !appChainId || !connectedAddress || !wagerWriteHook.writeContract) {
+        logger.error("placeBet: Wagmi/OnchainKit clients or address are not initialized.")
         setInternalError("clients or address are not initialized")
         return
       }
@@ -212,16 +197,11 @@ export function usePlaceBet(game: CASINO_GAME_TYPE) {
           return
         }
 
-        const { data: rollEventData } = getRollEventData(
-          game,
-          appChainId,
-          betId,
-        )
+        const { data: rollEventData } = getRollEventData(game, appChainId, betId)
         logger.debug("placeBet: Setting up Roll event listener...")
         setWatchTarget({
           betId,
-          contractAddress:
-            casinoChainById[appChainId].contracts.games[game]!.address,
+          contractAddress: casinoChainById[appChainId].contracts.games[game]!.address,
           gameType: game,
           eventAbi: rollEventData.abi,
           eventName: rollEventData.eventName,
@@ -256,10 +236,7 @@ async function _submitBetTransaction(
   wagerWriteHook: ReturnType<typeof useWriteContract>["writeContract"],
 ) {
   logger.debug("_submitBetTransaction: Preparing and sending transaction...")
-  const placeBetTxData = getPlaceBetFunctionData(
-    { ...betParams, receiver },
-    chainId,
-  )
+  const placeBetTxData = getPlaceBetFunctionData({ ...betParams, receiver }, chainId)
   wagerWriteHook({
     abi: placeBetTxData.data.abi,
     address: placeBetTxData.data.to,
@@ -287,11 +264,7 @@ async function _extractBetIdFromReceipt(
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
   logger.debug("_extractBetIdFromReceipt: Receipt received.")
 
-  const { data: placeBetEventData } = getPlaceBetEventData(
-    gameType,
-    chainId,
-    receiver,
-  )
+  const { data: placeBetEventData } = getPlaceBetEventData(gameType, chainId, receiver)
 
   for (const log of receipt.logs) {
     if (

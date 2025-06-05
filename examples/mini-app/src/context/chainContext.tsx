@@ -1,17 +1,6 @@
-import React, {
-  useState,
-  useContext,
-  createContext,
-  useEffect,
-  useMemo,
-} from "react"
+import { CasinoChain, CasinoChainId, casinoChainById, casinoChainIds } from "@betswirl/sdk-core"
+import React, { useState, useContext, createContext, useEffect, useMemo } from "react"
 import { type Chain } from "viem"
-import {
-  CasinoChain,
-  casinoChainById,
-  CasinoChainId,
-  casinoChainIds,
-} from "@betswirl/sdk-core"
 import { useSwitchChain } from "wagmi"
 import { useAccount } from "wagmi"
 
@@ -44,10 +33,7 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
   const { switchChain: switchWalletChain } = useSwitchChain()
 
   // Allow to know if the connected wallet chain and the app chain are the same
-  const areChainsSynced = useMemo(
-    () => walletChainId === appChainId,
-    [walletChainId, appChainId],
-  )
+  const areChainsSynced = useMemo(() => walletChainId === appChainId, [walletChainId, appChainId])
 
   const switchAppChain = (chainId: CasinoChainId) => {
     // @Kinco advice: Here for example you could save the chain id in cookies to save user preferences
@@ -63,10 +49,7 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
   // Try to switch the app chain automatically each time the wallet chain changes
   useEffect(() => {
     // @Kinco advice. Instead of checking if the wallet chain is in the list of BetSwirlsupported chains, we should check if the wallet chain is supported by the authorized chains. The authorized chains could be passed via props for example.
-    if (
-      walletChainId &&
-      casinoChainIds.includes(walletChainId as CasinoChainId)
-    ) {
+    if (walletChainId && casinoChainIds.includes(walletChainId as CasinoChainId)) {
       switchAppChain(walletChainId as CasinoChainId)
     }
   }, [walletChainId])
@@ -78,11 +61,8 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
     walletChainId,
     areChainsSynced,
     switchAppChain,
-    switchWalletChain: (chainId: CasinoChainId) =>
-      switchWalletChain({ chainId }),
+    switchWalletChain: (chainId: CasinoChainId) => switchWalletChain({ chainId }),
   }
 
-  return (
-    <ChainContext.Provider value={context}>{children}</ChainContext.Provider>
-  )
+  return <ChainContext.Provider value={context}>{children}</ChainContext.Provider>
 }

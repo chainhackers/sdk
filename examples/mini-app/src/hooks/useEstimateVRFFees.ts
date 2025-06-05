@@ -1,17 +1,17 @@
 import {
   CASINO_GAME_TYPE,
-  chainById,
   FORMAT_TYPE,
+  Token,
+  chainById,
   formatRawAmount,
   getChainlinkVrfCostFunctionData,
-  Token,
   wrappedGasTokenById,
 } from "@betswirl/sdk-core"
-import { useChain } from "../context/chainContext"
 import { useEffect, useMemo, useState } from "react"
 import { useCall } from "wagmi"
-import { useGasPrice } from "./useGasPrice"
 import { CHAINLINK_VRF_FEES_BUFFER_PERCENT } from "../consts"
+import { useChain } from "../context/chainContext"
+import { useGasPrice } from "./useGasPrice"
 
 type UseEstimateVRFFeesProps = {
   game: CASINO_GAME_TYPE
@@ -50,20 +50,14 @@ export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
     if (wagmiHook.data?.data) {
       // Add a 26% buffer to the Chainlink VRF fees to cover gas price peaks
       setVrfFees(
-        (BigInt(wagmiHook.data.data) *
-          BigInt(CHAINLINK_VRF_FEES_BUFFER_PERCENT + 100)) /
-          100n,
+        (BigInt(wagmiHook.data.data) * BigInt(CHAINLINK_VRF_FEES_BUFFER_PERCENT + 100)) / 100n,
       )
     }
   }, [wagmiHook.data?.data])
 
   const formattedVrfFees = useMemo(() => {
-    return parseFloat(
-      formatRawAmount(
-        vrfFees,
-        chainById[appChainId].nativeCurrency.decimals,
-        FORMAT_TYPE.PRECISE,
-      ),
+    return Number.parseFloat(
+      formatRawAmount(vrfFees, chainById[appChainId].nativeCurrency.decimals, FORMAT_TYPE.PRECISE),
     )
   }, [vrfFees, appChainId])
 

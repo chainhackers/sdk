@@ -71,9 +71,7 @@ function InteractiveCoinTossGameControls({
 
   const handleCoinClick = () => {
     setSelectedSide(
-      selectedSide === COINTOSS_FACE.HEADS
-        ? COINTOSS_FACE.TAILS
-        : COINTOSS_FACE.HEADS,
+      selectedSide === COINTOSS_FACE.HEADS ? COINTOSS_FACE.TAILS : COINTOSS_FACE.HEADS,
     )
   }
 
@@ -112,17 +110,12 @@ function StaticCoinTossGameControls({
 
 export const DefaultHeads: Story = {
   name: "Default (Heads)",
-  render: () => (
-    <InteractiveCoinTossGameControls
-      initialSelectedSide={COINTOSS_FACE.HEADS}
-    />
-  ),
+  render: () => <InteractiveCoinTossGameControls initialSelectedSide={COINTOSS_FACE.HEADS} />,
   args: {} as any,
   parameters: {
     docs: {
       description: {
-        story:
-          "Default coin showing Heads. Click the coin to flip between Heads and Tails.",
+        story: "Default coin showing Heads. Click the coin to flip between Heads and Tails.",
       },
     },
   },
@@ -130,17 +123,12 @@ export const DefaultHeads: Story = {
 
 export const DefaultTails: Story = {
   name: "Default (Tails)",
-  render: () => (
-    <InteractiveCoinTossGameControls
-      initialSelectedSide={COINTOSS_FACE.TAILS}
-    />
-  ),
+  render: () => <InteractiveCoinTossGameControls initialSelectedSide={COINTOSS_FACE.TAILS} />,
   args: {} as any,
   parameters: {
     docs: {
       description: {
-        story:
-          "Default coin showing Tails. Click the coin to flip between Heads and Tails.",
+        story: "Default coin showing Tails. Click the coin to flip between Heads and Tails.",
       },
     },
   },
@@ -148,18 +136,12 @@ export const DefaultTails: Story = {
 
 export const DisabledHeads: Story = {
   name: "Disabled (Heads)",
-  render: () => (
-    <StaticCoinTossGameControls
-      selectedSide={COINTOSS_FACE.HEADS}
-      isDisabled={true}
-    />
-  ),
+  render: () => <StaticCoinTossGameControls selectedSide={COINTOSS_FACE.HEADS} isDisabled={true} />,
   args: {} as any,
   parameters: {
     docs: {
       description: {
-        story:
-          "Disabled coin showing Heads. Coin cannot be clicked when disabled.",
+        story: "Disabled coin showing Heads. Coin cannot be clicked when disabled.",
       },
     },
   },
@@ -167,12 +149,7 @@ export const DisabledHeads: Story = {
 
 export const DisabledTails: Story = {
   name: "Disabled (Tails)",
-  render: () => (
-    <StaticCoinTossGameControls
-      selectedSide={COINTOSS_FACE.TAILS}
-      isDisabled={true}
-    />
-  ),
+  render: () => <StaticCoinTossGameControls selectedSide={COINTOSS_FACE.TAILS} isDisabled={true} />,
   args: {} as any,
   parameters: {
     docs: {

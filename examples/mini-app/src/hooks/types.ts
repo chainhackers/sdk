@@ -9,5 +9,3 @@ export interface WatchTarget {
   eventName: string
   eventArgs: { id: bigint }
 }
-
-

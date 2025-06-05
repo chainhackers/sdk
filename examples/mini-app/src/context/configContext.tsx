@@ -10,8 +10,7 @@ const ConfigContext = createContext<ConfigContextValue | null>(null)
 
 export const useBettingConfig = () => {
   const configContext = useContext(ConfigContext) as ConfigContextValue
-  if (!configContext)
-    throw new Error("useBettingConfig must be used inside ConfigProvider")
+  if (!configContext) throw new Error("useBettingConfig must be used inside ConfigProvider")
   return configContext
 }
 
@@ -34,7 +33,5 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
     affiliate,
   }
 
-  return (
-    <ConfigContext.Provider value={context}>{children}</ConfigContext.Provider>
-  )
+  return <ConfigContext.Provider value={context}>{children}</ConfigContext.Provider>
 }

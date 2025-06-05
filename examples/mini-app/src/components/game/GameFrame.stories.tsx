@@ -5,9 +5,9 @@ import { useState } from "react"
 import { parseUnits } from "viem"
 import gameBg from "../../assets/game/game-background.png"
 import { ETH_TOKEN } from "../../lib/tokens"
-import { GameFrame } from "./GameFrame"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { DiceGameControls } from "./DiceGameControls"
+import { GameFrame } from "./GameFrame"
 import { type HistoryEntry } from "./HistorySheetPanel"
 
 declare global {
@@ -80,9 +80,7 @@ function InteractiveCoinTossControls({
   const handleCoinClick = () => {
     if (isDisabled) return
     setSelectedSide(
-      selectedSide === COINTOSS_FACE.HEADS
-        ? COINTOSS_FACE.TAILS
-        : COINTOSS_FACE.HEADS,
+      selectedSide === COINTOSS_FACE.HEADS ? COINTOSS_FACE.TAILS : COINTOSS_FACE.HEADS,
     )
   }
 
@@ -131,10 +129,7 @@ export const CoinTossWalletNotConnected: Story = {
         <GameFrame.InfoButton
           winChance={50}
           rngFee={0.0001}
-          targetPayout={(
-            (parseUnits("0.1234567", 18) * 194n) /
-            100n
-          ).toString()}
+          targetPayout={((parseUnits("0.1234567", 18) * 194n) / 100n).toString()}
           gasPrice={34.2123}
           tokenDecimals={18}
           nativeCurrencySymbol="ETH"
@@ -170,10 +165,7 @@ export const CoinTossWalletConnected: Story = {
         <GameFrame.InfoButton
           winChance={50}
           rngFee={0.0001}
-          targetPayout={(
-            (parseUnits("0.1234567", 18) * 194n) /
-            100n
-          ).toString()}
+          targetPayout={((parseUnits("0.1234567", 18) * 194n) / 100n).toString()}
           gasPrice={34.2123}
           tokenDecimals={18}
           nativeCurrencySymbol="ETH"
@@ -209,10 +201,7 @@ export const CoinTossPlacingBet: Story = {
         <GameFrame.InfoButton
           winChance={50}
           rngFee={0.0001}
-          targetPayout={(
-            (parseUnits("0.1234567", 18) * 194n) /
-            100n
-          ).toString()}
+          targetPayout={((parseUnits("0.1234567", 18) * 194n) / 100n).toString()}
           gasPrice={34.2123}
           tokenDecimals={18}
           nativeCurrencySymbol="ETH"
@@ -248,10 +237,7 @@ export const CoinTossWin: Story = {
         <GameFrame.InfoButton
           winChance={50}
           rngFee={0.0001}
-          targetPayout={(
-            (parseUnits("0.1234567", 18) * 194n) /
-            100n
-          ).toString()}
+          targetPayout={((parseUnits("0.1234567", 18) * 194n) / 100n).toString()}
           gasPrice={34.2123}
           tokenDecimals={18}
           nativeCurrencySymbol="ETH"
@@ -297,10 +283,7 @@ export const CoinTossLoss: Story = {
         <GameFrame.InfoButton
           winChance={50}
           rngFee={0.0001}
-          targetPayout={(
-            (parseUnits("0.1234567", 18) * 194n) /
-            100n
-          ).toString()}
+          targetPayout={((parseUnits("0.1234567", 18) * 194n) / 100n).toString()}
           gasPrice={34.2123}
           tokenDecimals={18}
           nativeCurrencySymbol="ETH"
@@ -346,10 +329,7 @@ export const DiceWalletNotConnected: Story = {
         <GameFrame.InfoButton
           winChance={50}
           rngFee={0.0001}
-          targetPayout={(
-            (parseUnits("0.1234567", 18) * 194n) /
-            100n
-          ).toString()}
+          targetPayout={((parseUnits("0.1234567", 18) * 194n) / 100n).toString()}
           gasPrice={34.2123}
           tokenDecimals={18}
           nativeCurrencySymbol="ETH"
@@ -385,10 +365,7 @@ export const DiceWalletConnected: Story = {
         <GameFrame.InfoButton
           winChance={50}
           rngFee={0.0001}
-          targetPayout={(
-            (parseUnits("0.1234567", 18) * 194n) /
-            100n
-          ).toString()}
+          targetPayout={((parseUnits("0.1234567", 18) * 194n) / 100n).toString()}
           gasPrice={34.2123}
           tokenDecimals={18}
           nativeCurrencySymbol="ETH"
@@ -424,10 +401,7 @@ export const DicePlacingBet: Story = {
         <GameFrame.InfoButton
           winChance={50}
           rngFee={0.0001}
-          targetPayout={(
-            (parseUnits("0.1234567", 18) * 194n) /
-            100n
-          ).toString()}
+          targetPayout={((parseUnits("0.1234567", 18) * 194n) / 100n).toString()}
           gasPrice={34.2123}
           tokenDecimals={18}
           nativeCurrencySymbol="ETH"
@@ -463,10 +437,7 @@ export const DiceWin: Story = {
         <GameFrame.InfoButton
           winChance={50}
           rngFee={0.0001}
-          targetPayout={(
-            (parseUnits("0.1234567", 18) * 194n) /
-            100n
-          ).toString()}
+          targetPayout={((parseUnits("0.1234567", 18) * 194n) / 100n).toString()}
           gasPrice={34.2123}
           tokenDecimals={18}
           nativeCurrencySymbol="ETH"
@@ -512,10 +483,7 @@ export const DiceLoss: Story = {
         <GameFrame.InfoButton
           winChance={50}
           rngFee={0.0001}
-          targetPayout={(
-            (parseUnits("0.1234567", 18) * 194n) /
-            100n
-          ).toString()}
+          targetPayout={((parseUnits("0.1234567", 18) * 194n) / 100n).toString()}
           gasPrice={34.2123}
           tokenDecimals={18}
           nativeCurrencySymbol="ETH"

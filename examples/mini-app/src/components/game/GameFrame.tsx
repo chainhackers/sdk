@@ -1,20 +1,14 @@
 import { History, Info } from "lucide-react"
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react"
+import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 import { cn } from "../../lib/utils"
+import { BetStatus, GameResult } from "../../types"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { BetStatus, GameResult } from "../../types"
 import { Sheet, SheetTrigger } from "../ui/sheet"
+import { BettingPanel } from "./BettingPanel"
 import { GameResultWindow } from "./GameResultWindow"
 import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
-import { BettingPanel } from "./BettingPanel"
 
 interface ThemeSettings {
   theme?: "light" | "dark" | "system"
@@ -41,9 +35,7 @@ const GameFrameContext = createContext<GameFrameContextValue | null>(null)
 const useGameFrameContext = () => {
   const context = useContext(GameFrameContext)
   if (!context) {
-    throw new Error(
-      "GameFrame compound components must be used within GameFrame",
-    )
+    throw new Error("GameFrame compound components must be used within GameFrame")
   }
   return context
 }
@@ -79,20 +71,13 @@ function GameFrameRoot({ themeSettings, children, ...props }: GameFrameProps) {
   return (
     <GameFrameContext.Provider value={contextValue}>
       <div
-        className={cn(
-          "cointoss-game-wrapper game-global-styles",
-          themeClass,
-          props.className,
-        )}
+        className={cn("cointoss-game-wrapper game-global-styles", themeClass, props.className)}
         style={themeSettings.customTheme as React.CSSProperties}
         {...props}
       >
         <Card
           ref={cardRef}
-          className={cn(
-            "relative overflow-hidden",
-            "bg-card text-card-foreground border",
-          )}
+          className={cn("relative overflow-hidden", "bg-card text-card-foreground border")}
         >
           {children}
         </Card>
@@ -109,9 +94,7 @@ interface HeaderProps {
 function Header({ title, connectWalletButton }: HeaderProps) {
   return (
     <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-      <CardTitle className="text-lg text-title-color font-bold">
-        {title}
-      </CardTitle>
+      <CardTitle className="text-lg text-title-color font-bold">{title}</CardTitle>
       {connectWalletButton}
     </CardHeader>
   )
@@ -135,12 +118,7 @@ function GameArea({ children }: GameAreaProps) {
           backgroundImage: `url(${themeSettings.backgroundImage})`,
         }}
       >
-        <div
-          className={cn(
-            "absolute inset-0 rounded-[16px]",
-            "bg-game-window-overlay",
-          )}
-        />
+        <div className={cn("absolute inset-0 rounded-[16px]", "bg-game-window-overlay")} />
         {children}
       </div>
     </CardContent>
@@ -164,8 +142,7 @@ function InfoButton({
   tokenDecimals,
   nativeCurrencySymbol,
 }: InfoButtonProps) {
-  const { isInfoSheetOpen, setIsInfoSheetOpen, portalContainer, isMounted } =
-    useGameFrameContext()
+  const { isInfoSheetOpen, setIsInfoSheetOpen, portalContainer, isMounted } = useGameFrameContext()
 
   return (
     <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
@@ -192,8 +169,7 @@ function InfoButton({
           token={{
             symbol: "ETH",
             decimals: tokenDecimals,
-            address:
-              "0x0000000000000000000000000000000000000000" as `0x${string}`,
+            address: "0x0000000000000000000000000000000000000000" as `0x${string}`,
           }}
           nativeCurrencySymbol={nativeCurrencySymbol}
         />
@@ -208,12 +184,8 @@ interface HistoryButtonProps {
 }
 
 function HistoryButton({ historyData, onHistoryOpen }: HistoryButtonProps) {
-  const {
-    isHistorySheetOpen,
-    setIsHistorySheetOpen,
-    portalContainer,
-    isMounted,
-  } = useGameFrameContext()
+  const { isHistorySheetOpen, setIsHistorySheetOpen, portalContainer, isMounted } =
+    useGameFrameContext()
 
   const handleHistoryOpen = (open: boolean) => {
     if (open) {
@@ -238,10 +210,7 @@ function HistoryButton({ historyData, onHistoryOpen }: HistoryButtonProps) {
         </Button>
       </SheetTrigger>
       {isMounted && portalContainer && (
-        <HistorySheetPanel
-          portalContainer={portalContainer}
-          historyData={historyData}
-        />
+        <HistorySheetPanel portalContainer={portalContainer} historyData={historyData} />
       )}
     </Sheet>
   )
@@ -261,11 +230,7 @@ interface ResultWindowProps {
   currency?: string
 }
 
-function ResultWindow({
-  gameResult,
-  betAmount,
-  currency = "ETH",
-}: ResultWindowProps) {
+function ResultWindow({ gameResult, betAmount, currency = "ETH" }: ResultWindowProps) {
   return (
     <GameResultWindow
       isVisible={!!gameResult}

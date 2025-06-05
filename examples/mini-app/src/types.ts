@@ -1,9 +1,5 @@
 import { COINTOSS_FACE, DiceNumber } from "@betswirl/sdk-core"
-import {
-  type DefaultError,
-  type QueryKey,
-  type UseQueryOptions,
-} from "@tanstack/react-query"
+import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
 
 export type QueryParameter<
   queryFnData = unknown,
@@ -13,12 +9,7 @@ export type QueryParameter<
 > =
   | Omit<
       UseQueryOptions<queryFnData, error, data, queryKey>,
-      | "queryFn"
-      | "queryHash"
-      | "queryKey"
-      | "queryKeyHashFn"
-      | "throwOnError"
-      | "select"
+      "queryFn" | "queryHash" | "queryKey" | "queryKeyHashFn" | "throwOnError" | "select"
     >
   | undefined
 
