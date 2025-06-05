@@ -3,7 +3,7 @@ import { useState } from "react"
 import { DiceGameControls } from "./DiceGameControls"
 
 const meta = {
-  title: "Game/DiceGameControls",
+  title: "Game/Controls/DiceGameControls",
   component: DiceGameControls,
   parameters: {
     layout: "centered",

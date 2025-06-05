@@ -1,10 +1,13 @@
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { COINTOSS_FACE, DiceNumber } from "@betswirl/sdk-core"
 import { TokenImage } from "@coinbase/onchainkit/token"
-import type { Meta } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
+import { useState } from "react"
 import { parseUnits } from "viem"
 import gameBg from "../../assets/game/game-background.png"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { GameFrame } from "./GameFrame"
+import { CoinTossGameControls } from "./CoinTossGameControls"
+import { DiceGameControls } from "./DiceGameControls"
 import { type HistoryEntry } from "./HistorySheetPanel"
 
 declare global {
@@ -34,6 +37,7 @@ const meta = {
 } satisfies Meta<typeof GameFrame>
 
 export default meta
+type Story = StoryObj<typeof meta>
 
 const mockHistoryData: HistoryEntry[] = [
   {
@@ -62,7 +66,64 @@ const mockHistoryData: HistoryEntry[] = [
   },
 ]
 
-export const WalletNotConnected = {
+function InteractiveCoinTossControls({
+  initialSelectedSide = COINTOSS_FACE.HEADS,
+  multiplier = "1.94",
+  isDisabled = false,
+}: {
+  initialSelectedSide?: COINTOSS_FACE
+  multiplier?: string
+  isDisabled?: boolean
+}) {
+  const [selectedSide, setSelectedSide] = useState(initialSelectedSide)
+
+  const handleCoinClick = () => {
+    if (isDisabled) return
+    setSelectedSide(
+      selectedSide === COINTOSS_FACE.HEADS
+        ? COINTOSS_FACE.TAILS
+        : COINTOSS_FACE.HEADS,
+    )
+  }
+
+  return (
+    <CoinTossGameControls
+      selectedSide={selectedSide}
+      onCoinClick={handleCoinClick}
+      multiplier={multiplier}
+      isDisabled={isDisabled}
+    />
+  )
+}
+
+function InteractiveDiceControls({
+  initialSelectedNumber = 50,
+  multiplier = 1.94,
+  isDisabled = false,
+}: {
+  initialSelectedNumber?: number
+  multiplier?: number
+  isDisabled?: boolean
+}) {
+  const [selectedNumber, setSelectedNumber] = useState(initialSelectedNumber)
+
+  const handleNumberChange = (value: number) => {
+    if (isDisabled) return
+    setSelectedNumber(value)
+  }
+
+  return (
+    <DiceGameControls
+      selectedNumber={selectedNumber}
+      onNumberChange={handleNumberChange}
+      multiplier={multiplier}
+      isDisabled={isDisabled}
+    />
+  )
+}
+
+export const CoinTossWalletNotConnected: Story = {
+  args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
       <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
@@ -83,9 +144,7 @@ export const WalletNotConnected = {
           onHistoryOpen={() => console.log("History opened")}
         />
         <GameFrame.GameControls>
-          <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
-            1.94 x
-          </div>
+          <InteractiveCoinTossControls isDisabled={true} />
         </GameFrame.GameControls>
       </GameFrame.GameArea>
       <GameFrame.BettingSection
@@ -102,7 +161,8 @@ export const WalletNotConnected = {
   ),
 }
 
-export const WalletConnected = {
+export const CoinTossWalletConnected: Story = {
+  args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
       <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
@@ -123,9 +183,7 @@ export const WalletConnected = {
           onHistoryOpen={() => console.log("History opened")}
         />
         <GameFrame.GameControls>
-          <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
-            1.94 x
-          </div>
+          <InteractiveCoinTossControls />
         </GameFrame.GameControls>
       </GameFrame.GameArea>
       <GameFrame.BettingSection
@@ -142,7 +200,8 @@ export const WalletConnected = {
   ),
 }
 
-export const PlacingBet = {
+export const CoinTossPlacingBet: Story = {
+  args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
       <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
@@ -163,9 +222,7 @@ export const PlacingBet = {
           onHistoryOpen={() => console.log("History opened")}
         />
         <GameFrame.GameControls>
-          <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
-            1.94 x
-          </div>
+          <InteractiveCoinTossControls isDisabled={true} />
         </GameFrame.GameControls>
       </GameFrame.GameArea>
       <GameFrame.BettingSection
@@ -182,7 +239,8 @@ export const PlacingBet = {
   ),
 }
 
-export const Win = {
+export const CoinTossWin: Story = {
+  args: {} as any,
   render: () => (
     <GameFrame themeSettings={{ backgroundImage: gameBg }}>
       <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
@@ -203,9 +261,7 @@ export const Win = {
           onHistoryOpen={() => console.log("History opened")}
         />
         <GameFrame.GameControls>
-          <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
-            1.94 x
-          </div>
+          <InteractiveCoinTossControls isDisabled={true} />
         </GameFrame.GameControls>
         <GameFrame.ResultWindow
           gameResult={{
@@ -213,6 +269,270 @@ export const Win = {
             payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
             currency: "ETH",
             rolled: COINTOSS_FACE.HEADS,
+          }}
+          betAmount={parseUnits("0.1234567", 18)}
+          currency="ETH"
+        />
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={1123456n * 10n ** 12n}
+        isConnected={true}
+        tokenDecimals={18}
+        betStatus="success"
+        betAmount={parseUnits("0.1234567", 18)}
+        onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
+        onPlayBtnClick={() => console.log("Play clicked")}
+        areChainsSynced={true}
+      />
+    </GameFrame>
+  ),
+}
+
+export const CoinTossLoss: Story = {
+  args: {} as any,
+  render: () => (
+    <GameFrame themeSettings={{ backgroundImage: gameBg }}>
+      <GameFrame.Header title="CoinToss" connectWalletButton={<></>} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={0.0001}
+          targetPayout={(
+            (parseUnits("0.1234567", 18) * 194n) /
+            100n
+          ).toString()}
+          gasPrice={34.2123}
+          tokenDecimals={18}
+          nativeCurrencySymbol="ETH"
+        />
+        <GameFrame.HistoryButton
+          historyData={mockHistoryData}
+          onHistoryOpen={() => console.log("History opened")}
+        />
+        <GameFrame.GameControls>
+          <InteractiveCoinTossControls isDisabled={true} />
+        </GameFrame.GameControls>
+        <GameFrame.ResultWindow
+          gameResult={{
+            isWin: false,
+            payout: 0n,
+            currency: "ETH",
+            rolled: COINTOSS_FACE.TAILS,
+          }}
+          betAmount={parseUnits("0.1234567", 18)}
+          currency="ETH"
+        />
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={1123456n * 10n ** 12n}
+        isConnected={true}
+        tokenDecimals={18}
+        betStatus="success"
+        betAmount={parseUnits("0.1234567", 18)}
+        onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
+        onPlayBtnClick={() => console.log("Play clicked")}
+        areChainsSynced={true}
+      />
+    </GameFrame>
+  ),
+}
+
+export const DiceWalletNotConnected: Story = {
+  args: {} as any,
+  render: () => (
+    <GameFrame themeSettings={{ backgroundImage: gameBg }}>
+      <GameFrame.Header title="Dice" connectWalletButton={<></>} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={0.0001}
+          targetPayout={(
+            (parseUnits("0.1234567", 18) * 194n) /
+            100n
+          ).toString()}
+          gasPrice={34.2123}
+          tokenDecimals={18}
+          nativeCurrencySymbol="ETH"
+        />
+        <GameFrame.HistoryButton
+          historyData={mockHistoryData}
+          onHistoryOpen={() => console.log("History opened")}
+        />
+        <GameFrame.GameControls>
+          <InteractiveDiceControls isDisabled={true} />
+        </GameFrame.GameControls>
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={1123456n * 10n ** 12n}
+        isConnected={false}
+        tokenDecimals={18}
+        betStatus={null}
+        betAmount={parseUnits("0.1234567", 18)}
+        onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
+        onPlayBtnClick={() => console.log("Play clicked")}
+        areChainsSynced={true}
+      />
+    </GameFrame>
+  ),
+}
+
+export const DiceWalletConnected: Story = {
+  args: {} as any,
+  render: () => (
+    <GameFrame themeSettings={{ backgroundImage: gameBg }}>
+      <GameFrame.Header title="Dice" connectWalletButton={<></>} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={0.0001}
+          targetPayout={(
+            (parseUnits("0.1234567", 18) * 194n) /
+            100n
+          ).toString()}
+          gasPrice={34.2123}
+          tokenDecimals={18}
+          nativeCurrencySymbol="ETH"
+        />
+        <GameFrame.HistoryButton
+          historyData={mockHistoryData}
+          onHistoryOpen={() => console.log("History opened")}
+        />
+        <GameFrame.GameControls>
+          <InteractiveDiceControls />
+        </GameFrame.GameControls>
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={1123456n * 10n ** 12n}
+        isConnected={true}
+        tokenDecimals={18}
+        betStatus={null}
+        betAmount={parseUnits("0.1234567", 18)}
+        onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
+        onPlayBtnClick={() => console.log("Play clicked")}
+        areChainsSynced={true}
+      />
+    </GameFrame>
+  ),
+}
+
+export const DicePlacingBet: Story = {
+  args: {} as any,
+  render: () => (
+    <GameFrame themeSettings={{ backgroundImage: gameBg }}>
+      <GameFrame.Header title="Dice" connectWalletButton={<></>} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={0.0001}
+          targetPayout={(
+            (parseUnits("0.1234567", 18) * 194n) /
+            100n
+          ).toString()}
+          gasPrice={34.2123}
+          tokenDecimals={18}
+          nativeCurrencySymbol="ETH"
+        />
+        <GameFrame.HistoryButton
+          historyData={mockHistoryData}
+          onHistoryOpen={() => console.log("History opened")}
+        />
+        <GameFrame.GameControls>
+          <InteractiveDiceControls isDisabled={true} />
+        </GameFrame.GameControls>
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={1123456n * 10n ** 12n}
+        isConnected={true}
+        tokenDecimals={18}
+        betStatus="pending"
+        betAmount={parseUnits("0.1234567", 18)}
+        onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
+        onPlayBtnClick={() => console.log("Play clicked")}
+        areChainsSynced={true}
+      />
+    </GameFrame>
+  ),
+}
+
+export const DiceWin: Story = {
+  args: {} as any,
+  render: () => (
+    <GameFrame themeSettings={{ backgroundImage: gameBg }}>
+      <GameFrame.Header title="Dice" connectWalletButton={<></>} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={0.0001}
+          targetPayout={(
+            (parseUnits("0.1234567", 18) * 194n) /
+            100n
+          ).toString()}
+          gasPrice={34.2123}
+          tokenDecimals={18}
+          nativeCurrencySymbol="ETH"
+        />
+        <GameFrame.HistoryButton
+          historyData={mockHistoryData}
+          onHistoryOpen={() => console.log("History opened")}
+        />
+        <GameFrame.GameControls>
+          <InteractiveDiceControls isDisabled={true} />
+        </GameFrame.GameControls>
+        <GameFrame.ResultWindow
+          gameResult={{
+            isWin: true,
+            payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
+            currency: "ETH",
+            rolled: 42 as DiceNumber,
+          }}
+          betAmount={parseUnits("0.1234567", 18)}
+          currency="ETH"
+        />
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        balance={1123456n * 10n ** 12n}
+        isConnected={true}
+        tokenDecimals={18}
+        betStatus="success"
+        betAmount={parseUnits("0.1234567", 18)}
+        onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
+        onPlayBtnClick={() => console.log("Play clicked")}
+        areChainsSynced={true}
+      />
+    </GameFrame>
+  ),
+}
+
+export const DiceLoss: Story = {
+  args: {} as any,
+  render: () => (
+    <GameFrame themeSettings={{ backgroundImage: gameBg }}>
+      <GameFrame.Header title="Dice" connectWalletButton={<></>} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={50}
+          rngFee={0.0001}
+          targetPayout={(
+            (parseUnits("0.1234567", 18) * 194n) /
+            100n
+          ).toString()}
+          gasPrice={34.2123}
+          tokenDecimals={18}
+          nativeCurrencySymbol="ETH"
+        />
+        <GameFrame.HistoryButton
+          historyData={mockHistoryData}
+          onHistoryOpen={() => console.log("History opened")}
+        />
+        <GameFrame.GameControls>
+          <InteractiveDiceControls isDisabled={true} />
+        </GameFrame.GameControls>
+        <GameFrame.ResultWindow
+          gameResult={{
+            isWin: false,
+            payout: 0n,
+            currency: "ETH",
+            rolled: 75 as DiceNumber,
           }}
           betAmount={parseUnits("0.1234567", 18)}
           currency="ETH"
