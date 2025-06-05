@@ -19,12 +19,23 @@ import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import { useChain } from "../context/chainContext"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
-import { BetStatus, GameResult } from "../types"
+import { BetStatus, GameResult } from "../types/types"
 
 const logger = createLogger("usePlaceBet")
 
+export interface IUsePlaceBetReturn {
+  placeBet: (betAmount: bigint, choice: COINTOSS_FACE) => Promise<void>
+  betStatus: BetStatus
+  isWaiting: boolean
+  isError: unknown
+  gameResult: GameResult | null
+  resetBetState: () => void
+  vrfFees: bigint
+  gasPrice: bigint
+  formattedVrfFees: number
+}
 
-export function usePlaceBet(game: CASINO_GAME_TYPE) {
+export function usePlaceBet(game: CASINO_GAME_TYPE): IUsePlaceBetReturn {
   const { appChainId } = useChain()
   const publicClient = usePublicClient({ chainId: appChainId })
   const { address: connectedAddress } = useAccount()
