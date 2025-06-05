@@ -24,13 +24,13 @@ import { Label } from "../ui/label"
 import { TokenImage } from "@coinbase/onchainkit/token"
 
 import { ETH_TOKEN } from "../../lib/tokens"
-import { BetStatus, GameResult } from "../../types"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { GameResultWindow } from "./GameResultWindow"
-import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
 import { useChain } from "../../context/chainContext"
 import { useHouseEdge } from "../../hooks/useHouseEdge"
+import { BetStatus, GameResult, HistoryEntry } from "../../types/types"
+import { HistorySheetPanel } from "./HistorySheetPanel"
 
 interface IThemeSettings {
   theme?: "light" | "dark" | "system"

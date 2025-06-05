@@ -15,22 +15,9 @@ import { useAccount } from "wagmi"
 import { createLogger } from "../lib/logger"
 import { ETH_TOKEN } from "../lib/tokens"
 import { toLowerCase } from "../lib/utils"
+import { HistoryEntry, HistoryEntryStatus } from "../types/types"
 
 const logger = createLogger("useGameHistory")
-
-enum HistoryEntryStatus {
-  WonBet = "Won bet",
-  Busted = "Busted",
-}
-
-export interface HistoryEntry {
-  id: string
-  status: HistoryEntryStatus
-  multiplier: number | string
-  payoutAmount: number | string
-  payoutCurrencyIcon: React.ReactElement
-  timestamp: string
-}
 
 function formatRelativeTime(timestampSecs: number): string {
   const now = new Date()

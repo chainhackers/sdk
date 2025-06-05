@@ -16,3 +16,17 @@ export interface GameResult {
 }
 
 export type BetStatus = "loading" | "pending" | "success" | "rolling" | "error" | "waiting-error" | "internal-error" | null
+
+export enum HistoryEntryStatus {
+  WonBet = "Won bet",
+  Busted = "Busted",
+}
+
+export interface HistoryEntry {
+  id: string
+  status: HistoryEntryStatus
+  multiplier: number | string
+  payoutAmount: number | string
+  payoutCurrencyIcon: React.ReactElement
+  timestamp: string
+}

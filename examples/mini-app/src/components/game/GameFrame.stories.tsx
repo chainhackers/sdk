@@ -1,3 +1,4 @@
+import React from "react"
 import {
   chainByKey,
   chainNativeCurrencyToToken,
@@ -9,7 +10,7 @@ import { parseUnits } from "viem"
 import gameBg from "../../assets/game/game-background.png"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { GameFrame } from "./GameFrame"
-import { type HistoryEntry } from "./HistorySheetPanel"
+import { type HistoryEntry, HistoryEntryStatus } from "../../types/types"
 
 declare global {
   interface BigInt {
@@ -45,7 +46,7 @@ const connectWalletBtnStub = <div />
 const mockHistoryData: HistoryEntry[] = [
   {
     id: "1",
-    status: "Won bet",
+    status: HistoryEntryStatus.WonBet,
     multiplier: 1.94,
     payoutAmount: "1.94675",
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
@@ -53,7 +54,7 @@ const mockHistoryData: HistoryEntry[] = [
   },
   {
     id: "2",
-    status: "Won bet",
+    status: HistoryEntryStatus.WonBet,
     multiplier: 1.2,
     payoutAmount: 0.2,
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
@@ -61,7 +62,7 @@ const mockHistoryData: HistoryEntry[] = [
   },
   {
     id: "3",
-    status: "Busted",
+    status: HistoryEntryStatus.Busted,
     multiplier: 1.94,
     payoutAmount: 1.94,
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
@@ -69,7 +70,7 @@ const mockHistoryData: HistoryEntry[] = [
   },
   {
     id: "4",
-    status: "Won bet",
+    status: HistoryEntryStatus.WonBet,
     multiplier: 1.946,
     payoutAmount: 2.453,
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
@@ -77,7 +78,7 @@ const mockHistoryData: HistoryEntry[] = [
   },
   {
     id: "5",
-    status: "Busted",
+    status: HistoryEntryStatus.Busted,
     multiplier: 1.94,
     payoutAmount: 1.94,
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
@@ -85,7 +86,7 @@ const mockHistoryData: HistoryEntry[] = [
   },
   {
     id: "6",
-    status: "Won bet",
+    status: HistoryEntryStatus.WonBet,
     multiplier: 1.946,
     payoutAmount: 2.453,
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
@@ -93,7 +94,7 @@ const mockHistoryData: HistoryEntry[] = [
   },
   {
     id: "7",
-    status: "Won bet",
+    status: HistoryEntryStatus.WonBet,
     multiplier: 1.94,
     payoutAmount: 0.1,
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
@@ -101,7 +102,7 @@ const mockHistoryData: HistoryEntry[] = [
   },
   {
     id: "8",
-    status: "Won bet",
+    status: HistoryEntryStatus.WonBet,
     multiplier: 1.94,
     payoutAmount: 0.1,
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
@@ -109,7 +110,7 @@ const mockHistoryData: HistoryEntry[] = [
   },
   {
     id: "9",
-    status: "Won bet",
+    status: HistoryEntryStatus.WonBet,
     multiplier: 1.94,
     payoutAmount: 0.1,
     payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,

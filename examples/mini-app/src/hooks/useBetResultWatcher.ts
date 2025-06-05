@@ -5,7 +5,7 @@ import { decodeEventLog } from "viem"
 import { usePublicClient, useWatchContractEvent } from "wagmi"
 import { createLogger } from "../lib/logger"
 import type { WatchTarget } from "./types"
-import { GameResult } from "../types"
+import { GameResult } from "../types/types"
 
 const logger = createLogger("useBetResultWatcher")
 
