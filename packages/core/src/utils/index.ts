@@ -7,6 +7,7 @@ export * from "./tokens";
 export * from "./bet";
 export * from "./format";
 export * from "./wallet";
+export * from "./api";
 
 export function bigIntFormatter(_key: string | number, value: any) {
   if (typeof value === "bigint") {

@@ -12,14 +12,21 @@ import type { Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
 import {
   type CasinoBetParams,
+  type CasinoFreebetParams,
   type CasinoPlaceBetOptions,
   type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
+  type PlaceFreebetCallbacks,
   getPlacedBetFromReceipt,
   placeBet,
+  placeFreebet,
 } from "./game";
 
-export interface RouletteParams extends CasinoBetParams {
+export interface RouletteBetParams extends CasinoBetParams {
+  numbers: RouletteNumber[];
+}
+
+export interface RouletteFreebetParams extends CasinoFreebetParams {
   numbers: RouletteNumber[];
 }
 
@@ -31,7 +38,7 @@ export interface RoulettePlacedBet extends NormalCasinoPlacedBet {
 
 export async function placeRouletteBet(
   wallet: BetSwirlWallet,
-  rouletteParams: RouletteParams,
+  rouletteParams: RouletteBetParams,
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks,
 ): Promise<{ placedBet: RoulettePlacedBet; receipt: TransactionReceipt }> {
@@ -62,6 +69,41 @@ export async function placeRouletteBet(
     );
   }
   return { placedBet: roulettePlacedBet, receipt };
+}
+
+export async function placeRouletteFreebet(
+  wallet: BetSwirlWallet,
+  rouletteParams: RouletteFreebetParams,
+  options?: CasinoPlaceBetOptions,
+  callbacks?: PlaceFreebetCallbacks,
+): Promise<{ placedFreebet: RoulettePlacedBet; receipt: TransactionReceipt }> {
+  const { placedFreebet, receipt } = await placeFreebet(
+    wallet,
+    {
+      game: CASINO_GAME_TYPE.ROULETTE,
+      gameEncodedAbiParametersInput: Roulette.encodeAbiParametersInput(rouletteParams.numbers),
+      ...rouletteParams,
+    },
+    options,
+    callbacks,
+  );
+  const roulettePlacedFreebet = await getRoulettePlacedBetFromReceipt(
+    wallet,
+    receipt,
+    placedFreebet.chainId,
+    placedFreebet.token,
+  );
+  if (!roulettePlacedFreebet) {
+    throw new TransactionError(
+      "Roulette PlaceBet event not found",
+      ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
+      {
+        hash: receipt.transactionHash,
+        chainId: placedFreebet.chainId,
+      },
+    );
+  }
+  return { placedFreebet: roulettePlacedFreebet, receipt };
 }
 
 export async function getRoulettePlacedBetFromReceipt(

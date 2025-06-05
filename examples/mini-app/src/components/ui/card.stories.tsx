@@ -1,14 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { BellRing, Check } from "lucide-react"
 import { Button } from "./button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card"
 
 const meta = {
   title: "UI/Card",
@@ -50,12 +43,8 @@ export const ExampleWithContent: Story = {
         <div className=" flex items-center space-x-4 rounded-md border p-4">
           <BellRing />
           <div className="flex-1 space-y-1">
-            <p className="text-sm font-medium leading-none">
-              Push Notifications
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Send notifications to device.
-            </p>
+            <p className="text-sm font-medium leading-none">Push Notifications</p>
+            <p className="text-sm text-muted-foreground">Send notifications to device.</p>
           </div>
         </div>
       </CardContent>

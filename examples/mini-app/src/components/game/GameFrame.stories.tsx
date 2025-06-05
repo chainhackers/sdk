@@ -1,10 +1,25 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { GameFrame } from "./GameFrame"
+import {
+  chainByKey,
+  chainNativeCurrencyToToken,
+  COINTOSS_FACE,
+} from "@betswirl/sdk-core"
 import { TokenImage } from "@coinbase/onchainkit/token"
-import { ETH_TOKEN } from "../../lib/tokens"
-import { type HistoryEntry } from "./HistorySheetPanel"
+import type { Meta, StoryObj } from "@storybook/react"
+import { parseUnits } from "viem"
 import gameBg from "../../assets/game/game-background.png"
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
+import { ETH_TOKEN } from "../../lib/tokens"
+import { GameFrame } from "./GameFrame"
+import { type HistoryEntry } from "./HistorySheetPanel"
+
+declare global {
+  interface BigInt {
+    toJSON(): string
+  }
+}
+
+BigInt.prototype.toJSON = function () {
+  return this.toString()
+}
 
 const meta = {
   title: "Game/GameFrame",
@@ -25,7 +40,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const connectWalletBtnStub = <div></div>
+const connectWalletBtnStub = <div />
 
 const mockHistoryData: HistoryEntry[] = [
   {
@@ -33,7 +48,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: "1.94675",
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~24h ago",
   },
   {
@@ -41,7 +56,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.2,
     payoutAmount: 0.2,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -49,7 +64,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.94,
     payoutAmount: 1.94,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -57,7 +72,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.946,
     payoutAmount: 2.453,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -65,7 +80,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.94,
     payoutAmount: 1.94,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -73,7 +88,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.946,
     payoutAmount: 2.453,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -81,7 +96,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -89,7 +104,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
   {
@@ -97,7 +112,7 @@ const mockHistoryData: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
+    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
 ]
@@ -108,14 +123,22 @@ const Template: Story = {
       backgroundImage: gameBg,
     },
     historyData: mockHistoryData,
-    balance: 1.7,
+    balance: 1123456n * 10n ** 12n,
     connectWallletBtn: connectWalletBtnStub,
     isConnected: false,
-    onPlayBtnClick: (betAmount: string, selectedSide: COINTOSS_FACE) =>
-      console.log("betAmount: ", betAmount, "selectedSide: ", selectedSide),
-    tokenDecimals: 18,
+    onPlayBtnClick: (selectedSide: COINTOSS_FACE) =>
+      console.log("selectedSide: ", selectedSide),
     gameResult: null,
     betStatus: null,
+    token: chainNativeCurrencyToToken(chainByKey.base.nativeCurrency),
+    onHistoryOpen: () => console.log("onHistoryOpen"),
+    betAmount: parseUnits("0.1234567", 18),
+    setBetAmount: (betAmount?: bigint) => console.log("betAmount: ", betAmount),
+    onHalfBet: () => console.log("onHalfBet"),
+    onDoubleBet: () => console.log("onDoubleBet"),
+    onMaxBet: () => console.log("onMaxBet"),
+    vrfFees: 0.0001,
+    gasPrice: 34.2123,
   },
   render: (args) => <GameFrame {...args} />,
 }
@@ -156,7 +179,7 @@ export const Win: Story = {
     betStatus: "success",
     gameResult: {
       isWin: true,
-      payout: 0.19,
+      payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
       currency: "ETH",
       rolled: COINTOSS_FACE.HEADS,
     },
@@ -170,7 +193,7 @@ export const Loss: Story = {
     betStatus: "success",
     gameResult: {
       isWin: false,
-      payout: 0.19,
+      payout: (parseUnits("0.1234567", 18) * 194n) / 100n,
       currency: "ETH",
       rolled: COINTOSS_FACE.TAILS,
     },

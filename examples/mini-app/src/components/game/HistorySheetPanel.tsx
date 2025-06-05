@@ -2,14 +2,7 @@ import React from "react"
 import { cn } from "../../lib/utils"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
 
 export interface HistoryEntry {
   id: string
@@ -25,20 +18,14 @@ interface HistorySheetPanelProps {
   historyData: HistoryEntry[]
 }
 
-export function HistorySheetPanel({
-  portalContainer,
-  historyData,
-}: HistorySheetPanelProps) {
+export function HistorySheetPanel({ portalContainer, historyData }: HistorySheetPanelProps) {
   const isEmpty = historyData.length === 0
 
   return (
     <SheetPortal container={portalContainer}>
       <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
       <SheetBottomPanelContent
-        className={cn(
-          isEmpty ? "!h-auto !max-h-[70%]" : "!h-[70%] !max-h-full",
-          "p-0",
-        )}
+        className={cn(isEmpty ? "!h-auto !max-h-[70%]" : "!h-[70%] !max-h-full", "p-0")}
       >
         <ScrollArea className="h-full w-full rounded-t-[16px] overflow-hidden">
           <div className="p-1 pt-0">
@@ -62,10 +49,7 @@ export function HistorySheetPanel({
               <TableBody>
                 {isEmpty ? (
                   <TableRow className="border-b-0">
-                    <TableCell
-                      colSpan={4}
-                      className="px-3 py-6 text-left align-top"
-                    >
+                    <TableCell colSpan={4} className="px-3 py-6 text-left align-top">
                       <div>
                         <p className="text-base text-card-foreground font-semibold">
                           No bets currently
@@ -85,9 +69,7 @@ export function HistorySheetPanel({
                       <TableCell
                         className={cn(
                           "px-3 py-2.5",
-                          entry.status === "Won bet"
-                            ? "text-game-win"
-                            : "text-game-loss",
+                          entry.status === "Won bet" ? "text-game-win" : "text-game-loss",
                         )}
                       >
                         {entry.status}

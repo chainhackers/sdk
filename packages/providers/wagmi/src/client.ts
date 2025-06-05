@@ -10,26 +10,32 @@ import type {
   CasinoToken,
   CasinoWaitRollOptions,
   ChainId,
-  CoinTossParams,
+  CoinTossBetParams,
+  CoinTossFreebetParams,
   CoinTossPlacedBet,
   CoinTossRolledBet,
-  DiceParams,
+  DiceBetParams,
+  DiceFreebetParams,
   DicePlacedBet,
   DiceRolledBet,
   GAS_PRICE_TYPE,
+  KenoBetParams,
   KenoConfiguration,
-  KenoParams,
+  KenoFreebetParams,
   KenoPlacedBet,
   KenoRolledBet,
   NormalCasinoPlacedBet,
   PlaceBetCallbacks,
-  RouletteParams,
+  PlaceFreebetCallbacks,
+  RouletteBetParams,
+  RouletteFreebetParams,
   RoulettePlacedBet,
   RouletteRolledBet,
   Token,
   WeightedCasinoPlacedBet,
   WeightedGameConfiguration,
-  WheelParams,
+  WheelBetParams,
+  WheelFreebetParams,
   WheelPlacedBet,
   WheelRolledBet,
 } from "@betswirl/sdk-core";
@@ -45,10 +51,15 @@ import {
   getKenoConfiguration,
   getWeightedGameConfiguration,
   placeCoinTossBet,
+  placeCoinTossFreebet,
   placeDiceBet,
+  placeDiceFreebet,
   placeKenoBet,
+  placeKenoFreebet,
   placeRouletteBet,
+  placeRouletteFreebet,
   placeWheelBet,
+  placeWheelFreebet,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
   waitKenoRolledBet,
@@ -88,7 +99,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     weightedGameConfiguration?: WeightedGameConfiguration,
     houseEdge?: number,
   ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }> {
-    this._switchChain(placedBet.chainId);
+    await this._switchChain(placedBet.chainId);
     const isWeighted = WEIGHTED_CASINO_GAME_TYPES.includes(placedBet.game);
     if (isWeighted) {
       return waitRolledBet(
@@ -109,15 +120,32 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   }
 
   async playCoinToss(
-    params: CoinTossParams,
+    params: CoinTossBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
     chainId?: CasinoChainId,
   ): Promise<{ placedBet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return placeCoinTossBet(
       this.betSwirlWallet,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetCoinToss(
+    params: CoinTossFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: CoinTossPlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(params.freebet.chainId);
+    return placeCoinTossFreebet(
+      this.betSwirlWallet,
+      params,
       {
         ...this.betSwirlDefaultOptions,
         ...options,
@@ -130,7 +158,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     placedBet: CoinTossPlacedBet,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: CoinTossRolledBet; receipt: TransactionReceipt }> {
-    this._switchChain(placedBet.chainId);
+    await this._switchChain(placedBet.chainId);
     return waitCoinTossRolledBet(this.betSwirlWallet, placedBet, {
       ...this.betSwirlDefaultOptions,
       ...options,
@@ -138,15 +166,32 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   }
 
   async playDice(
-    params: DiceParams,
+    params: DiceBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
     chainId?: CasinoChainId,
   ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return placeDiceBet(
       this.betSwirlWallet,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetDice(
+    params: DiceFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: DicePlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(params.freebet.chainId);
+    return placeDiceFreebet(
+      this.betSwirlWallet,
+      params,
       {
         ...this.betSwirlDefaultOptions,
         ...options,
@@ -159,7 +204,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     placedBet: DicePlacedBet,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: DiceRolledBet; receipt: TransactionReceipt }> {
-    this._switchChain(placedBet.chainId);
+    await this._switchChain(placedBet.chainId);
     return waitDiceRolledBet(this.betSwirlWallet, placedBet, {
       ...this.betSwirlDefaultOptions,
       ...options,
@@ -167,15 +212,32 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   }
 
   async playRoulette(
-    params: RouletteParams,
+    params: RouletteBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
     chainId?: CasinoChainId,
   ): Promise<{ placedBet: RoulettePlacedBet; receipt: TransactionReceipt }> {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return placeRouletteBet(
       this.betSwirlWallet,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetRoulette(
+    params: RouletteFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: RoulettePlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(params.freebet.chainId);
+    return placeRouletteFreebet(
+      this.betSwirlWallet,
+      params,
       {
         ...this.betSwirlDefaultOptions,
         ...options,
@@ -188,7 +250,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     placedBet: RoulettePlacedBet,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: RouletteRolledBet; receipt: TransactionReceipt }> {
-    this._switchChain(placedBet.chainId);
+    await this._switchChain(placedBet.chainId);
     return waitRouletteRolledBet(this.betSwirlWallet, placedBet, {
       ...this.betSwirlDefaultOptions,
       ...options,
@@ -196,15 +258,32 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   }
 
   async playKeno(
-    params: KenoParams,
+    params: KenoBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
     chainId?: CasinoChainId,
   ): Promise<{ placedBet: KenoPlacedBet; receipt: TransactionReceipt }> {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return placeKenoBet(
       this.betSwirlWallet,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetKeno(
+    params: KenoFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: KenoPlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(params.freebet.chainId);
+    return placeKenoFreebet(
+      this.betSwirlWallet,
+      params,
       {
         ...this.betSwirlDefaultOptions,
         ...options,
@@ -217,7 +296,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     placedBet: KenoPlacedBet,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: KenoRolledBet; receipt: TransactionReceipt }> {
-    this._switchChain(placedBet.chainId);
+    await this._switchChain(placedBet.chainId);
     return waitKenoRolledBet(this.betSwirlWallet, placedBet, {
       ...this.betSwirlDefaultOptions,
       ...options,
@@ -225,15 +304,32 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   }
 
   async playWheel(
-    params: WheelParams,
+    params: WheelBetParams,
     options?: CasinoPlaceBetOptions,
     callbacks?: PlaceBetCallbacks,
     chainId?: CasinoChainId,
   ): Promise<{ placedBet: WheelPlacedBet; receipt: TransactionReceipt }> {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return placeWheelBet(
       this.betSwirlWallet,
       { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetWheel(
+    params: WheelFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: WheelPlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(params.freebet.chainId);
+    return placeWheelFreebet(
+      this.betSwirlWallet,
+      params,
       {
         ...this.betSwirlDefaultOptions,
         ...options,
@@ -248,7 +344,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     houseEdge: number,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: WheelRolledBet; receipt: TransactionReceipt }> {
-    this._switchChain(placedBet.chainId);
+    await this._switchChain(placedBet.chainId);
     return waitWheelRolledBet(
       this.betSwirlWallet,
       placedBet,
@@ -264,12 +360,12 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   /* Casino Utilities */
 
   async getCasinoGames(onlyActive = false, chainId?: CasinoChainId) {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return getCasinoGames(this.betSwirlWallet, onlyActive);
   }
 
   async getCasinoTokens(onlyActive = false, chainId?: CasinoChainId): Promise<CasinoToken[]> {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return getCasinoTokens(this.betSwirlWallet, onlyActive);
   }
 
@@ -279,7 +375,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     affiliate?: Hex,
   ): Promise<CasinoGameToken> {
     const casinoChain = casinoChainById[casinoToken.chainId];
-    this._switchChain(casinoToken.chainId);
+    await this._switchChain(casinoToken.chainId);
     return getCasinoGameToken(
       this.betSwirlWallet,
       casinoToken,
@@ -294,7 +390,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     game: CASINO_GAME_TYPE,
     chainId?: CasinoChainId,
   ): Promise<BetRequirements> {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return getBetRequirements(this.betSwirlWallet, token, multiplier, game);
   }
 
@@ -306,7 +402,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     gasPriceType?: GAS_PRICE_TYPE,
     chainId?: CasinoChainId,
   ) {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return getChainlinkVrfCost(
       this.betSwirlWallet,
       game,
@@ -318,7 +414,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   }
 
   async getKenoConfiguration(token: Token, chainId?: CasinoChainId): Promise<KenoConfiguration> {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return getKenoConfiguration(this.betSwirlWallet, token);
   }
 
@@ -326,7 +422,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     configId: number | string,
     chainId?: CasinoChainId,
   ): Promise<WeightedGameConfiguration> {
-    this._switchChain(chainId);
+    await this._switchChain(chainId);
     return getWeightedGameConfiguration(this.betSwirlWallet, configId);
   }
 

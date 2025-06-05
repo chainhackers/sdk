@@ -1,5 +1,5 @@
 import {
-  type BetSwirlEventData,
+  type BetSwirlExtendedEventData,
   type BetSwirlFunctionData,
   BetSwirlWallet,
   wrappedGasTokenById,
@@ -98,7 +98,7 @@ export class WagmiBetSwirlWallet extends BetSwirlWallet {
     return getTransactionReceipt(this.wagmiConfig, { hash: txHash });
   }
 
-  watchContractEvent<TEventData extends BetSwirlEventData<Abi, string, any>>(
+  watchContractEvent<TEventData extends BetSwirlExtendedEventData<Abi, string, any>>(
     eventData: TEventData,
   ): () => void {
     return watchContractEvent(this.wagmiConfig, {

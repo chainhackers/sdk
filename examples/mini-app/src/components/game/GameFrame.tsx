@@ -1,9 +1,21 @@
+import {
+  BP_VALUE,
+  CASINO_GAME_TYPE,
+  chainById,
+  chainNativeCurrencyToToken,
+  CoinToss,
+  COINTOSS_FACE,
+  FORMAT_TYPE,
+  formatRawAmount,
+  Token,
+} from "@betswirl/sdk-core"
+import Decimal from "decimal.js"
 import { History, Info } from "lucide-react"
-import { ChangeEvent, useEffect, useRef, useState } from "react"
+import React, { ChangeEvent, useEffect, useMemo, useRef, useState } from "react"
+import { parseUnits } from "viem"
 import coinHeadsIcon from "../../assets/game/coin-heads.svg"
 import coinTailsIcon from "../../assets/game/coin-tails.svg"
 import { cn } from "../../lib/utils"
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Input } from "../ui/input"
@@ -11,29 +23,14 @@ import { Label } from "../ui/label"
 
 import { TokenImage } from "@coinbase/onchainkit/token"
 
+import { ETH_TOKEN } from "../../lib/tokens"
+import { BetStatus, GameResult } from "../../types"
 import { Sheet, SheetTrigger } from "../ui/sheet"
+import { GameResultWindow } from "./GameResultWindow"
 import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
-import { ETH_TOKEN } from "../../lib/tokens"
-import { GameResultWindow } from "./GameResultWindow"
-import { BetStatus, GameResultFormatted } from "../../types"
-
-function formatBetAmount(num: number, decimals: number): string {
-  if (Number.isNaN(num)) return "0"
-  if (num === 0) return "0"
-
-  let s = num.toFixed(decimals)
-
-  if (s.includes(".")) {
-    s = s.replace(/\.?0+$/, "")
-  }
-
-  if (s.endsWith(".")) {
-    s = s.slice(0, -1)
-  }
-
-  return s === "" || Number.isNaN(parseFloat(s)) ? "0" : s
-}
+import { useChain } from "../../context/chainContext"
+import { useHouseEdge } from "../../hooks/useHouseEdge"
 
 interface IThemeSettings {
   theme?: "light" | "dark" | "system"
@@ -48,13 +45,21 @@ interface IThemeSettings {
 interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   themeSettings: IThemeSettings
   historyData: HistoryEntry[]
-  balance: number
+  balance: bigint
   connectWallletBtn: React.ReactNode
   isConnected: boolean
-  onPlayBtnClick: (betAmount: string, selectedSide: COINTOSS_FACE) => void
-  tokenDecimals: number
-  gameResult: GameResultFormatted | null
+  onPlayBtnClick: (selectedSide: COINTOSS_FACE) => void
+  token: Token
+  gameResult: GameResult | null
   betStatus: BetStatus | null
+  onHistoryOpen: () => void
+  betAmount: bigint | undefined
+  setBetAmount: (amount: bigint | undefined) => void
+  onHalfBet: () => void
+  onDoubleBet: () => void
+  onMaxBet: () => void
+  vrfFees: number | string // formatted
+  gasPrice: number | string // gwei formatted
 }
 
 const STEP = 0.0001
@@ -66,74 +71,149 @@ export function GameFrame({
   connectWallletBtn,
   isConnected,
   onPlayBtnClick,
-  tokenDecimals,
+  token,
   gameResult,
   betStatus,
+  onHistoryOpen,
+  betAmount,
+  setBetAmount,
+  onHalfBet,
+  onDoubleBet,
+  onMaxBet,
+  vrfFees,
+  gasPrice,
   ...props
 }: GameFrameProps) {
-  const [betAmount, setBetAmount] = useState("0")
+  const [betAmountError, setBetAmountError] = useState<string | null>(null)
+  const [inputValue, setInputValue] = useState<string>("")
+  const [isValidInput, setIsValidInput] = useState<boolean>(true)
+  const [isUserTyping, setIsUserTyping] = useState<boolean>(false)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
   const [selectedSide, setSelectedSide] = useState<COINTOSS_FACE>(
     COINTOSS_FACE.HEADS,
   )
+  const { areChainsSynced, appChainId } = useChain()
   const cardRef = useRef<HTMLDivElement>(null)
   const [isMounted, setIsMounted] = useState(false)
   const { theme } = themeSettings
+  const [betCount, _] = useState(1)
 
   const themeClass = theme === "system" ? undefined : theme
 
   useEffect(() => {
     setIsMounted(true)
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
   }, [])
 
-  const isBetAmountInvalid =
-    Number.isNaN(Number.parseFloat(betAmount)) ||
-    Number.parseFloat(betAmount || "0") <= 0
+  // Sync inputValue with external betAmount changes from buttons (but not when user is typing)
+  useEffect(() => {
+    if (isUserTyping) return
 
-  const multiplier = 1.94
-  const winChance = 50
-  const parsedBetAmountForPayout = Number.parseFloat(betAmount || "0")
-  const targetPayout = (
-    (Number.isNaN(parsedBetAmountForPayout) ? 0 : parsedBetAmountForPayout) *
-    multiplier
+    if (betAmount === undefined) {
+      setInputValue("")
+      setIsValidInput(true)
+    } else {
+      const formatted = formatRawAmount(
+        betAmount,
+        token.decimals,
+        FORMAT_TYPE.PRECISE,
+      )
+      setInputValue(formatted)
+      setIsValidInput(true)
+    }
+  }, [betAmount, token.decimals, isUserTyping])
+
+  const isBetAmountValid = betAmount && betAmount > 0n
+  const { houseEdge } = useHouseEdge({
+    game: CASINO_GAME_TYPE.COINTOSS,
+    token: chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
+  })
+  const grossMultiplier = CoinToss.getMultiplier(selectedSide)
+  const winChance = CoinToss.getWinChancePercent(selectedSide)
+
+  const targetPayout = useMemo(() => {
+    if (!betAmount) return 0n
+    return getNetPayout(betAmount, betCount)
+  }, [betAmount, betCount])
+
+  const formattedTargetPayout = useMemo(() => {
+    if (!targetPayout) return "0"
+    return formatRawAmount(targetPayout, token.decimals)
+  }, [targetPayout, token.decimals])
+
+  const multiplier = Number(
+    Number(getNetPayout(1000000000000000000n, 1)) / 1e18,
   ).toFixed(2)
-  const fee = 0
 
-  const formattedBalance = balance.toFixed(4)
+  /*const houseEdgeFees = useMemo(
+    () => getFees(getGrossPayout(betAmount ?? 0n, betCount)),
+    [betAmount, betCount],
+  ) */
+  const formattedBalance = formatRawAmount(balance, token.decimals)
 
-  const isInGameResultState = !!gameResult
-  const isBettingInProgress = betStatus === "pending"
+  const isBetSuccees = betStatus === "success"
+  // Redundant with isWaiting from usePlaceBet
+  const isWaiting =
+    betStatus === "loading" ||
+    betStatus === "pending" ||
+    betStatus === "rolling"
+  const isError =
+    betStatus === "error" ||
+    betStatus === "waiting-error" ||
+    betStatus === "internal-error"
+
   const canInitiateBet =
-    isConnected && !isBetAmountInvalid && !isBettingInProgress
+    isConnected && areChainsSynced && isBetAmountValid && !isWaiting
 
-  const isErrorState = betStatus === "error"
-
-  const isPlayButtonDisabled: boolean = isErrorState
-    ? false
-    : isInGameResultState
-      ? false
-      : !canInitiateBet
+  const isPlayButtonDisabled: boolean = isError || isWaiting || !canInitiateBet
 
   let playButtonText: string
-  if (isErrorState) {
+  if (isError) {
     playButtonText = "Error, try again"
-  } else if (isInGameResultState) {
+  } else if (isBetSuccees) {
     playButtonText = "Try again"
-  } else if (isBettingInProgress) {
+  } else if (betStatus === "pending") {
     playButtonText = "Placing Bet..."
+  } else if (betStatus === "loading") {
+    playButtonText = "Loading Bet..."
+  } else if (betStatus === "rolling") {
+    playButtonText = "Bet rolling..."
   } else if (!isConnected) {
     playButtonText = "Connect Wallet"
+  } else if (!areChainsSynced) {
+    playButtonText = "Switch chain"
   } else {
     playButtonText = "Place Bet"
   }
 
+  function getFees(payout: bigint) {
+    return (payout * BigInt(houseEdge)) / BigInt(BP_VALUE)
+  }
+  function getGrossPayout(amount: bigint, numBets: number) {
+    return (
+      (amount * BigInt(numBets) * BigInt(grossMultiplier)) / BigInt(BP_VALUE)
+    )
+  }
+  function getNetPayout(amount: bigint, numBets: number) {
+    const grossPayout = getGrossPayout(amount, numBets)
+    return grossPayout - getFees(grossPayout)
+  }
+
   const handlePlayBtnClick = () => {
-    if (isInGameResultState) {
-      setBetAmount("0")
+    if (isBetSuccees) {
+      setBetAmount(0n)
+      setInputValue("")
       setSelectedSide(COINTOSS_FACE.HEADS)
     }
-    onPlayBtnClick(betAmount, selectedSide)
+    onPlayBtnClick(selectedSide)
   }
 
   const handleCoinClick = () => {
@@ -145,6 +225,13 @@ export function GameFrame({
         ? COINTOSS_FACE.TAILS
         : COINTOSS_FACE.HEADS,
     )
+  }
+
+  const handleHistoryOpen = (open: boolean) => {
+    if (open) {
+      onHistoryOpen()
+    }
+    setIsHistorySheetOpen(open)
   }
 
   const currentCoinIcon =
@@ -190,7 +277,7 @@ export function GameFrame({
                 "absolute inset-0 rounded-[16px]",
                 "bg-game-window-overlay",
               )}
-            ></div>
+            />
 
             <Sheet open={isInfoSheetOpen} onOpenChange={setIsInfoSheetOpen}>
               <SheetTrigger asChild>
@@ -210,17 +297,15 @@ export function GameFrame({
                 <InfoSheetPanel
                   portalContainer={cardRef.current}
                   winChance={winChance}
-                  rngFee={fee}
-                  targetPayout={targetPayout}
-                  gasPrice="34.2123 gwei"
+                  rngFee={vrfFees}
+                  targetPayout={formattedTargetPayout}
+                  gasPrice={gasPrice}
+                  token={token}
                 />
               )}
             </Sheet>
 
-            <Sheet
-              open={isHistorySheetOpen}
-              onOpenChange={setIsHistorySheetOpen}
-            >
+            <Sheet open={isHistorySheetOpen} onOpenChange={handleHistoryOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="iconTransparent"
@@ -243,14 +328,16 @@ export function GameFrame({
             </Sheet>
 
             <div className="absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white">
-              {multiplier.toFixed(2)} x
+              {multiplier} x
             </div>
             <Button
               variant="coinButton"
               size="coin"
               onClick={handleCoinClick}
               disabled={!isCoinClickable}
-              aria-label={`Select ${selectedSide === COINTOSS_FACE.HEADS ? "Tails" : "Heads"} side`}
+              aria-label={`Select ${
+                selectedSide === COINTOSS_FACE.HEADS ? "Tails" : "Heads"
+              } side`}
               className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2"
             >
               <img
@@ -262,7 +349,7 @@ export function GameFrame({
             <GameResultWindow
               isVisible={!!gameResult}
               isWin={gameResult?.isWin}
-              amount={Number(betAmount)}
+              amount={betAmount || 0n}
               payout={gameResult?.payout}
               currency="ETH"
               rolled={gameResult?.rolled || ""}
@@ -276,7 +363,7 @@ export function GameFrame({
                   Balance:&nbsp;
                 </span>
                 <span className="font-semibold">{formattedBalance}</span>
-                <TokenImage token={ETH_TOKEN} size={16} className="ml-1" />
+                <TokenImage token={ETH_TOKEN} size={18} className="ml-1" />
               </div>
 
               <Label
@@ -290,65 +377,92 @@ export function GameFrame({
                 type="number"
                 placeholder="0"
                 min={0}
-                max={balance}
+                // Note: The real maximum is set by CoinTossGame and operates on the balance amount in bigint.
+                // Converting formattedBalance to a float here may lose precision for large values;
+                // however, a bigint-compatible approach is not required here because the actual maximum, if enforced,
+                // is handled by CoinTossGame using the balance amount as bigint.
+                max={Number.parseFloat(formattedBalance)}
                 step={STEP}
-                value={betAmount}
+                value={inputValue}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setBetAmount(e.target.value)
+                  const newInputValue = e.target.value
+                  setInputValue(newInputValue)
+                  setIsUserTyping(true)
+
+                  // Clear existing timeout
+                  if (typingTimeoutRef.current) {
+                    clearTimeout(typingTimeoutRef.current)
+                  }
+
+                  // Set new timeout to stop typing state after 1 second
+                  typingTimeoutRef.current = setTimeout(() => {
+                    setIsUserTyping(false)
+                  }, 1000)
+
+                  if (newInputValue === "") {
+                    setBetAmount(undefined)
+                    setIsValidInput(true)
+                    setBetAmountError(null)
+                    return
+                  }
+
+                  try {
+                    new Decimal(newInputValue)
+
+                    try {
+                      const weiValue = parseUnits(newInputValue, token.decimals)
+                      setBetAmount(weiValue)
+                      setIsValidInput(true)
+                      setBetAmountError(null)
+                    } catch {
+                      setIsValidInput(false)
+                      setBetAmountError(null)
+                    }
+                  } catch {
+                    setIsValidInput(false)
+                    setBetAmountError(null)
+                  }
                 }}
-                className="relative"
+                className={cn(
+                  "relative",
+                  !isValidInput && "[&_input]:text-muted-foreground",
+                )}
                 token={{
-                  icon: <TokenImage token={ETH_TOKEN} size={16} />,
+                  icon: <TokenImage token={ETH_TOKEN} size={18} />,
                   symbol: "ETH",
                 }}
                 disabled={
                   !isConnected || betStatus === "pending" || !!gameResult
                 }
               />
+              {betAmountError && (
+                <div className="text-red-500 text-xs mt-1">
+                  {betAmountError}
+                </div>
+              )}
 
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   variant="secondary"
-                  onClick={() => {
-                    setBetAmount((prev) => {
-                      const prevNum = Number.parseFloat(prev || "0")
-                      if (Number.isNaN(prevNum) || prevNum === 0) return "0"
-                      return formatBetAmount(prevNum / 2, tokenDecimals)
-                    })
-                  }}
+                  onClick={onHalfBet}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isWaiting || !isBetAmountValid}
                 >
                   1/2
                 </Button>
                 <Button
                   variant="secondary"
-                  onClick={() => {
-                    setBetAmount((prev) => {
-                      const oldNum = Number.parseFloat(prev || "0")
-                      const newAmount = oldNum * 2
-                      const finalAmount = Math.min(balance, newAmount)
-                      return formatBetAmount(finalAmount, tokenDecimals)
-                    })
-                  }}
+                  onClick={onDoubleBet}
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  disabled={!isConnected || isWaiting || !isBetAmountValid}
                 >
                   2x
                 </Button>
                 <Button
                   variant="secondary"
                   className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-                  onClick={() => {
-                    setBetAmount(formattedBalance)
-                  }}
-                  disabled={
-                    !isConnected || isBettingInProgress || isInGameResultState
-                  }
+                  onClick={onMaxBet}
+                  disabled={!isConnected || isWaiting || !isBetAmountValid}
                 >
                   Max
                 </Button>
@@ -364,7 +478,7 @@ export function GameFrame({
                 "rounded-[16px]",
                 "text-play-btn-font",
               )}
-              variant={isErrorState ? "destructive" : "default"}
+              variant={isError ? "destructive" : "default"}
               onClick={handlePlayBtnClick}
               disabled={isPlayButtonDisabled}
             >

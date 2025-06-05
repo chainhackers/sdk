@@ -1,5 +1,4 @@
-import React from "react"
-import type { Preview, Decorator } from "@storybook/react"
+import type { Decorator, Preview } from "@storybook/react"
 import "../src/index.css"
 
 const withAppProviders: Decorator = (StoryComponent) => {
@@ -12,6 +11,11 @@ const preview: Preview = {
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/i,
+      },
+    },
+    options: {
+      storySort: {
+        order: ["Game", ["CoinTossGame", "*"]],
       },
     },
   },

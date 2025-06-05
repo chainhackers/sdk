@@ -1,3 +1,5 @@
+import { type EncodeAbiParametersReturnType, encodeAbiParameters } from "viem";
+import { parseAbiParameters } from "viem";
 import { getFormattedNetMultiplier } from "../..";
 import { CASINO_GAME_TYPE, getNetMultiplier } from "../..";
 import { BP_VALUE } from "../../constants";
@@ -114,6 +116,13 @@ export class Keno extends AbstractCasinoGame<
       }, "");
     // 5. Transform the binary numbers to a number
     return Number.parseInt(binaryNumbers, 2);
+  }
+
+  static encodeAbiParametersInput(
+    balls: KenoBall[],
+    kenoConfig: KenoConfiguration,
+  ): EncodeAbiParametersReturnType {
+    return encodeAbiParameters(parseAbiParameters("uint40"), [Keno.encodeInput(balls, kenoConfig)]);
   }
 
   static decodeInput(encodedBalls: KenoEncodedInput | string): KenoBall[] {

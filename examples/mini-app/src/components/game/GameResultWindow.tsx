@@ -1,8 +1,9 @@
-import winIcon from "../../assets/game/game-result/win-icon.svg"
+import { FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
+import { useEffect } from "react"
+import lossBgWebp from "../../assets/game/game-result/loss-bg.webp"
 import lossIcon from "../../assets/game/game-result/loss-icon.svg"
 import winBgWebp from "../../assets/game/game-result/win-bg.webp"
-import lossBgWebp from "../../assets/game/game-result/loss-bg.webp"
-import { useEffect } from "react"
+import winIcon from "../../assets/game/game-result/win-icon.svg"
 
 const images = {
   win: {
@@ -18,8 +19,8 @@ const images = {
 interface GameResultWindowProps {
   isWin?: boolean
   isVisible: boolean
-  amount: number
-  payout?: number
+  amount: bigint
+  payout?: bigint
   currency: string
   rolled: string
   className?: string
@@ -29,7 +30,7 @@ export function GameResultWindow({
   isWin = false,
   isVisible,
   amount,
-  payout = 0,
+  payout = 0n,
   currency,
   rolled,
   className,
@@ -44,15 +45,18 @@ export function GameResultWindow({
       img.src = imgSrc
     }
 
-    Object.values(images).forEach(({ bg, icon }) => {
+    for (const { bg, icon } of Object.values(images)) {
       preloadImg(bg)
       preloadImg(icon)
-    })
+    }
   }, [])
 
   if (!isVisible) {
     return null
   }
+
+  const formattedAmount = formatRawAmount(amount)
+  const formattedPayout = formatRawAmount(payout, 18, FORMAT_TYPE.PRECISE) //TODO use tokenDecimals
 
   return (
     <div
@@ -66,24 +70,18 @@ export function GameResultWindow({
 
       <div className="flex flex-col items-center gap-[8px] text-center relative">
         <div className="w-[48px] h-[44px] flex items-center justify-center bg-game-result-icon-bg relative rounded-[6px]">
-          <img
-            className="absolute"
-            src={currentImages.icon}
-            alt={`${resultType} icon`}
-          />
+          <img className="absolute" src={currentImages.icon} alt={`${resultType} icon`} />
         </div>
         <p className="text-[16px] leading-[150%] font-bold">
           {sign}
-          {amount}
+          {formattedAmount}
           <span className="uppercase"> {currency}</span>
         </p>
         <p className="text-[14px] leading-[157%] font-semibold">
-          Payout: {payout}
+          Payout: {formattedPayout}
           <span className="uppercase"> {currency}</span>
         </p>
-        <p className="text-[12px] leading-[167%] font-medium uppercase">
-          Draw: {rolled}
-        </p>
+        <p className="text-[12px] leading-[167%] font-medium uppercase">Draw: {rolled}</p>
       </div>
     </div>
   )

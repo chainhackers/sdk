@@ -1,19 +1,22 @@
-import React from "react"
+import React, { useState } from "react"
 import coinTossBackground from "../../assets/game/game-background.png"
 import { cn } from "../../lib/utils"
 
-import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { Avatar, Name } from "@coinbase/onchainkit/identity"
-import { TokenImage } from "@coinbase/onchainkit/token"
+import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
 import { useAccount, useBalance } from "wagmi"
-import { formatEther, formatUnits, parseEther } from "viem"
 
-import { type HistoryEntry } from "./HistorySheetPanel"
-import { ETH_TOKEN } from "../../lib/tokens"
-
+import {
+  CASINO_GAME_TYPE,
+  chainById,
+  chainNativeCurrencyToToken,
+  COINTOSS_FACE,
+} from "@betswirl/sdk-core"
+import { useGameHistory } from "../../hooks/useGameHistory"
 import { usePlaceBet } from "../../hooks/usePlaceBet"
-import { COINTOSS_FACE } from "@betswirl/sdk-core"
 import { GameFrame } from "./GameFrame"
+import { formatGwei } from "viem"
+import { useChain } from "../../context/chainContext"
 
 export interface CoinTossGameProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -26,81 +29,6 @@ export interface CoinTossGameProps
   backgroundImage?: string
 }
 
-const mockHistoryData: HistoryEntry[] = [
-  {
-    id: "1",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: "1.94675",
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~24h ago",
-  },
-  {
-    id: "2",
-    status: "Won bet",
-    multiplier: 1.2,
-    payoutAmount: 0.2,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "3",
-    status: "Busted",
-    multiplier: 1.94,
-    payoutAmount: 1.94,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "4",
-    status: "Won bet",
-    multiplier: 1.946,
-    payoutAmount: 2.453,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "5",
-    status: "Busted",
-    multiplier: 1.94,
-    payoutAmount: 1.94,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "6",
-    status: "Won bet",
-    multiplier: 1.946,
-    payoutAmount: 2.453,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "7",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "8",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-  {
-    id: "9",
-    status: "Won bet",
-    multiplier: 1.94,
-    payoutAmount: 0.1,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={14} />,
-    timestamp: "~2h ago",
-  },
-]
-
 export function CoinTossGame({
   theme = "system",
   customTheme,
@@ -109,50 +37,79 @@ export function CoinTossGame({
 }: CoinTossGameProps) {
   const themeSettings = { theme, customTheme, backgroundImage }
   const { isConnected: isWalletConnected, address } = useAccount()
+  const { gameHistory, refreshHistory } = useGameHistory(
+    CASINO_GAME_TYPE.COINTOSS,
+  )
   const { data: balance } = useBalance({
     address,
   })
-  const balanceFloat = balance
-    ? parseFloat(formatUnits(balance.value, balance.decimals))
-    : 0
+  const { appChainId } = useChain()
+  const token = chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
 
-  const tokenDecimals = balance?.decimals ?? 18
+  const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
 
-  const { placeBet, betStatus, gameResult, resetBetState } = usePlaceBet()
+  const {
+    placeBet,
+    betStatus,
+    gameResult,
+    resetBetState,
+    formattedVrfFees,
+    gasPrice,
+  } = usePlaceBet(CASINO_GAME_TYPE.COINTOSS)
   const isInGameResultState = !!gameResult
 
-  const handlePlayButtonClick = (
-    betAmount: string,
-    selectedSide: COINTOSS_FACE,
-  ) => {
-    if (betStatus === "error") {
+  const handlePlayButtonClick = (selectedSide: COINTOSS_FACE) => {
+    if (betStatus === "error" || isInGameResultState) {
       resetBetState()
-      placeBet(parseEther(betAmount), selectedSide)
-    } else if (isInGameResultState) {
-      resetBetState()
-    } else {
-      placeBet(parseEther(betAmount), selectedSide)
+    } else if (isWalletConnected && betAmount && betAmount > 0n) {
+      placeBet(betAmount, selectedSide)
     }
   }
 
-  const gameResultFormatted = gameResult
-    ? {
-        ...gameResult,
-        payout: Number(formatEther(gameResult.payout)),
-      }
-    : null
+  const handleHalfBet = () => {
+    const currentAmount = betAmount ?? 0n
+    if (currentAmount > 0n) {
+      setBetAmount(currentAmount / 2n)
+    }
+  }
+
+  const handleDoubleBet = () => {
+    const currentAmount = betAmount ?? 0n
+    const doubledAmount = currentAmount * 2n
+    // Only limit to balance if connected
+    if (isWalletConnected) {
+      const maxAmount = balance?.value ?? 0n
+      setBetAmount(doubledAmount > maxAmount ? maxAmount : doubledAmount)
+    } else {
+      setBetAmount(doubledAmount)
+    }
+  }
+
+  const handleMaxBet = () => {
+    if (isWalletConnected) {
+      setBetAmount(balance?.value ?? 0n)
+    }
+  }
 
   return (
     <GameFrame
       {...props}
       onPlayBtnClick={handlePlayButtonClick}
-      historyData={mockHistoryData}
-      tokenDecimals={tokenDecimals}
+      historyData={gameHistory}
+      token={token}
       themeSettings={themeSettings}
       isConnected={isWalletConnected}
-      balance={balanceFloat}
-      gameResult={gameResultFormatted}
+      balance={balance?.value ?? 0n}
+      betAmount={betAmount}
+      setBetAmount={setBetAmount}
+      onHalfBet={handleHalfBet}
+      onDoubleBet={handleDoubleBet}
+      onMaxBet={handleMaxBet}
+      gameResult={gameResult}
       betStatus={betStatus}
+      onHistoryOpen={refreshHistory}
+      vrfFees={formattedVrfFees}
+      gasPrice={formatGwei(gasPrice)}
       connectWallletBtn={
         <Wallet>
           <ConnectWallet

@@ -8,14 +8,21 @@ import type { Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
 import {
   type CasinoBetParams,
+  type CasinoFreebetParams,
   type CasinoPlaceBetOptions,
   type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
+  type PlaceFreebetCallbacks,
   getPlacedBetFromReceipt,
   placeBet,
+  placeFreebet,
 } from "./game";
 
-export interface DiceParams extends CasinoBetParams {
+export interface DiceBetParams extends CasinoBetParams {
+  cap: DiceNumber;
+}
+
+export interface DiceFreebetParams extends CasinoFreebetParams {
   cap: DiceNumber;
 }
 
@@ -27,7 +34,7 @@ export interface DicePlacedBet extends NormalCasinoPlacedBet {
 
 export async function placeDiceBet(
   wallet: BetSwirlWallet,
-  diceParams: DiceParams,
+  diceParams: DiceBetParams,
   options?: CasinoPlaceBetOptions,
   callbacks?: PlaceBetCallbacks,
 ): Promise<{ placedBet: DicePlacedBet; receipt: TransactionReceipt }> {
@@ -59,6 +66,41 @@ export async function placeDiceBet(
   }
 
   return { placedBet: dicePlacedBet, receipt };
+}
+
+export async function placeDiceFreebet(
+  wallet: BetSwirlWallet,
+  diceParams: DiceFreebetParams,
+  options?: CasinoPlaceBetOptions,
+  callbacks?: PlaceFreebetCallbacks,
+): Promise<{ placedFreebet: DicePlacedBet; receipt: TransactionReceipt }> {
+  const { placedFreebet, receipt } = await placeFreebet(
+    wallet,
+    {
+      game: CASINO_GAME_TYPE.DICE,
+      gameEncodedAbiParametersInput: Dice.encodeAbiParametersInput(diceParams.cap),
+      ...diceParams,
+    },
+    options,
+    callbacks,
+  );
+  const dicePlacedFreebet = await getDicePlacedBetFromReceipt(
+    wallet,
+    receipt,
+    placedFreebet.chainId,
+    placedFreebet.token,
+  );
+  if (!dicePlacedFreebet) {
+    throw new TransactionError(
+      "Dice PlaceBet event not found",
+      ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
+      {
+        hash: receipt.transactionHash,
+        chainId: placedFreebet.chainId,
+      },
+    );
+  }
+  return { placedFreebet: dicePlacedFreebet, receipt };
 }
 
 export async function getDicePlacedBetFromReceipt(
