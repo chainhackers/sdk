@@ -33,6 +33,7 @@
   "exclude": [
     "src/App.tsx",
     "src/main.tsx", 
-    "src/**/*.stories.tsx"
+    "src/**/*.stories.tsx",
+    "src/components/ui/**/*.tsx",
   ]
 }
