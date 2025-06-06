@@ -21,12 +21,6 @@ export function CoinTossGame({
   backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
-  const gameLogic = useGameLogic({
-    gameType: CASINO_GAME_TYPE.COINTOSS,
-    defaultSelection: COINTOSS_FACE.HEADS,
-    backgroundImage,
-  })
-
   const {
     isWalletConnected,
     balance,
@@ -48,7 +42,11 @@ export function CoinTossGame({
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
-  } = gameLogic
+  } = useGameLogic({
+    gameType: CASINO_GAME_TYPE.COINTOSS,
+    defaultSelection: COINTOSS_FACE.HEADS,
+    backgroundImage,
+  })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
 

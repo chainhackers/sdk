@@ -23,12 +23,6 @@ export function DiceGame({
   backgroundImage = diceBackground,
   ...props
 }: DiceGameProps) {
-  const gameLogic = useGameLogic({
-    gameType: CASINO_GAME_TYPE.DICE,
-    defaultSelection: DEFAULT_DICE_NUMBER,
-    backgroundImage,
-  })
-
   const {
     isWalletConnected,
     balance,
@@ -50,7 +44,11 @@ export function DiceGame({
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
-  } = gameLogic
+  } = useGameLogic({
+    gameType: CASINO_GAME_TYPE.DICE,
+    defaultSelection: DEFAULT_DICE_NUMBER,
+    backgroundImage,
+  })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
 

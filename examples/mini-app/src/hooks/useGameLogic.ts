@@ -105,7 +105,12 @@ export function useGameLogic<T extends GameSelection>({
   }
 
   const handlePlayButtonClick = () => {
-    if (betStatus === "error" || isInGameResultState) {
+    if (betStatus === "error") {
+      resetBetState()
+      if (isWalletConnected && betAmount && betAmount > 0n) {
+        placeBet(betAmount, selection)
+      }
+    } else if (isInGameResultState) {
       resetBetState()
     } else if (isWalletConnected && betAmount && betAmount > 0n) {
       placeBet(betAmount, selection)
