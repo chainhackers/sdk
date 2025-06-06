@@ -17,7 +17,11 @@ export function getFees(payout: bigint, houseEdge: number): bigint {
   return (payout * BigInt(houseEdge)) / BigInt(BP_VALUE)
 }
 
-export function getGrossPayout(amount: bigint, numBets: number, grossMultiplier: number): bigint {
+export function getGrossPayout(
+  amount: bigint,
+  numBets: number,
+  grossMultiplier: number,
+): bigint {
   return (amount * BigInt(numBets) * BigInt(grossMultiplier)) / BigInt(BP_VALUE)
 }
 
@@ -46,9 +50,9 @@ export function calculatePayoutDetails(
   }
 }
 
-export function formatMultiplier(params: GameCalculationParams, decimals = 2): string {
+export function formatMultiplier(params: GameCalculationParams): number {
   const netPayout = getNetPayout(ONE_ETHER, 1, params)
-  return Number(Number(netPayout) / 1e18).toFixed(decimals)
+  return Number(Number(netPayout) / 1e18)
 }
 
 export function calculateTargetPayout(

@@ -2,6 +2,7 @@ import {
   CASINO_GAME_TYPE,
   COINTOSS_FACE,
   DiceNumber,
+  Token,
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
@@ -27,7 +28,7 @@ interface UseGameLogicResult<T extends GameSelection> {
   isWalletConnected: boolean
   address: string | undefined
   balance: bigint
-  tokenDecimals: number
+  token: Token
   areChainsSynced: boolean
   gameHistory: HistoryEntry[]
   refreshHistory: () => void
@@ -42,7 +43,7 @@ interface UseGameLogicResult<T extends GameSelection> {
   formattedVrfFees: number | string
   gasPrice: string
   targetPayoutAmount: bigint
-  multiplier: string
+  multiplier: number
   isInGameResultState: boolean
   nativeCurrencySymbol: string
   themeSettings: {
@@ -69,16 +70,23 @@ export function useGameLogic<T extends GameSelection>({
   const { data: balance, refetch: refetchBalance } = useBalance({ address })
   const { areChainsSynced, appChainId } = useChain()
 
+  const token = chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
   const { houseEdge } = useHouseEdge({
     game: gameType,
-    token: chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
+    token,
   })
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
   const [selection, setSelection] = useState<T>(defaultSelection)
 
-  const { placeBet, betStatus, gameResult, resetBetState, formattedVrfFees, gasPrice } =
-    usePlaceBet(gameType, refetchBalance)
+  const {
+    placeBet,
+    betStatus,
+    gameResult,
+    resetBetState,
+    formattedVrfFees,
+    gasPrice,
+  } = usePlaceBet(gameType, refetchBalance)
 
   const { targetPayoutAmount, multiplier } = useGameCalculations({
     gameType,
@@ -88,7 +96,6 @@ export function useGameLogic<T extends GameSelection>({
   })
 
   const isInGameResultState = !!gameResult
-  const tokenDecimals = balance?.decimals ?? 18
   const nativeCurrencySymbol = chainById[appChainId].nativeCurrency.symbol
 
   const themeSettings = {
@@ -113,7 +120,7 @@ export function useGameLogic<T extends GameSelection>({
     isWalletConnected,
     address,
     balance: balance?.value ?? 0n,
-    tokenDecimals,
+    token,
     areChainsSynced,
     gameHistory,
     refreshHistory,

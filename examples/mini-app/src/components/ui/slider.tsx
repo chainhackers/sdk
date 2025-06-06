@@ -1,16 +1,37 @@
 import * as SliderPrimitive from "@radix-ui/react-slider"
 import * as React from "react"
 import { cn } from "../../lib/utils"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./tooltip"
 
-function getAdjustedPercentage(value: number, min: number, max: number): number {
+const SLIDER_EDGE_THRESHOLD_LOW = 5
+const SLIDER_EDGE_THRESHOLD_HIGH = 95
+const SLIDER_EDGE_ADJUSTMENT_FACTOR = 0.3
+
+function getAdjustedPercentage(
+  value: number,
+  min: number,
+  max: number,
+): number {
   const basePercentage = ((value - min) / (max - min)) * 100
 
-  if (basePercentage <= 5) {
-    return basePercentage + (5 - basePercentage) * 0.3
+  if (basePercentage <= SLIDER_EDGE_THRESHOLD_LOW) {
+    return (
+      basePercentage +
+      (SLIDER_EDGE_THRESHOLD_LOW - basePercentage) *
+        SLIDER_EDGE_ADJUSTMENT_FACTOR
+    )
   }
-  if (basePercentage >= 95) {
-    return basePercentage - (basePercentage - 95) * 0.3
+  if (basePercentage >= SLIDER_EDGE_THRESHOLD_HIGH) {
+    return (
+      basePercentage -
+      (basePercentage - SLIDER_EDGE_THRESHOLD_HIGH) *
+        SLIDER_EDGE_ADJUSTMENT_FACTOR
+    )
   }
   return basePercentage
 }
@@ -35,7 +56,8 @@ function Slider({
     return [min]
   }
 
-  const [internalValues, setInternalValues] = React.useState<number[]>(getInitialValues)
+  const [internalValues, setInternalValues] =
+    React.useState<number[]>(getInitialValues)
   const [isDragging, setIsDragging] = React.useState(false)
   const [isFocused, setIsFocused] = React.useState(false)
 

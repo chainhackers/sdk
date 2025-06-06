@@ -1,11 +1,10 @@
 import { Slider } from "../ui/slider"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
+import { GameControlsProps } from "./shared/types"
 
-interface DiceGameControlsProps {
+interface DiceGameControlsProps extends GameControlsProps {
   selectedNumber: number
   onNumberChange: (value: number) => void
-  multiplier: number
-  isDisabled: boolean
 }
 
 export function DiceGameControls({

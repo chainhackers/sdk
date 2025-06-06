@@ -1,12 +1,15 @@
 import { cn } from "../../../lib/utils"
 
 interface GameMultiplierDisplayProps {
-  multiplier: string | number
+  multiplier: number
   className?: string
 }
 
-export function GameMultiplierDisplay({ multiplier, className }: GameMultiplierDisplayProps) {
-  const displayValue = typeof multiplier === "number" ? multiplier.toFixed(2) : multiplier
+export function GameMultiplierDisplay({
+  multiplier,
+  className,
+}: GameMultiplierDisplayProps) {
+  const displayValue = multiplier.toFixed(2)
 
   return (
     <div

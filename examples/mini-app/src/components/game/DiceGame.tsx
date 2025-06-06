@@ -1,11 +1,18 @@
 import diceBackground from "../../assets/game/game-background.png"
 
-import { CASINO_GAME_TYPE, DiceNumber, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  DiceNumber,
+  FORMAT_TYPE,
+  formatRawAmount,
+} from "@betswirl/sdk-core"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { DiceGameControls } from "./DiceGameControls"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
+
+const DEFAULT_DICE_NUMBER = 20 as DiceNumber
 
 export interface DiceGameProps extends BaseGameProps {}
 
@@ -17,14 +24,14 @@ export function DiceGame({
 }: DiceGameProps) {
   const gameLogic = useGameLogic({
     gameType: CASINO_GAME_TYPE.DICE,
-    defaultSelection: 50 as DiceNumber,
+    defaultSelection: DEFAULT_DICE_NUMBER,
     backgroundImage,
   })
 
   const {
     isWalletConnected,
     balance,
-    tokenDecimals,
+    token,
     areChainsSynced,
     gameHistory,
     refreshHistory,
@@ -62,22 +69,32 @@ export function DiceGame({
 
   return (
     <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header title="Dice" connectWalletButton={<GameConnectWallet />} />
+      <GameFrame.Header
+        title="Dice"
+        connectWalletButton={<GameConnectWallet />}
+      />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={100 - selectedNumber}
           rngFee={formattedVrfFees}
-          targetPayout={formatRawAmount(targetPayoutAmount, tokenDecimals, FORMAT_TYPE.PRECISE)}
+          targetPayout={formatRawAmount(
+            targetPayoutAmount,
+            token.decimals,
+            FORMAT_TYPE.PRECISE,
+          )}
           gasPrice={gasPrice}
-          tokenDecimals={tokenDecimals}
+          tokenDecimals={token.decimals}
           nativeCurrencySymbol={nativeCurrencySymbol}
         />
-        <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
+        <GameFrame.HistoryButton
+          historyData={gameHistory}
+          onHistoryOpen={refreshHistory}
+        />
         <GameFrame.GameControls>
           <DiceGameControls
             selectedNumber={selectedNumber}
             onNumberChange={handleNumberChange}
-            multiplier={Number(multiplier)}
+            multiplier={multiplier}
             isDisabled={isControlsDisabled}
           />
         </GameFrame.GameControls>
@@ -90,7 +107,7 @@ export function DiceGame({
       <GameFrame.BettingSection
         balance={balance}
         isConnected={isWalletConnected}
-        tokenDecimals={tokenDecimals}
+        token={token}
         betStatus={betStatus}
         betAmount={betAmount}
         onBetAmountChange={handleBetAmountChange}

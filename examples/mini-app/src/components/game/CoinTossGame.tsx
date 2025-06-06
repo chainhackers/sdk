@@ -1,6 +1,11 @@
 import coinTossBackground from "../../assets/game/game-background.png"
 
-import { CASINO_GAME_TYPE, COINTOSS_FACE, FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  COINTOSS_FACE,
+  FORMAT_TYPE,
+  formatRawAmount,
+} from "@betswirl/sdk-core"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameFrame } from "./GameFrame"
@@ -24,7 +29,7 @@ export function CoinTossGame({
   const {
     isWalletConnected,
     balance,
-    tokenDecimals,
+    token,
     areChainsSynced,
     gameHistory,
     refreshHistory,
@@ -66,17 +71,27 @@ export function CoinTossGame({
 
   return (
     <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header title="CoinToss" connectWalletButton={<GameConnectWallet />} />
+      <GameFrame.Header
+        title="CoinToss"
+        connectWalletButton={<GameConnectWallet />}
+      />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={50}
           rngFee={formattedVrfFees}
-          targetPayout={formatRawAmount(targetPayoutAmount, tokenDecimals, FORMAT_TYPE.PRECISE)}
+          targetPayout={formatRawAmount(
+            targetPayoutAmount,
+            token.decimals,
+            FORMAT_TYPE.PRECISE,
+          )}
           gasPrice={gasPrice}
-          tokenDecimals={tokenDecimals}
+          tokenDecimals={token.decimals}
           nativeCurrencySymbol={nativeCurrencySymbol}
         />
-        <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
+        <GameFrame.HistoryButton
+          historyData={gameHistory}
+          onHistoryOpen={refreshHistory}
+        />
         <GameFrame.GameControls>
           <CoinTossGameControls
             selectedSide={selectedSide}
@@ -85,12 +100,16 @@ export function CoinTossGame({
             isDisabled={isControlsDisabled}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow gameResult={gameResult} betAmount={betAmount} currency="ETH" />
+        <GameFrame.ResultWindow
+          gameResult={gameResult}
+          betAmount={betAmount}
+          currency="ETH"
+        />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         balance={balance}
         isConnected={isWalletConnected}
-        tokenDecimals={tokenDecimals}
+        token={token}
         betStatus={betStatus}
         betAmount={betAmount}
         onBetAmountChange={handleBetAmountChange}

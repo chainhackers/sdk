@@ -9,3 +9,8 @@ export interface BaseGameProps extends React.HTMLAttributes<HTMLDivElement> {
   } & React.CSSProperties
   backgroundImage?: string
 }
+
+export interface GameControlsProps {
+  multiplier: number
+  isDisabled: boolean
+}
