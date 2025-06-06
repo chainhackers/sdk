@@ -2,6 +2,7 @@ import diceBackground from "../../assets/game/game-background.png"
 
 import {
   CASINO_GAME_TYPE,
+  Dice,
   DiceNumber,
   FORMAT_TYPE,
   formatRawAmount,
@@ -75,7 +76,7 @@ export function DiceGame({
       />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
-          winChance={100 - selectedNumber}
+          winChance={Dice.getWinChancePercent(selectedNumber)}
           rngFee={formattedVrfFees}
           targetPayout={formatRawAmount(
             targetPayoutAmount,

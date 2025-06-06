@@ -3,6 +3,7 @@ import coinTossBackground from "../../assets/game/game-background.png"
 import {
   CASINO_GAME_TYPE,
   COINTOSS_FACE,
+  CoinToss,
   FORMAT_TYPE,
   formatRawAmount,
 } from "@betswirl/sdk-core"
@@ -77,7 +78,7 @@ export function CoinTossGame({
       />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
-          winChance={50}
+          winChance={CoinToss.getWinChancePercent(selectedSide)}
           rngFee={formattedVrfFees}
           targetPayout={formatRawAmount(
             targetPayoutAmount,
