@@ -1,4 +1,9 @@
-import { COINTOSS_FACE, DiceNumber } from "@betswirl/sdk-core"
+import {
+  COINTOSS_FACE,
+  CoinTossEncodedInput,
+  DiceEncodedInput,
+  DiceNumber,
+} from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
 
 export type QueryParameter<
@@ -17,7 +22,7 @@ export type GameChoice = COINTOSS_FACE | DiceNumber
 
 export type GameRolledResult = COINTOSS_FACE | DiceNumber
 
-export type GameEncodedInput = boolean | DiceNumber
+export type GameEncodedInput = CoinTossEncodedInput | DiceEncodedInput
 
 export interface GameResult {
   isWin: boolean

@@ -3,8 +3,10 @@ import {
   COINTOSS_FACE,
   CasinoChainId,
   CoinToss,
-  DiceNumber,
+  Dice,
   GenericCasinoBetParams,
+  MAX_SELECTABLE_DICE_NUMBER,
+  MIN_SELECTABLE_DICE_NUMBER,
   casinoChainById,
   chainById,
   chainNativeCurrencyToToken,
@@ -28,8 +30,15 @@ function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncod
   switch (game) {
     case CASINO_GAME_TYPE.COINTOSS:
       return CoinToss.encodeInput(choice as COINTOSS_FACE)
-    case CASINO_GAME_TYPE.DICE:
-      return choice as DiceNumber
+    case CASINO_GAME_TYPE.DICE: {
+      const choiceNum = Number(choice)
+      if (choiceNum < MIN_SELECTABLE_DICE_NUMBER || choiceNum > MAX_SELECTABLE_DICE_NUMBER) {
+        throw new Error(
+          `Invalid dice number: ${choiceNum}. Must be between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER}`,
+        )
+      }
+      return Dice.encodeInput(choice)
+    }
     default:
       throw new Error(`Unsupported game type for encoding input: ${game}`)
   }
