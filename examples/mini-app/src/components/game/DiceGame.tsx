@@ -40,7 +40,9 @@ export function DiceGame({
     gasPrice,
     targetPayoutAmount,
     multiplier,
+    grossMultiplier,
     isInGameResultState,
+    isGamePaused,
     nativeCurrencySymbol,
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
@@ -69,17 +71,27 @@ export function DiceGame({
 
   return (
     <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header title="Dice" connectWalletButton={<GameConnectWallet />} />
+      <GameFrame.Header
+        title="Dice"
+        connectWalletButton={<GameConnectWallet />}
+      />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={Dice.getWinChancePercent(selectedNumber)}
           rngFee={formattedVrfFees}
-          targetPayout={formatRawAmount(targetPayoutAmount, token.decimals, FORMAT_TYPE.PRECISE)}
+          targetPayout={formatRawAmount(
+            targetPayoutAmount,
+            token.decimals,
+            FORMAT_TYPE.PRECISE,
+          )}
           gasPrice={gasPrice}
           tokenDecimals={token.decimals}
           nativeCurrencySymbol={nativeCurrencySymbol}
         />
-        <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
+        <GameFrame.HistoryButton
+          historyData={gameHistory}
+          onHistoryOpen={refreshHistory}
+        />
         <GameFrame.GameControls>
           <DiceGameControls
             selectedNumber={selectedNumber}
@@ -95,6 +107,9 @@ export function DiceGame({
         />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.DICE}
+        betCount={1}
+        grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
         token={token}
@@ -104,6 +119,7 @@ export function DiceGame({
         onBetAmountChange={handleBetAmountChange}
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
+        isGamePaused={isGamePaused}
       />
     </GameFrame>
   )

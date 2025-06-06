@@ -1,4 +1,5 @@
 import {
+  CASINO_GAME_TYPE,
   COINTOSS_FACE,
   DiceNumber,
   chainByKey,
@@ -150,6 +151,9 @@ export const CoinTossWalletNotConnected: Story = {
         </GameFrame.GameControls>
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.COINTOSS}
+        betCount={1}
+        grossMultiplier={20000}
         balance={1123456n * 10n ** 12n}
         isConnected={false}
         token={MOCK_TOKEN}
@@ -159,6 +163,7 @@ export const CoinTossWalletNotConnected: Story = {
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
+        isGamePaused={false}
       />
     </GameFrame>
   ),
@@ -187,6 +192,9 @@ export const CoinTossWalletConnected: Story = {
         </GameFrame.GameControls>
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.COINTOSS}
+        betCount={1}
+        grossMultiplier={20000}
         balance={1123456n * 10n ** 12n}
         isConnected={true}
         token={MOCK_TOKEN}
@@ -196,6 +204,7 @@ export const CoinTossWalletConnected: Story = {
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
+        isGamePaused={false}
       />
     </GameFrame>
   ),
@@ -224,6 +233,9 @@ export const CoinTossPlacingBet: Story = {
         </GameFrame.GameControls>
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.COINTOSS}
+        betCount={1}
+        grossMultiplier={20000}
         balance={1123456n * 10n ** 12n}
         isConnected={true}
         token={MOCK_TOKEN}
@@ -233,6 +245,7 @@ export const CoinTossPlacingBet: Story = {
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
+        isGamePaused={false}
       />
     </GameFrame>
   ),
@@ -271,6 +284,9 @@ export const CoinTossWin: Story = {
         />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.COINTOSS}
+        betCount={1}
+        grossMultiplier={20000}
         balance={1123456n * 10n ** 12n}
         isConnected={true}
         token={MOCK_TOKEN}
@@ -280,6 +296,7 @@ export const CoinTossWin: Story = {
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
+        isGamePaused={false}
       />
     </GameFrame>
   ),
@@ -318,6 +335,9 @@ export const CoinTossLoss: Story = {
         />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.COINTOSS}
+        betCount={1}
+        grossMultiplier={20000}
         balance={1123456n * 10n ** 12n}
         isConnected={true}
         token={MOCK_TOKEN}
@@ -327,6 +347,7 @@ export const CoinTossLoss: Story = {
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
+        isGamePaused={false}
       />
     </GameFrame>
   ),
@@ -355,6 +376,9 @@ export const DiceWalletNotConnected: Story = {
         </GameFrame.GameControls>
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.DICE}
+        betCount={1}
+        grossMultiplier={20000}
         balance={1123456n * 10n ** 12n}
         isConnected={false}
         token={MOCK_TOKEN}
@@ -364,6 +388,7 @@ export const DiceWalletNotConnected: Story = {
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
+        isGamePaused={false}
       />
     </GameFrame>
   ),
@@ -392,6 +417,9 @@ export const DiceWalletConnected: Story = {
         </GameFrame.GameControls>
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.DICE}
+        betCount={1}
+        grossMultiplier={20000}
         balance={1123456n * 10n ** 12n}
         isConnected={true}
         token={MOCK_TOKEN}
@@ -401,6 +429,7 @@ export const DiceWalletConnected: Story = {
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
+        isGamePaused={false}
       />
     </GameFrame>
   ),
@@ -429,6 +458,9 @@ export const DicePlacingBet: Story = {
         </GameFrame.GameControls>
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.DICE}
+        betCount={1}
+        grossMultiplier={20000}
         balance={1123456n * 10n ** 12n}
         isConnected={true}
         token={MOCK_TOKEN}
@@ -438,6 +470,7 @@ export const DicePlacingBet: Story = {
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
+        isGamePaused={false}
       />
     </GameFrame>
   ),
@@ -476,6 +509,9 @@ export const DiceWin: Story = {
         />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.DICE}
+        betCount={1}
+        grossMultiplier={20000}
         balance={1123456n * 10n ** 12n}
         isConnected={true}
         token={MOCK_TOKEN}
@@ -485,6 +521,7 @@ export const DiceWin: Story = {
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
+        isGamePaused={false}
       />
     </GameFrame>
   ),
@@ -523,6 +560,9 @@ export const DiceLoss: Story = {
         />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.DICE}
+        betCount={1}
+        grossMultiplier={20000}
         balance={1123456n * 10n ** 12n}
         isConnected={true}
         token={MOCK_TOKEN}
@@ -532,6 +572,7 @@ export const DiceLoss: Story = {
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
+        isGamePaused={false}
       />
     </GameFrame>
   ),

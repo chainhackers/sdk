@@ -15,6 +15,7 @@ import { useGameCalculations } from "./useGameCalculations"
 import { HistoryEntry, useGameHistory } from "./useGameHistory"
 import { useHouseEdge } from "./useHouseEdge"
 import { usePlaceBet } from "./usePlaceBet"
+import { useIsGamePaused } from "./useIsGamePaused"
 
 type GameSelection = COINTOSS_FACE | DiceNumber
 
@@ -45,7 +46,9 @@ interface UseGameLogicResult<T extends GameSelection> {
   gasPrice: string
   targetPayoutAmount: bigint
   multiplier: number
+  grossMultiplier: number // BP
   isInGameResultState: boolean
+  isGamePaused: boolean
   nativeCurrencySymbol: string
   themeSettings: {
     theme: "light" | "dark" | "system"
@@ -76,6 +79,9 @@ export function useGameLogic<T extends GameSelection>({
     game: gameType,
     token,
   })
+  const {isPaused: isGamePaused} = useIsGamePaused({
+    game: gameType,
+  })
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
   const [selection, setSelection] = useState<T>(defaultSelection)
@@ -83,7 +89,7 @@ export function useGameLogic<T extends GameSelection>({
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
     usePlaceBet(gameType, refetchBalance)
 
-  const { targetPayoutAmount, multiplier } = useGameCalculations({
+  const { targetPayoutAmount, multiplier, grossMultiplier } = useGameCalculations({
     gameType,
     selection,
     houseEdge,
@@ -137,7 +143,9 @@ export function useGameLogic<T extends GameSelection>({
     gasPrice: formatGwei(gasPrice),
     targetPayoutAmount,
     multiplier,
+    grossMultiplier,
     isInGameResultState,
+    isGamePaused,
     nativeCurrencySymbol,
     themeSettings,
     handlePlayButtonClick,
