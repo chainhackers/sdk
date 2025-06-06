@@ -36,6 +36,17 @@ function getAdjustedPercentage(
   return basePercentage
 }
 
+interface SliderProps {
+  className?: string
+  defaultValue?: number[]
+  value?: number[]
+  min?: number
+  max?: number
+  onValueChange?: (value: number[]) => void
+  disabled?: boolean
+  step?: number
+}
+
 function Slider({
   className,
   defaultValue,
@@ -44,14 +55,15 @@ function Slider({
   max = 100,
   onValueChange,
   disabled,
+  step,
   ...props
-}: React.ComponentProps<typeof SliderPrimitive.Root>) {
+}: SliderProps) {
   const getInitialValues = (): number[] => {
     if (value !== undefined) {
-      return Array.isArray(value) ? value : [value]
+      return value
     }
     if (defaultValue !== undefined) {
-      return Array.isArray(defaultValue) ? defaultValue : [defaultValue]
+      return defaultValue
     }
     return [min]
   }
@@ -63,13 +75,11 @@ function Slider({
 
   React.useEffect(() => {
     if (value !== undefined) {
-      const newPropValues = Array.isArray(value) ? value : [value]
-
       if (
-        newPropValues.length !== internalValues.length ||
-        newPropValues.some((v, i) => v !== internalValues[i])
+        value.length !== internalValues.length ||
+        value.some((v, i) => v !== internalValues[i])
       ) {
-        setInternalValues(newPropValues)
+        setInternalValues(value)
       }
     }
   }, [value, internalValues])
@@ -92,6 +102,7 @@ function Slider({
         value={value}
         min={min}
         max={max}
+        step={step}
         disabled={disabled}
         onValueChange={handleValueChange}
         onPointerDown={() => setIsDragging(true)}
