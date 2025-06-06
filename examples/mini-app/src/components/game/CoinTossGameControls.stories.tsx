@@ -29,10 +29,10 @@ const meta = {
       },
     },
     multiplier: {
-      control: { type: "text" },
+      control: { type: "number", min: 1, max: 10, step: 0.01 },
       description: "The multiplier value displayed above the coin",
       table: {
-        type: { summary: "string" },
+        type: { summary: "number" },
         defaultValue: { summary: "1.94" },
       },
     },
@@ -60,11 +60,11 @@ type Story = StoryObj<typeof meta> & {
 
 function InteractiveCoinTossGameControls({
   initialSelectedSide = COINTOSS_FACE.HEADS,
-  multiplier = "1.94",
+  multiplier = 1.94,
   isDisabled = false,
 }: {
   initialSelectedSide?: COINTOSS_FACE
-  multiplier?: string
+  multiplier?: number
   isDisabled?: boolean
 }) {
   const [selectedSide, setSelectedSide] = useState(initialSelectedSide)
@@ -89,11 +89,11 @@ function InteractiveCoinTossGameControls({
 
 function StaticCoinTossGameControls({
   selectedSide = COINTOSS_FACE.HEADS,
-  multiplier = "1.94",
+  multiplier = 1.94,
   isDisabled = false,
 }: {
   selectedSide?: COINTOSS_FACE
-  multiplier?: string
+  multiplier?: number
   isDisabled?: boolean
 }) {
   return (

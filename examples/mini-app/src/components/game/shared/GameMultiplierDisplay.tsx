@@ -5,10 +5,7 @@ interface GameMultiplierDisplayProps {
   className?: string
 }
 
-export function GameMultiplierDisplay({
-  multiplier,
-  className,
-}: GameMultiplierDisplayProps) {
+export function GameMultiplierDisplay({ multiplier, className }: GameMultiplierDisplayProps) {
   const displayValue = multiplier.toFixed(2)
 
   return (

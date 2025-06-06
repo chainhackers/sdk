@@ -1,4 +1,9 @@
-import { COINTOSS_FACE, DiceNumber } from "@betswirl/sdk-core"
+import {
+  COINTOSS_FACE,
+  DiceNumber,
+  chainByKey,
+  chainNativeCurrencyToToken,
+} from "@betswirl/sdk-core"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
@@ -19,6 +24,8 @@ declare global {
 BigInt.prototype.toJSON = function () {
   return this.toString()
 }
+
+const MOCK_TOKEN = chainNativeCurrencyToToken(chainByKey.base.nativeCurrency)
 
 const meta = {
   title: "Game/GameFrame",
@@ -68,11 +75,11 @@ const mockHistoryData: HistoryEntry[] = [
 
 function InteractiveCoinTossControls({
   initialSelectedSide = COINTOSS_FACE.HEADS,
-  multiplier = "1.94",
+  multiplier = 1.94,
   isDisabled = false,
 }: {
   initialSelectedSide?: COINTOSS_FACE
-  multiplier?: string
+  multiplier?: number
   isDisabled?: boolean
 }) {
   const [selectedSide, setSelectedSide] = useState(initialSelectedSide)
@@ -145,9 +152,10 @@ export const CoinTossWalletNotConnected: Story = {
       <GameFrame.BettingSection
         balance={1123456n * 10n ** 12n}
         isConnected={false}
-        tokenDecimals={18}
+        token={MOCK_TOKEN}
         betStatus={null}
         betAmount={parseUnits("0.1234567", 18)}
+        vrfFees={parseUnits("0.0001", 18)}
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
@@ -181,9 +189,10 @@ export const CoinTossWalletConnected: Story = {
       <GameFrame.BettingSection
         balance={1123456n * 10n ** 12n}
         isConnected={true}
-        tokenDecimals={18}
+        token={MOCK_TOKEN}
         betStatus={null}
         betAmount={parseUnits("0.1234567", 18)}
+        vrfFees={parseUnits("0.0001", 18)}
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
@@ -217,9 +226,10 @@ export const CoinTossPlacingBet: Story = {
       <GameFrame.BettingSection
         balance={1123456n * 10n ** 12n}
         isConnected={true}
-        tokenDecimals={18}
+        token={MOCK_TOKEN}
         betStatus="pending"
         betAmount={parseUnits("0.1234567", 18)}
+        vrfFees={parseUnits("0.0001", 18)}
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
@@ -263,9 +273,10 @@ export const CoinTossWin: Story = {
       <GameFrame.BettingSection
         balance={1123456n * 10n ** 12n}
         isConnected={true}
-        tokenDecimals={18}
+        token={MOCK_TOKEN}
         betStatus="success"
         betAmount={parseUnits("0.1234567", 18)}
+        vrfFees={parseUnits("0.0001", 18)}
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
@@ -309,9 +320,10 @@ export const CoinTossLoss: Story = {
       <GameFrame.BettingSection
         balance={1123456n * 10n ** 12n}
         isConnected={true}
-        tokenDecimals={18}
+        token={MOCK_TOKEN}
         betStatus="success"
         betAmount={parseUnits("0.1234567", 18)}
+        vrfFees={parseUnits("0.0001", 18)}
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
@@ -345,9 +357,10 @@ export const DiceWalletNotConnected: Story = {
       <GameFrame.BettingSection
         balance={1123456n * 10n ** 12n}
         isConnected={false}
-        tokenDecimals={18}
+        token={MOCK_TOKEN}
         betStatus={null}
         betAmount={parseUnits("0.1234567", 18)}
+        vrfFees={parseUnits("0.0001", 18)}
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
@@ -381,9 +394,10 @@ export const DiceWalletConnected: Story = {
       <GameFrame.BettingSection
         balance={1123456n * 10n ** 12n}
         isConnected={true}
-        tokenDecimals={18}
+        token={MOCK_TOKEN}
         betStatus={null}
         betAmount={parseUnits("0.1234567", 18)}
+        vrfFees={parseUnits("0.0001", 18)}
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
@@ -417,9 +431,10 @@ export const DicePlacingBet: Story = {
       <GameFrame.BettingSection
         balance={1123456n * 10n ** 12n}
         isConnected={true}
-        tokenDecimals={18}
+        token={MOCK_TOKEN}
         betStatus="pending"
         betAmount={parseUnits("0.1234567", 18)}
+        vrfFees={parseUnits("0.0001", 18)}
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
@@ -463,9 +478,10 @@ export const DiceWin: Story = {
       <GameFrame.BettingSection
         balance={1123456n * 10n ** 12n}
         isConnected={true}
-        tokenDecimals={18}
+        token={MOCK_TOKEN}
         betStatus="success"
         betAmount={parseUnits("0.1234567", 18)}
+        vrfFees={parseUnits("0.0001", 18)}
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}
@@ -509,9 +525,10 @@ export const DiceLoss: Story = {
       <GameFrame.BettingSection
         balance={1123456n * 10n ** 12n}
         isConnected={true}
-        tokenDecimals={18}
+        token={MOCK_TOKEN}
         betStatus="success"
         betAmount={parseUnits("0.1234567", 18)}
+        vrfFees={parseUnits("0.0001", 18)}
         onBetAmountChange={(amount) => console.log("Bet amount:", amount)}
         onPlayBtnClick={() => console.log("Play clicked")}
         areChainsSynced={true}

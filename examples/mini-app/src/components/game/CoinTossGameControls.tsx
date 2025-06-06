@@ -16,8 +16,7 @@ export function CoinTossGameControls({
   multiplier,
   isDisabled,
 }: CoinTossGameControlsProps) {
-  const currentCoinIcon =
-    selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
+  const currentCoinIcon = selectedSide === COINTOSS_FACE.HEADS ? coinHeadsIcon : coinTailsIcon
 
   return (
     <>
@@ -27,9 +26,7 @@ export function CoinTossGameControls({
         size="coin"
         onClick={onCoinClick}
         disabled={isDisabled}
-        aria-label={`Select ${
-          selectedSide === COINTOSS_FACE.HEADS ? "Tails" : "Heads"
-        } side`}
+        aria-label={`Select ${selectedSide === COINTOSS_FACE.HEADS ? "Tails" : "Heads"} side`}
         className="absolute top-[62px] left-1/2 transform -translate-x-1/2 mt-2"
       >
         <img

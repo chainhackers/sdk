@@ -1,10 +1,4 @@
-import {
-  CASINO_GAME_TYPE,
-  COINTOSS_FACE,
-  CoinToss,
-  Dice,
-  DiceNumber,
-} from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, COINTOSS_FACE, CoinToss, Dice, DiceNumber } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import {
   GameCalculationParams,
@@ -66,10 +60,7 @@ export function useGameCalculations<T extends GameSelection>({
     [betAmount, gameCalculationParams],
   )
 
-  const multiplier = useMemo(
-    () => formatMultiplier(gameCalculationParams),
-    [gameCalculationParams],
-  )
+  const multiplier = useMemo(() => formatMultiplier(gameCalculationParams), [gameCalculationParams])
 
   return {
     gameCalculationParams,

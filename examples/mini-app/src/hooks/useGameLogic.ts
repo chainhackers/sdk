@@ -40,6 +40,7 @@ interface UseGameLogicResult<T extends GameSelection> {
   betStatus: BetStatus
   gameResult: GameResult | null
   resetBetState: () => void
+  vrfFees: bigint
   formattedVrfFees: number | string
   gasPrice: string
   targetPayoutAmount: bigint
@@ -79,14 +80,8 @@ export function useGameLogic<T extends GameSelection>({
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
   const [selection, setSelection] = useState<T>(defaultSelection)
 
-  const {
-    placeBet,
-    betStatus,
-    gameResult,
-    resetBetState,
-    formattedVrfFees,
-    gasPrice,
-  } = usePlaceBet(gameType, refetchBalance)
+  const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
+    usePlaceBet(gameType, refetchBalance)
 
   const { targetPayoutAmount, multiplier } = useGameCalculations({
     gameType,
@@ -137,6 +132,7 @@ export function useGameLogic<T extends GameSelection>({
     betStatus,
     gameResult,
     resetBetState,
+    vrfFees,
     formattedVrfFees,
     gasPrice: formatGwei(gasPrice),
     targetPayoutAmount,
