@@ -33,7 +33,6 @@ export function BettingPanel({
   onPlayBtnClick,
   areChainsSynced,
 }: BettingPanelProps) {
-  const [betAmountError, setBetAmountError] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState<string>("")
   const [isValidInput, setIsValidInput] = useState<boolean>(true)
   const [isUserTyping, setIsUserTyping] = useState<boolean>(false)
@@ -65,6 +64,7 @@ export function BettingPanel({
   }, [betAmount, token.decimals, isUserTyping])
 
   const isBetAmountValid = betAmount && betAmount > 0n
+  const isBetAmountExceedsBalance = betAmount && betAmount > balance
   const formattedBalance = formatRawAmount(balance, token.decimals)
 
   const isBetSuccees = betStatus === "success"
@@ -78,7 +78,11 @@ export function BettingPanel({
     betStatus === "internal-error"
 
   const canInitiateBet =
-    isConnected && areChainsSynced && isBetAmountValid && !isWaiting
+    isConnected &&
+    areChainsSynced &&
+    isBetAmountValid &&
+    !isBetAmountExceedsBalance &&
+    !isWaiting
 
   const isInputDisabled = !isConnected || isWaiting || isBetSuccees
 
@@ -99,15 +103,13 @@ export function BettingPanel({
     playButtonText = "Connect Wallet"
   } else if (!areChainsSynced) {
     playButtonText = "Switch chain"
+  } else if (isBetAmountExceedsBalance) {
+    playButtonText = "Insufficient balance"
   } else {
     playButtonText = "Place Bet"
   }
 
   const handlePlayBtnClick = () => {
-    if (isBetSuccees) {
-      onBetAmountChange(undefined)
-      setInputValue("")
-    }
     onPlayBtnClick()
   }
 
@@ -153,7 +155,6 @@ export function BettingPanel({
     if (newInputValue === "") {
       onBetAmountChange(undefined)
       setIsValidInput(true)
-      setBetAmountError(null)
       return
     }
 
@@ -164,14 +165,11 @@ export function BettingPanel({
         const weiValue = parseUnits(newInputValue, token.decimals)
         onBetAmountChange(weiValue)
         setIsValidInput(true)
-        setBetAmountError(null)
       } catch {
         setIsValidInput(false)
-        setBetAmountError(null)
       }
     } catch {
       setIsValidInput(false)
-      setBetAmountError(null)
     }
   }
 
@@ -209,9 +207,6 @@ export function BettingPanel({
           }}
           disabled={isInputDisabled}
         />
-        {betAmountError && (
-          <div className="text-red-500 text-xs mt-1">{betAmountError}</div>
-        )}
 
         <div className="grid grid-cols-3 gap-2">
           <Button
