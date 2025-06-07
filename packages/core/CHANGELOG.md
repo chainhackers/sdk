@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.5
+
+### Patch Changes
+
+- Add getPayoutDetails
+
 ## 0.1.4
 
 ### Patch Changes
