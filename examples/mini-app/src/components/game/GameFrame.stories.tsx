@@ -40,6 +40,9 @@ const meta = {
         { name: "dark", value: "oklch(0.15 0 0)" },
       ],
     },
+    loki: {
+      skip: true,
+    },
   },
   tags: ["autodocs"],
 } satisfies Meta<typeof GameFrame>
