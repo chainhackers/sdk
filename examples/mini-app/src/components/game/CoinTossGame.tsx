@@ -37,7 +37,7 @@ export function CoinTossGame({
     formattedVrfFees,
     gasPrice,
     targetPayoutAmount,
-    multiplier,
+    formattedNetMultiplier,
     grossMultiplier,
     isInGameResultState,
     isGamePaused,
@@ -88,7 +88,7 @@ export function CoinTossGame({
           <CoinTossGameControls
             selectedSide={selectedSide}
             onCoinClick={handleCoinClick}
-            multiplier={multiplier}
+            multiplier={formattedNetMultiplier}
             isDisabled={isControlsDisabled}
           />
         </GameFrame.GameControls>

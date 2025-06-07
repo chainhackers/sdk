@@ -11,11 +11,11 @@ import { formatGwei } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { BetStatus, GameResult } from "../types"
-import { useGameCalculations } from "./useGameCalculations"
 import { HistoryEntry, useGameHistory } from "./useGameHistory"
 import { useHouseEdge } from "./useHouseEdge"
 import { useIsGamePaused } from "./useIsGamePaused"
 import { usePlaceBet } from "./usePlaceBet"
+import { useBetCalculations } from "./useBetCalculations"
 
 type GameSelection = COINTOSS_FACE | DiceNumber
 
@@ -45,7 +45,7 @@ interface UseGameLogicResult<T extends GameSelection> {
   formattedVrfFees: number | string
   gasPrice: string
   targetPayoutAmount: bigint
-  multiplier: number
+  formattedNetMultiplier: number
   grossMultiplier: number // BP
   isInGameResultState: boolean
   isGamePaused: boolean
@@ -110,11 +110,12 @@ export function useGameLogic<T extends GameSelection>({
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
     usePlaceBet(gameType, refetchBalance)
 
-  const { targetPayoutAmount, multiplier, grossMultiplier } = useGameCalculations({
+  const { netPayout, formattedNetMultiplier, grossMultiplier } = useBetCalculations({
     gameType,
     selection,
     houseEdge,
     betAmount,
+    betCount: 1, // TODO #64: Use the real bet count
   })
 
   const isInGameResultState = !!gameResult
@@ -162,8 +163,8 @@ export function useGameLogic<T extends GameSelection>({
     vrfFees,
     formattedVrfFees,
     gasPrice: formatGwei(gasPrice),
-    targetPayoutAmount,
-    multiplier,
+    targetPayoutAmount: netPayout,
+    formattedNetMultiplier: formattedNetMultiplier,
     grossMultiplier,
     isInGameResultState,
     isGamePaused,
