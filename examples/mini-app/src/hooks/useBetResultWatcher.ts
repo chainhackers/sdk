@@ -81,6 +81,24 @@ function _decodeRolled(rolled: boolean[] | DiceNumber, game: CASINO_GAME_TYPE): 
   }
 }
 
+/**
+ * Watches for bet result events from casino contracts.
+ * Uses primary event subscription with automatic fallback to polling if filters fail.
+ *
+ * @param watchParams - Contract address, event details, and bet ID to watch
+ * @param publicClient - Viem public client for blockchain interactions
+ * @param enabled - Whether the watcher should be active
+ * @returns Game result data, watcher status, error state, and reset function
+ *
+ * @example
+ * ```ts
+ * const { gameResult, status } = useBetResultWatcher({
+ *   watchParams: { contractAddress, betId, gameType, eventAbi, eventName },
+ *   publicClient,
+ *   enabled: betStatus === 'awaiting_result'
+ * })
+ * ```
+ */
 export function useBetResultWatcher({
   watchParams,
   publicClient,

@@ -64,6 +64,27 @@ interface UseGameLogicResult<T extends GameSelection> {
   placeBet: (betAmount: bigint, choice: T) => void
 }
 
+/**
+ * Centralizes casino game logic including bet placement, result tracking, and UI state.
+ * Manages the complete game flow from selection to payout calculation.
+ *
+ * @param gameType - Type of casino game (coin toss or dice)
+ * @param defaultSelection - Initial game selection
+ * @param backgroundImage - Game background image URL
+ * @returns Complete game state and control functions
+ *
+ * @example
+ * ```ts
+ * const gameLogic = useGameLogic({
+ *   gameType: CASINO_GAME_TYPE.DICE,
+ *   defaultSelection: 1,
+ *   backgroundImage: '/assets/dice-bg.png'
+ * })
+ *
+ * // Place bet when ready
+ * gameLogic.handlePlayButtonClick()
+ * ```
+ */
 export function useGameLogic<T extends GameSelection>({
   gameType,
   defaultSelection,

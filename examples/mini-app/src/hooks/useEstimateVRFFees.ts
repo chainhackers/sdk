@@ -18,6 +18,25 @@ type UseEstimateVRFFeesProps = {
   token: Token
   betCount: number
 }
+
+/**
+ * Estimates Chainlink VRF fees for random number generation.
+ * VRF ensures provably fair randomness in gambling applications.
+ *
+ * @param props.game - Type of casino game
+ * @param props.token - Token used for betting
+ * @param props.betCount - Number of bets (affects gas consumption)
+ * @returns VRF fee estimates with buffer, gas price, and formatted values
+ *
+ * @example
+ * ```ts
+ * const { vrfFees, formattedVrfFees } = useEstimateVRFFees({
+ *   game: CASINO_GAME_TYPE.DICE,
+ *   token: ethToken,
+ *   betCount: 1
+ * })
+ * ```
+ */
 export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
   const { appChainId } = useChain()
   const { data: gasPriceData } = useGasPrice({

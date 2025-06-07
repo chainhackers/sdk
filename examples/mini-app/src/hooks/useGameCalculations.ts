@@ -36,6 +36,26 @@ function getMultiplierForGame<T extends GameSelection>(
   }
 }
 
+/**
+ * Calculates payout amounts and multipliers for casino games.
+ * House edge represents the mathematical advantage the casino has over players.
+ *
+ * @param gameType - Type of casino game being played
+ * @param selection - Player's choice (coin face or dice number)
+ * @param houseEdge - Casino's edge in basis points (e.g., 100 = 1%)
+ * @param betAmount - Amount wagered by the player
+ * @returns Payout calculations including multipliers and target payout
+ *
+ * @example
+ * ```ts
+ * const { targetPayoutAmount, multiplier } = useGameCalculations({
+ *   gameType: CASINO_GAME_TYPE.COINTOSS,
+ *   selection: COINTOSS_FACE.HEADS,
+ *   houseEdge: 100, // 1% house edge
+ *   betAmount: parseEther('1')
+ * })
+ * ```
+ */
 export function useGameCalculations<T extends GameSelection>({
   gameType,
   selection,

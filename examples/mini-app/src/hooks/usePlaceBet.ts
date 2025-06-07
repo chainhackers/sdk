@@ -44,6 +44,30 @@ function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncod
   }
 }
 
+/**
+ * Handles the complete bet placement flow from transaction to result.
+ * Manages transaction submission, VRF fee estimation, and result monitoring.
+ *
+ * @param game - Type of casino game being played
+ * @param refetchBalance - Callback to refresh user balance after bet
+ * @returns Bet placement functions and state including status, VRF fees, and results
+ *
+ * @example
+ * ```ts
+ * const { placeBet, betStatus, gameResult } = usePlaceBet(
+ *   CASINO_GAME_TYPE.DICE,
+ *   refetchBalance
+ * )
+ *
+ * // Place a bet
+ * await placeBet(parseEther('0.1'), 3) // Bet 0.1 ETH on dice number 3
+ *
+ * // Monitor status: pending -> loading -> rolling -> success
+ * if (betStatus === 'success') {
+ *   console.log('You', gameResult.isWin ? 'won' : 'lost')
+ * }
+ * ```
+ */
 export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void) {
   const { appChainId } = useChain()
   const publicClient = usePublicClient({ chainId: appChainId })

@@ -27,6 +27,23 @@ const defaultGasPriceResult: GetGasPriceResult = {
   optimalGasPrice: 0n,
 }
 
+/**
+ * Fetches current gas prices with network-specific optimizations.
+ * Applies buffers to ensure transactions succeed during price fluctuations.
+ *
+ * @param props.query - Optional query settings (refetchInterval, enabled, etc.)
+ * @returns Gas prices in wei for different speeds and recommended optimal price
+ * @returns data.detailedGasPrices - Gas prices for normal (5% buffer), fast (20% buffer), instant (50% buffer)
+ * @returns data.optimalGasPrice - Best gas price for current network (fast for Polygon/Avalanche, normal for others)
+ *
+ * @example
+ * ```ts
+ * const { data: gasPriceData } = useGasPrice({
+ *   query: { refetchInterval: 10000 } // Refresh every 10 seconds
+ * })
+ * console.log('Optimal gas price:', gasPriceData.optimalGasPrice)
+ * ```
+ */
 export function useGasPrice(props: UseGasPriceProps = {}) {
   const config = useConfig()
   const { query = {} } = props
