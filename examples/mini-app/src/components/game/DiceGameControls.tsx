@@ -21,7 +21,7 @@ export function DiceGameControls({
     <>
       <GameMultiplierDisplay multiplier={multiplier} />
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-2 w-full max-w-md flex flex-col items-center">
-        <div className="bg-white/80 rounded-md p-2 h-[40px] w-[188px] flex items-center">
+        <div className="bg-dice-slider-box rounded-md p-2 h-[40px] w-[188px] flex items-center">
           <Slider
             value={[selectedNumber]}
             onValueChange={handleSliderChange}
