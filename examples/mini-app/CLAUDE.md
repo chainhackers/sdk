@@ -232,11 +232,11 @@ export function CustomGamePage() {
         <OnchainKitProvider chain={base}>
           <BetSwirlSDKProvider initialChainId={8453} affiliate="0x0">
             <CoinTossGame
-              theme="dark"
+              theme="dark" // Options: "light" | "dark" | "system"
               customTheme={{
-                "--primary": "#ff6b35",
-                "--play-btn-font": "#ffffff",
-                "--game-window-overlay": "rgba(0,0,0,0.8)"
+                "--primary": "#ff6b35",           // Primary color for buttons and accents
+                "--play-btn-font": "#ffffff",     // Play button text color
+                "--game-window-overlay": "rgba(0,0,0,0.8)" // Game overlay background
               }}
               backgroundImage="/my-custom-background.png"
             />
@@ -247,6 +247,14 @@ export function CustomGamePage() {
   )
 }
 ```
+
+#### Theme Configuration Options
+- **`theme`**: `"light"` | `"dark"` | `"system"` (follows device preference)
+- **`customTheme`**: CSS custom properties object for styling:
+  - `"--primary"` - Main color for buttons and highlights
+  - `"--play-btn-font"` - Text color for play buttons
+  - `"--game-window-overlay"` - Background overlay for game windows
+- **`backgroundImage`**: Custom background image URL
 
 ### Current Limitations & Next Steps
 
