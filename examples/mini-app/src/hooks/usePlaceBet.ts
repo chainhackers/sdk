@@ -3,37 +3,123 @@ import {
   COINTOSS_FACE,
   CasinoChainId,
   CoinToss,
+  Dice,
   GenericCasinoBetParams,
-  getChainlinkVrfCostFunctionData,
+  MAX_SELECTABLE_DICE_NUMBER,
+  MIN_SELECTABLE_DICE_NUMBER,
+  casinoChainById,
+  chainById,
+  chainNativeCurrencyToToken,
   getPlaceBetEventData,
   getPlaceBetFunctionData,
   getRollEventData,
 } from "@betswirl/sdk-core"
-import { useOnchainKit } from "@coinbase/onchainkit"
-import { useCallback, useEffect, useState } from "react"
-import { Hex, decodeEventLog, zeroAddress } from "viem"
-import { useAccount, usePublicClient, useWriteContract } from "wagmi"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { Hex, decodeEventLog } from "viem"
+import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
+import { useChain } from "../context/chainContext"
 import { createLogger } from "../lib/logger"
-import type { GameResult, WatchTarget } from "./types"
+import { BetStatus, GameChoice, GameEncodedInput, GameResult } from "../types"
+import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
+import { useEstimateVRFFees } from "./useEstimateVRFFees"
 
 const logger = createLogger("usePlaceBet")
 
-interface SubmitBetResult {
-  txHash: Hex
-  contractAddress: Hex
+function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncodedInput {
+  switch (game) {
+    case CASINO_GAME_TYPE.COINTOSS:
+      return CoinToss.encodeInput(choice as COINTOSS_FACE)
+    case CASINO_GAME_TYPE.DICE: {
+      const choiceNum = Number(choice)
+      if (choiceNum < MIN_SELECTABLE_DICE_NUMBER || choiceNum > MAX_SELECTABLE_DICE_NUMBER) {
+        throw new Error(
+          `Invalid dice number: ${choiceNum}. Must be between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER}`,
+        )
+      }
+      return Dice.encodeInput(choice)
+    }
+    default:
+      throw new Error(`Unsupported game type for encoding input: ${game}`)
+  }
 }
 
-export function usePlaceBet() {
-  const { chain } = useOnchainKit()
-  const chainId = chain?.id as CasinoChainId | undefined
-  const publicClient = usePublicClient({ chainId })
+/**
+ * Handles the complete bet placement flow from transaction to result.
+ * Manages transaction submission, VRF fee estimation, and result monitoring.
+ *
+ * @param game - Type of casino game being played
+ * @param refetchBalance - Callback to refresh user balance after bet
+ * @returns Bet placement functions and state including status, VRF fees, and results
+ *
+ * @example
+ * ```ts
+ * const { placeBet, betStatus, gameResult } = usePlaceBet(
+ *   CASINO_GAME_TYPE.DICE,
+ *   refetchBalance
+ * )
+ *
+ * // Place a bet
+ * await placeBet(parseEther('0.1'), 3) // Bet 0.1 ETH on dice number 3
+ *
+ * // Monitor status: pending -> loading -> rolling -> success
+ * if (betStatus === 'success') {
+ *   console.log('You', gameResult.isWin ? 'won' : 'lost')
+ * }
+ * ```
+ */
+export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void) {
+  const { appChainId } = useChain()
+  const publicClient = usePublicClient({ chainId: appChainId })
   const { address: connectedAddress } = useAccount()
-  const { writeContractAsync, reset: resetWagmiWriteContract } = useWriteContract()
+  const wagerWriteHook = useWriteContract()
 
-  const [betStatus, setBetStatus] = useState<"pending" | "success" | "error" | null>(null)
+  const wagerWaitingHook = useWaitForTransactionReceipt({
+    hash: wagerWriteHook.data,
+    chainId: appChainId,
+  })
+  const {
+    vrfFees,
+    wagmiHook: estimateVrfFeesWagmiHook,
+    formattedVrfFees,
+    gasPrice,
+  } = useEstimateVRFFees({
+    game,
+    token: chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency), // TODO make this token dynamic when the token list is integrated
+    betCount: 1, // TODO make this number dynamic when multi betting is integrated
+  })
   const [gameResult, setGameResult] = useState<GameResult | null>(null)
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
+  const [isRolling, setIsRolling] = useState(false)
+  // @Kinco advice. The goal is to never have an internal error. In the main frontend, it never happens due to retry system, etc (or maybe 1/100000)
+  const [internalError, setInternalError] = useState<string | null>(null)
+
+  const betStatus: BetStatus = useMemo(() => {
+    if (internalError) return "internal-error"
+    if (wagerWriteHook.error) return "error"
+    if (wagerWaitingHook.error) return "waiting-error"
+    if (wagerWriteHook.isPending) return "pending"
+    if (wagerWaitingHook.isLoading) return "loading"
+    if (isRolling) return "rolling"
+    if (gameResult) return "success"
+    return null
+  }, [
+    internalError,
+    wagerWriteHook.error,
+    wagerWaitingHook.error,
+    wagerWriteHook.isPending,
+    wagerWaitingHook.isLoading,
+    isRolling,
+    gameResult,
+  ])
+
+  const isWaiting = useMemo(() => {
+    return wagerWaitingHook.isLoading || wagerWaitingHook.isPending || isRolling
+  }, [wagerWaitingHook.isLoading, wagerWaitingHook.isPending, isRolling])
+
+  const isError = useMemo(() => {
+    return wagerWriteHook.error || wagerWaitingHook.error || internalError
+  }, [wagerWriteHook.error, wagerWaitingHook.error, internalError])
 
   const {
     gameResult: watcherGameResult,
@@ -48,58 +134,93 @@ export function usePlaceBet() {
   useEffect(() => {
     if (watcherStatus === "success" && watcherGameResult) {
       setGameResult(watcherGameResult)
-      setBetStatus("success")
+      setIsRolling(false)
       logger.debug("watcher: Bet resolved: SUCCESS", {
         gameResult: watcherGameResult,
       })
+
+      refetchBalance()
     } else if (watcherStatus === "error") {
-      setBetStatus("error")
+      setInternalError("watcher error")
       logger.debug("watcher: Bet resolved: ERROR from watcher")
     }
-  }, [watcherStatus, watcherGameResult])
+  }, [watcherStatus, watcherGameResult, refetchBalance])
+
+  const resetBetState = useCallback(() => {
+    wagerWriteHook.reset()
+    setGameResult(null)
+    setWatchTarget(null)
+    resetWatcher()
+  }, [resetWatcher, wagerWriteHook.reset])
 
   const placeBet = useCallback(
-    async (betAmount: bigint, choice: COINTOSS_FACE) => {
-      try {
-        resetWagmiWriteContract()
-        setGameResult(null)
-        setWatchTarget(null)
-        resetWatcher()
+    async (betAmount: bigint, choice: GameChoice) => {
+      resetBetState()
 
-        const betParams = {
-          game: CASINO_GAME_TYPE.COINTOSS,
-          gameEncodedInput: CoinToss.encodeInput(choice),
-          betAmount,
-        }
+      const betParams = {
+        game,
+        gameEncodedInput: _encodeGameInput(choice, game),
+        betAmount,
+      }
 
-        if (!publicClient || !chainId || !connectedAddress || !writeContractAsync) {
-          logger.error("placeBet: Wagmi/OnchainKit clients or address are not initialized.")
-          setBetStatus("error")
-          return
-        }
-        logger.debug("placeBet: Starting bet process:", {
-          betParams,
-          connectedAddress,
-        })
-        setBetStatus("pending")
+      if (!publicClient || !appChainId || !connectedAddress || !wagerWriteHook.writeContract) {
+        logger.error("placeBet: Wagmi/OnchainKit clients or address are not initialized.")
+        setInternalError("clients or address are not initialized")
+        return
+      }
+      logger.debug("placeBet: Starting bet process:", {
+        betParams,
+        connectedAddress,
+      })
 
-        const vrfCost = await _fetchVrfCost(betParams.game, chainId, publicClient)
+      await estimateVrfFeesWagmiHook.refetch()
 
-        const submitResult = await _submitBetTransaction(
-          betParams,
-          connectedAddress,
-          vrfCost,
-          chainId,
-          writeContractAsync,
-        )
-        const { txHash, contractAddress } = submitResult
+      logger.debug("placeBet: VRF cost refetched:", formattedVrfFees)
 
+      _submitBetTransaction(
+        betParams,
+        connectedAddress,
+        vrfFees,
+        gasPrice,
+        appChainId,
+        wagerWriteHook.writeContract,
+      )
+    },
+    [
+      game,
+      resetBetState,
+      publicClient,
+      appChainId,
+      connectedAddress,
+      wagerWriteHook.writeContract,
+      estimateVrfFeesWagmiHook.refetch,
+      formattedVrfFees,
+      vrfFees,
+      gasPrice,
+    ],
+  )
+
+  useEffect(() => {
+    if (wagerWriteHook.error) {
+      logger.debug("_usePlaceBet: An error occured:", wagerWriteHook.error)
+    }
+  }, [wagerWriteHook.error])
+
+  useEffect(() => {
+    if (wagerWaitingHook.error) {
+      logger.debug("_usePlaceBet: An error occured:", wagerWaitingHook.error)
+    }
+  }, [wagerWaitingHook.error])
+
+  useEffect(() => {
+    if (wagerWaitingHook.isSuccess) {
+      setIsRolling(true)
+      const waitRoll = async () => {
         const betId = await _extractBetIdFromReceipt(
-          txHash,
-          contractAddress,
-          betParams.game,
-          chainId,
-          connectedAddress,
+          wagerWriteHook.data!,
+          game,
+          appChainId,
+          connectedAddress!,
           publicClient,
         )
 
@@ -107,92 +228,72 @@ export function usePlaceBet() {
           logger.error(
             "placeBet: Bet ID was not extracted. Roll event listener will not be started.",
           )
-          setBetStatus("error")
+          setInternalError("bet id not found")
           return
         }
 
-        const { data: rollEventData } = getRollEventData(betParams.game, chainId, betId)
+        const { data: rollEventData } = getRollEventData(game, appChainId, betId)
         logger.debug("placeBet: Setting up Roll event listener...")
         setWatchTarget({
           betId,
-          contractAddress,
-          gameType: betParams.game,
+          contractAddress: casinoChainById[appChainId].contracts.games[game]!.address,
+          gameType: game,
           eventAbi: rollEventData.abi,
           eventName: rollEventData.eventName,
           eventArgs: rollEventData.args,
         })
-      } catch (error) {
-        logger.error("placeBet: Error placing bet:", error)
-        setBetStatus("error")
+
+        refetchBalance()
       }
-    },
-    [
-      publicClient,
-      chainId,
-      connectedAddress,
-      writeContractAsync,
-      resetWagmiWriteContract,
-      resetWatcher,
-    ],
-  )
+      waitRoll()
+    }
+  }, [
+    wagerWaitingHook.isSuccess,
+    wagerWriteHook.data,
+    game,
+    appChainId,
+    connectedAddress,
+    publicClient,
+    refetchBalance,
+  ])
 
-  const resetBetState = useCallback(() => {
-    setBetStatus(null)
-    setGameResult(null)
-    setWatchTarget(null)
-    resetWatcher()
-  }, [resetWatcher])
-
-  return { placeBet, betStatus, gameResult, resetBetState }
-}
-
-async function _fetchVrfCost(
-  gameType: CASINO_GAME_TYPE,
-  chainId: CasinoChainId,
-  publicClient: ReturnType<typeof usePublicClient>,
-): Promise<bigint> {
-  if (!publicClient) {
-    logger.error("_fetchVrfCost: publicClient is undefined")
-    throw new Error("publicClient is undefined")
+  return {
+    placeBet,
+    betStatus,
+    isWaiting,
+    isError,
+    gameResult,
+    resetBetState,
+    vrfFees,
+    gasPrice,
+    formattedVrfFees,
   }
-  logger.debug("_fetchVrfCost: Getting VRF cost...")
-  const vrfCostFunctionData = getChainlinkVrfCostFunctionData(gameType, zeroAddress, 1, chainId)
-  const vrfCost = (await publicClient.readContract({
-    address: vrfCostFunctionData.data.to,
-    abi: vrfCostFunctionData.data.abi,
-    functionName: vrfCostFunctionData.data.functionName,
-    args: vrfCostFunctionData.data.args,
-  })) as bigint
-  logger.debug("_fetchVrfCost: VRF cost received:", vrfCost?.toString())
-  return vrfCost
 }
 
 async function _submitBetTransaction(
   betParams: GenericCasinoBetParams,
   receiver: Hex,
   vrfCost: bigint,
+  gasPrice: bigint,
   chainId: CasinoChainId,
-  writeContractAsync: ReturnType<typeof useWriteContract>["writeContractAsync"],
-): Promise<SubmitBetResult> {
+  wagerWriteHook: ReturnType<typeof useWriteContract>["writeContract"],
+) {
   logger.debug("_submitBetTransaction: Preparing and sending transaction...")
   const placeBetTxData = getPlaceBetFunctionData({ ...betParams, receiver }, chainId)
-  const txHash = await writeContractAsync({
+  wagerWriteHook({
     abi: placeBetTxData.data.abi,
     address: placeBetTxData.data.to,
     functionName: placeBetTxData.data.functionName,
     args: placeBetTxData.data.args,
     value: placeBetTxData.extraData.getValue(betParams.betAmount + vrfCost),
+    gasPrice,
+    chainId,
   })
-  logger.debug("_submitBetTransaction: Transaction sent, hash:", txHash)
-  return {
-    txHash,
-    contractAddress: placeBetTxData.data.to,
-  }
 }
 
+// @Kinco advice. Create a retry system
 async function _extractBetIdFromReceipt(
   txHash: Hex,
-  expectedContractAddress: Hex,
   gameType: CASINO_GAME_TYPE,
   chainId: CasinoChainId,
   receiver: Hex,
@@ -209,7 +310,11 @@ async function _extractBetIdFromReceipt(
   const { data: placeBetEventData } = getPlaceBetEventData(gameType, chainId, receiver)
 
   for (const log of receipt.logs) {
-    if (log.address.toLowerCase() !== expectedContractAddress.toLowerCase()) continue
+    if (
+      log.address.toLowerCase() !==
+      casinoChainById[chainId].contracts.games[gameType]?.address.toLowerCase()
+    )
+      continue
     const decodedLog = decodeEventLog({
       abi: placeBetEventData.abi,
       data: log.data,

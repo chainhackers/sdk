@@ -1,3 +1,4 @@
+import { chainByKey, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { Info } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
@@ -76,6 +77,8 @@ const InfoSheetWithWrapper = ({
             rngFee={rngFee}
             targetPayout={targetPayout}
             gasPrice={gasPrice}
+            token={chainNativeCurrencyToToken(chainByKey.base.nativeCurrency)}
+            nativeCurrencySymbol={chainByKey.base.nativeCurrency.symbol}
           />
         </Sheet>
       )}

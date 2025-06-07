@@ -1,12 +1,15 @@
+import { Token } from "@betswirl/sdk-core"
 import { cn } from "../../lib/utils"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 
 interface InfoSheetPanelProps {
   portalContainer: HTMLElement
   winChance: number
-  rngFee: number | string
-  targetPayout: string
-  gasPrice: string
+  rngFee: number | string // formatted
+  targetPayout: number | string // formatted
+  gasPrice: number | string // gwei formatted
+  token: Token
+  nativeCurrencySymbol: string
 }
 
 export function InfoSheetPanel({
@@ -15,6 +18,8 @@ export function InfoSheetPanel({
   rngFee,
   targetPayout,
   gasPrice,
+  token,
+  nativeCurrencySymbol,
 }: InfoSheetPanelProps) {
   return (
     <SheetPortal container={portalContainer}>
@@ -27,15 +32,19 @@ export function InfoSheetPanel({
           </div>
           <div>
             <p>RNG fee:</p>
-            <p className="text-text-on-surface">{rngFee} ETH</p>
+            <p className="text-text-on-surface">
+              {rngFee} {nativeCurrencySymbol}
+            </p>
           </div>
           <div>
             <p>Target payout:</p>
-            <p className="text-text-on-surface">{targetPayout} ETH</p>
+            <p className="text-text-on-surface">
+              {targetPayout} {token.symbol}
+            </p>
           </div>
           <div>
             <p>Gas price:</p>
-            <p className="text-text-on-surface">{gasPrice}</p>
+            <p className="text-text-on-surface">{gasPrice} gwei</p>
           </div>
         </div>
       </SheetBottomPanelContent>

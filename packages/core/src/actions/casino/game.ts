@@ -1,23 +1,32 @@
-import { type Hash, type Hex, type TransactionReceipt, encodeFunctionData } from "viem";
+import {
+  type Address,
+  type EncodeAbiParametersReturnType,
+  type Hash,
+  type Hex,
+  type TransactionReceipt,
+  encodeFunctionData,
+} from "viem";
 import { decodeEventLog } from "viem";
 import { coinTossAbi } from "../../abis/v2/casino/cointoss";
+import { freebetAbi } from "../../abis/v2/casino/freebet";
 import { GAS_TOKEN_ADDRESS } from "../../constants";
+import type { SignedFreebet } from "../../data";
 import {
+  CASINO_GAME_PLACE_BET_ABI,
   CASINO_GAME_TYPE,
-  type CasinoChain,
   type CasinoChainId,
   MAX_SDK_HOUSE_EGDE,
   type NORMAL_CASINO_GAME_TYPE,
   type WEIGHTED_CASINO_GAME_TYPE,
   casinoChainById,
 } from "../../data/casino";
-import type { KenoEncodedInput } from "../../entities";
+import type { KenoEncodedInput, WeightedGameEncodedInput } from "../../entities";
 import type { CoinTossEncodedInput } from "../../entities/casino/cointoss";
 import type { DiceEncodedInput } from "../../entities/casino/dice";
 import type { RouletteEncodedInput } from "../../entities/casino/roulette";
 import { ERROR_CODES } from "../../errors/codes";
 import { ChainError, ConfigurationError, TransactionError } from "../../errors/types";
-import type { BetSwirlFunctionData, Token } from "../../interfaces";
+import type { BetSwirlEventData, BetSwirlFunctionData, GameAbi, Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
 import { getChainlinkVrfCost } from "../../read/common/chainlinkVrfCost";
 import { GAS_PRICE_TYPE, getGasPrices } from "../../read/common/gasPrice";
@@ -63,7 +72,8 @@ export type GameEncodedInput =
   | CoinTossEncodedInput
   | DiceEncodedInput
   | RouletteEncodedInput
-  | KenoEncodedInput;
+  | KenoEncodedInput
+  | WeightedGameEncodedInput;
 export interface GenericCasinoBetParams extends CasinoBetParams {
   game: CASINO_GAME_TYPE;
   gameEncodedInput: GameEncodedInput;
@@ -217,13 +227,36 @@ export async function placeBet(
     );
   }
 }
-type GameAbi<T extends CASINO_GAME_TYPE> = NonNullable<CasinoChain["contracts"]["games"][T]>["abi"];
 
-export function getPlaceBetFunctionData(
-  gameParams: Omit<GenericCasinoBetParams, "receiver" | "vrfFees" | "token"> & {
+/* Previously was Omit<GenericCasinoBetParams, "receiver" | "vrfFees" | "token"> & {
     receiver: Hex;
     tokenAddress?: Hex;
-  },
+  } */
+export interface PlaceBetFunctionDataGameParams {
+  receiver: Hex;
+  game: CASINO_GAME_TYPE;
+  gameEncodedInput: GameEncodedInput;
+  betAmount: bigint;
+  tokenAddress?: Hex;
+  betCount?: number;
+  stopGain?: bigint;
+  stopLoss?: bigint;
+  affiliate?: Hex;
+}
+
+export interface PlaceBetExtraData {
+  totalBetAmount: bigint;
+  tokenAddress: Address;
+  betCount: number;
+  stopGain: bigint;
+  stopLoss: bigint;
+  maxHouseEdge: number;
+  affiliate: Address;
+  getValue: (vrfFees: bigint) => bigint;
+}
+
+export function getPlaceBetFunctionData(
+  gameParams: PlaceBetFunctionDataGameParams,
   chainId: CasinoChainId,
 ): BetSwirlFunctionData<
   GameAbi<typeof gameParams.game>,
@@ -242,16 +275,7 @@ export function getPlaceBetFunctionData(
     },
   ]
 > & {
-  extraData: {
-    totalBetAmount: bigint;
-    tokenAddress: Hex;
-    betCount: number;
-    stopGain: bigint;
-    stopLoss: bigint;
-    maxHouseEdge: number;
-    affiliate: Hex;
-    getValue: (vrfFees: bigint) => bigint;
-  };
+  extraData: PlaceBetExtraData;
 } {
   const casinoChain = casinoChainById[chainId];
   const game = casinoChain.contracts.games[gameParams.game];
@@ -295,6 +319,211 @@ export function getPlaceBetFunctionData(
   const totalBetAmount = gameParams.betAmount * BigInt(betCount);
   return {
     data: { to: game.address, abi, functionName, args },
+    encodedData: encodeFunctionData({ abi, functionName, args }),
+    extraData: {
+      totalBetAmount,
+      tokenAddress,
+      betCount,
+      stopGain,
+      stopLoss,
+      maxHouseEdge,
+      affiliate,
+      getValue: (vrfFees: bigint) =>
+        tokenAddress === GAS_TOKEN_ADDRESS ? totalBetAmount + vrfFees : vrfFees,
+    },
+  };
+}
+
+/* Freebet section */
+
+export interface CasinoFreebetParams {
+  freebet: SignedFreebet;
+  vrfFees?: bigint;
+}
+
+export interface GenericCasinoFreebetParams extends CasinoFreebetParams {
+  game: CASINO_GAME_TYPE;
+  gameEncodedAbiParametersInput: EncodeAbiParametersReturnType;
+}
+
+export type CasinoPlacedFreebet = CasinoPlacedBet;
+
+export interface PlaceFreebetCallbacks {
+  onBetPlacedPending?: (tx: Hash) => void | Promise<void>;
+}
+
+export async function placeFreebet(
+  wallet: BetSwirlWallet,
+  freebetParams: GenericCasinoFreebetParams,
+  options?: CasinoPlaceBetOptions,
+  callbacks?: PlaceFreebetCallbacks,
+): Promise<{ placedFreebet: CasinoPlacedFreebet; receipt: TransactionReceipt }> {
+  const casinoChainId = getCasinoChainId(wallet);
+  if (casinoChainId !== freebetParams.freebet.chainId) {
+    throw new ChainError(
+      `Chain id mismatch: ${casinoChainId} (wallet) !== ${freebetParams.freebet.chainId} (freebet)`,
+      ERROR_CODES.CHAIN.CHAIN_ID_MISMATCH,
+    );
+  }
+  const casinoChain = casinoChainById[casinoChainId];
+  const game = casinoChain.contracts.games[freebetParams.game];
+
+  if (!game) {
+    throw new ChainError(
+      `${freebetParams.game} is not available for chain ${casinoChain.viemChain.name} (${casinoChainId})`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
+      {
+        chainId: casinoChainId,
+        supportedChains: Object.keys(casinoChainById),
+      },
+    );
+  }
+
+  try {
+    // Get gas price if needed
+    const gasPrice =
+      options?.gasPrice ||
+      (await getGasPrices(wallet, casinoChainId))[
+        options?.gasPriceType || defaultCasinoPlaceBetOptions.gasPriceType
+      ];
+    const token = freebetParams.freebet.token;
+
+    // Generate function data
+    const functionData = getPlaceFreebetFunctionData(freebetParams, casinoChainId);
+
+    // Get VRF fees
+    const vrfFees =
+      freebetParams.vrfFees ||
+      (await getChainlinkVrfCost(
+        wallet,
+        freebetParams.game,
+        token.address,
+        functionData.extraData.betCount,
+        gasPrice,
+      ));
+    // Execute place bet tx
+    const hash = await wallet.writeContract(
+      functionData,
+      functionData.extraData.getValue(vrfFees),
+      gasPrice,
+    );
+    await callbacks?.onBetPlacedPending?.(hash);
+    const pollingInterval = options?.pollingInterval || casinoChain.options.pollingInterval;
+    const receipt = await wallet.waitTransaction(hash, pollingInterval);
+
+    const placedFreebet = await getPlacedBetFromReceipt(wallet, receipt, freebetParams.game);
+    if (!placedFreebet) {
+      throw new TransactionError(
+        "PlaceBet event not found",
+        ERROR_CODES.GAME.PLACE_BET_EVENT_NOT_FOUND,
+        {
+          gameAddress: game.address,
+          gameType: freebetParams.game,
+          chainId: casinoChainId,
+          token,
+        },
+      );
+    }
+
+    return { placedFreebet, receipt };
+  } catch (error) {
+    throw new TransactionError(
+      `An error occured while placing the freebet: ${error}`,
+      ERROR_CODES.GAME.PLACE_FREEBET_ERROR,
+      {
+        gameAddress: game.address,
+        gameType: freebetParams.game,
+        chainId: casinoChainId,
+        token: freebetParams.freebet.token,
+        input: freebetParams.gameEncodedAbiParametersInput,
+        freebetId: freebetParams.freebet.id,
+        playerAddress: freebetParams.freebet.playerAddress,
+        amount: freebetParams.freebet.amount,
+        tokenAddress: freebetParams.freebet.token.address,
+        expiresAt: freebetParams.freebet.expirationDate,
+        affiliateAddress: freebetParams.freebet.affiliateAddress,
+        freebetAddress: freebetParams.freebet.freebetAddress,
+      },
+    );
+  }
+}
+
+export interface PlaceFreebetFunctionDataGameParams {
+  freebet: SignedFreebet;
+  game: CASINO_GAME_TYPE;
+  gameEncodedAbiParametersInput: EncodeAbiParametersReturnType;
+}
+
+export interface PlaceFreebetExtraData extends PlaceBetExtraData {}
+
+export function getPlaceFreebetFunctionData(
+  gameParams: PlaceFreebetFunctionDataGameParams,
+  chainId: CasinoChainId,
+): BetSwirlFunctionData<
+  typeof freebetAbi,
+  "wager",
+  readonly [
+    Hex,
+    EncodeAbiParametersReturnType,
+    {
+      readonly chainId: bigint;
+      readonly freeBetId: bigint;
+      readonly player: Address;
+      readonly amount: bigint;
+      readonly token: Address;
+      readonly expiresAt: bigint;
+      readonly affiliate: Address;
+      readonly freebetAddress: Address;
+    },
+    Hex, // signature
+    number,
+  ]
+> & {
+  extraData: PlaceFreebetExtraData;
+} {
+  const casinoChain = casinoChainById[chainId];
+  const game = casinoChain.contracts.games[gameParams.game];
+
+  if (!game) {
+    throw new ChainError(
+      `${gameParams.game} is not available for chain ${casinoChain.viemChain.name} (${chainId})`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
+      {
+        chainId,
+        supportedChains: Object.keys(casinoChainById),
+      },
+    );
+  }
+
+  const affiliate = gameParams.freebet.affiliateAddress;
+  const tokenAddress = gameParams.freebet.token.address;
+  const betCount = 1; // freebet is always 1 bet
+  const stopGain = 0n;
+  const stopLoss = 0n;
+  const maxHouseEdge = MAX_SDK_HOUSE_EGDE;
+
+  const abi = freebetAbi;
+  const functionName = "wager" as const;
+  const args = [
+    game.address,
+    gameParams.gameEncodedAbiParametersInput,
+    {
+      chainId: BigInt(gameParams.freebet.chainId),
+      freeBetId: BigInt(gameParams.freebet.id),
+      player: gameParams.freebet.playerAddress,
+      amount: gameParams.freebet.amount,
+      token: gameParams.freebet.token.address,
+      expiresAt: BigInt(Math.floor(gameParams.freebet.expirationDate.getTime() / 1000)),
+      affiliate: gameParams.freebet.affiliateAddress,
+      freebetAddress: gameParams.freebet.freebetAddress,
+    },
+    gameParams.freebet.signature,
+    maxHouseEdge,
+  ] as const;
+
+  const totalBetAmount = gameParams.freebet.amount;
+  return {
+    data: { to: gameParams.freebet.freebetAddress, abi, functionName, args },
     encodedData: encodeFunctionData({ abi, functionName, args }),
     extraData: {
       totalBetAmount,
@@ -361,5 +590,36 @@ export async function getPlacedBetFromReceipt(
     betBlock: receipt.blockNumber,
     chainId: casinoChainId,
     game,
+  };
+}
+
+export function getPlaceBetEventData(
+  game: CASINO_GAME_TYPE,
+  casinoChainId: CasinoChainId,
+  receiver: Address,
+): BetSwirlEventData<GameAbi<typeof game>, "PlaceBet", { receiver: Address }> & {
+  event: { abiEvent: (typeof CASINO_GAME_PLACE_BET_ABI)[typeof game][number] };
+} {
+  const casinoChain = casinoChainById[casinoChainId];
+
+  const gameData = casinoChain.contracts.games[game];
+  if (!gameData) {
+    throw new ChainError(
+      `Game ${game} not found for chain ${casinoChainId}`,
+      ERROR_CODES.CHAIN.UNSUPPORTED_GAME,
+    );
+  }
+
+  const abi = CASINO_GAME_PLACE_BET_ABI[game];
+  const eventName = "PlaceBet" as const;
+  const args = { receiver: receiver } as const;
+
+  const placeBetEvent = CASINO_GAME_PLACE_BET_ABI[game]![0];
+
+  return {
+    data: { to: gameData.address, abi, eventName, args },
+    event: {
+      abiEvent: placeBetEvent,
+    },
   };
 }

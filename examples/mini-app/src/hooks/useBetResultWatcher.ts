@@ -1,10 +1,11 @@
-import { CASINO_GAME_TYPE, COINTOSS_FACE, CoinToss } from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, CoinToss, DiceNumber } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { AbiEvent, Log } from "viem"
 import { decodeEventLog } from "viem"
 import { usePublicClient, useWatchContractEvent } from "wagmi"
 import { createLogger } from "../lib/logger"
-import type { GameResult, WatchTarget } from "./types"
+import { GameResult, GameRolledResult } from "../types"
+import type { WatchTarget } from "./types"
 
 const logger = createLogger("useBetResultWatcher")
 
@@ -23,19 +24,81 @@ interface BetResultWatcherOutput {
   reset: () => void
 }
 
+interface DecodedEventLog {
+  eventName: string
+  args: readonly unknown[]
+}
+
 const POLLING_INTERVAL = 2500
 const PRIMARY_WATCHER_TIMEOUT = 30000
 
-function _decodeRolled(rolled: boolean[], game: CASINO_GAME_TYPE): COINTOSS_FACE {
+function _extractEventData(
+  decodedRollLog: DecodedEventLog,
+  gameType: CASINO_GAME_TYPE,
+): { rolledData: boolean[] | DiceNumber; payout: bigint; id: bigint } {
+  switch (gameType) {
+    case CASINO_GAME_TYPE.DICE: {
+      const diceRollArgs = decodedRollLog.args as unknown as {
+        id: bigint
+        payout: bigint
+        rolled: DiceNumber
+      }
+      return {
+        rolledData: diceRollArgs.rolled,
+        payout: diceRollArgs.payout,
+        id: diceRollArgs.id,
+      }
+    }
+    case CASINO_GAME_TYPE.COINTOSS: {
+      const coinTossRollArgs = decodedRollLog.args as unknown as {
+        id: bigint
+        payout: bigint
+        rolled: boolean[]
+      }
+      return {
+        rolledData: coinTossRollArgs.rolled,
+        payout: coinTossRollArgs.payout,
+        id: coinTossRollArgs.id,
+      }
+    }
+    default:
+      throw new Error(`Unsupported game type for event extraction: ${gameType}`)
+  }
+}
+
+function _decodeRolled(rolled: boolean[] | DiceNumber, game: CASINO_GAME_TYPE): GameRolledResult {
   switch (game) {
     case CASINO_GAME_TYPE.COINTOSS:
-      return CoinToss.decodeRolled(rolled[0])
+      if (Array.isArray(rolled)) {
+        return CoinToss.decodeRolled(rolled[0])
+      }
+      throw new Error(`Invalid rolled data for COINTOSS: expected boolean array, got ${rolled}`)
+    case CASINO_GAME_TYPE.DICE:
+      return rolled as DiceNumber
     default:
       logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
       throw new Error(`Unsupported game type for decoding roll: ${game}`)
   }
 }
 
+/**
+ * Watches for bet result events from casino contracts.
+ * Uses primary event subscription with automatic fallback to polling if filters fail.
+ *
+ * @param watchParams - Contract address, event details, and bet ID to watch
+ * @param publicClient - Viem public client for blockchain interactions
+ * @param enabled - Whether the watcher should be active
+ * @returns Game result data, watcher status, error state, and reset function
+ *
+ * @example
+ * ```ts
+ * const { gameResult, status } = useBetResultWatcher({
+ *   watchParams: { contractAddress, betId, gameType, eventAbi, eventName },
+ *   publicClient,
+ *   enabled: betStatus === 'awaiting_result'
+ * })
+ * ```
+ */
 export function useBetResultWatcher({
   watchParams,
   publicClient,
@@ -114,19 +177,19 @@ export function useBetResultWatcher({
         strict: false,
       })
 
+      if (!decodedRollLog.eventName || !decodedRollLog.args) continue
       if (decodedRollLog.eventName !== eventName) continue
 
-      const rollArgs = decodedRollLog.args as unknown as {
-        id: bigint
-        payout: bigint
-        rolled: boolean[]
-      }
+      const { rolledData, payout, id } = _extractEventData(
+        decodedRollLog as unknown as DecodedEventLog,
+        gameType,
+      )
 
-      if (rollArgs.id === betId) {
-        const rolledResult = _decodeRolled(rollArgs.rolled, gameType)
+      if (id === betId) {
+        const rolledResult = _decodeRolled(rolledData, gameType)
         const result: GameResult = {
-          isWin: rollArgs.payout > 0n,
-          payout: rollArgs.payout,
+          isWin: payout > 0n,
+          payout: payout,
           currency: "ETH",
           rolled: rolledResult,
         }

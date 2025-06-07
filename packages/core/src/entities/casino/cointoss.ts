@@ -1,3 +1,4 @@
+import { type EncodeAbiParametersReturnType, encodeAbiParameters, parseAbiParameters } from "viem";
 import { BP_VALUE } from "../../constants";
 import { CASINO_GAME_TYPE } from "../../data/casino";
 import { getFormattedNetMultiplier, getNetMultiplier } from "../../utils/bet";
@@ -36,6 +37,10 @@ export class CoinToss extends AbstractCasinoGame<
 
   static encodeInput(face: COINTOSS_FACE | string): CoinTossEncodedInput {
     return face === COINTOSS_FACE.HEADS || face.toLowerCase() === "true" || face === "1";
+  }
+
+  static encodeAbiParametersInput(face: COINTOSS_FACE | string): EncodeAbiParametersReturnType {
+    return encodeAbiParameters(parseAbiParameters("bool"), [CoinToss.encodeInput(face)]);
   }
 
   static decodeInput(encodedFace: CoinTossEncodedInput | string): COINTOSS_FACE {

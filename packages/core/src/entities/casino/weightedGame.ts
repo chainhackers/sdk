@@ -1,3 +1,6 @@
+import { encodeAbiParameters } from "viem";
+import { parseAbiParameters } from "viem";
+import type { EncodeAbiParametersReturnType } from "viem/_types/utils/abi/encodeAbiParameters";
 import {
   type CasinoChainId,
   type WEIGHTED_CASINO_GAME_TYPE,
@@ -56,6 +59,10 @@ export class WeightedGame extends AbstractCasinoGame<
 
   static encodeInput(configId: WeightedGameConfigId): WeightedGameEncodedInput {
     return configId;
+  }
+
+  static encodeAbiParametersInput(configId: WeightedGameConfigId): EncodeAbiParametersReturnType {
+    return encodeAbiParameters(parseAbiParameters("uint40"), [WeightedGame.encodeInput(configId)]);
   }
 
   static decodeInput(configId: WeightedGameEncodedInput | string): WeightedGameConfigId {

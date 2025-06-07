@@ -1,6 +1,7 @@
 import { select } from "@inquirer/prompts";
 import * as dotenv from "dotenv";
 import { startPlaceBetProcess } from "./functionalities/placeBet";
+import { startPlaceFreebetProcess } from "./functionalities/placeFreebet";
 import { startShowHistoryBetsProcess } from "./functionalities/showHistoryBets";
 dotenv.config();
 
@@ -13,6 +14,10 @@ const showMenu = async () => {
       {
         name: "Place a bet",
         value: "place_bet",
+      },
+      {
+        name: "Place a freebet",
+        value: "place_freebet",
       },
       {
         name: "Show my previous bets",
@@ -31,6 +36,9 @@ const showMenu = async () => {
       break;
     case "previous_bets":
       await startShowHistoryBetsProcess();
+      break;
+    case "place_freebet":
+      await startPlaceFreebetProcess();
       break;
     case "quit":
       console.log("Bye!");

@@ -55,6 +55,9 @@
   --color-close-btn-hovered: var(--close-btn-hovered);
   --color-game-result-icon-bg: var(--game-result-icon-bg);
   --color-table-text: var(--table-text);
+  --color-slider-disabled: var(--slider-disabled);
+  --color-slider-disabled-shadow: var(--slider-disabled-shadow);
+  --color-slider-disabled-tooltip: var(--slider-disabled-tooltip);
 }
 
 @layer base {
@@ -129,6 +132,9 @@
     --close-btn-hovered: var(--dark-stroke);
     --game-result-icon-bg: var(--white);
     --table-text: var(--dark-surface);
+    --slider-disabled: oklch(0.7774 0.0129 276.04);
+    --slider-disabled-shadow: oklch(0.7774 0.0129 276.04 / 0.2);
+    --slider-disabled-tooltip: oklch(0.6138 0.014 271.18);
   }
 
   .dark {
@@ -174,6 +180,9 @@
     --close-btn-color: var(--dark-on-surface-variant);
     --game-result-icon-bg: var(--dark-surface-high);
     --table-text: var(--white);
+    --slider-disabled: oklch(0.7774 0.0129 276.04);
+    --slider-disabled-shadow: oklch(0.7774 0.0129 276.04 / 0.2);
+    --slider-disabled-tooltip: oklch(0.6138 0.014 271.18);
   }
 
   @font-face {
