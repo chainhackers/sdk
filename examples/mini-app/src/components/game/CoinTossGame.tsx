@@ -95,8 +95,8 @@ export function CoinTossGame({
         <GameFrame.ResultWindow gameResult={gameResult} betAmount={betAmount} currency="ETH" />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.COINTOSS}
         betCount={1} // TODO: Dynamic bet count support (#64)
-        betCount={1}
         grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
