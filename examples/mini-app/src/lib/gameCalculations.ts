@@ -1,4 +1,5 @@
 import { BP_VALUE } from "@betswirl/sdk-core"
+import { formatUnits } from "viem"
 
 const ONE_ETHER = 1000000000000000000n
 
@@ -48,7 +49,7 @@ export function calculatePayoutDetails(
 
 export function formatMultiplier(params: GameCalculationParams): number {
   const netPayout = getNetPayout(ONE_ETHER, 1, params)
-  return Number(Number(netPayout) / 1e18)
+  return Number(formatUnits(netPayout, 18))
 }
 
 export function calculateTargetPayout(
