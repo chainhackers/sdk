@@ -1,3 +1,4 @@
+import { chainByKey, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { Info } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
@@ -5,7 +6,6 @@ import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { InfoSheetPanel } from "./InfoSheetPanel"
-import { chainByKey, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode
@@ -78,6 +78,7 @@ const InfoSheetWithWrapper = ({
             targetPayout={targetPayout}
             gasPrice={gasPrice}
             token={chainNativeCurrencyToToken(chainByKey.base.nativeCurrency)}
+            nativeCurrencySymbol={chainByKey.base.nativeCurrency.symbol}
           />
         </Sheet>
       )}
