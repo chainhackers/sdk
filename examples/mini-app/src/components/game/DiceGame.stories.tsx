@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import gameBg from "../../assets/game/game-background-1.png"
+import gameBg from "../../assets/game/game-background-1.jpg"
 import { AppProviders } from "../../providers"
 import { DiceGame } from "./DiceGame"
 

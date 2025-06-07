@@ -9,7 +9,7 @@ import { TokenImage } from "@coinbase/onchainkit/token"
 import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
 import { parseUnits } from "viem"
-import gameBg from "../../assets/game/game-background.png"
+import gameBg from "../../assets/game/game-background.jpg"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { DiceGameControls } from "./DiceGameControls"
@@ -39,6 +39,9 @@ const meta = {
         { name: "light", value: "#FFFFFF" },
         { name: "dark", value: "oklch(0.15 0 0)" },
       ],
+    },
+    loki: {
+      skip: true,
     },
   },
   tags: ["autodocs"],
