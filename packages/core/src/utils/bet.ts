@@ -45,16 +45,19 @@ export function getPayoutDetails(
   netPayout: bigint;
   betSwirlFees: bigint;
   netMultiplier: number;
+  formattedNetMultiplier: number;
 } {
   const grossPayout = getGrossPayout(amount, betCount, grossMultiplier);
   const fees = getBetSwirlFees(grossPayout, houseEdge);
   const netPayout = grossPayout - fees;
   const netMultiplier = getNetMultiplier(grossMultiplier, houseEdge);
+  const formattedNetMultiplier = getFormattedNetMultiplier(grossMultiplier, houseEdge);
   return {
     grossPayout,
     netPayout,
     betSwirlFees: fees,
     netMultiplier,
+    formattedNetMultiplier,
   };
 }
 

@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.6
+
+### Patch Changes
+
+- Add formattedNetMultiplier to getPayoutDetails
+
 ## 0.1.5
 
 ### Patch Changes
