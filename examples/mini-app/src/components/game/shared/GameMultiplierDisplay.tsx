@@ -11,7 +11,7 @@ export function GameMultiplierDisplay({ multiplier, className }: GameMultiplierD
   return (
     <div
       className={cn(
-        "absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-white",
+        "absolute top-1/5 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[26px] font-extrabold leading-[34px] text-text-color",
         className,
       )}
     >

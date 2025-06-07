@@ -60,7 +60,7 @@ export function GameResultWindow({
 
   return (
     <div
-      className={`w-full h-full flex flex-col items-center py-[12px] px-[42px] absolute left-0 top-0 text-white ${className}`}
+      className={`w-full h-full flex flex-col items-center py-[12px] px-[42px] absolute left-0 top-0 text-text-color ${className}`}
     >
       <img
         src={currentImages.bg}
