@@ -98,7 +98,7 @@ export function DiceGame({
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.DICE}
-        betCount={1}
+        betCount={1} // TODO: Dynamic bet count support (#64)
         grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
