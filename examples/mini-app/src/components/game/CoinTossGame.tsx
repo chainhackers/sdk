@@ -73,27 +73,17 @@ export function CoinTossGame({
 
   return (
     <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header
-        title="CoinToss"
-        connectWalletButton={<GameConnectWallet />}
-      />
+      <GameFrame.Header title="CoinToss" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={CoinToss.getWinChancePercent(selectedSide)}
           rngFee={formattedVrfFees}
-          targetPayout={formatRawAmount(
-            targetPayoutAmount,
-            token.decimals,
-            FORMAT_TYPE.PRECISE,
-          )}
+          targetPayout={formatRawAmount(targetPayoutAmount, token.decimals, FORMAT_TYPE.PRECISE)}
           gasPrice={gasPrice}
           tokenDecimals={token.decimals}
           nativeCurrencySymbol={nativeCurrencySymbol}
         />
-        <GameFrame.HistoryButton
-          historyData={gameHistory}
-          onHistoryOpen={refreshHistory}
-        />
+        <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
         <GameFrame.GameControls>
           <CoinTossGameControls
             selectedSide={selectedSide}
@@ -102,11 +92,7 @@ export function CoinTossGame({
             isDisabled={isControlsDisabled}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow
-          gameResult={gameResult}
-          betAmount={betAmount}
-          currency="ETH"
-        />
+        <GameFrame.ResultWindow gameResult={gameResult} betAmount={betAmount} currency="ETH" />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.COINTOSS}

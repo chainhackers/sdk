@@ -71,27 +71,17 @@ export function DiceGame({
 
   return (
     <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header
-        title="Dice"
-        connectWalletButton={<GameConnectWallet />}
-      />
+      <GameFrame.Header title="Dice" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={Dice.getWinChancePercent(selectedNumber)}
           rngFee={formattedVrfFees}
-          targetPayout={formatRawAmount(
-            targetPayoutAmount,
-            token.decimals,
-            FORMAT_TYPE.PRECISE,
-          )}
+          targetPayout={formatRawAmount(targetPayoutAmount, token.decimals, FORMAT_TYPE.PRECISE)}
           gasPrice={gasPrice}
           tokenDecimals={token.decimals}
           nativeCurrencySymbol={nativeCurrencySymbol}
         />
-        <GameFrame.HistoryButton
-          historyData={gameHistory}
-          onHistoryOpen={refreshHistory}
-        />
+        <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
         <GameFrame.GameControls>
           <DiceGameControls
             selectedNumber={selectedNumber}

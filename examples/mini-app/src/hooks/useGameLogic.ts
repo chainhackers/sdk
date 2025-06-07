@@ -14,8 +14,8 @@ import { BetStatus, GameResult } from "../types"
 import { useGameCalculations } from "./useGameCalculations"
 import { HistoryEntry, useGameHistory } from "./useGameHistory"
 import { useHouseEdge } from "./useHouseEdge"
-import { usePlaceBet } from "./usePlaceBet"
 import { useIsGamePaused } from "./useIsGamePaused"
+import { usePlaceBet } from "./usePlaceBet"
 
 type GameSelection = COINTOSS_FACE | DiceNumber
 
@@ -79,7 +79,7 @@ export function useGameLogic<T extends GameSelection>({
     game: gameType,
     token,
   })
-  const {isPaused: isGamePaused} = useIsGamePaused({
+  const { isPaused: isGamePaused } = useIsGamePaused({
     game: gameType,
   })
 
