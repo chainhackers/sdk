@@ -10,7 +10,7 @@ import { useConfig } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { QueryParameter } from "../types"
 type GetGasPriceResult = {
-  detailledGasPrices: RETURN_TYPE_GAS_PRICES
+  detailedGasPrices: RETURN_TYPE_GAS_PRICES
   optimalGasPrice: bigint
 }
 
@@ -19,7 +19,7 @@ type UseGasPriceProps = {
 }
 
 const defaultGasPriceResult: GetGasPriceResult = {
-  detailledGasPrices: {
+  detailedGasPrices: {
     [GAS_PRICE_TYPE.NORMAL]: 0n,
     [GAS_PRICE_TYPE.FAST]: 0n,
     [GAS_PRICE_TYPE.INSTANT]: 0n,
@@ -38,7 +38,7 @@ export function useGasPrice(props: UseGasPriceProps = {}) {
     const gasPrices = await getGasPrices(betswirlWallet, appChain.id)
 
     return {
-      detailledGasPrices: {
+      detailedGasPrices: {
         [GAS_PRICE_TYPE.NORMAL]: (gasPrices[GAS_PRICE_TYPE.NORMAL] * 105n) / 100n, // 5% buffer
         [GAS_PRICE_TYPE.FAST]: gasPrices[GAS_PRICE_TYPE.FAST], // 20% buffer (already included from sdk)
         [GAS_PRICE_TYPE.INSTANT]: gasPrices[GAS_PRICE_TYPE.INSTANT], // 50% buffer (already included from sdk)
