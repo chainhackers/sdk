@@ -1,8 +1,15 @@
-import { FORMAT_TYPE, Token, formatRawAmount } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  FORMAT_TYPE,
+  GAS_TOKEN_ADDRESS,
+  Token,
+  formatRawAmount,
+} from "@betswirl/sdk-core"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import Decimal from "decimal.js"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
-import { parseUnits, zeroAddress } from "viem"
+import { parseUnits } from "viem"
+import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { cn } from "../../lib/utils"
 import { BetStatus } from "../../types"
@@ -11,29 +18,37 @@ import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 
 interface BettingPanelProps {
+  game: CASINO_GAME_TYPE
   balance: bigint
   isConnected: boolean
   token: Token
   betStatus: BetStatus | null
   betAmount: bigint | undefined
+  betCount: number
+  grossMultiplier: number // BP
   vrfFees: bigint
   onBetAmountChange: (amount: bigint | undefined) => void
   onPlayBtnClick: () => void
   areChainsSynced: boolean
+  isGamePaused: boolean
 }
 
 const BET_AMOUNT_INPUT_STEP = 0.0001
 
 export function BettingPanel({
+  game,
   balance,
   isConnected,
   token,
   betStatus,
   betAmount,
+  betCount,
+  grossMultiplier,
   vrfFees,
   onBetAmountChange,
   onPlayBtnClick,
   areChainsSynced,
+  isGamePaused,
 }: BettingPanelProps) {
   const [inputValue, setInputValue] = useState<string>("")
   const [isValidInput, setIsValidInput] = useState<boolean>(true)
@@ -61,10 +76,24 @@ export function BettingPanel({
     }
   }, [betAmount, token.decimals, isUserTyping])
 
+  const {
+    isAllowed: isTokenAllowed,
+    maxBetAmount,
+    formattedMaxBetAmount,
+    maxBetCount,
+  } = useBetRequirements({
+    game,
+    token,
+    grossMultiplier,
+  })
+
   const isBetAmountValid = betAmount && betAmount > 0n
 
-  const effectiveBalance = token.address === zeroAddress ? balance - vrfFees : balance
-  const isBetAmountExceedsBalance = betAmount && betAmount > effectiveBalance
+  const effectiveBalance = token.address === GAS_TOKEN_ADDRESS ? balance - vrfFees : balance
+  const isTotalbetAmountExceedsBalance =
+    betAmount && BigInt(betCount) * betAmount > effectiveBalance
+  const isBetCountValid = betCount > 0 && betCount <= maxBetCount
+  const isBetAmountExceedsMaxBetAmount = betAmount && betAmount > maxBetAmount
 
   const formattedBalance = formatRawAmount(balance, token.decimals)
 
@@ -74,7 +103,15 @@ export function BettingPanel({
     betStatus === "error" || betStatus === "waiting-error" || betStatus === "internal-error"
 
   const canInitiateBet =
-    isConnected && areChainsSynced && isBetAmountValid && !isBetAmountExceedsBalance && !isWaiting
+    isConnected &&
+    areChainsSynced &&
+    isBetAmountValid &&
+    !isTotalbetAmountExceedsBalance &&
+    !isWaiting &&
+    !isGamePaused &&
+    isTokenAllowed &&
+    isBetCountValid &&
+    !isBetAmountExceedsMaxBetAmount
 
   const isInputDisabled = !isConnected || isWaiting || isBetSuccees
 
@@ -95,8 +132,16 @@ export function BettingPanel({
     playButtonText = "Connect Wallet"
   } else if (!areChainsSynced) {
     playButtonText = "Switch chain"
-  } else if (isBetAmountExceedsBalance) {
+  } else if (isGamePaused) {
+    playButtonText = "Game paused"
+  } else if (!isTokenAllowed) {
+    playButtonText = "Token not allowed"
+  } else if (isTotalbetAmountExceedsBalance) {
     playButtonText = "Insufficient balance"
+  } else if (!isBetCountValid) {
+    playButtonText = `Max bet count exceeded (${maxBetCount})`
+  } else if (isBetAmountExceedsMaxBetAmount) {
+    playButtonText = `Max bet amount exceeded (${formattedMaxBetAmount})`
   } else {
     playButtonText = "Place Bet"
   }
@@ -127,7 +172,7 @@ export function BettingPanel({
 
   const handleMaxBet = () => {
     if (isConnected) {
-      const maxBalance = token.address === zeroAddress ? balance - vrfFees : balance
+      const maxBalance = token.address === GAS_TOKEN_ADDRESS ? balance - vrfFees : balance
 
       const maxBetAmount = maxBalance > 0n ? maxBalance : 0n
       onBetAmountChange(maxBetAmount)

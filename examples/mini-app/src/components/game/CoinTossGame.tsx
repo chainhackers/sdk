@@ -38,7 +38,9 @@ export function CoinTossGame({
     gasPrice,
     targetPayoutAmount,
     multiplier,
+    grossMultiplier,
     isInGameResultState,
+    isGamePaused,
     nativeCurrencySymbol,
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
@@ -93,6 +95,9 @@ export function CoinTossGame({
         <GameFrame.ResultWindow gameResult={gameResult} betAmount={betAmount} currency="ETH" />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.COINTOSS}
+        betCount={1} // TODO: Dynamic bet count support (#64)
+        grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
         token={token}
@@ -102,6 +107,7 @@ export function CoinTossGame({
         onBetAmountChange={handleBetAmountChange}
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
+        isGamePaused={isGamePaused}
       />
     </GameFrame>
   )

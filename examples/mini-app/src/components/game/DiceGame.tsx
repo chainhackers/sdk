@@ -40,7 +40,9 @@ export function DiceGame({
     gasPrice,
     targetPayoutAmount,
     multiplier,
+    grossMultiplier,
     isInGameResultState,
+    isGamePaused,
     nativeCurrencySymbol,
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
@@ -95,6 +97,9 @@ export function DiceGame({
         />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.DICE}
+        betCount={1} // TODO: Dynamic bet count support (#64)
+        grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
         token={token}
@@ -104,6 +109,7 @@ export function DiceGame({
         onBetAmountChange={handleBetAmountChange}
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
+        isGamePaused={isGamePaused}
       />
     </GameFrame>
   )

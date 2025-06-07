@@ -1,4 +1,4 @@
-import { Token } from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, Token } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 import { cn } from "../../lib/utils"
@@ -245,15 +245,19 @@ function ResultWindow({ gameResult, betAmount, currency = "ETH" }: ResultWindowP
 }
 
 interface BettingSectionProps {
+  game: CASINO_GAME_TYPE
   balance: bigint
   isConnected: boolean
   token: Token
   betStatus: BetStatus | null
   betAmount: bigint | undefined
+  betCount: number
+  grossMultiplier: number // BP
   vrfFees: bigint
   onBetAmountChange: (amount: bigint | undefined) => void
   onPlayBtnClick: () => void
   areChainsSynced: boolean
+  isGamePaused: boolean
 }
 
 function BettingSection(props: BettingSectionProps) {
