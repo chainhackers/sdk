@@ -4,17 +4,25 @@ export * from "./types/types";
 
 export * from "./hooks/types";
 export * from "./hooks/usePlaceBet";
-export * from "./hooks/useBetResultWatcher";
-export * from "./hooks/useGameHistory";
-export * from "./hooks/useHouseEdge";
-export * from "./hooks/useEstimateVRFFees";
+export * from "./hooks/useGameLogic";
 export * from "./hooks/useGasPrice";
+export * from "./hooks/useBetResultWatcher";
+export * from "./hooks/useHouseEdge";
+export * from "./hooks/useIsGamePaused";
+export * from "./hooks/useBetRequirements";
+export * from "./hooks/useEstimateVRFFees";
+export * from "./hooks/useGameCalculations";
+export * from "./hooks/useGameHistory";
 
+export * from "./components/game/BettingPanel";
 export * from "./components/game/CoinTossGame";
+export * from "./components/game/CoinTossGameControls";
+export * from "./components/game/DiceGame";
+export * from "./components/game/DiceGameControls";
 export * from "./components/game/GameFrame";
+export * from "./components/game/GameResultWindow";
 export * from "./components/game/HistorySheetPanel";
 export * from "./components/game/InfoSheetPanel";
-export * from "./components/game/GameResultWindow";
 
 export * from "./providers";
 
