@@ -15,8 +15,8 @@
     "test:loki": "pnpm loki test --chromeTolerance 1"
   },
   "dependencies": {
-    "@betswirl/sdk-core": "^0.1.3",
-    "@betswirl/wagmi-provider": "^0.1.3",
+    "@betswirl/sdk-core": "^0.1.6",
+    "@betswirl/wagmi-provider": "^0.1.6",
     "@coinbase/onchainkit": "^0.38.13",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-label": "^2.1.7",
