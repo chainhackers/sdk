@@ -2,12 +2,12 @@ import { TokenImage } from "@coinbase/onchainkit/token"
 import type { Meta, StoryObj } from "@storybook/react"
 import { History as HistoryIcon } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
+import { HistorySheetPanel } from "../../components/game/HistorySheetPanel"
+import { Button } from "../../components/ui/button"
+import { Sheet, SheetTrigger } from "../../components/ui/sheet"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { cn } from "../../lib/utils"
 import { HistoryEntry, HistoryEntryStatus } from "../../types/types"
-import { Button } from "../ui/button"
-import { Sheet, SheetTrigger } from "../ui/sheet"
-import { HistorySheetPanel } from "./HistorySheetPanel"
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode

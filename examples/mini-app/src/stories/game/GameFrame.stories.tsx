@@ -10,11 +10,11 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
 import { parseUnits } from "viem"
 import gameBg from "../../assets/game/game-background.jpg"
+import { CoinTossGameControls } from "../../components/game/CoinTossGameControls"
+import { DiceGameControls } from "../../components/game/DiceGameControls"
+import { GameFrame } from "../../components/game/GameFrame"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { type HistoryEntry, HistoryEntryStatus } from "../../types/types"
-import { CoinTossGameControls } from "./CoinTossGameControls"
-import { DiceGameControls } from "./DiceGameControls"
-import { GameFrame } from "./GameFrame"
 
 declare global {
   interface BigInt {

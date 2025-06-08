@@ -1,7 +1,7 @@
 import { TokenImage } from "@coinbase/onchainkit/token"
 import type { Meta, StoryObj } from "@storybook/react"
+import { Input } from "../../components/ui/input"
 import { ETH_TOKEN } from "../../lib/tokens"
-import { Input } from "./input"
 
 const meta = {
   title: "UI/Input",
