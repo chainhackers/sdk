@@ -21,7 +21,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
-      name: "ChainhackersUI",
+      name: "@betswirl/ui",
     },
     rollupOptions: {
       external: (id) => {
