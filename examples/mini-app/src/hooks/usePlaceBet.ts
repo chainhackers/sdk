@@ -3,7 +3,10 @@ import {
   COINTOSS_FACE,
   CasinoChainId,
   CoinToss,
+  Dice,
   GenericCasinoBetParams,
+  MAX_SELECTABLE_DICE_NUMBER,
+  MIN_SELECTABLE_DICE_NUMBER,
   casinoChainById,
   chainById,
   chainNativeCurrencyToToken,
@@ -14,17 +17,17 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Hex, decodeEventLog } from "viem"
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
+import { useChain } from "../context/chainContext"
 import { createLogger } from "../lib/logger"
+import { BetStatus, GameChoice, GameEncodedInput, GameResult } from "../types/types"
 import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
-import { useChain } from "../context/chainContext"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
-import { BetStatus, GameResult } from "../types/types"
 
 const logger = createLogger("usePlaceBet")
 
 export interface IUsePlaceBetReturn {
-  placeBet: (betAmount: bigint, choice: COINTOSS_FACE) => Promise<void>
+  placeBet: (betAmount: bigint, choice: GameChoice) => Promise<void>
   betStatus: BetStatus
   isWaiting: boolean
   isError: unknown
@@ -35,18 +38,65 @@ export interface IUsePlaceBetReturn {
   formattedVrfFees: number
 }
 
-export function usePlaceBet(game: CASINO_GAME_TYPE): IUsePlaceBetReturn {
+function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncodedInput {
+  switch (game) {
+    case CASINO_GAME_TYPE.COINTOSS:
+      return CoinToss.encodeInput(choice as COINTOSS_FACE)
+    case CASINO_GAME_TYPE.DICE: {
+      const choiceNum = Number(choice)
+      if (choiceNum < MIN_SELECTABLE_DICE_NUMBER || choiceNum > MAX_SELECTABLE_DICE_NUMBER) {
+        throw new Error(
+          `Invalid dice number: ${choiceNum}. Must be between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER}`,
+        )
+      }
+      return Dice.encodeInput(choice)
+    }
+    default:
+      throw new Error(`Unsupported game type for encoding input: ${game}`)
+  }
+}
+
+/**
+ * Handles the complete bet placement flow from transaction to result.
+ * Manages transaction submission, VRF fee estimation, and result monitoring.
+ *
+ * @param game - Type of casino game being played
+ * @param refetchBalance - Callback to refresh user balance after bet
+ * @returns Bet placement functions and state including status, VRF fees, and results
+ *
+ * @example
+ * ```ts
+ * const { placeBet, betStatus, gameResult } = usePlaceBet(
+ *   CASINO_GAME_TYPE.DICE,
+ *   refetchBalance
+ * )
+ *
+ * // Place a bet
+ * await placeBet(parseEther('0.1'), 3) // Bet 0.1 ETH on dice number 3
+ *
+ * // Monitor status: pending -> loading -> rolling -> success
+ * if (betStatus === 'success') {
+ *   console.log('You', gameResult.isWin ? 'won' : 'lost')
+ * }
+ * ```
+ */
+export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void): IUsePlaceBetReturn {
   const { appChainId } = useChain()
   const publicClient = usePublicClient({ chainId: appChainId })
   const { address: connectedAddress } = useAccount()
-  const wagerWriteHook = useWriteContract();
+  const wagerWriteHook = useWriteContract()
 
   const wagerWaitingHook = useWaitForTransactionReceipt({
     hash: wagerWriteHook.data,
     chainId: appChainId,
-  });
-  const { vrfFees, wagmiHook: estimateVrfFeesWagmiHook, formattedVrfFees, gasPrice } = useEstimateVRFFees({
-    game: CASINO_GAME_TYPE.COINTOSS,
+  })
+  const {
+    vrfFees,
+    wagmiHook: estimateVrfFeesWagmiHook,
+    formattedVrfFees,
+    gasPrice,
+  } = useEstimateVRFFees({
+    game,
     token: chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency), // TODO make this token dynamic when the token list is integrated
     betCount: 1, // TODO make this number dynamic when multi betting is integrated
   })
@@ -58,14 +108,22 @@ export function usePlaceBet(game: CASINO_GAME_TYPE): IUsePlaceBetReturn {
 
   const betStatus: BetStatus = useMemo(() => {
     if (internalError) return "internal-error"
-    else if (wagerWriteHook.error) return "error"
-    else if (wagerWaitingHook.error) return "waiting-error"
-    else if (wagerWriteHook.isPending) return "pending"
-    else if (wagerWaitingHook.isLoading) return "loading"
-    else if (isRolling) return "rolling"
-    else if (gameResult) return "success"
+    if (wagerWriteHook.error) return "error"
+    if (wagerWaitingHook.error) return "waiting-error"
+    if (wagerWriteHook.isPending) return "pending"
+    if (wagerWaitingHook.isLoading) return "loading"
+    if (isRolling) return "rolling"
+    if (gameResult) return "success"
     return null
-  }, [internalError, wagerWriteHook.error, wagerWaitingHook.error, wagerWriteHook.isPending, wagerWaitingHook.isLoading, isRolling, gameResult])
+  }, [
+    internalError,
+    wagerWriteHook.error,
+    wagerWaitingHook.error,
+    wagerWriteHook.isPending,
+    wagerWaitingHook.isLoading,
+    isRolling,
+    gameResult,
+  ])
 
   const isWaiting = useMemo(() => {
     return wagerWaitingHook.isLoading || wagerWaitingHook.isPending || isRolling
@@ -92,20 +150,28 @@ export function usePlaceBet(game: CASINO_GAME_TYPE): IUsePlaceBetReturn {
       logger.debug("watcher: Bet resolved: SUCCESS", {
         gameResult: watcherGameResult,
       })
+
+      refetchBalance()
     } else if (watcherStatus === "error") {
       setInternalError("watcher error")
       logger.debug("watcher: Bet resolved: ERROR from watcher")
     }
-  }, [watcherStatus, watcherGameResult])
+  }, [watcherStatus, watcherGameResult, refetchBalance])
+
+  const resetBetState = useCallback(() => {
+    wagerWriteHook.reset()
+    setGameResult(null)
+    setWatchTarget(null)
+    resetWatcher()
+  }, [resetWatcher, wagerWriteHook.reset])
 
   const placeBet = useCallback(
-    async (betAmount: bigint, choice: COINTOSS_FACE) => {
+    async (betAmount: bigint, choice: GameChoice) => {
       resetBetState()
-
 
       const betParams = {
         game,
-        gameEncodedInput: CoinToss.encodeInput(choice),
+        gameEncodedInput: _encodeGameInput(choice, game),
         betAmount,
       }
 
@@ -123,24 +189,26 @@ export function usePlaceBet(game: CASINO_GAME_TYPE): IUsePlaceBetReturn {
 
       logger.debug("placeBet: VRF cost refetched:", formattedVrfFees)
 
-
       _submitBetTransaction(
         betParams,
         connectedAddress,
         vrfFees,
         gasPrice,
         appChainId,
-        wagerWriteHook.writeContract
+        wagerWriteHook.writeContract,
       )
     },
     [
+      game,
+      resetBetState,
       publicClient,
       appChainId,
       connectedAddress,
       wagerWriteHook.writeContract,
-      wagerWriteHook.reset,
-      resetWatcher,
-      vrfFees
+      estimateVrfFeesWagmiHook.refetch,
+      formattedVrfFees,
+      vrfFees,
+      gasPrice,
     ],
   )
 
@@ -186,21 +254,32 @@ export function usePlaceBet(game: CASINO_GAME_TYPE): IUsePlaceBetReturn {
           eventName: rollEventData.eventName,
           eventArgs: rollEventData.args,
         })
-        // TODO refetch balance
-        // TODO refetch allowance
+
+        refetchBalance()
       }
       waitRoll()
     }
-  }, [wagerWaitingHook.isSuccess])
+  }, [
+    wagerWaitingHook.isSuccess,
+    wagerWriteHook.data,
+    game,
+    appChainId,
+    connectedAddress,
+    publicClient,
+    refetchBalance,
+  ])
 
-  const resetBetState = useCallback(() => {
-    wagerWriteHook.reset()
-    setGameResult(null)
-    setWatchTarget(null)
-    resetWatcher()
-  }, [resetWatcher])
-
-  return { placeBet, betStatus, isWaiting, isError, gameResult, resetBetState, vrfFees, gasPrice, formattedVrfFees }
+  return {
+    placeBet,
+    betStatus,
+    isWaiting,
+    isError,
+    gameResult,
+    resetBetState,
+    vrfFees,
+    gasPrice,
+    formattedVrfFees,
+  }
 }
 
 async function _submitBetTransaction(
@@ -222,7 +301,6 @@ async function _submitBetTransaction(
     gasPrice,
     chainId,
   })
-
 }
 
 // @Kinco advice. Create a retry system
@@ -244,7 +322,11 @@ async function _extractBetIdFromReceipt(
   const { data: placeBetEventData } = getPlaceBetEventData(gameType, chainId, receiver)
 
   for (const log of receipt.logs) {
-    if (log.address.toLowerCase() !== casinoChainById[chainId].contracts.games[gameType]?.address.toLowerCase()) continue
+    if (
+      log.address.toLowerCase() !==
+      casinoChainById[chainId].contracts.games[gameType]?.address.toLowerCase()
+    )
+      continue
     const decodedLog = decodeEventLog({
       abi: placeBetEventData.abi,
       data: log.data,

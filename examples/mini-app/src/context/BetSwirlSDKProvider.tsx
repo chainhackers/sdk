@@ -5,9 +5,7 @@ import { ConfigProviderProps } from "./configContext"
 type BetSwirlSDKProviderProps = ChainProviderProps & ConfigProviderProps
 import { ConfigProvider } from "./configContext"
 
-export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (
-  props,
-) => {
+export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) => {
   const { children, initialChainId, affiliate } = props
 
   return (
