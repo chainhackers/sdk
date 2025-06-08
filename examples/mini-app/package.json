@@ -18,9 +18,7 @@
     },
     "./styles.css": "./dist/index.css"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "dev": "vite",
     "build": "rm -rf dist && tsc -b && vite build && cp -r src/assets dist/assets",

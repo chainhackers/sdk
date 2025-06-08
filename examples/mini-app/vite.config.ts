@@ -4,11 +4,11 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 
 const assetFileNames = (assetInfo: any) => {
-  if (assetInfo.name && assetInfo.name.endsWith(".css")) {
-    return "index.css";
+  if (assetInfo.name?.endsWith(".css")) {
+    return "index.css"
   }
-  return "assets/[name][extname]";
-};
+  return "assets/[name][extname]"
+}
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -25,7 +25,6 @@ export default defineConfig({
     },
     rollupOptions: {
       external: (id) => {
-
         const externalPackages = [
           "react",
           "react-dom",
@@ -34,12 +33,10 @@ export default defineConfig({
           "@coinbase/onchainkit",
           "@tanstack/react-query",
           "viem",
-          "wagmi"
-        ];
-        
-        return externalPackages.some(pkg => 
-          id === pkg || id.startsWith(pkg + "/")
-        );
+          "wagmi",
+        ]
+
+        return externalPackages.some((pkg) => id === pkg || id.startsWith(`${pkg}/`))
       },
       output: [
         {

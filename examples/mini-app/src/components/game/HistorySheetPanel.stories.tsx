@@ -4,10 +4,10 @@ import { History as HistoryIcon } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { cn } from "../../lib/utils"
+import { HistoryEntry, HistoryEntryStatus } from "../../types/types"
 import { Button } from "../ui/button"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { HistorySheetPanel } from "./HistorySheetPanel"
-import { HistoryEntry, HistoryEntryStatus } from "../../types/types"
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode

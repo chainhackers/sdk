@@ -1,4 +1,3 @@
-import React from "react"
 import {
   CASINO_GAME_TYPE,
   COINTOSS_FACE,
@@ -12,10 +11,10 @@ import { useState } from "react"
 import { parseUnits } from "viem"
 import gameBg from "../../assets/game/game-background.jpg"
 import { ETH_TOKEN } from "../../lib/tokens"
+import { type HistoryEntry, HistoryEntryStatus } from "../../types/types"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { DiceGameControls } from "./DiceGameControls"
 import { GameFrame } from "./GameFrame"
-import { type HistoryEntry, HistoryEntryStatus } from "../../types/types"
 
 declare global {
   interface BigInt {

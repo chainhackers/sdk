@@ -1,5 +1,5 @@
-import { HistoryEntry } from "../../types/types"
 import { cn } from "../../lib/utils"
+import { HistoryEntry } from "../../types/types"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"

@@ -80,7 +80,10 @@ function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncod
  * }
  * ```
  */
-export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void): IUsePlaceBetReturn {
+export function usePlaceBet(
+  game: CASINO_GAME_TYPE,
+  refetchBalance: () => void,
+): IUsePlaceBetReturn {
   const { appChainId } = useChain()
   const publicClient = usePublicClient({ chainId: appChainId })
   const { address: connectedAddress } = useAccount()
