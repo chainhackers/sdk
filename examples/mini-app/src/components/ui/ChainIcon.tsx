@@ -11,7 +11,7 @@ interface ChainIconProps {
 export function ChainIcon({ chainId, size = 18, className }: ChainIconProps) {
   const chainIconUrl = getChainIconUrl(chainId)
   const chainName = getChainName(chainId)
-  
+
   return (
     <TokenImage
       token={{

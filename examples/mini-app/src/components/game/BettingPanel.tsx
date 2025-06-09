@@ -14,10 +14,10 @@ import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { cn } from "../../lib/utils"
 import { BetStatus } from "../../types"
+import { ChainIcon } from "../ui/ChainIcon"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
-import { ChainIcon } from "../ui/ChainIcon"
 
 interface BettingPanelProps {
   game: CASINO_GAME_TYPE
@@ -73,11 +73,7 @@ export function BettingPanel({
       setInputValue("")
       setIsValidInput(true)
     } else {
-      const formatted = formatRawAmount(
-        betAmount,
-        token.decimals,
-        FORMAT_TYPE.PRECISE,
-      )
+      const formatted = formatRawAmount(betAmount, token.decimals, FORMAT_TYPE.PRECISE)
       setInputValue(formatted)
       setIsValidInput(true)
     }
@@ -96,8 +92,7 @@ export function BettingPanel({
 
   const isBetAmountValid = betAmount && betAmount > 0n
 
-  const effectiveBalance =
-    token.address === GAS_TOKEN_ADDRESS ? balance - vrfFees : balance
+  const effectiveBalance = token.address === GAS_TOKEN_ADDRESS ? balance - vrfFees : balance
   const isTotalbetAmountExceedsBalance =
     betAmount && BigInt(betCount) * betAmount > effectiveBalance
   const isBetCountValid = betCount > 0 && betCount <= maxBetCount
@@ -106,14 +101,9 @@ export function BettingPanel({
   const formattedBalance = formatRawAmount(balance, token.decimals)
 
   const isBetSuccees = betStatus === "success"
-  const isWaiting =
-    betStatus === "loading" ||
-    betStatus === "pending" ||
-    betStatus === "rolling"
+  const isWaiting = betStatus === "loading" || betStatus === "pending" || betStatus === "rolling"
   const isError =
-    betStatus === "error" ||
-    betStatus === "waiting-error" ||
-    betStatus === "internal-error"
+    betStatus === "error" || betStatus === "waiting-error" || betStatus === "internal-error"
 
   const canInitiateBet =
     isConnected &&
@@ -185,8 +175,7 @@ export function BettingPanel({
 
   const handleMaxBet = () => {
     if (isConnected) {
-      const maxBalance =
-        token.address === GAS_TOKEN_ADDRESS ? balance - vrfFees : balance
+      const maxBalance = token.address === GAS_TOKEN_ADDRESS ? balance - vrfFees : balance
 
       const maxBetAmount = maxBalance > 0n ? maxBalance : 0n
       onBetAmountChange(maxBetAmount)
@@ -234,11 +223,7 @@ export function BettingPanel({
           <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
           <span className="font-semibold">{formattedBalance}</span>
           <div className="flex items-center ml-1">
-            <ChainIcon
-              chainId={appChainId}
-              size={18}
-              className="-mr-[4px] mask-overlap-cutout"
-            />
+            <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
             <TokenImage token={ETH_TOKEN} size={18} />
           </div>
         </div>
@@ -258,10 +243,7 @@ export function BettingPanel({
           step={BET_AMOUNT_INPUT_STEP}
           value={inputValue}
           onChange={handleInputChange}
-          className={cn(
-            "relative",
-            !isValidInput && "[&_input]:text-muted-foreground",
-          )}
+          className={cn("relative", !isValidInput && "[&_input]:text-muted-foreground")}
           token={{
             icon: <TokenImage token={ETH_TOKEN} size={18} />,
             symbol: token.symbol,
@@ -299,13 +281,7 @@ export function BettingPanel({
 
       <Button
         size="lg"
-        className={cn(
-          "w-full",
-          "border-0",
-          "font-bold",
-          "rounded-[16px]",
-          "text-play-btn-font",
-        )}
+        className={cn("w-full", "border-0", "font-bold", "rounded-[16px]", "text-play-btn-font")}
         variant={isError ? "destructive" : "default"}
         onClick={handlePlayBtnClick}
         disabled={isPlayButtonDisabled}
