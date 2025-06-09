@@ -9,10 +9,12 @@ import { TokenImage } from "@coinbase/onchainkit/token"
 import Decimal from "decimal.js"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { parseUnits } from "viem"
+import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { cn } from "../../lib/utils"
 import { BetStatus } from "../../types"
+import { ChainIcon } from "../ui/ChainIcon"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
@@ -50,6 +52,7 @@ export function BettingPanel({
   areChainsSynced,
   isGamePaused,
 }: BettingPanelProps) {
+  const { appChainId } = useChain()
   const [inputValue, setInputValue] = useState<string>("")
   const [isValidInput, setIsValidInput] = useState<boolean>(true)
   const [isUserTyping, setIsUserTyping] = useState<boolean>(false)
@@ -219,7 +222,10 @@ export function BettingPanel({
         <div className="text-sm font-medium flex items-center">
           <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
           <span className="font-semibold">{formattedBalance}</span>
-          <TokenImage token={ETH_TOKEN} size={18} className="ml-1" />
+          <div className="flex items-center ml-1">
+            <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
+            <TokenImage token={ETH_TOKEN} size={18} />
+          </div>
         </div>
 
         <Label
