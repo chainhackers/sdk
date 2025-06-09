@@ -219,7 +219,18 @@ export function BettingPanel({
         <div className="text-sm font-medium flex items-center">
           <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
           <span className="font-semibold">{formattedBalance}</span>
-          <TokenImage token={ETH_TOKEN} size={18} className="ml-1" />
+          <div className="flex items-center ml-1">
+            <TokenImage
+              token={{
+                ...ETH_TOKEN,
+                image:
+                  "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/info/logo.png",
+              }}
+              size={18}
+              className="-mr-[4px]  mask-overlap-cutout"
+            />
+            <TokenImage token={ETH_TOKEN} size={18} />
+          </div>
         </div>
 
         <Label

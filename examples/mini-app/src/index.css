@@ -240,4 +240,9 @@
 
 @layer components {
   @import "@coinbase/onchainkit/styles.css";
+
+  .mask-overlap-cutout {
+    mask-image: radial-gradient(circle 12px at 23px center, transparent 11.5px, black 12px);
+    -webkit-mask-image: radial-gradient(circle 12px at 23px center, transparent 11.5px, black 12px);
+  }
 }
