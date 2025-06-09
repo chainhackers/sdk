@@ -11,11 +11,11 @@ import { formatGwei } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { BetStatus, GameResult } from "../types"
+import { useBetCalculations } from "./useBetCalculations"
 import { HistoryEntry, useGameHistory } from "./useGameHistory"
 import { useHouseEdge } from "./useHouseEdge"
 import { useIsGamePaused } from "./useIsGamePaused"
 import { usePlaceBet } from "./usePlaceBet"
-import { useBetCalculations } from "./useBetCalculations"
 
 type GameSelection = COINTOSS_FACE | DiceNumber
 
