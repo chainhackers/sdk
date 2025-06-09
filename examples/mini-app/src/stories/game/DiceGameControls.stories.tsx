@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
-import { DiceGameControls } from "./DiceGameControls"
+import { DiceGameControls } from "../../components/game/DiceGameControls"
 
 const meta = {
   title: "Game/Controls/DiceGameControls",

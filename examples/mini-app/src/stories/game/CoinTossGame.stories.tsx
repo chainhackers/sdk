@@ -1,11 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import gameBg from "../../assets/game/game-background-1.jpg"
+import { CoinTossGame } from "../../components/game/CoinTossGame"
 import { AppProviders } from "../../providers"
-import { DiceGame } from "./DiceGame"
+import gameBg1 from "../assets/game/game-background-1.jpg"
+import gameBg2 from "../assets/game/game-background-2.jpg"
+import gameBg3 from "../assets/game/game-background-3.jpg"
+import gameBg4 from "../assets/game/game-background-4.jpg"
+import gameBg5 from "../assets/game/game-background-5.png"
+import gameBg6 from "../assets/game/game-background-6.jpg"
+import gameBg7 from "../assets/game/game-background-7.png"
+import gameBg8 from "../assets/game/game-background-8.jpg"
 
 const meta = {
-  title: "Game/DiceGame",
-  component: DiceGame,
+  title: "Game/CoinTossGame",
+  component: CoinTossGame,
   parameters: {
     layout: "centered",
     backgrounds: {
@@ -52,13 +59,13 @@ const meta = {
       accept: "image/*",
     },
   },
-} satisfies Meta<typeof DiceGame>
+} satisfies Meta<typeof CoinTossGame>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 const Template: Story = {
-  render: (args) => <DiceGame {...args} />,
+  render: (args) => <CoinTossGame {...args} />,
 }
 
 export const LightTheme: Story = {
@@ -72,6 +79,7 @@ export const DarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    backgroundImage: gameBg2,
   },
   parameters: {
     backgrounds: { default: "dark" },
@@ -82,6 +90,7 @@ export const SystemTheme: Story = {
   ...Template,
   args: {
     theme: "system",
+    backgroundImage: gameBg4,
   },
 }
 
@@ -92,8 +101,8 @@ export const CustomTheme1: Story = {
     customTheme: {
       "--primary": "#4dae52",
       "--play-btn-font": "#1B5E20",
-      "--game-window-overlay": "oklch(0 0 0 / 40%)",
     } as React.CSSProperties,
+    backgroundImage: gameBg1,
   },
 }
 
@@ -102,10 +111,57 @@ export const CustomTheme2: Story = {
   args: {
     theme: "light",
     customTheme: {
-      "--primary": "#6AB3D3",
+      "--primary": "rgb(239 185 1)",
       "--play-btn-font": "#ffffff",
-      "--game-window-overlay": "oklch(0 0 0 / 10%)",
     } as React.CSSProperties,
-    backgroundImage: gameBg,
+    backgroundImage: gameBg3,
+  },
+}
+
+export const CustomTheme3: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    customTheme: {
+      "--primary": "#ffb74d",
+      "--play-btn-font": "#3e2723",
+    } as React.CSSProperties,
+    backgroundImage: gameBg5,
+  },
+}
+
+export const CustomTheme4: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    customTheme: {
+      "--primary": "#b8d32f",
+      "--play-btn-font": "#002a47",
+    } as React.CSSProperties,
+    backgroundImage: gameBg6,
+  },
+}
+
+export const CustomTheme5: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    customTheme: {
+      "--primary": "hsl(13.9deg 83.1% 41.76%)",
+      "--play-btn-font": "#ffffff",
+    } as React.CSSProperties,
+    backgroundImage: gameBg7,
+  },
+}
+
+export const CustomTheme6: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    customTheme: {
+      "--primary": "rgb(44 52 51)",
+      "--play-btn-font": "rgb(171 181 171)",
+    } as React.CSSProperties,
+    backgroundImage: gameBg8,
   },
 }
