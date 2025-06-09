@@ -36,3 +36,5 @@ jobs:
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           workingDir: examples/mini-app
+          exitZeroOnChanges: false
+          skip: "dependabot/**"
