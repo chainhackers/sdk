@@ -11,7 +11,6 @@ export * from "./hooks/useHouseEdge"
 export * from "./hooks/useIsGamePaused"
 export * from "./hooks/useBetRequirements"
 export * from "./hooks/useEstimateVRFFees"
-export * from "./hooks/useGameCalculations"
 export * from "./hooks/useGameHistory"
 
 export * from "./components/game/BettingPanel"

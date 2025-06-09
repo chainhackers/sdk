@@ -39,7 +39,7 @@ export function DiceGame({
     formattedVrfFees,
     gasPrice,
     targetPayoutAmount,
-    multiplier,
+    formattedNetMultiplier,
     grossMultiplier,
     isInGameResultState,
     isGamePaused,
@@ -86,7 +86,7 @@ export function DiceGame({
           <DiceGameControls
             selectedNumber={selectedNumber}
             onNumberChange={handleNumberChange}
-            multiplier={multiplier}
+            multiplier={formattedNetMultiplier}
             isDisabled={isControlsDisabled}
           />
         </GameFrame.GameControls>
