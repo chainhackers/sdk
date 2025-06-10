@@ -60,6 +60,16 @@
   --color-slider-disabled-tooltip: var(--slider-disabled-tooltip);
   --color-dice-slider-box: var(--dice-slider-box);
   --color-text-color: var(--text-color);
+  --color-roulette-red: var(--roulette-red);
+  --color-roulette-red-hover: var(--roulette-red-hover);
+  --color-roulette-black: var(--roulette-black);
+  --color-roulette-black-hover: var(--roulette-black-hover);
+  --color-roulette-green: var(--roulette-green);
+  --color-roulette-green-hover: var(--roulette-green-hover);
+  --color-roulette-bundle: var(--roulette-bundle);
+  --color-roulette-bundle-hover: var(--roulette-bundle-hover);
+  --color-roulette-disabled: var(--roulette-disabled);
+  --color-roulette-disabled-text: var(--roulette-disabled-text);
 }
 
 @layer base {
@@ -139,6 +149,17 @@
     --slider-disabled-tooltip: oklch(0.6138 0.014 271.18);
     --dice-slider-box: oklch(1 0 0 / 80%);
     --text-color: var(--white);
+
+    --roulette-red: oklch(0.6273 0.1893 23.38);
+    --roulette-red-hover: oklch(0.6573 0.1893 23.38);
+    --roulette-black: oklch(0.343 0.0139 235.28);
+    --roulette-black-hover: oklch(0.373 0.0139 235.28);
+    --roulette-green: oklch(0.784 0.1418 166.22);
+    --roulette-green-hover: oklch(0.804 0.1418 166.22);
+    --roulette-bundle: oklch(0.2398 0.0062 214.42);
+    --roulette-bundle-hover: oklch(0.2698 0.0062 214.42);
+    --roulette-disabled: oklch(0.8399 0.0061 239.84);
+    --roulette-disabled-text: oklch(0.6138 0.014 271.18);
   }
 
   .dark {
@@ -187,6 +208,17 @@
     --slider-disabled: oklch(0.7774 0.0129 276.04);
     --slider-disabled-shadow: oklch(0.7774 0.0129 276.04 / 0.2);
     --slider-disabled-tooltip: oklch(0.6138 0.014 271.18);
+
+    --roulette-red: oklch(0.6273 0.1893 23.38);
+    --roulette-red-hover: oklch(0.6573 0.1893 23.38);
+    --roulette-black: oklch(0.343 0.0139 235.28);
+    --roulette-black-hover: oklch(0.373 0.0139 235.28);
+    --roulette-green: oklch(0.78 0.1418 166.22);
+    --roulette-green-hover: oklch(0.804 0.1418 166.22);
+    --roulette-bundle: oklch(0.2398 0.0062 214.42);
+    --roulette-bundle-hover: oklch(0.2698 0.0062 214.42);
+    --roulette-disabled: oklch(0.8399 0.0061 239.84);
+    --roulette-disabled-text: oklch(0.6138 0.014 271.18);
   }
 
   @font-face {
@@ -242,7 +274,15 @@
   @import "@coinbase/onchainkit/styles.css";
 
   .mask-overlap-cutout {
-    mask-image: radial-gradient(circle 12px at 23px center, transparent 11.5px, black 12px);
-    -webkit-mask-image: radial-gradient(circle 12px at 23px center, transparent 11.5px, black 12px);
+    mask-image: radial-gradient(
+      circle 12px at 23px center,
+      transparent 11.5px,
+      black 12px
+    );
+    -webkit-mask-image: radial-gradient(
+      circle 12px at 23px center,
+      transparent 11.5px,
+      black 12px
+    );
   }
 }
