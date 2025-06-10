@@ -4,7 +4,7 @@ import {
   getBetRequirementsFunctionData,
   maxGameBetCountByType,
 } from "@betswirl/sdk-core"
-import { useMemo } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { formatUnits } from "viem"
 import { useReadContract } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -31,9 +31,29 @@ const MAX_BET_REFETCH_INTERVAL = 120000 // 2 minutes - Max bet depends on bankro
  */
 export function useBetRequirements(props: UseBetRequirementsProps) {
   const { appChainId } = useChain()
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const [debouncedMultiplier, setDebouncedMultiplier] = useState(props.grossMultiplier)
+
+  useEffect(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      setDebouncedMultiplier(props.grossMultiplier)
+    }, 500)
+
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
+      }
+    }
+  }, [props.grossMultiplier])
+
   const functionData = useMemo(() => {
-    return getBetRequirementsFunctionData(props.token.address, props.grossMultiplier, appChainId)
-  }, [props.token.address, props.grossMultiplier, appChainId])
+    return getBetRequirementsFunctionData(props.token.address, debouncedMultiplier, appChainId)
+  }, [props.token.address, debouncedMultiplier, appChainId])
 
   const wagmiHook = useReadContract({
     abi: functionData.data.abi,
@@ -43,7 +63,7 @@ export function useBetRequirements(props: UseBetRequirementsProps) {
     chainId: appChainId,
     query: {
       initialData: [false, 0n, 1n],
-      refetchInterval: MAX_BET_REFETCH_INTERVAL, // Max bet amount depends directly of the bankroll, it means it has been updated regularly
+      refetchInterval: MAX_BET_REFETCH_INTERVAL,
     },
   })
 
