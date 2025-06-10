@@ -98,8 +98,7 @@ export const CustomTheme1: Story = {
     theme: "light",
     customTheme: {
       "--primary": "#7f5058",
-      "--play-btn-font": "rgb(238 231 235)",
-      "--game-window-overlay": "oklch(0 0 0 / 40%)",
+      "--play-btn-font": "rgb(238 231 235)"
     } as React.CSSProperties,
     backgroundImage: gameBg5,
   },
@@ -111,8 +110,7 @@ export const CustomTheme2: Story = {
     theme: "dark",
     customTheme: {
       "--primary": "#d7caab",
-      "--play-btn-font": "#254450",
-      "--game-window-overlay": "oklch(0 0 0 / 10%)",
+      "--play-btn-font": "#254450"
     } as React.CSSProperties,
     backgroundImage: gameBg1,
   },
@@ -124,8 +122,7 @@ export const CustomTheme3: Story = {
     theme: "dark",
     customTheme: {
       "--primary": "#595b5c",
-      "--play-btn-font": "#c5c2ab",
-      "--game-window-overlay": "oklch(0 0 0 / 10%)",
+      "--play-btn-font": "#c5c2ab"
     } as React.CSSProperties,
     backgroundImage: gameBg3,
   },
@@ -137,8 +134,7 @@ export const CustomTheme4: Story = {
     theme: "dark",
     customTheme: {
       "--primary": "rgb(74 41 24)",
-      "--play-btn-font": "rgb(225 159 31)",
-      "--game-window-overlay": "oklch(0 0 0 / 10%)",
+      "--play-btn-font": "rgb(225 159 31)"
     } as React.CSSProperties,
     backgroundImage: gameBg6,
   },
