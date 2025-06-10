@@ -58,9 +58,7 @@ function InteractiveRouletteGameControls({
   multiplier?: number
   isDisabled?: boolean
 }) {
-  const [selectedNumbers, setSelectedNumbers] = useState<RouletteNumber[]>(
-    initialSelectedNumbers,
-  )
+  const [selectedNumbers, setSelectedNumbers] = useState<RouletteNumber[]>(initialSelectedNumbers)
 
   const handleNumbersChange = (numbers: RouletteNumber[]) => {
     setSelectedNumbers(numbers)
@@ -115,9 +113,7 @@ export const Default: Story = {
 
 export const MultipleNumbers: Story = {
   name: "Multiple Numbers",
-  render: () => (
-    <InteractiveRouletteGameControls initialSelectedNumbers={[7, 14, 21, 28]} />
-  ),
+  render: () => <InteractiveRouletteGameControls initialSelectedNumbers={[7, 14, 21, 28]} />,
   args: {} as any,
   parameters: {
     docs: {
@@ -150,9 +146,7 @@ export const FirstDozen: Story = {
 
 export const DisabledEmpty: Story = {
   name: "Disabled (Empty)",
-  render: () => (
-    <StaticRouletteGameControls selectedNumbers={[]} isDisabled={true} />
-  ),
+  render: () => <StaticRouletteGameControls selectedNumbers={[]} isDisabled={true} />,
   args: {} as any,
   parameters: {
     docs: {
@@ -177,8 +171,7 @@ export const DisabledWithSelections: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Disabled roulette table with existing selections. Shows disabled state styling.",
+        story: "Disabled roulette table with existing selections. Shows disabled state styling.",
       },
     },
   },
