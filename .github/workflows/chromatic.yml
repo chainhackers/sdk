@@ -6,6 +6,7 @@ jobs:
   chromatic:
     name: Run Chromatic
     runs-on: ubuntu-latest
+    if: "!contains(github.event.pull_request.title, '[draft]')"
     defaults:
       run:
         working-directory: ./examples/mini-app
