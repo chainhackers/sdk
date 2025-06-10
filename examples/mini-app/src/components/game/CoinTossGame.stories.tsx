@@ -93,8 +93,8 @@ export const SystemTheme: Story = {
     backgroundImage: gameBg4,
   },
   parameters: {
-    chromatic: { disable: true }
-  }
+    chromatic: { disable: true },
+  },
 }
 
 export const CustomTheme1: Story = {
@@ -108,8 +108,8 @@ export const CustomTheme1: Story = {
     backgroundImage: gameBg1,
   },
   parameters: {
-    chromatic: { disable: true }
-  }
+    chromatic: { disable: true },
+  },
 }
 
 export const CustomTheme2: Story = {
@@ -123,8 +123,8 @@ export const CustomTheme2: Story = {
     backgroundImage: gameBg3,
   },
   parameters: {
-    chromatic: { disable: true }
-  }
+    chromatic: { disable: true },
+  },
 }
 
 export const CustomTheme3: Story = {
@@ -138,8 +138,8 @@ export const CustomTheme3: Story = {
     backgroundImage: gameBg5,
   },
   parameters: {
-    chromatic: { disable: true }
-  }
+    chromatic: { disable: true },
+  },
 }
 
 export const CustomTheme4: Story = {
@@ -153,8 +153,8 @@ export const CustomTheme4: Story = {
     backgroundImage: gameBg6,
   },
   parameters: {
-    chromatic: { disable: true }
-  }
+    chromatic: { disable: true },
+  },
 }
 
 export const CustomTheme5: Story = {
@@ -168,8 +168,8 @@ export const CustomTheme5: Story = {
     backgroundImage: gameBg7,
   },
   parameters: {
-    chromatic: { disable: true }
-  }
+    chromatic: { disable: true },
+  },
 }
 
 export const CustomTheme6: Story = {
@@ -183,6 +183,6 @@ export const CustomTheme6: Story = {
     backgroundImage: gameBg8,
   },
   parameters: {
-    chromatic: { disable: true }
-  }
+    chromatic: { disable: true },
+  },
 }
