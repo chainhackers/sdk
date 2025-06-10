@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import gameBg from "../../assets/game/game-background-1.jpg"
+import gameBg1 from "../../assets/game/game-background-9.png"
+import gameBg4 from "../../assets/game/game-background-10.png"
+import gameBg2 from "../../assets/game/game-background-11.webp"
+import gameBg3 from "../../assets/game/game-background-12.png"
+import gameBg5 from "../../assets/game/game-background-13.png"
+import gameBg6 from "../../assets/game/game-background-14.png"
 import { AppProviders } from "../../providers"
 import { DiceGame } from "./DiceGame"
 
@@ -72,9 +77,10 @@ export const DarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    backgroundImage: gameBg2,
   },
   parameters: {
-    backgrounds: { default: "dark" },
+    backgrounds: { default: "light" },
   },
 }
 
@@ -82,6 +88,7 @@ export const SystemTheme: Story = {
   ...Template,
   args: {
     theme: "system",
+    backgroundImage: gameBg4,
   },
 }
 
@@ -90,22 +97,45 @@ export const CustomTheme1: Story = {
   args: {
     theme: "light",
     customTheme: {
-      "--primary": "#4dae52",
-      "--play-btn-font": "#1B5E20",
-      "--game-window-overlay": "oklch(0 0 0 / 40%)",
+      "--primary": "#7f5058",
+      "--play-btn-font": "rgb(238 231 235)",
     } as React.CSSProperties,
+    backgroundImage: gameBg5,
   },
 }
 
 export const CustomTheme2: Story = {
   ...Template,
   args: {
-    theme: "light",
+    theme: "dark",
     customTheme: {
-      "--primary": "#6AB3D3",
-      "--play-btn-font": "#ffffff",
-      "--game-window-overlay": "oklch(0 0 0 / 10%)",
+      "--primary": "#d7caab",
+      "--play-btn-font": "#254450",
     } as React.CSSProperties,
-    backgroundImage: gameBg,
+    backgroundImage: gameBg1,
+  },
+}
+
+export const CustomTheme3: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    customTheme: {
+      "--primary": "#595b5c",
+      "--play-btn-font": "#c5c2ab",
+    } as React.CSSProperties,
+    backgroundImage: gameBg3,
+  },
+}
+
+export const CustomTheme4: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    customTheme: {
+      "--primary": "rgb(74 41 24)",
+      "--play-btn-font": "rgb(225 159 31)",
+    } as React.CSSProperties,
+    backgroundImage: gameBg6,
   },
 }
