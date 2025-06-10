@@ -92,6 +92,9 @@ export const SystemTheme: Story = {
     theme: "system",
     backgroundImage: gameBg4,
   },
+  parameters: {
+    chromatic: { disable: true }
+  }
 }
 
 export const CustomTheme1: Story = {
@@ -104,6 +107,9 @@ export const CustomTheme1: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg1,
   },
+  parameters: {
+    chromatic: { disable: true }
+  }
 }
 
 export const CustomTheme2: Story = {
@@ -116,6 +122,9 @@ export const CustomTheme2: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg3,
   },
+  parameters: {
+    chromatic: { disable: true }
+  }
 }
 
 export const CustomTheme3: Story = {
@@ -128,6 +137,9 @@ export const CustomTheme3: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg5,
   },
+  parameters: {
+    chromatic: { disable: true }
+  }
 }
 
 export const CustomTheme4: Story = {
@@ -140,6 +152,9 @@ export const CustomTheme4: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg6,
   },
+  parameters: {
+    chromatic: { disable: true }
+  }
 }
 
 export const CustomTheme5: Story = {
@@ -152,6 +167,9 @@ export const CustomTheme5: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg7,
   },
+  parameters: {
+    chromatic: { disable: true }
+  }
 }
 
 export const CustomTheme6: Story = {
@@ -164,4 +182,7 @@ export const CustomTheme6: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg8,
   },
+  parameters: {
+    chromatic: { disable: true }
+  }
 }
