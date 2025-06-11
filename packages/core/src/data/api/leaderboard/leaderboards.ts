@@ -130,11 +130,15 @@ export type RawCompleteLeaderboard = {
   shares: string[];
   casino_rules?: RawCasinoRules;
   sport_rules?: RawSportRules;
+  effective_rules: RawCasinoRules | RawSportRules;
+  is_usd_rules_source: boolean;
   rankings: RawLeaderboardRanking[];
   player_rank?: RawLeaderboardRanking;
   total_bettors: number;
   total_bets: number;
   total_wagered: string;
+  wagered_symbol: string; // "$" if USD source, else token symbol
+  wagered_decimals: number; // 2 if USD source, else token decimals
 };
 
 export type RawAffiliateCompleteLeaderboard = RawCompleteLeaderboard & {
@@ -180,6 +184,8 @@ export type Leaderboard = {
   formattedShares: string[];
   casinoRules?: CasinoRules;
   sportRules?: SportRules;
+  effectiveRules: CasinoRules | SportRules;
+  isUsdRulesSource: boolean;
   type: LEADERBOARD_TYPE;
   rankings: LeaderboardRanking[];
   player_rank?: LeaderboardRanking;
@@ -187,6 +193,8 @@ export type Leaderboard = {
   totalBets: number;
   totalWagered: bigint;
   formattedTotalWagered: string;
+  wageredSymbol: string;
+  wageredDecimals: number;
 };
 
 export type AffiliateLeaderboard = Leaderboard & {
@@ -431,11 +439,44 @@ export const fetchAffiliateLeaderboard = async (
 };
 
 const _formatRawLeaderboard = (leaderboard: RawCompleteLeaderboard): Leaderboard => {
-  const type = leaderboard.casino_rules ? LEADERBOARD_TYPE.CASINO : LEADERBOARD_TYPE.SPORTS;
-  const tokenRules =
-    type === LEADERBOARD_TYPE.CASINO
-      ? leaderboard.casino_rules!.tokens[0]!
-      : leaderboard.sport_rules!.tokens[0]!;
+  const casinoRules = leaderboard.casino_rules
+    ? {
+        tokens: leaderboard.casino_rules.tokens,
+        games: leaderboard.casino_rules.games,
+        source: leaderboard.casino_rules.source,
+        interval: BigInt(leaderboard.casino_rules.interval),
+        formattedInterval: formatUnits(
+          BigInt(leaderboard.casino_rules.interval),
+          leaderboard.wagered_decimals,
+        ),
+        pointsPerInterval: leaderboard.casino_rules.points_per_interval,
+        minValue: leaderboard.casino_rules.min_value
+          ? BigInt(leaderboard.casino_rules.min_value)
+          : undefined,
+        formattedMinValue: leaderboard.casino_rules.min_value
+          ? formatUnits(BigInt(leaderboard.casino_rules.min_value), leaderboard.wagered_decimals)
+          : undefined,
+      }
+    : undefined;
+  const sportRules = leaderboard.sport_rules
+    ? {
+        tokens: leaderboard.sport_rules.tokens,
+        source: leaderboard.sport_rules.source,
+        interval: BigInt(leaderboard.sport_rules.interval),
+        formattedInterval: formatUnits(
+          BigInt(leaderboard.sport_rules.interval),
+          leaderboard.wagered_decimals,
+        ),
+        pointsPerInterval: leaderboard.sport_rules.points_per_interval,
+        minValue: leaderboard.sport_rules.min_value
+          ? BigInt(leaderboard.sport_rules.min_value)
+          : undefined,
+        formattedMinValue: leaderboard.sport_rules.min_value
+          ? formatUnits(BigInt(leaderboard.sport_rules.min_value), leaderboard.wagered_decimals)
+          : undefined,
+        betTypes: leaderboard.sport_rules.bet_types,
+      }
+    : undefined;
   return {
     affiliateAddress: leaderboard.affiliate_address,
     chainId: leaderboard.chain_id,
@@ -464,44 +505,10 @@ const _formatRawLeaderboard = (leaderboard: RawCompleteLeaderboard): Leaderboard
     formattedShares: leaderboard.shares.map((share) =>
       formatUnits(BigInt(share), leaderboard.token.decimals),
     ),
-    casinoRules: leaderboard.casino_rules
-      ? {
-          tokens: leaderboard.casino_rules.tokens,
-          games: leaderboard.casino_rules.games,
-          source: leaderboard.casino_rules.source,
-          interval: BigInt(leaderboard.casino_rules.interval),
-          formattedInterval: formatUnits(
-            BigInt(leaderboard.casino_rules.interval),
-            tokenRules.decimals,
-          ),
-          pointsPerInterval: leaderboard.casino_rules.points_per_interval,
-          minValue: leaderboard.casino_rules.min_value
-            ? BigInt(leaderboard.casino_rules.min_value)
-            : undefined,
-          formattedMinValue: leaderboard.casino_rules.min_value
-            ? formatUnits(BigInt(leaderboard.casino_rules.min_value), tokenRules.decimals)
-            : undefined,
-        }
-      : undefined,
-    sportRules: leaderboard.sport_rules
-      ? {
-          tokens: leaderboard.sport_rules.tokens,
-          source: leaderboard.sport_rules.source,
-          interval: BigInt(leaderboard.sport_rules.interval),
-          formattedInterval: formatUnits(
-            BigInt(leaderboard.sport_rules.interval),
-            tokenRules.decimals,
-          ),
-          pointsPerInterval: leaderboard.sport_rules.points_per_interval,
-          minValue: leaderboard.sport_rules.min_value
-            ? BigInt(leaderboard.sport_rules.min_value)
-            : undefined,
-          formattedMinValue: leaderboard.sport_rules.min_value
-            ? formatUnits(BigInt(leaderboard.sport_rules.min_value), tokenRules.decimals)
-            : undefined,
-          betTypes: leaderboard.sport_rules.bet_types,
-        }
-      : undefined,
+    casinoRules,
+    sportRules,
+    effectiveRules: casinoRules || sportRules!,
+    isUsdRulesSource: leaderboard.is_usd_rules_source,
     type: leaderboard.casino_rules ? LEADERBOARD_TYPE.CASINO : LEADERBOARD_TYPE.SPORTS,
     rankings: leaderboard.rankings.map((ranking) => ({
       bettorAddress: ranking.bettor_address,
@@ -531,8 +538,10 @@ const _formatRawLeaderboard = (leaderboard: RawCompleteLeaderboard): Leaderboard
     totalWagered: BigInt(leaderboard.total_wagered),
     formattedTotalWagered: formatUnits(
       BigInt(leaderboard.total_wagered),
-      leaderboard.token.decimals,
+      leaderboard.wagered_decimals,
     ),
+    wageredSymbol: leaderboard.wagered_symbol,
+    wageredDecimals: leaderboard.wagered_decimals,
   };
 };
 

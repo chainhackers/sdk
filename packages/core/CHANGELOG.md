@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.7
+
+### Patch Changes
+
+- Add USD sources to Leaderboard
+
 ## 0.1.6
 
 ### Patch Changes
