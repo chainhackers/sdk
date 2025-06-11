@@ -256,4 +256,24 @@
     mask-image: radial-gradient(circle 12px at 23px center, transparent 11.5px, black 12px);
     -webkit-mask-image: radial-gradient(circle 12px at 23px center, transparent 11.5px, black 12px);
   }
+
+  .roulette-button-shadow-red {
+    box-shadow: 0 1px 0 oklch(0.519 0.1466 22.27);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-shadow-black {
+    box-shadow: 0 1px 0 oklch(0.3195 0.0141 235.34);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-shadow-green {
+    box-shadow: 0 1px 0 oklch(0.6621 0.1215 165.65);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-shadow-bundle {
+    box-shadow: 0 1px 0 oklch(0.1989 0.0051 248.08);
+    padding-bottom: 1px;
+  }
 }

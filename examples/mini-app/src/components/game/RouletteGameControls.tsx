@@ -25,21 +25,21 @@ interface ButtonColorConfig {
 
 const ROULETTE_COLORS: Record<RouletteColor, ButtonColorConfig> = {
   red: {
-    bg: "bg-roulette-red",
+    bg: "bg-roulette-red roulette-button-shadow-red",
     hover: "hover:bg-roulette-red-hover",
   },
   black: {
-    bg: "bg-roulette-black",
+    bg: "bg-roulette-black roulette-button-shadow-black",
     hover: "hover:bg-roulette-black-hover",
   },
   green: {
-    bg: "bg-roulette-green",
+    bg: "bg-roulette-green roulette-button-shadow-green",
     hover: "hover:bg-roulette-green-hover",
   },
 }
 
 const BUNDLE_COLORS: ButtonColorConfig = {
-  bg: "bg-roulette-bundle",
+  bg: "bg-roulette-bundle roulette-button-shadow-bundle",
   hover: "hover:bg-roulette-bundle-hover",
 }
 
@@ -166,7 +166,7 @@ export function RouletteGameControls({
       ROULETTE_INPUT_BUNDLE.THIRD_ROW,
     ].includes(bundle)
 
-    const sizeClass = isRowButton ? "h-[22px] w-[22px]" : "h-[28px]"
+    const sizeClass = isRowButton ? "flex-1 w-[22px]" : "h-[28px]"
     const bundleStyles = `${BUNDLE_COLORS.bg} ${BUNDLE_COLORS.hover}`
 
     return (
@@ -210,8 +210,8 @@ export function RouletteGameControls({
     <>
       <GameMultiplierDisplay multiplier={multiplier} className="top-[23px]" />
       <div className="absolute bottom-[16px] left-[3.5px] w-[321px] h-[130px]">
-        <div className="w-[321px] h-[130px] space-y-px">
-          <div className="flex gap-px">
+        <div className="w-[321px] h-[130px] space-y-0.5">
+          <div className="flex gap-0.5">
             <div className="flex flex-col justify-stretch h-[70px]">
               <Button
                 variant="ghost"
@@ -238,39 +238,39 @@ export function RouletteGameControls({
               </Button>
             </div>
 
-            <div className="w-[275px] grid grid-rows-3 gap-px">
-              <div className="grid grid-cols-12 gap-px">{renderRowNumbers(3)}</div>
-              <div className="grid grid-cols-12 gap-px">{renderRowNumbers(2)}</div>
-              <div className="grid grid-cols-12 gap-px">{renderRowNumbers(1)}</div>
+            <div className="w-[275px] grid grid-rows-3 gap-0.5">
+              <div className="grid grid-cols-12 gap-0.5">{renderRowNumbers(3)}</div>
+              <div className="grid grid-cols-12 gap-0.5">{renderRowNumbers(2)}</div>
+              <div className="grid grid-cols-12 gap-0.5">{renderRowNumbers(1)}</div>
             </div>
 
-            <div className="w-[22px] flex flex-col gap-px">
+            <div className="w-[22px] flex flex-col gap-0.5">
               {renderBundleButton(ROULETTE_INPUT_BUNDLE.THIRD_ROW, "2:1")}
               {renderBundleButton(ROULETTE_INPUT_BUNDLE.SECOND_ROW, "2:1")}
               {renderBundleButton(ROULETTE_INPUT_BUNDLE.FIRST_ROW, "2:1")}
             </div>
           </div>
 
-          <div className="flex gap-px">
+          <div className="flex gap-0.5">
             <div className="w-[22px]" />
 
-            <div className="w-[275px] space-y-px">
-              <div className="grid grid-cols-3 gap-px">
+            <div className="w-[275px] space-y-0.5">
+              <div className="grid grid-cols-3 gap-0.5">
                 {renderBundleButton(ROULETTE_INPUT_BUNDLE.ONE_TO_TWELVE, "1 to 12")}
                 {renderBundleButton(ROULETTE_INPUT_BUNDLE.THIRTEEN_TO_TWENTY_FOUR, "13 to 24")}
                 {renderBundleButton(ROULETTE_INPUT_BUNDLE.TWENTY_FIVE_TO_THIRTY_SIX, "25 to 36")}
               </div>
 
-              <div className="grid grid-cols-3 gap-px">
-                <div className="grid grid-cols-2 gap-px">
+              <div className="grid grid-cols-3 gap-0.5">
+                <div className="grid grid-cols-2 gap-0.5">
                   {renderBundleButton(ROULETTE_INPUT_BUNDLE.ONE_TO_EIGHTEEN, "1 to 18")}
                   {renderBundleButton(ROULETTE_INPUT_BUNDLE.EVEN, "Even")}
                 </div>
-                <div className="flex gap-px">
+                <div className="flex gap-0.5">
                   {renderColorButton(ROULETTE_INPUT_BUNDLE.BLACK, false)}
                   {renderColorButton(ROULETTE_INPUT_BUNDLE.RED, true)}
                 </div>
-                <div className="grid grid-cols-2 gap-px">
+                <div className="grid grid-cols-2 gap-0.5">
                   {renderBundleButton(ROULETTE_INPUT_BUNDLE.ODD, "Odd")}
                   {renderBundleButton(ROULETTE_INPUT_BUNDLE.EIGHTEEN_TO_THIRTY_SIX, "19 to 36")}
                 </div>
