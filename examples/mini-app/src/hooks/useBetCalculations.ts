@@ -4,11 +4,13 @@ import {
   CoinToss,
   Dice,
   DiceNumber,
+  Roulette,
+  RouletteNumber,
   getPayoutDetails,
 } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 
-type GameSelection = COINTOSS_FACE | DiceNumber
+type GameSelection = COINTOSS_FACE | DiceNumber | RouletteNumber[]
 
 interface UseBetCalculationsProps<T extends GameSelection> {
   gameType: CASINO_GAME_TYPE
@@ -38,6 +40,8 @@ function getMultiplierForGame<T extends GameSelection>(
       return CoinToss.getMultiplier(selection as COINTOSS_FACE)
     case CASINO_GAME_TYPE.DICE:
       return Dice.getMultiplier(selection as DiceNumber)
+    case CASINO_GAME_TYPE.ROULETTE:
+      return Roulette.getMultiplier(selection as RouletteNumber[])
     default:
       throw new Error(`Unsupported game type: ${gameType}`)
   }
@@ -80,8 +84,13 @@ export function useBetCalculations<T extends GameSelection>({
     [betAmount, betCount],
   )
 
-  const { grossPayout, netPayout, betSwirlFees, netMultiplier, formattedNetMultiplier } =
-    getPayoutDetails(betAmount ?? 0n, betCount, grossMultiplier, houseEdge)
+  const {
+    grossPayout,
+    netPayout,
+    betSwirlFees,
+    netMultiplier,
+    formattedNetMultiplier,
+  } = getPayoutDetails(betAmount ?? 0n, betCount, grossMultiplier, houseEdge)
 
   return {
     houseEdge,

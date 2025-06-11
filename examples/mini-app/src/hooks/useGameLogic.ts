@@ -2,6 +2,7 @@ import {
   CASINO_GAME_TYPE,
   COINTOSS_FACE,
   DiceNumber,
+  RouletteNumber,
   Token,
   chainById,
   chainNativeCurrencyToToken,
@@ -17,7 +18,7 @@ import { useHouseEdge } from "./useHouseEdge"
 import { useIsGamePaused } from "./useIsGamePaused"
 import { usePlaceBet } from "./usePlaceBet"
 
-type GameSelection = COINTOSS_FACE | DiceNumber
+type GameSelection = COINTOSS_FACE | DiceNumber | RouletteNumber[]
 
 interface UseGameLogicProps<T extends GameSelection> {
   gameType: CASINO_GAME_TYPE

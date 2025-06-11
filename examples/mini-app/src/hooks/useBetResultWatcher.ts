@@ -1,4 +1,11 @@
-import { CASINO_GAME_TYPE, CoinToss, DiceNumber } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  CoinToss,
+  Dice,
+  DiceNumber,
+  Roulette,
+  RouletteNumber,
+} from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { AbiEvent, Log } from "viem"
 import { decodeEventLog } from "viem"
@@ -35,7 +42,11 @@ const PRIMARY_WATCHER_TIMEOUT = 30000
 function _extractEventData(
   decodedRollLog: DecodedEventLog,
   gameType: CASINO_GAME_TYPE,
-): { rolledData: boolean[] | DiceNumber; payout: bigint; id: bigint } {
+): {
+  rolledData: boolean[] | DiceNumber | RouletteNumber
+  payout: bigint
+  id: bigint
+} {
   switch (gameType) {
     case CASINO_GAME_TYPE.DICE: {
       const diceRollArgs = decodedRollLog.args as unknown as {
@@ -61,12 +72,27 @@ function _extractEventData(
         id: coinTossRollArgs.id,
       }
     }
+    case CASINO_GAME_TYPE.ROULETTE: {
+      const rouletteRollArgs = decodedRollLog.args as unknown as {
+        id: bigint
+        payout: bigint
+        rolled: RouletteNumber
+      }
+      return {
+        rolledData: rouletteRollArgs.rolled,
+        payout: rouletteRollArgs.payout,
+        id: rouletteRollArgs.id,
+      }
+    }
     default:
       throw new Error(`Unsupported game type for event extraction: ${gameType}`)
   }
 }
 
-function _decodeRolled(rolled: boolean[] | DiceNumber, game: CASINO_GAME_TYPE): GameRolledResult {
+function _decodeRolled(
+  rolled: boolean[] | DiceNumber | RouletteNumber,
+  game: CASINO_GAME_TYPE,
+): GameRolledResult {
   switch (game) {
     case CASINO_GAME_TYPE.COINTOSS:
       if (Array.isArray(rolled)) {
@@ -74,7 +100,9 @@ function _decodeRolled(rolled: boolean[] | DiceNumber, game: CASINO_GAME_TYPE): 
       }
       throw new Error(`Invalid rolled data for COINTOSS: expected boolean array, got ${rolled}`)
     case CASINO_GAME_TYPE.DICE:
-      return rolled as DiceNumber
+      return Dice.decodeRolled(rolled as DiceNumber)
+    case CASINO_GAME_TYPE.ROULETTE:
+      return Roulette.decodeRolled(rolled as RouletteNumber)
     default:
       logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
       throw new Error(`Unsupported game type for decoding roll: ${game}`)

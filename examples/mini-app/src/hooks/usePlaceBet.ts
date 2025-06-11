@@ -4,9 +4,12 @@ import {
   CasinoChainId,
   CoinToss,
   Dice,
+  DiceNumber,
   GenericCasinoBetParams,
   MAX_SELECTABLE_DICE_NUMBER,
   MIN_SELECTABLE_DICE_NUMBER,
+  Roulette,
+  RouletteNumber,
   casinoChainById,
   chainById,
   chainNativeCurrencyToToken,
@@ -37,8 +40,10 @@ function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncod
           `Invalid dice number: ${choiceNum}. Must be between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER}`,
         )
       }
-      return Dice.encodeInput(choice)
+      return Dice.encodeInput(choice as DiceNumber)
     }
+    case CASINO_GAME_TYPE.ROULETTE:
+      return Roulette.encodeInput(choice as RouletteNumber[])
     default:
       throw new Error(`Unsupported game type for encoding input: ${game}`)
   }
