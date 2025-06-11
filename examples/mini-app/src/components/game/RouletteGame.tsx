@@ -70,9 +70,9 @@ export function RouletteGame({
   }
 
   return (
-    <GameFrame themeSettings={themeSettings} {...props}>
+    <GameFrame themeSettings={themeSettings} variant="roulette" {...props}>
       <GameFrame.Header title="Roulette" connectWalletButton={<GameConnectWallet />} />
-      <GameFrame.GameArea>
+      <GameFrame.GameArea variant="roulette">
         <GameFrame.InfoButton
           winChance={Roulette.getWinChancePercent(selectedNumbers)}
           rngFee={formattedVrfFees}

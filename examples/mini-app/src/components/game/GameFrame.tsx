@@ -44,9 +44,10 @@ const useGameFrameContext = () => {
 interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   themeSettings: ThemeSettings
   children: React.ReactNode
+  variant?: "default" | "roulette"
 }
 
-function GameFrameRoot({ themeSettings, children, ...props }: GameFrameProps) {
+function GameFrameRoot({ themeSettings, children, variant = "default", ...props }: GameFrameProps) {
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
@@ -54,6 +55,8 @@ function GameFrameRoot({ themeSettings, children, ...props }: GameFrameProps) {
   const { theme } = themeSettings
 
   const themeClass = theme === "system" ? undefined : theme
+  const isRoulette = variant === "roulette"
+  const cardHeightClass = isRoulette ? "h-[546px]" : ""
 
   useEffect(() => {
     setIsMounted(true)
@@ -78,7 +81,11 @@ function GameFrameRoot({ themeSettings, children, ...props }: GameFrameProps) {
       >
         <Card
           ref={cardRef}
-          className={cn("relative overflow-hidden", "bg-card text-card-foreground border")}
+          className={cn(
+            "relative overflow-hidden",
+            "bg-card text-card-foreground border",
+            cardHeightClass,
+          )}
         >
           {children}
         </Card>
@@ -103,23 +110,31 @@ function Header({ title, connectWalletButton }: HeaderProps) {
 
 interface GameAreaProps {
   children: React.ReactNode
+  variant?: "default" | "roulette"
 }
 
-function GameArea({ children }: GameAreaProps) {
+function GameArea({ children, variant = "default" }: GameAreaProps) {
   const { themeSettings } = useGameFrameContext()
 
+  const isRoulette = variant === "roulette"
+  const heightClass = isRoulette ? "h-[194px]" : "h-[160px]"
+  const roundedClass = isRoulette ? "" : "rounded-[16px]"
+  const cardContentClass = isRoulette ? "flex flex-col gap-4 -mx-3" : "flex flex-col gap-4"
+
   return (
-    <CardContent className="flex flex-col gap-4">
+    <CardContent className={cardContentClass}>
       <div
         className={cn(
-          "h-[160px] rounded-[16px] flex flex-col justify-end items-center relative bg-cover bg-center bg-no-repeat",
+          heightClass,
+          roundedClass,
+          "flex flex-col justify-end items-center relative bg-cover bg-center bg-no-repeat",
           "bg-muted overflow-hidden",
         )}
         style={{
           backgroundImage: `url(${themeSettings.backgroundImage})`,
         }}
       >
-        <div className={cn("absolute inset-0 rounded-[16px]", "bg-game-window-overlay")} />
+        <div className={cn("absolute inset-0", roundedClass, "bg-game-window-overlay")} />
         {children}
       </div>
     </CardContent>

@@ -84,13 +84,8 @@ export function useBetCalculations<T extends GameSelection>({
     [betAmount, betCount],
   )
 
-  const {
-    grossPayout,
-    netPayout,
-    betSwirlFees,
-    netMultiplier,
-    formattedNetMultiplier,
-  } = getPayoutDetails(betAmount ?? 0n, betCount, grossMultiplier, houseEdge)
+  const { grossPayout, netPayout, betSwirlFees, netMultiplier, formattedNetMultiplier } =
+    getPayoutDetails(betAmount ?? 0n, betCount, grossMultiplier, houseEdge)
 
   return {
     houseEdge,
