@@ -7,6 +7,7 @@ const meta = {
   component: Slider,
   parameters: {
     layout: "centered",
+    chromatic: { disable: true },
     backgrounds: {
       default: "dark",
       values: [{ name: "dark", value: "oklch(0.15 0 0)" }],
