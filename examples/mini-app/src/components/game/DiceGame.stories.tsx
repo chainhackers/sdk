@@ -90,9 +90,12 @@ export const SystemTheme: Story = {
     theme: "system",
     backgroundImage: gameBg4,
   },
+  parameters: {
+    chromatic: { disable: true },
+  },
 }
 
-export const CustomTheme1: Story = {
+export const DonutRollLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
@@ -102,9 +105,12 @@ export const CustomTheme1: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg5,
   },
+  parameters: {
+    chromatic: { disable: true },
+  },
 }
 
-export const CustomTheme2: Story = {
+export const SatelliteDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -114,9 +120,12 @@ export const CustomTheme2: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg1,
   },
+  parameters: {
+    chromatic: { disable: true },
+  },
 }
 
-export const CustomTheme3: Story = {
+export const SpaceshipDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -126,9 +135,12 @@ export const CustomTheme3: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg3,
   },
+  parameters: {
+    chromatic: { disable: true },
+  },
 }
 
-export const CustomTheme4: Story = {
+export const MysticForestDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -137,5 +149,8 @@ export const CustomTheme4: Story = {
       "--play-btn-font": "rgb(225 159 31)",
     } as React.CSSProperties,
     backgroundImage: gameBg6,
+  },
+  parameters: {
+    chromatic: { disable: true },
   },
 }
