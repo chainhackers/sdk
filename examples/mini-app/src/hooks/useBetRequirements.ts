@@ -8,6 +8,7 @@ import { useMemo } from "react"
 import { formatUnits } from "viem"
 import { useReadContract } from "wagmi"
 import { useChain } from "../context/chainContext"
+import { useDebounce } from "./useDebounce"
 
 type UseBetRequirementsProps = {
   game: CASINO_GAME_TYPE
@@ -16,6 +17,7 @@ type UseBetRequirementsProps = {
 }
 
 const MAX_BET_REFETCH_INTERVAL = 120000 // 2 minutes - Max bet depends on bankroll
+const DEBOUNCE_DELAY = 500 // 500ms - Debounce delay for grossMultiplier updates
 
 /**
  * Retrieves betting requirements and restrictions for a specific game and token
@@ -31,9 +33,11 @@ const MAX_BET_REFETCH_INTERVAL = 120000 // 2 minutes - Max bet depends on bankro
  */
 export function useBetRequirements(props: UseBetRequirementsProps) {
   const { appChainId } = useChain()
+  const debouncedMultiplier = useDebounce(props.grossMultiplier, DEBOUNCE_DELAY)
+
   const functionData = useMemo(() => {
-    return getBetRequirementsFunctionData(props.token.address, props.grossMultiplier, appChainId)
-  }, [props.token.address, props.grossMultiplier, appChainId])
+    return getBetRequirementsFunctionData(props.token.address, debouncedMultiplier, appChainId)
+  }, [props.token.address, debouncedMultiplier, appChainId])
 
   const wagmiHook = useReadContract({
     abi: functionData.data.abi,
@@ -43,7 +47,7 @@ export function useBetRequirements(props: UseBetRequirementsProps) {
     chainId: appChainId,
     query: {
       initialData: [false, 0n, 1n],
-      refetchInterval: MAX_BET_REFETCH_INTERVAL, // Max bet amount depends directly of the bankroll, it means it has been updated regularly
+      refetchInterval: MAX_BET_REFETCH_INTERVAL,
     },
   })
 

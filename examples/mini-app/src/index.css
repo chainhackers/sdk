@@ -60,6 +60,16 @@
   --color-slider-disabled-tooltip: var(--slider-disabled-tooltip);
   --color-dice-slider-box: var(--dice-slider-box);
   --color-text-color: var(--text-color);
+  --color-roulette-red: var(--roulette-red);
+  --color-roulette-red-hover: var(--roulette-red-hover);
+  --color-roulette-black: var(--roulette-black);
+  --color-roulette-black-hover: var(--roulette-black-hover);
+  --color-roulette-green: var(--roulette-green);
+  --color-roulette-green-hover: var(--roulette-green-hover);
+  --color-roulette-bundle: var(--roulette-bundle);
+  --color-roulette-bundle-hover: var(--roulette-bundle-hover);
+  --color-roulette-disabled: var(--roulette-disabled);
+  --color-roulette-disabled-text: var(--roulette-disabled-text);
 }
 
 @layer base {
@@ -139,6 +149,17 @@
     --slider-disabled-tooltip: oklch(0.6138 0.014 271.18);
     --dice-slider-box: oklch(1 0 0 / 80%);
     --text-color: var(--white);
+
+    --roulette-red: oklch(0.6273 0.1893 23.38);
+    --roulette-red-hover: oklch(0.6573 0.1893 23.38);
+    --roulette-black: oklch(0.343 0.0139 235.28);
+    --roulette-black-hover: oklch(0.373 0.0139 235.28);
+    --roulette-green: oklch(0.784 0.1418 166.22);
+    --roulette-green-hover: oklch(0.804 0.1418 166.22);
+    --roulette-bundle: oklch(0.2398 0.0062 214.42);
+    --roulette-bundle-hover: oklch(0.2698 0.0062 214.42);
+    --roulette-disabled: oklch(0.8399 0.0061 239.84);
+    --roulette-disabled-text: oklch(0.6138 0.014 271.18);
   }
 
   .dark {
@@ -161,12 +182,6 @@
     --destructive-foreground: oklch(0.9 0 0);
     --border: oklch(0.3 0 0 / 0.5);
     --input: oklch(1 0 0 / 10%);
-    --ring: transparent;
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
 
     --control-panel-background: var(--dark-stroke);
     --transparent-button-border: var(--dark-gray);
@@ -175,7 +190,6 @@
     --text-on-surface-variant: var(--dark-on-surface-variant);
     --text-on-surface: oklch(0.93 0.0058 264.53);
     --border-stroke: var(--dark-stroke);
-    --play-btn-font: var(--white);
 
     --game-win: oklch(0.78 0.1418 166.22);
 
@@ -184,9 +198,6 @@
     --close-btn-color: var(--dark-on-surface-variant);
     --game-result-icon-bg: var(--dark-surface-high);
     --table-text: var(--white);
-    --slider-disabled: oklch(0.7774 0.0129 276.04);
-    --slider-disabled-shadow: oklch(0.7774 0.0129 276.04 / 0.2);
-    --slider-disabled-tooltip: oklch(0.6138 0.014 271.18);
   }
 
   @font-face {
@@ -244,5 +255,25 @@
   .mask-overlap-cutout {
     mask-image: radial-gradient(circle 12px at 23px center, transparent 11.5px, black 12px);
     -webkit-mask-image: radial-gradient(circle 12px at 23px center, transparent 11.5px, black 12px);
+  }
+
+  .roulette-button-shadow-red {
+    box-shadow: 0 1px 0 oklch(0.519 0.1466 22.27);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-shadow-black {
+    box-shadow: 0 1px 0 oklch(0.3195 0.0141 235.34);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-shadow-green {
+    box-shadow: 0 1px 0 oklch(0.6621 0.1215 165.65);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-shadow-bundle {
+    box-shadow: 0 1px 0 oklch(0.1989 0.0051 248.08);
+    padding-bottom: 1px;
   }
 }
