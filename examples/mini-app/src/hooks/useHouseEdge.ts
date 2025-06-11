@@ -1,7 +1,6 @@
 import { CASINO_GAME_TYPE, Token, getAffiliateHouseEdgeFunctionData } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { useReadContract } from "wagmi"
-import { PLACEHOLDER_AFFILIATE_HOUSE_EDGE } from "../consts"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
 
@@ -32,7 +31,7 @@ type UseHouseEdgeProps = {
  */
 export function useHouseEdge(props: UseHouseEdgeProps) {
   const { appChainId } = useChain()
-  const { affiliate } = useBettingConfig()
+  const { affiliate, affiliateHouseEdge } = useBettingConfig()
   const functionData = useMemo(() => {
     return getAffiliateHouseEdgeFunctionData(props.game, props.token.address, affiliate, appChainId)
   }, [props.game, props.token.address, affiliate, appChainId])
@@ -44,11 +43,11 @@ export function useHouseEdge(props: UseHouseEdgeProps) {
     args: functionData.data.args,
     chainId: appChainId,
     query: {
-      initialData: PLACEHOLDER_AFFILIATE_HOUSE_EDGE,
+      initialData: affiliateHouseEdge,
     },
   })
 
-  const houseEdge = wagmiHook.data ?? PLACEHOLDER_AFFILIATE_HOUSE_EDGE
+  const houseEdge = wagmiHook.data ?? affiliateHouseEdge
 
   const houseEdgePercent = useMemo(() => {
     return houseEdge / 100
