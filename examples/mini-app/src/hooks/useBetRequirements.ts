@@ -16,6 +16,7 @@ type UseBetRequirementsProps = {
 }
 
 const MAX_BET_REFETCH_INTERVAL = 120000 // 2 minutes - Max bet depends on bankroll
+const DEBOUNCE_DELAY = 500 // 500ms - Debounce delay for grossMultiplier updates
 
 /**
  * Retrieves betting requirements and restrictions for a specific game and token
@@ -42,7 +43,7 @@ export function useBetRequirements(props: UseBetRequirementsProps) {
 
     debounceTimeoutRef.current = setTimeout(() => {
       setDebouncedMultiplier(props.grossMultiplier)
-    }, 500)
+    }, DEBOUNCE_DELAY)
 
     return () => {
       if (debounceTimeoutRef.current) {
