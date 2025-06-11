@@ -95,7 +95,7 @@ export const SystemTheme: Story = {
   },
 }
 
-export const CustomTheme1: Story = {
+export const DonutRollLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
@@ -110,7 +110,7 @@ export const CustomTheme1: Story = {
   },
 }
 
-export const CustomTheme2: Story = {
+export const SatelliteDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -125,7 +125,7 @@ export const CustomTheme2: Story = {
   },
 }
 
-export const CustomTheme3: Story = {
+export const SpaceshipDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -140,7 +140,7 @@ export const CustomTheme3: Story = {
   },
 }
 
-export const CustomTheme4: Story = {
+export const MysticForestDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",

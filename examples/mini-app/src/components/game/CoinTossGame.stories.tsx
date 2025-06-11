@@ -97,7 +97,7 @@ export const SystemTheme: Story = {
   },
 }
 
-export const CustomTheme1: Story = {
+export const SheepsLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
@@ -112,7 +112,7 @@ export const CustomTheme1: Story = {
   },
 }
 
-export const CustomTheme2: Story = {
+export const ChickletLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
@@ -127,7 +127,7 @@ export const CustomTheme2: Story = {
   },
 }
 
-export const CustomTheme3: Story = {
+export const CatsDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -142,7 +142,7 @@ export const CustomTheme3: Story = {
   },
 }
 
-export const CustomTheme4: Story = {
+export const LightfishDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -157,7 +157,7 @@ export const CustomTheme4: Story = {
   },
 }
 
-export const CustomTheme5: Story = {
+export const MarticoinDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -172,7 +172,7 @@ export const CustomTheme5: Story = {
   },
 }
 
-export const CustomTheme6: Story = {
+export const FrogDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
