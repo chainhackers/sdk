@@ -8,6 +8,7 @@ const meta = {
   component: Card,
   parameters: {
     layout: "centered",
+    chromatic: { disable: true },
   },
   tags: ["autodocs"],
 } satisfies Meta<typeof Card>

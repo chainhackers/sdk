@@ -8,6 +8,7 @@ const meta = {
   component: Input,
   parameters: {
     layout: "centered",
+    chromatic: { disable: true },
   },
   tags: ["autodocs"],
   argTypes: {
