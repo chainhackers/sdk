@@ -167,7 +167,7 @@ function InfoButton({
           variant="iconTransparent"
           size="iconRound"
           className={cn(
-            "absolute top-2 left-2 z-10",
+            "absolute top-2 left-2 z-30",
             "text-text-color border border-border-stroke bg-neutral-background",
             isInfoSheetOpen && "text-primary border-primary",
           )}
@@ -217,7 +217,7 @@ function HistoryButton({ historyData, onHistoryOpen }: HistoryButtonProps) {
           variant="iconTransparent"
           size="iconRound"
           className={cn(
-            "absolute top-2 right-2 z-[5]",
+            "absolute top-2 right-2 z-30",
             "text-text-color border border-border-stroke bg-neutral-background",
             isHistorySheetOpen && "text-primary border-primary",
           )}
