@@ -209,7 +209,7 @@ export function RouletteGameControls({
   return (
     <>
       <GameMultiplierDisplay multiplier={multiplier} className="top-[23px]" />
-      <div className="absolute bottom-[16px] left-[3.5px] w-[321px] h-[130px]">
+      <div className="absolute bottom-[16px] left-[2.5px] w-[321px] h-[130px]">
         <div className="w-[321px] h-[130px] space-y-0.5">
           <div className="flex gap-0.5">
             <div className="flex flex-col justify-stretch h-[70px]">
