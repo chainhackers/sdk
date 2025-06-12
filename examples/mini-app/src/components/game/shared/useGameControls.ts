@@ -5,6 +5,7 @@ export function useGameControls(
   isWalletConnected: boolean,
   betStatus: BetStatus | null,
   isInGameResultState: boolean,
+  isGamePaused: boolean,
 ) {
   return useMemo(
     () =>
@@ -12,7 +13,8 @@ export function useGameControls(
       betStatus === "pending" ||
       betStatus === "loading" ||
       betStatus === "rolling" ||
-      isInGameResultState,
-    [isWalletConnected, betStatus, isInGameResultState],
+      isInGameResultState ||
+      isGamePaused,
+    [isWalletConnected, betStatus, isInGameResultState, isGamePaused],
   )
 }

@@ -55,7 +55,12 @@ export function DiceGame({
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
-  const isControlsDisabled = useGameControls(isWalletConnected, betStatus, isInGameResultState)
+  const isControlsDisabled = useGameControls(
+    isWalletConnected,
+    betStatus,
+    isInGameResultState,
+    isGamePaused,
+  )
 
   const handleNumberChange = (value: number) => {
     if (isControlsDisabled) {

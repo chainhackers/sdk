@@ -53,7 +53,12 @@ export function CoinTossGame({
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
-  const isControlsDisabled = useGameControls(isWalletConnected, betStatus, isInGameResultState)
+  const isControlsDisabled = useGameControls(
+    isWalletConnected,
+    betStatus,
+    isInGameResultState,
+    isGamePaused,
+  )
 
   const handleCoinClick = () => {
     if (isControlsDisabled) {
