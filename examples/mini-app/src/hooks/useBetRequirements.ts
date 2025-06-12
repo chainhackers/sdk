@@ -4,10 +4,11 @@ import {
   getBetRequirementsFunctionData,
   maxGameBetCountByType,
 } from "@betswirl/sdk-core"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useMemo } from "react"
 import { formatUnits } from "viem"
 import { useReadContract } from "wagmi"
 import { useChain } from "../context/chainContext"
+import { useDebounce } from "./useDebounce"
 
 type UseBetRequirementsProps = {
   game: CASINO_GAME_TYPE
@@ -32,25 +33,7 @@ const DEBOUNCE_DELAY = 500 // 500ms - Debounce delay for grossMultiplier updates
  */
 export function useBetRequirements(props: UseBetRequirementsProps) {
   const { appChainId } = useChain()
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  const [debouncedMultiplier, setDebouncedMultiplier] = useState(props.grossMultiplier)
-
-  useEffect(() => {
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current)
-    }
-
-    debounceTimeoutRef.current = setTimeout(() => {
-      setDebouncedMultiplier(props.grossMultiplier)
-    }, DEBOUNCE_DELAY)
-
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current)
-      }
-    }
-  }, [props.grossMultiplier])
+  const debouncedMultiplier = useDebounce(props.grossMultiplier, DEBOUNCE_DELAY)
 
   const functionData = useMemo(() => {
     return getBetRequirementsFunctionData(props.token.address, debouncedMultiplier, appChainId)
