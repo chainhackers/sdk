@@ -32,8 +32,8 @@ export function RouletteGame({
     gameHistory,
     refreshHistory,
     betAmount,
-    selection: selectedNumbers,
-    setSelection: setSelectedNumbers,
+    selection,
+    setSelection,
     betStatus,
     gameResult,
     vrfFees,
@@ -50,7 +50,10 @@ export function RouletteGame({
     handleBetAmountChange,
   } = useGameLogic({
     gameType: CASINO_GAME_TYPE.ROULETTE,
-    defaultSelection: DEFAULT_ROULETTE_SELECTION,
+    defaultSelection: {
+      game: CASINO_GAME_TYPE.ROULETTE,
+      choice: DEFAULT_ROULETTE_SELECTION,
+    },
     backgroundImage,
   })
 
@@ -62,11 +65,15 @@ export function RouletteGame({
     isGamePaused,
   )
 
+  const selectedNumbers = (
+    selection as { game: CASINO_GAME_TYPE.ROULETTE; choice: RouletteNumber[] }
+  ).choice
+
   const handleNumbersChange = (numbers: RouletteNumber[]) => {
     if (isControlsDisabled) {
       return
     }
-    setSelectedNumbers(numbers as typeof selectedNumbers)
+    setSelection({ game: CASINO_GAME_TYPE.ROULETTE, choice: numbers })
   }
 
   return (

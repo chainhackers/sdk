@@ -96,13 +96,22 @@ function _decodeRolled(
   switch (game) {
     case CASINO_GAME_TYPE.COINTOSS:
       if (Array.isArray(rolled)) {
-        return CoinToss.decodeRolled(rolled[0])
+        return {
+          game: CASINO_GAME_TYPE.COINTOSS,
+          rolled: CoinToss.decodeRolled(rolled[0]),
+        }
       }
       throw new Error(`Invalid rolled data for COINTOSS: expected boolean array, got ${rolled}`)
     case CASINO_GAME_TYPE.DICE:
-      return Dice.decodeRolled(rolled as DiceNumber)
+      return {
+        game: CASINO_GAME_TYPE.DICE,
+        rolled: Dice.decodeRolled(rolled as DiceNumber),
+      }
     case CASINO_GAME_TYPE.ROULETTE:
-      return Roulette.decodeRolled(rolled as RouletteNumber)
+      return {
+        game: CASINO_GAME_TYPE.ROULETTE,
+        rolled: Roulette.decodeRolled(rolled as RouletteNumber),
+      }
     default:
       logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
       throw new Error(`Unsupported game type for decoding roll: ${game}`)

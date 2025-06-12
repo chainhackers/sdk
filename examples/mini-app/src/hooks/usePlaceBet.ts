@@ -1,17 +1,14 @@
 import {
   CASINO_GAME_TYPE,
-  COINTOSS_FACE,
   CasinoChainId,
   CoinToss,
   Dice,
-  DiceNumber,
   GenericCasinoBetParams,
   MAX_SELECTABLE_DICE_NUMBER,
   MAX_SELECTABLE_ROULETTE_NUMBER,
   MIN_SELECTABLE_DICE_NUMBER,
   MIN_SELECTABLE_ROULETTE_NUMBER,
   Roulette,
-  RouletteNumber,
   casinoChainById,
   chainById,
   chainNativeCurrencyToToken,
@@ -31,21 +28,27 @@ import { useEstimateVRFFees } from "./useEstimateVRFFees"
 
 const logger = createLogger("usePlaceBet")
 
-function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncodedInput {
-  switch (game) {
+function _encodeGameInput(choice: GameChoice): GameEncodedInput {
+  switch (choice.game) {
     case CASINO_GAME_TYPE.COINTOSS:
-      return CoinToss.encodeInput(choice as COINTOSS_FACE)
+      return {
+        game: CASINO_GAME_TYPE.COINTOSS,
+        encodedInput: CoinToss.encodeInput(choice.choice),
+      }
     case CASINO_GAME_TYPE.DICE: {
-      const choiceNum = Number(choice)
+      const choiceNum = Number(choice.choice)
       if (choiceNum < MIN_SELECTABLE_DICE_NUMBER || choiceNum > MAX_SELECTABLE_DICE_NUMBER) {
         throw new Error(
           `Invalid dice number: ${choiceNum}. Must be between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER}`,
         )
       }
-      return Dice.encodeInput(choice as DiceNumber)
+      return {
+        game: CASINO_GAME_TYPE.DICE,
+        encodedInput: Dice.encodeInput(choice.choice),
+      }
     }
     case CASINO_GAME_TYPE.ROULETTE: {
-      const numbers = choice as RouletteNumber[]
+      const numbers = choice.choice
       if (numbers.length === 0) throw new Error("Roulette bet must include at least one number")
       if (
         numbers.some(
@@ -55,10 +58,13 @@ function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncod
         throw new Error(
           `Roulette number out of range (${MIN_SELECTABLE_ROULETTE_NUMBER}-${MAX_SELECTABLE_ROULETTE_NUMBER})`,
         )
-      return Roulette.encodeInput(numbers)
+      return {
+        game: CASINO_GAME_TYPE.ROULETTE,
+        encodedInput: Roulette.encodeInput(numbers),
+      }
     }
     default:
-      throw new Error(`Unsupported game type for encoding input: ${game}`)
+      throw new Error(`Unsupported game type for encoding input: ${(choice as any).game}`)
   }
 }
 
@@ -175,9 +181,10 @@ export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void) 
     async (betAmount: bigint, choice: GameChoice) => {
       resetBetState()
 
+      const encodedInput = _encodeGameInput(choice)
       const betParams = {
         game,
-        gameEncodedInput: _encodeGameInput(choice, game),
+        gameEncodedInput: encodedInput.encodedInput,
         betAmount,
       }
 

@@ -1,4 +1,5 @@
 import {
+  CASINO_GAME_TYPE,
   COINTOSS_FACE,
   CoinTossEncodedInput,
   DiceEncodedInput,
@@ -20,11 +21,20 @@ export type QueryParameter<
     >
   | undefined
 
-export type GameChoice = COINTOSS_FACE | DiceNumber | RouletteNumber[]
+export type GameChoice =
+  | { game: CASINO_GAME_TYPE.COINTOSS; choice: COINTOSS_FACE }
+  | { game: CASINO_GAME_TYPE.DICE; choice: DiceNumber }
+  | { game: CASINO_GAME_TYPE.ROULETTE; choice: RouletteNumber[] }
 
-export type GameRolledResult = COINTOSS_FACE | DiceNumber | RouletteNumber
+export type GameRolledResult =
+  | { game: CASINO_GAME_TYPE.COINTOSS; rolled: COINTOSS_FACE }
+  | { game: CASINO_GAME_TYPE.DICE; rolled: DiceNumber }
+  | { game: CASINO_GAME_TYPE.ROULETTE; rolled: RouletteNumber }
 
-export type GameEncodedInput = CoinTossEncodedInput | DiceEncodedInput | RouletteEncodedInput
+export type GameEncodedInput =
+  | { game: CASINO_GAME_TYPE.COINTOSS; encodedInput: CoinTossEncodedInput }
+  | { game: CASINO_GAME_TYPE.DICE; encodedInput: DiceEncodedInput }
+  | { game: CASINO_GAME_TYPE.ROULETTE; encodedInput: RouletteEncodedInput }
 
 export interface GameResult {
   isWin: boolean

@@ -43,7 +43,7 @@ const BUNDLE_COLORS: ButtonColorConfig = {
   hover: "hover:bg-roulette-bundle-hover",
 }
 
-const getBundleStyles = (isDisabled: boolean = false): string => {
+const getBundleStyles = (isDisabled = false): string => {
   const shadowClass = isDisabled
     ? "roulette-button-shadow-disabled"
     : "roulette-button-shadow-bundle"
@@ -59,7 +59,7 @@ const getNumberColor = (number: RouletteNumber): RouletteColor => {
   return RED_NUMBERS.includes(number) ? "red" : "black"
 }
 
-const getColorStyles = (color: RouletteColor, isDisabled: boolean = false): string => {
+const getColorStyles = (color: RouletteColor, isDisabled = false): string => {
   const colorConfig = ROULETTE_COLORS[color]
   const shadowClass = isDisabled ? "roulette-button-shadow-disabled" : colorConfig.bg.split(" ")[1]
   const bgClass = colorConfig.bg.split(" ")[0]

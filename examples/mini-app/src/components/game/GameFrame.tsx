@@ -2,7 +2,20 @@ import { CASINO_GAME_TYPE, Token } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 import { cn } from "../../lib/utils"
-import { BetStatus, GameResult } from "../../types"
+import { BetStatus, GameResult, GameRolledResult } from "../../types"
+
+function formatRolledResult(rolled: GameRolledResult): string {
+  switch (rolled.game) {
+    case CASINO_GAME_TYPE.COINTOSS:
+      return rolled.rolled
+    case CASINO_GAME_TYPE.DICE:
+      return rolled.rolled.toString()
+    case CASINO_GAME_TYPE.ROULETTE:
+      return rolled.rolled.toString()
+    default:
+      return ""
+  }
+}
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Sheet, SheetTrigger } from "../ui/sheet"
@@ -257,7 +270,7 @@ function ResultWindow({ gameResult, betAmount, currency = "ETH" }: ResultWindowP
       amount={betAmount || 0n}
       payout={gameResult?.payout}
       currency={currency}
-      rolled={gameResult?.rolled.toString() || ""}
+      rolled={gameResult?.rolled ? formatRolledResult(gameResult.rolled) : ""}
     />
   )
 }

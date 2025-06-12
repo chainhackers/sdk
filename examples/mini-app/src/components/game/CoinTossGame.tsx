@@ -30,8 +30,8 @@ export function CoinTossGame({
     gameHistory,
     refreshHistory,
     betAmount,
-    selection: selectedSide,
-    setSelection: setSelectedSide,
+    selection,
+    setSelection,
     betStatus,
     gameResult,
     vrfFees,
@@ -48,7 +48,10 @@ export function CoinTossGame({
     handleBetAmountChange,
   } = useGameLogic({
     gameType: CASINO_GAME_TYPE.COINTOSS,
-    defaultSelection: COINTOSS_FACE.HEADS,
+    defaultSelection: {
+      game: CASINO_GAME_TYPE.COINTOSS,
+      choice: COINTOSS_FACE.HEADS,
+    },
     backgroundImage,
   })
 
@@ -60,15 +63,15 @@ export function CoinTossGame({
     isGamePaused,
   )
 
+  const selectedSide = (selection as { game: CASINO_GAME_TYPE.COINTOSS; choice: COINTOSS_FACE })
+    .choice
+
   const handleCoinClick = () => {
     if (isControlsDisabled) {
       return
     }
-    setSelectedSide(
-      (selectedSide === COINTOSS_FACE.HEADS
-        ? COINTOSS_FACE.TAILS
-        : COINTOSS_FACE.HEADS) as typeof selectedSide,
-    )
+    const newSide = selectedSide === COINTOSS_FACE.HEADS ? COINTOSS_FACE.TAILS : COINTOSS_FACE.HEADS
+    setSelection({ game: CASINO_GAME_TYPE.COINTOSS, choice: newSide })
   }
 
   return (

@@ -32,8 +32,8 @@ export function DiceGame({
     gameHistory,
     refreshHistory,
     betAmount,
-    selection: selectedNumber,
-    setSelection: setSelectedNumber,
+    selection,
+    setSelection,
     betStatus,
     gameResult,
     vrfFees,
@@ -50,7 +50,10 @@ export function DiceGame({
     handleBetAmountChange,
   } = useGameLogic({
     gameType: CASINO_GAME_TYPE.DICE,
-    defaultSelection: DEFAULT_DICE_NUMBER,
+    defaultSelection: {
+      game: CASINO_GAME_TYPE.DICE,
+      choice: DEFAULT_DICE_NUMBER,
+    },
     backgroundImage,
   })
 
@@ -62,11 +65,14 @@ export function DiceGame({
     isGamePaused,
   )
 
+  const selectedDiceNumber = (selection as { game: CASINO_GAME_TYPE.DICE; choice: DiceNumber })
+    .choice
+
   const handleNumberChange = (value: number) => {
     if (isControlsDisabled) {
       return
     }
-    setSelectedNumber(value as DiceNumber)
+    setSelection({ game: CASINO_GAME_TYPE.DICE, choice: value as DiceNumber })
   }
 
   return (
@@ -74,7 +80,7 @@ export function DiceGame({
       <GameFrame.Header title="Dice" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
-          winChance={Dice.getWinChancePercent(selectedNumber)}
+          winChance={Dice.getWinChancePercent(selectedDiceNumber)}
           rngFee={formattedVrfFees}
           targetPayout={formatRawAmount(targetPayoutAmount, token.decimals, FORMAT_TYPE.PRECISE)}
           gasPrice={gasPrice}
@@ -84,7 +90,7 @@ export function DiceGame({
         <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
         <GameFrame.GameControls>
           <DiceGameControls
-            selectedNumber={selectedNumber}
+            selectedNumber={selectedDiceNumber}
             onNumberChange={handleNumberChange}
             multiplier={formattedNetMultiplier}
             isDisabled={isControlsDisabled}
