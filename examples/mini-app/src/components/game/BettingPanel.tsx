@@ -33,6 +33,7 @@ interface BettingPanelProps {
   onPlayBtnClick: () => void
   areChainsSynced: boolean
   isGamePaused: boolean
+  hasValidSelection?: boolean
 }
 
 const BET_AMOUNT_INPUT_STEP = 0.0001
@@ -51,6 +52,7 @@ export function BettingPanel({
   onPlayBtnClick,
   areChainsSynced,
   isGamePaused,
+  hasValidSelection = true,
 }: BettingPanelProps) {
   const { appChainId } = useChain()
   const [inputValue, setInputValue] = useState<string>("")
@@ -114,7 +116,8 @@ export function BettingPanel({
     !isGamePaused &&
     isTokenAllowed &&
     isBetCountValid &&
-    !isBetAmountExceedsMaxBetAmount
+    !isBetAmountExceedsMaxBetAmount &&
+    hasValidSelection
 
   const isInputDisabled = !isConnected || isWaiting || isBetSuccees
 
@@ -137,6 +140,8 @@ export function BettingPanel({
     playButtonText = "Switch chain"
   } else if (isGamePaused) {
     playButtonText = "Game paused"
+  } else if (!hasValidSelection) {
+    playButtonText = "Make your selection"
   } else if (!isTokenAllowed) {
     playButtonText = "Token not allowed"
   } else if (isTotalbetAmountExceedsBalance) {

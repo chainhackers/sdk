@@ -113,6 +113,7 @@ export function RouletteGame({
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
         isGamePaused={isGamePaused}
+        hasValidSelection={selectedNumbers.length > 0}
       />
     </GameFrame>
   )
