@@ -12,6 +12,7 @@ import { DiceGameControls } from "./DiceGameControls"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
+import { useGameControls } from "./shared/useGameControls"
 
 const DEFAULT_DICE_NUMBER = 20 as DiceNumber
 
@@ -54,6 +55,7 @@ export function DiceGame({
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
+  const isControlsDisabled = useGameControls(isWalletConnected, betStatus, isInGameResultState)
 
   const handleNumberChange = (value: number) => {
     if (isControlsDisabled) {
@@ -61,13 +63,6 @@ export function DiceGame({
     }
     setSelectedNumber(value as DiceNumber)
   }
-
-  const isControlsDisabled =
-    !isWalletConnected ||
-    betStatus === "pending" ||
-    betStatus === "loading" ||
-    betStatus === "rolling" ||
-    isInGameResultState
 
   return (
     <GameFrame themeSettings={themeSettings} {...props}>

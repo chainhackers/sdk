@@ -12,6 +12,7 @@ import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
+import { useGameControls } from "./shared/useGameControls"
 
 export interface CoinTossGameProps extends BaseGameProps {}
 
@@ -52,13 +53,7 @@ export function CoinTossGame({
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
-
-  const isControlsDisabled =
-    !isWalletConnected ||
-    betStatus === "pending" ||
-    betStatus === "loading" ||
-    betStatus === "rolling" ||
-    isInGameResultState
+  const isControlsDisabled = useGameControls(isWalletConnected, betStatus, isInGameResultState)
 
   const handleCoinClick = () => {
     if (isControlsDisabled) {

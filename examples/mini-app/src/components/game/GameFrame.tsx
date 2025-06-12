@@ -10,6 +10,8 @@ import { BettingPanel } from "./BettingPanel"
 import { GameResultWindow } from "./GameResultWindow"
 import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
+import { getVariantConfig } from "./shared/gameVariants"
+import { GameVariant } from "./shared/types"
 
 interface ThemeSettings {
   theme?: "light" | "dark" | "system"
@@ -44,7 +46,7 @@ const useGameFrameContext = () => {
 interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   themeSettings: ThemeSettings
   children: React.ReactNode
-  variant?: "default" | "roulette"
+  variant?: GameVariant
 }
 
 function GameFrameRoot({ themeSettings, children, variant = "default", ...props }: GameFrameProps) {
@@ -55,8 +57,7 @@ function GameFrameRoot({ themeSettings, children, variant = "default", ...props 
   const { theme } = themeSettings
 
   const themeClass = theme === "system" ? undefined : theme
-  const isRoulette = variant === "roulette"
-  const cardHeightClass = isRoulette ? "h-[546px]" : ""
+  const variantConfig = getVariantConfig(variant)
 
   useEffect(() => {
     setIsMounted(true)
@@ -84,7 +85,7 @@ function GameFrameRoot({ themeSettings, children, variant = "default", ...props 
           className={cn(
             "relative overflow-hidden",
             "bg-card text-card-foreground border",
-            cardHeightClass,
+            variantConfig.card.height,
           )}
         >
           {children}
@@ -110,23 +111,19 @@ function Header({ title, connectWalletButton }: HeaderProps) {
 
 interface GameAreaProps {
   children: React.ReactNode
-  variant?: "default" | "roulette"
+  variant?: GameVariant
 }
 
 function GameArea({ children, variant = "default" }: GameAreaProps) {
   const { themeSettings } = useGameFrameContext()
-
-  const isRoulette = variant === "roulette"
-  const heightClass = isRoulette ? "h-[194px]" : "h-[160px]"
-  const roundedClass = isRoulette ? "" : "rounded-[16px]"
-  const cardContentClass = isRoulette ? "flex flex-col gap-4 -mx-3" : "flex flex-col gap-4"
+  const variantConfig = getVariantConfig(variant)
 
   return (
-    <CardContent className={cardContentClass}>
+    <CardContent className={variantConfig.gameArea.contentClass}>
       <div
         className={cn(
-          heightClass,
-          roundedClass,
+          variantConfig.gameArea.height,
+          variantConfig.gameArea.rounded,
           "flex flex-col justify-end items-center relative bg-cover bg-center bg-no-repeat",
           "bg-muted overflow-hidden",
         )}
@@ -134,7 +131,13 @@ function GameArea({ children, variant = "default" }: GameAreaProps) {
           backgroundImage: `url(${themeSettings.backgroundImage})`,
         }}
       >
-        <div className={cn("absolute inset-0", roundedClass, "bg-game-window-overlay")} />
+        <div
+          className={cn(
+            "absolute inset-0",
+            variantConfig.gameArea.rounded,
+            "bg-game-window-overlay",
+          )}
+        />
         {children}
       </div>
     </CardContent>

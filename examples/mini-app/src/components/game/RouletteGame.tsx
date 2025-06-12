@@ -12,8 +12,9 @@ import { GameFrame } from "./GameFrame"
 import { RouletteGameControls } from "./RouletteGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
+import { useGameControls } from "./shared/useGameControls"
 
-const DEFAULT_ROULETTE_SELECTION: RouletteNumber[] = [1]
+const DEFAULT_ROULETTE_SELECTION: RouletteNumber[] = []
 
 export interface RouletteGameProps extends BaseGameProps {}
 
@@ -54,13 +55,7 @@ export function RouletteGame({
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
-
-  const isControlsDisabled =
-    !isWalletConnected ||
-    betStatus === "pending" ||
-    betStatus === "loading" ||
-    betStatus === "rolling" ||
-    isInGameResultState
+  const isControlsDisabled = useGameControls(isWalletConnected, betStatus, isInGameResultState)
 
   const handleNumbersChange = (numbers: RouletteNumber[]) => {
     if (isControlsDisabled) {
