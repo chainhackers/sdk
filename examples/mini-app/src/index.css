@@ -158,7 +158,7 @@
     --roulette-green-hover: oklch(0.804 0.1418 166.22);
     --roulette-bundle: oklch(0.2398 0.0062 214.42);
     --roulette-bundle-hover: oklch(0.2698 0.0062 214.42);
-    --roulette-disabled: oklch(0.8399 0.0061 239.84);
+    --roulette-disabled: oklch(0.8523 0.0061 239.83);
     --roulette-disabled-text: oklch(0.6138 0.014 271.18);
   }
 
@@ -274,6 +274,11 @@
 
   .roulette-button-shadow-bundle {
     box-shadow: 0 1px 0 oklch(0.1989 0.0051 248.08);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-shadow-disabled {
+    box-shadow: 0 1px 0 oklch(0.7733 0.0109 247.97);
     padding-bottom: 1px;
   }
 }

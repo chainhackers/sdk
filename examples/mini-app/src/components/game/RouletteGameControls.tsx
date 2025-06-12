@@ -43,6 +43,13 @@ const BUNDLE_COLORS: ButtonColorConfig = {
   hover: "hover:bg-roulette-bundle-hover",
 }
 
+const getBundleStyles = (isDisabled: boolean = false): string => {
+  const shadowClass = isDisabled
+    ? "roulette-button-shadow-disabled"
+    : "roulette-button-shadow-bundle"
+  return `bg-roulette-bundle ${shadowClass} ${BUNDLE_COLORS.hover}`
+}
+
 const DISABLED_STYLES =
   "disabled:bg-roulette-disabled disabled:text-roulette-disabled-text disabled:opacity-100"
 const COMMON_BUTTON_STYLES = "text-white hover:text-white disabled:hover:bg-opacity-100"
@@ -52,9 +59,11 @@ const getNumberColor = (number: RouletteNumber): RouletteColor => {
   return RED_NUMBERS.includes(number) ? "red" : "black"
 }
 
-const getColorStyles = (color: RouletteColor): string => {
+const getColorStyles = (color: RouletteColor, isDisabled: boolean = false): string => {
   const colorConfig = ROULETTE_COLORS[color]
-  return `${colorConfig.bg} ${colorConfig.hover}`
+  const shadowClass = isDisabled ? "roulette-button-shadow-disabled" : colorConfig.bg.split(" ")[1]
+  const bgClass = colorConfig.bg.split(" ")[0]
+  return `${bgClass} ${shadowClass} ${colorConfig.hover}`
 }
 
 export function RouletteGameControls({
@@ -137,7 +146,7 @@ export function RouletteGameControls({
   const renderNumberButton = (number: RouletteNumber) => {
     const color = getNumberColor(number)
     const selected = isNumberSelected(number)
-    const colorStyles = getColorStyles(color)
+    const colorStyles = getColorStyles(color, isDisabled)
 
     return (
       <Button
@@ -167,7 +176,7 @@ export function RouletteGameControls({
     ].includes(bundle)
 
     const sizeClass = isRowButton ? "flex-1 w-[22px]" : "h-[28px]"
-    const bundleStyles = `${BUNDLE_COLORS.bg} ${BUNDLE_COLORS.hover}`
+    const bundleStyles = getBundleStyles(isDisabled)
 
     return (
       <Button
@@ -193,7 +202,7 @@ export function RouletteGameControls({
 
   const renderColorButton = (bundle: ROULETTE_INPUT_BUNDLE, isRed: boolean) => {
     const color: RouletteColor = isRed ? "red" : "black"
-    const colorStyles = getColorStyles(color)
+    const colorStyles = getColorStyles(color, isDisabled)
 
     return (
       <Button
@@ -220,6 +229,7 @@ export function RouletteGameControls({
                 disabled={isDisabled}
                 className={`relative w-[22px] h-full p-0 text-[12px] leading-5 font-bold rounded-sm ${getColorStyles(
                   "green",
+                  isDisabled,
                 )} ${COMMON_BUTTON_STYLES} ${DISABLED_STYLES}`}
               >
                 {isNumberSelected(0) && (
