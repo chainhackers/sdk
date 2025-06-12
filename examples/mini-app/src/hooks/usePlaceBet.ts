@@ -7,7 +7,9 @@ import {
   DiceNumber,
   GenericCasinoBetParams,
   MAX_SELECTABLE_DICE_NUMBER,
+  MAX_SELECTABLE_ROULETTE_NUMBER,
   MIN_SELECTABLE_DICE_NUMBER,
+  MIN_SELECTABLE_ROULETTE_NUMBER,
   Roulette,
   RouletteNumber,
   casinoChainById,
@@ -42,8 +44,19 @@ function _encodeGameInput(choice: GameChoice, game: CASINO_GAME_TYPE): GameEncod
       }
       return Dice.encodeInput(choice as DiceNumber)
     }
-    case CASINO_GAME_TYPE.ROULETTE:
-      return Roulette.encodeInput(choice as RouletteNumber[])
+    case CASINO_GAME_TYPE.ROULETTE: {
+      const numbers = choice as RouletteNumber[]
+      if (numbers.length === 0) throw new Error("Roulette bet must include at least one number")
+      if (
+        numbers.some(
+          (n) => n < MIN_SELECTABLE_ROULETTE_NUMBER || n > MAX_SELECTABLE_ROULETTE_NUMBER,
+        )
+      )
+        throw new Error(
+          `Roulette number out of range (${MIN_SELECTABLE_ROULETTE_NUMBER}-${MAX_SELECTABLE_ROULETTE_NUMBER})`,
+        )
+      return Roulette.encodeInput(numbers)
+    }
     default:
       throw new Error(`Unsupported game type for encoding input: ${game}`)
   }
