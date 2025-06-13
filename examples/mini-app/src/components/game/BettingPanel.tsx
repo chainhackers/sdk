@@ -86,6 +86,7 @@ export function BettingPanel({
     maxBetAmount,
     formattedMaxBetAmount,
     maxBetCount,
+    isLoading: isBetRequirementsLoading,
   } = useBetRequirements({
     game,
     token,
@@ -114,6 +115,7 @@ export function BettingPanel({
     !isTotalbetAmountExceedsBalance &&
     !isWaiting &&
     !isGamePaused &&
+    !isBetRequirementsLoading &&
     isTokenAllowed &&
     isBetCountValid &&
     !isBetAmountExceedsMaxBetAmount &&
@@ -142,6 +144,8 @@ export function BettingPanel({
     playButtonText = "Game paused"
   } else if (!hasValidSelection) {
     playButtonText = "Make your selection"
+  } else if (isBetRequirementsLoading) {
+    playButtonText = "Loading..."
   } else if (!isTokenAllowed) {
     playButtonText = "Token not allowed"
   } else if (isTotalbetAmountExceedsBalance) {
