@@ -1,6 +1,6 @@
 import { ROULETTE_INPUT_BUNDLE, RouletteNumber } from "@betswirl/sdk-core"
-import chipSvg from "../../assets/game/roulette-chip.svg"
 import chipDisabledSvg from "../../assets/game/roulette-chip-disabled.svg"
+import chipSvg from "../../assets/game/roulette-chip.svg"
 import { Button } from "../ui/button"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import { GameControlsProps } from "./shared/types"
@@ -20,35 +20,38 @@ const BLACK_NUMBERS: RouletteNumber[] = [
 type RouletteColor = "red" | "black" | "green"
 
 interface ButtonColorConfig {
-  bg: string
+  background: string
+  shadow: string
   hover: string
 }
 
 const ROULETTE_COLORS: Record<RouletteColor, ButtonColorConfig> = {
   red: {
-    bg: "bg-roulette-red roulette-button-shadow-red",
+    background: "bg-roulette-red",
+    shadow: "roulette-button-shadow-red",
     hover: "hover:bg-roulette-red-hover",
   },
   black: {
-    bg: "bg-roulette-black roulette-button-shadow-black",
+    background: "bg-roulette-black",
+    shadow: "roulette-button-shadow-black",
     hover: "hover:bg-roulette-black-hover",
   },
   green: {
-    bg: "bg-roulette-green roulette-button-shadow-green",
+    background: "bg-roulette-green",
+    shadow: "roulette-button-shadow-green",
     hover: "hover:bg-roulette-green-hover",
   },
 }
 
 const BUNDLE_COLORS: ButtonColorConfig = {
-  bg: "bg-roulette-bundle roulette-button-shadow-bundle",
+  background: "bg-roulette-bundle",
+  shadow: "roulette-button-shadow-bundle",
   hover: "hover:bg-roulette-bundle-hover",
 }
 
 const getBundleStyles = (isDisabled = false): string => {
-  const shadowClass = isDisabled
-    ? "roulette-button-shadow-disabled"
-    : "roulette-button-shadow-bundle"
-  return `bg-roulette-bundle ${shadowClass} ${BUNDLE_COLORS.hover}`
+  const shadowClass = isDisabled ? "roulette-button-shadow-disabled" : BUNDLE_COLORS.shadow
+  return `${BUNDLE_COLORS.background} ${shadowClass} ${BUNDLE_COLORS.hover}`
 }
 
 const DISABLED_STYLES =
@@ -62,9 +65,8 @@ const getNumberColor = (number: RouletteNumber): RouletteColor => {
 
 const getColorStyles = (color: RouletteColor, isDisabled = false): string => {
   const colorConfig = ROULETTE_COLORS[color]
-  const shadowClass = isDisabled ? "roulette-button-shadow-disabled" : colorConfig.bg.split(" ")[1]
-  const bgClass = colorConfig.bg.split(" ")[0]
-  return `${bgClass} ${shadowClass} ${colorConfig.hover}`
+  const shadowClass = isDisabled ? "roulette-button-shadow-disabled" : colorConfig.shadow
+  return `${colorConfig.background} ${shadowClass} ${colorConfig.hover}`
 }
 
 export function RouletteGameControls({

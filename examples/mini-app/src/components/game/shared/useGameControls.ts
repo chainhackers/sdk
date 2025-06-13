@@ -3,7 +3,7 @@ import { BetStatus } from "../../../types"
 
 export function useGameControls(
   isWalletConnected: boolean,
-  betStatus: BetStatus | null,
+  betStatus: BetStatus,
   isInGameResultState: boolean,
   isGamePaused: boolean,
 ) {
