@@ -258,6 +258,8 @@ interface BettingSectionProps {
   onPlayBtnClick: () => void
   areChainsSynced: boolean
   isGamePaused: boolean
+  needsTokenApproval?: boolean
+  isApprovingToken?: boolean
 }
 
 function BettingSection(props: BettingSectionProps) {

@@ -9,9 +9,9 @@ import {
   formatAmount,
   formatRawAmount,
 } from "@betswirl/sdk-core"
-import { TokenImage } from "@coinbase/onchainkit/token"
 import React, { useState, useEffect, useCallback } from "react"
 import { useAccount } from "wagmi"
+import { TokenIcon } from "../components/ui/TokenIcon"
 import { createLogger } from "../lib/logger"
 import { ETH_TOKEN } from "../lib/tokens"
 import { toLowerCase } from "../lib/utils"
@@ -89,7 +89,7 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
         status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
         multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
         payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
-        payoutCurrencyIcon: React.createElement(TokenImage, {
+        payoutCurrencyIcon: React.createElement(TokenIcon, {
           token: ETH_TOKEN,
           size: 18,
         }),

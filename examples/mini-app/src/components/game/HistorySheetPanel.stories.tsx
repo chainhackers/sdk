@@ -1,4 +1,4 @@
-import { TokenImage } from "@coinbase/onchainkit/token"
+import { TokenIcon } from "../ui/TokenIcon"
 import type { Meta, StoryObj } from "@storybook/react"
 import { History as HistoryIcon } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
@@ -50,7 +50,7 @@ const mockHistoryDataDefault: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: "1.94675",
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
+    payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
     timestamp: "~24h ago",
   },
   {
@@ -58,7 +58,7 @@ const mockHistoryDataDefault: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.2,
     payoutAmount: 0.0,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
+    payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
 ]
@@ -70,7 +70,7 @@ const mockHistoryDataExtended: HistoryEntry[] = [
     status: Math.random() > 0.5 ? ("Won bet" as const) : ("Busted" as const),
     multiplier: (Math.random() * 5 + 1).toFixed(2),
     payoutAmount: (Math.random() * 10).toFixed(4),
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
+    payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
     timestamp: `~${i * 5 + 10}m ago`,
   })),
 ]

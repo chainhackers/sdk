@@ -6,6 +6,7 @@ import { WagmiProvider, createConfig } from "wagmi"
 import { base } from "wagmi/chains"
 import { DEFAULT_AFFILIATE_HOUSE_EDGE } from "./consts"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
+import { DEGEN_TOKEN } from "./lib/tokens"
 
 const CHAIN = base
 
@@ -44,6 +45,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
             initialChainId={CHAIN.id}
             affiliate={affiliate}
             affiliateHouseEdge={affiliateHouseEdge}
+            bankrollToken={DEGEN_TOKEN}
           >
             {children}
           </BetSwirlSDKProvider>

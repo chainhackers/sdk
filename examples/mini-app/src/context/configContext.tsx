@@ -1,3 +1,4 @@
+import { Token } from "@betswirl/sdk-core"
 import { createContext, useContext, useMemo } from "react"
 import { Address } from "viem"
 import { DEFAULT_AFFILIATE_HOUSE_EDGE } from "../consts"
@@ -6,6 +7,7 @@ import { useChain } from "./chainContext"
 export type ConfigContextValue = {
   affiliate: Address
   affiliateHouseEdge: number
+  bankrollToken?: Token
 }
 
 const ConfigContext = createContext<ConfigContextValue | null>(null)
@@ -20,6 +22,7 @@ export type ConfigProviderProps = {
   children: React.ReactNode
   affiliate?: Address
   affiliateHouseEdge?: number
+  bankrollToken?: Token
 }
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
@@ -27,6 +30,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
     children,
     affiliate: initialAffiliate,
     affiliateHouseEdge = DEFAULT_AFFILIATE_HOUSE_EDGE,
+    bankrollToken,
   } = props
   const { appChain } = useChain()
 
@@ -39,6 +43,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
   const context: ConfigContextValue = {
     affiliate,
     affiliateHouseEdge,
+    bankrollToken,
   }
 
   return <ConfigContext.Provider value={context}>{children}</ConfigContext.Provider>

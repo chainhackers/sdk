@@ -6,16 +6,19 @@ import {
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
+import { casinoChainById } from "@betswirl/sdk-core"
 import React, { useState } from "react"
-import { formatGwei } from "viem"
+import { type Hex, formatGwei } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
+import { useBettingConfig } from "../context/configContext"
 import { BetStatus, GameResult } from "../types"
 import { useBetCalculations } from "./useBetCalculations"
 import { HistoryEntry, useGameHistory } from "./useGameHistory"
 import { useHouseEdge } from "./useHouseEdge"
 import { useIsGamePaused } from "./useIsGamePaused"
 import { usePlaceBet } from "./usePlaceBet"
+import { useTokenAllowance } from "./useTokenAllowance"
 
 type GameSelection = COINTOSS_FACE | DiceNumber
 
@@ -62,6 +65,9 @@ interface UseGameLogicResult<T extends GameSelection> {
   handlePlayButtonClick: () => void
   handleBetAmountChange: (amount: bigint | undefined) => void
   placeBet: (betAmount: bigint, choice: T) => void
+  needsTokenApproval: boolean
+  isApprovingToken: boolean
+  approveToken: () => Promise<void>
 }
 
 /**
@@ -92,10 +98,15 @@ export function useGameLogic<T extends GameSelection>({
 }: UseGameLogicProps<T>): UseGameLogicResult<T> {
   const { isConnected: isWalletConnected, address } = useAccount()
   const { gameHistory, refreshHistory } = useGameHistory(gameType)
-  const { data: balance, refetch: refetchBalance } = useBalance({ address })
   const { areChainsSynced, appChainId } = useChain()
+  const { bankrollToken } = useBettingConfig()
 
-  const token = chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
+  const token = bankrollToken || chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
+
+  const { data: balance, refetch: refetchBalance } = useBalance({
+    address,
+    token: token.address as Hex,
+  })
   const { houseEdge } = useHouseEdge({
     game: gameType,
     token,
@@ -109,6 +120,19 @@ export function useGameLogic<T extends GameSelection>({
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
     usePlaceBet(gameType, refetchBalance)
+
+  const gameContractAddress = casinoChainById[appChainId]?.contracts.games[gameType]?.address
+
+  const {
+    needsApproval: needsTokenApproval,
+    isApproving: isApprovingToken,
+    approve: approveToken,
+  } = useTokenAllowance({
+    token,
+    spender: gameContractAddress || "0x0000000000000000000000000000000000000000",
+    amount: betAmount || 0n,
+    enabled: !!gameContractAddress && !!betAmount && betAmount > 0n,
+  })
 
   const { netPayout, formattedNetMultiplier, grossMultiplier } = useBetCalculations({
     gameType,
@@ -127,16 +151,24 @@ export function useGameLogic<T extends GameSelection>({
     backgroundImage,
   }
 
-  const handlePlayButtonClick = () => {
+  const handlePlayButtonClick = async () => {
     if (betStatus === "error") {
       resetBetState()
       if (isWalletConnected && betAmount && betAmount > 0n) {
-        placeBet(betAmount, selection)
+        if (needsTokenApproval) {
+          await approveToken()
+        } else {
+          placeBet(betAmount, selection)
+        }
       }
     } else if (isInGameResultState) {
       resetBetState()
     } else if (isWalletConnected && betAmount && betAmount > 0n) {
-      placeBet(betAmount, selection)
+      if (needsTokenApproval) {
+        await approveToken()
+      } else {
+        placeBet(betAmount, selection)
+      }
     }
   }
 
@@ -173,5 +205,8 @@ export function useGameLogic<T extends GameSelection>({
     handlePlayButtonClick,
     handleBetAmountChange,
     placeBet,
+    needsTokenApproval,
+    isApprovingToken,
+    approveToken,
   }
 }
