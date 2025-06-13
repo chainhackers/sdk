@@ -1,31 +1,23 @@
-import {
-  CASINO_GAME_TYPE,
-  COINTOSS_FACE,
-  DiceNumber,
-  Token,
-  chainById,
-  chainNativeCurrencyToToken,
-} from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, Token, chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import React, { useState } from "react"
 import { formatGwei } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { BetStatus, GameResult } from "../types"
+import { GameChoice } from "../types"
 import { useBetCalculations } from "./useBetCalculations"
 import { HistoryEntry, useGameHistory } from "./useGameHistory"
 import { useHouseEdge } from "./useHouseEdge"
 import { useIsGamePaused } from "./useIsGamePaused"
 import { usePlaceBet } from "./usePlaceBet"
 
-type GameSelection = COINTOSS_FACE | DiceNumber
-
-interface UseGameLogicProps<T extends GameSelection> {
+interface UseGameLogicProps {
   gameType: CASINO_GAME_TYPE
-  defaultSelection: T
+  defaultSelection: GameChoice
   backgroundImage: string
 }
 
-interface UseGameLogicResult<T extends GameSelection> {
+interface UseGameLogicResult {
   isWalletConnected: boolean
   address: string | undefined
   balance: bigint
@@ -36,8 +28,8 @@ interface UseGameLogicResult<T extends GameSelection> {
   refetchBalance: () => void
   betAmount: bigint | undefined
   setBetAmount: (amount: bigint | undefined) => void
-  selection: T
-  setSelection: (selection: T) => void
+  selection: GameChoice
+  setSelection: (selection: GameChoice) => void
   betStatus: BetStatus
   gameResult: GameResult | null
   resetBetState: () => void
@@ -61,7 +53,7 @@ interface UseGameLogicResult<T extends GameSelection> {
   }
   handlePlayButtonClick: () => void
   handleBetAmountChange: (amount: bigint | undefined) => void
-  placeBet: (betAmount: bigint, choice: T) => void
+  placeBet: (betAmount: bigint, choice: GameChoice) => void
 }
 
 /**
@@ -85,11 +77,11 @@ interface UseGameLogicResult<T extends GameSelection> {
  * gameLogic.handlePlayButtonClick()
  * ```
  */
-export function useGameLogic<T extends GameSelection>({
+export function useGameLogic({
   gameType,
   defaultSelection,
   backgroundImage,
-}: UseGameLogicProps<T>): UseGameLogicResult<T> {
+}: UseGameLogicProps): UseGameLogicResult {
   const { isConnected: isWalletConnected, address } = useAccount()
   const { gameHistory, refreshHistory } = useGameHistory(gameType)
   const { data: balance, refetch: refetchBalance } = useBalance({ address })
@@ -105,13 +97,12 @@ export function useGameLogic<T extends GameSelection>({
   })
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
-  const [selection, setSelection] = useState<T>(defaultSelection)
+  const [selection, setSelection] = useState<GameChoice>(defaultSelection)
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
     usePlaceBet(gameType, refetchBalance)
 
   const { netPayout, formattedNetMultiplier, grossMultiplier } = useBetCalculations({
-    gameType,
     selection,
     houseEdge,
     betAmount,

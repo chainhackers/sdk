@@ -1,29 +1,29 @@
-import diceBackground from "../../assets/game/game-background.jpg"
+import rouletteBackground from "../../assets/game/game-background-5.png"
 
 import {
   CASINO_GAME_TYPE,
-  Dice,
-  DiceNumber,
   FORMAT_TYPE,
+  Roulette,
+  RouletteNumber,
   formatRawAmount,
 } from "@betswirl/sdk-core"
 import { useGameLogic } from "../../hooks/useGameLogic"
-import { DiceGameControls } from "./DiceGameControls"
 import { GameFrame } from "./GameFrame"
+import { RouletteGameControls } from "./RouletteGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
 import { useGameControls } from "./shared/useGameControls"
 
-const DEFAULT_DICE_NUMBER = 20 as DiceNumber
+const DEFAULT_ROULETTE_SELECTION: RouletteNumber[] = []
 
-export interface DiceGameProps extends BaseGameProps {}
+export interface RouletteGameProps extends BaseGameProps {}
 
-export function DiceGame({
+export function RouletteGame({
   theme = "system",
   customTheme,
-  backgroundImage = diceBackground,
+  backgroundImage = rouletteBackground,
   ...props
-}: DiceGameProps) {
+}: RouletteGameProps) {
   const {
     isWalletConnected,
     balance,
@@ -49,10 +49,10 @@ export function DiceGame({
     handlePlayButtonClick,
     handleBetAmountChange,
   } = useGameLogic({
-    gameType: CASINO_GAME_TYPE.DICE,
+    gameType: CASINO_GAME_TYPE.ROULETTE,
     defaultSelection: {
-      game: CASINO_GAME_TYPE.DICE,
-      choice: DEFAULT_DICE_NUMBER,
+      game: CASINO_GAME_TYPE.ROULETTE,
+      choice: DEFAULT_ROULETTE_SELECTION,
     },
     backgroundImage,
   })
@@ -65,22 +65,23 @@ export function DiceGame({
     isGamePaused,
   )
 
-  const selectedDiceNumber = (selection as { game: CASINO_GAME_TYPE.DICE; choice: DiceNumber })
-    .choice
+  const selectedNumbers = (
+    selection as { game: CASINO_GAME_TYPE.ROULETTE; choice: RouletteNumber[] }
+  ).choice
 
-  const handleNumberChange = (value: number) => {
+  const handleNumbersChange = (numbers: RouletteNumber[]) => {
     if (isControlsDisabled) {
       return
     }
-    setSelection({ game: CASINO_GAME_TYPE.DICE, choice: value as DiceNumber })
+    setSelection({ game: CASINO_GAME_TYPE.ROULETTE, choice: numbers })
   }
 
   return (
-    <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header title="Dice" connectWalletButton={<GameConnectWallet />} />
-      <GameFrame.GameArea>
+    <GameFrame themeSettings={themeSettings} variant="roulette" {...props}>
+      <GameFrame.Header title="Roulette" connectWalletButton={<GameConnectWallet />} />
+      <GameFrame.GameArea variant="roulette">
         <GameFrame.InfoButton
-          winChance={Dice.getWinChancePercent(selectedDiceNumber)}
+          winChance={Roulette.getWinChancePercent(selectedNumbers)}
           rngFee={formattedVrfFees}
           targetPayout={formatRawAmount(targetPayoutAmount, token.decimals, FORMAT_TYPE.PRECISE)}
           gasPrice={gasPrice}
@@ -89,22 +90,18 @@ export function DiceGame({
         />
         <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
         <GameFrame.GameControls>
-          <DiceGameControls
-            selectedNumber={selectedDiceNumber}
-            onNumberChange={handleNumberChange}
+          <RouletteGameControls
+            selectedNumbers={selectedNumbers}
+            onNumbersChange={handleNumbersChange}
             multiplier={formattedNetMultiplier}
             isDisabled={isControlsDisabled}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow
-          gameResult={gameResult}
-          betAmount={betAmount}
-          currency={nativeCurrencySymbol}
-        />
+        <GameFrame.ResultWindow gameResult={gameResult} betAmount={betAmount} currency="ETH" />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
-        game={CASINO_GAME_TYPE.DICE}
-        betCount={1} // TODO: Dynamic bet count support (#64)
+        game={CASINO_GAME_TYPE.ROULETTE}
+        betCount={1}
         grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
@@ -116,6 +113,7 @@ export function DiceGame({
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
         isGamePaused={isGamePaused}
+        hasValidSelection={selectedNumbers.length > 0}
       />
     </GameFrame>
   )
