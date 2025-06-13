@@ -1,7 +1,9 @@
 import path from "node:path"
-import tailwindcss from "@tailwindcss/vite"
+import { fileURLToPath } from "node:url"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const assetFileNames = (assetInfo: any) => {
   if (assetInfo.name?.endsWith(".css")) {
@@ -10,15 +12,17 @@ const assetFileNames = (assetInfo: any) => {
   return "assets/[name][extname]"
 }
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   build: {
+    assetsInlineLimit: 0,
+    cssCodeSplit: false,
+
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
       name: "@betswirl/ui",
