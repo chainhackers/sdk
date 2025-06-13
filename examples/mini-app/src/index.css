@@ -198,6 +198,13 @@
     --close-btn-color: var(--dark-on-surface-variant);
     --game-result-icon-bg: var(--dark-surface-high);
     --table-text: var(--white);
+
+    --roulette-black: oklch(0.2398 0.0062 214.42);
+    --roulette-black-hover: oklch(0.2698 0.0062 214.42);
+    --roulette-bundle: oklch(0.1551 0.0069 214.42);
+    --roulette-bundle-hover: oklch(0.1851 0.0069 214.42);
+    --roulette-disabled: oklch(0.2746 0.0057 236.74);
+    --roulette-disabled-text: oklch(0.7774 0.0129 276.04);
   }
 
   @font-face {
@@ -279,6 +286,21 @@
 
   .roulette-button-shadow-disabled {
     box-shadow: 0 1px 0 oklch(0.7733 0.0109 247.97);
+    padding-bottom: 1px;
+  }
+
+  .dark .roulette-button-shadow-black {
+    box-shadow: 0 1px 0 oklch(0.188 0.0047 196.76);
+    padding-bottom: 1px;
+  }
+
+  .dark .roulette-button-shadow-bundle {
+    box-shadow: 0 1px 0 oklch(0.1067 0 0);
+    padding-bottom: 1px;
+  }
+
+  .dark .roulette-button-shadow-disabled {
+    box-shadow: 0 1px 0 oklch(0.2165 0.005 248.06);
     padding-bottom: 1px;
   }
 }

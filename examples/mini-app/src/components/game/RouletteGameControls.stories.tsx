@@ -53,10 +53,12 @@ function InteractiveRouletteGameControls({
   initialSelectedNumbers = [],
   multiplier = 35.1,
   isDisabled = false,
+  theme = "dark",
 }: {
   initialSelectedNumbers?: RouletteNumber[]
   multiplier?: number
   isDisabled?: boolean
+  theme?: "light" | "dark"
 }) {
   const [selectedNumbers, setSelectedNumbers] = useState<RouletteNumber[]>(initialSelectedNumbers)
 
@@ -65,13 +67,15 @@ function InteractiveRouletteGameControls({
   }
 
   return (
-    <div className="relative w-[328px] h-[194px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
-      <RouletteGameControls
-        selectedNumbers={selectedNumbers}
-        onNumbersChange={handleNumbersChange}
-        multiplier={multiplier}
-        isDisabled={isDisabled}
-      />
+    <div className={theme}>
+      <div className="relative w-[328px] h-[194px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
+        <RouletteGameControls
+          selectedNumbers={selectedNumbers}
+          onNumbersChange={handleNumbersChange}
+          multiplier={multiplier}
+          isDisabled={isDisabled}
+        />
+      </div>
     </div>
   )
 }
@@ -80,98 +84,130 @@ function StaticRouletteGameControls({
   selectedNumbers = [],
   multiplier = 35.1,
   isDisabled = false,
+  theme = "dark",
 }: {
   selectedNumbers?: RouletteNumber[]
   multiplier?: number
   isDisabled?: boolean
+  theme?: "light" | "dark"
 }) {
   return (
-    <div className="relative w-[328px] h-[194px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
-      <RouletteGameControls
-        selectedNumbers={selectedNumbers}
-        onNumbersChange={() => {}}
-        multiplier={multiplier}
-        isDisabled={isDisabled}
-      />
+    <div className={theme}>
+      <div className="relative w-[328px] h-[194px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
+        <RouletteGameControls
+          selectedNumbers={selectedNumbers}
+          onNumbersChange={() => {}}
+          multiplier={multiplier}
+          isDisabled={isDisabled}
+        />
+      </div>
     </div>
   )
 }
 
-export const Default: Story = {
-  name: "Default (Empty)",
-  render: () => <InteractiveRouletteGameControls initialSelectedNumbers={[]} />,
+export const LightThemeDefault: Story = {
+  name: "Light Theme - Default (Empty)",
+  render: () => <InteractiveRouletteGameControls initialSelectedNumbers={[]} theme="light" />,
   args: {} as any,
   parameters: {
+    backgrounds: { default: "light" },
     docs: {
       description: {
         story:
-          "Default roulette table with no numbers selected. Click numbers or betting areas to select them.",
+          "Light theme roulette table with no numbers selected. Click numbers or betting areas to select them.",
       },
     },
   },
 }
 
-export const MultipleNumbers: Story = {
-  name: "Multiple Numbers",
-  render: () => <InteractiveRouletteGameControls initialSelectedNumbers={[7, 14, 21, 28]} />,
-  args: {} as any,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Roulette table with multiple numbers selected. Demonstrates multi-selection functionality.",
-      },
-    },
-  },
-}
-
-export const FirstDozen: Story = {
-  name: "First Dozen (1-12)",
+export const LightThemeMultipleNumbers: Story = {
+  name: "Light Theme - Multiple Numbers",
   render: () => (
-    <InteractiveRouletteGameControls
-      initialSelectedNumbers={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
-      multiplier={2.92}
-    />
+    <InteractiveRouletteGameControls initialSelectedNumbers={[7, 14, 21, 28]} theme="light" />
   ),
   args: {} as any,
   parameters: {
+    backgrounds: { default: "light" },
     docs: {
       description: {
         story:
-          "First dozen (1-12) selected. Demonstrates dozen betting with appropriate multiplier.",
+          "Light theme roulette table with multiple numbers selected. Demonstrates multi-selection functionality.",
       },
     },
   },
 }
 
-export const DisabledEmpty: Story = {
-  name: "Disabled (Empty)",
-  render: () => <StaticRouletteGameControls selectedNumbers={[]} isDisabled={true} />,
-  args: {} as any,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Disabled roulette table with no selections. Numbers cannot be clicked when disabled.",
-      },
-    },
-  },
-}
-
-export const DisabledWithSelections: Story = {
-  name: "Disabled (With Selections)",
+export const LightThemeDisabled: Story = {
+  name: "Light Theme - Disabled (With Selections)",
   render: () => (
     <StaticRouletteGameControls
       selectedNumbers={[0, 7, 14, 21]}
       isDisabled={true}
       multiplier={8.75}
+      theme="light"
     />
   ),
   args: {} as any,
   parameters: {
+    backgrounds: { default: "light" },
     docs: {
       description: {
-        story: "Disabled roulette table with existing selections. Shows disabled state styling.",
+        story:
+          "Light theme disabled roulette table with existing selections. Shows disabled state styling.",
+      },
+    },
+  },
+}
+
+export const DarkThemeDefault: Story = {
+  name: "Dark Theme - Default (Empty)",
+  render: () => <InteractiveRouletteGameControls initialSelectedNumbers={[]} theme="dark" />,
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Dark theme roulette table with no numbers selected. Click numbers or betting areas to select them.",
+      },
+    },
+  },
+}
+
+export const DarkThemeMultipleNumbers: Story = {
+  name: "Dark Theme - Multiple Numbers",
+  render: () => (
+    <InteractiveRouletteGameControls initialSelectedNumbers={[7, 14, 21, 28]} theme="dark" />
+  ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Dark theme roulette table with multiple numbers selected. Demonstrates multi-selection functionality.",
+      },
+    },
+  },
+}
+
+export const DarkThemeDisabled: Story = {
+  name: "Dark Theme - Disabled (With Selections)",
+  render: () => (
+    <StaticRouletteGameControls
+      selectedNumbers={[0, 7, 14, 21]}
+      isDisabled={true}
+      multiplier={8.75}
+      theme="dark"
+    />
+  ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Dark theme disabled roulette table with existing selections. Shows disabled state styling.",
       },
     },
   },

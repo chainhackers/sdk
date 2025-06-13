@@ -1,5 +1,6 @@
 import { ROULETTE_INPUT_BUNDLE, RouletteNumber } from "@betswirl/sdk-core"
 import chipSvg from "../../assets/game/roulette-chip.svg"
+import chipDisabledSvg from "../../assets/game/roulette-chip-disabled.svg"
 import { Button } from "../ui/button"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import { GameControlsProps } from "./shared/types"
@@ -159,7 +160,11 @@ export function RouletteGameControls({
       >
         {selected && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <img src={chipSvg} alt="Selected" className="absolute w-full h-full top-0 left-0" />
+            <img
+              src={isDisabled ? chipDisabledSvg : chipSvg}
+              alt="Selected"
+              className="absolute w-full h-full top-0 left-0"
+            />
             <span className="relative z-10 text-white text-[10px]">{number}</span>
           </div>
         )}
@@ -235,7 +240,7 @@ export function RouletteGameControls({
                 {isNumberSelected(0) && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <img
-                      src={chipSvg}
+                      src={isDisabled ? chipDisabledSvg : chipSvg}
                       alt="chip"
                       className="absolute w-full h-full top-0 left-0 object-contain"
                     />
