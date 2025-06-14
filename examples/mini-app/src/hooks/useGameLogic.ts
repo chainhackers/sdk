@@ -1,7 +1,5 @@
 import {
   CASINO_GAME_TYPE,
-  COINTOSS_FACE,
-  DiceNumber,
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
