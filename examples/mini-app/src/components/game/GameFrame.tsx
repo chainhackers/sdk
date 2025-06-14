@@ -2,7 +2,7 @@ import { CASINO_GAME_TYPE } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 import { cn } from "../../lib/utils"
-import { BetStatus, GameResult, TokenWithImage } from "../../types"
+import { BetStatus, GameResult, GameRolledResult, TokenWithImage } from "../../types"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Sheet, SheetTrigger } from "../ui/sheet"
@@ -10,6 +10,8 @@ import { BettingPanel } from "./BettingPanel"
 import { GameResultWindow } from "./GameResultWindow"
 import { HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
+import { getVariantConfig } from "./shared/gameVariants"
+import { GameVariant } from "./shared/types"
 
 interface ThemeSettings {
   theme?: "light" | "dark" | "system"
@@ -44,9 +46,23 @@ const useGameFrameContext = () => {
 interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   themeSettings: ThemeSettings
   children: React.ReactNode
+  variant?: GameVariant
 }
 
-function GameFrameRoot({ themeSettings, children, ...props }: GameFrameProps) {
+function formatRolledResult(rolled: GameRolledResult): string {
+  switch (rolled.game) {
+    case CASINO_GAME_TYPE.COINTOSS:
+      return rolled.rolled
+    case CASINO_GAME_TYPE.DICE:
+      return rolled.rolled.toString()
+    case CASINO_GAME_TYPE.ROULETTE:
+      return rolled.rolled.toString()
+    default:
+      return ""
+  }
+}
+
+function GameFrameRoot({ themeSettings, children, variant = "default", ...props }: GameFrameProps) {
   const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
   const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
@@ -54,6 +70,7 @@ function GameFrameRoot({ themeSettings, children, ...props }: GameFrameProps) {
   const { theme } = themeSettings
 
   const themeClass = theme === "system" ? undefined : theme
+  const variantConfig = getVariantConfig(variant)
 
   useEffect(() => {
     setIsMounted(true)
@@ -78,7 +95,11 @@ function GameFrameRoot({ themeSettings, children, ...props }: GameFrameProps) {
       >
         <Card
           ref={cardRef}
-          className={cn("relative overflow-hidden", "bg-card text-card-foreground border")}
+          className={cn(
+            "relative overflow-hidden",
+            "bg-card text-card-foreground border",
+            variantConfig.card.height,
+          )}
         >
           {children}
         </Card>
@@ -103,23 +124,33 @@ function Header({ title, connectWalletButton }: HeaderProps) {
 
 interface GameAreaProps {
   children: React.ReactNode
+  variant?: GameVariant
 }
 
-function GameArea({ children }: GameAreaProps) {
+function GameArea({ children, variant = "default" }: GameAreaProps) {
   const { themeSettings } = useGameFrameContext()
+  const variantConfig = getVariantConfig(variant)
 
   return (
-    <CardContent className="flex flex-col gap-4">
+    <CardContent className={variantConfig.gameArea.contentClass}>
       <div
         className={cn(
-          "h-[160px] rounded-[16px] flex flex-col justify-end items-center relative bg-cover bg-center bg-no-repeat",
+          variantConfig.gameArea.height,
+          variantConfig.gameArea.rounded,
+          "flex flex-col justify-end items-center relative bg-cover bg-center bg-no-repeat",
           "bg-muted overflow-hidden",
         )}
         style={{
           backgroundImage: `url(${themeSettings.backgroundImage})`,
         }}
       >
-        <div className={cn("absolute inset-0 rounded-[16px]", "bg-game-window-overlay")} />
+        <div
+          className={cn(
+            "absolute inset-0",
+            variantConfig.gameArea.rounded,
+            "bg-game-window-overlay",
+          )}
+        />
         {children}
       </div>
     </CardContent>
@@ -152,7 +183,7 @@ function InfoButton({
           variant="iconTransparent"
           size="iconRound"
           className={cn(
-            "absolute top-2 left-2 z-10",
+            "absolute top-2 left-2 z-30",
             "text-text-color border border-border-stroke bg-neutral-background",
             isInfoSheetOpen && "text-primary border-primary",
           )}
@@ -202,7 +233,7 @@ function HistoryButton({ historyData, onHistoryOpen }: HistoryButtonProps) {
           variant="iconTransparent"
           size="iconRound"
           className={cn(
-            "absolute top-2 right-2 z-[5]",
+            "absolute top-2 right-2 z-30",
             "text-text-color border border-border-stroke bg-neutral-background",
             isHistorySheetOpen && "text-primary border-primary",
           )}
@@ -239,7 +270,7 @@ function ResultWindow({ gameResult, betAmount, currency = "ETH" }: ResultWindowP
       amount={betAmount || 0n}
       payout={gameResult?.payout}
       currency={currency}
-      rolled={gameResult?.rolled.toString() || ""}
+      rolled={gameResult?.rolled ? formatRolledResult(gameResult.rolled) : ""}
     />
   )
 }
@@ -260,6 +291,7 @@ interface BettingSectionProps {
   isGamePaused: boolean
   needsTokenApproval?: boolean
   isApprovingToken?: boolean
+  hasValidSelection?: boolean
 }
 
 function BettingSection(props: BettingSectionProps) {

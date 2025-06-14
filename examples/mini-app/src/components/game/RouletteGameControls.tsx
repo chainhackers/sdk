@@ -1,4 +1,5 @@
 import { ROULETTE_INPUT_BUNDLE, RouletteNumber } from "@betswirl/sdk-core"
+import chipDisabledSvg from "../../assets/game/roulette-chip-disabled.svg"
 import chipSvg from "../../assets/game/roulette-chip.svg"
 import { Button } from "../ui/button"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
@@ -19,28 +20,38 @@ const BLACK_NUMBERS: RouletteNumber[] = [
 type RouletteColor = "red" | "black" | "green"
 
 interface ButtonColorConfig {
-  bg: string
+  background: string
+  shadow: string
   hover: string
 }
 
 const ROULETTE_COLORS: Record<RouletteColor, ButtonColorConfig> = {
   red: {
-    bg: "bg-roulette-red roulette-button-shadow-red",
+    background: "bg-roulette-red",
+    shadow: "roulette-button-shadow-red",
     hover: "hover:bg-roulette-red-hover",
   },
   black: {
-    bg: "bg-roulette-black roulette-button-shadow-black",
+    background: "bg-roulette-black",
+    shadow: "roulette-button-shadow-black",
     hover: "hover:bg-roulette-black-hover",
   },
   green: {
-    bg: "bg-roulette-green roulette-button-shadow-green",
+    background: "bg-roulette-green",
+    shadow: "roulette-button-shadow-green",
     hover: "hover:bg-roulette-green-hover",
   },
 }
 
 const BUNDLE_COLORS: ButtonColorConfig = {
-  bg: "bg-roulette-bundle roulette-button-shadow-bundle",
+  background: "bg-roulette-bundle",
+  shadow: "roulette-button-shadow-bundle",
   hover: "hover:bg-roulette-bundle-hover",
+}
+
+const getBundleStyles = (isDisabled = false): string => {
+  const shadowClass = isDisabled ? "roulette-button-shadow-disabled" : BUNDLE_COLORS.shadow
+  return `${BUNDLE_COLORS.background} ${shadowClass} ${BUNDLE_COLORS.hover}`
 }
 
 const DISABLED_STYLES =
@@ -52,9 +63,10 @@ const getNumberColor = (number: RouletteNumber): RouletteColor => {
   return RED_NUMBERS.includes(number) ? "red" : "black"
 }
 
-const getColorStyles = (color: RouletteColor): string => {
+const getColorStyles = (color: RouletteColor, isDisabled = false): string => {
   const colorConfig = ROULETTE_COLORS[color]
-  return `${colorConfig.bg} ${colorConfig.hover}`
+  const shadowClass = isDisabled ? "roulette-button-shadow-disabled" : colorConfig.shadow
+  return `${colorConfig.background} ${shadowClass} ${colorConfig.hover}`
 }
 
 export function RouletteGameControls({
@@ -137,7 +149,7 @@ export function RouletteGameControls({
   const renderNumberButton = (number: RouletteNumber) => {
     const color = getNumberColor(number)
     const selected = isNumberSelected(number)
-    const colorStyles = getColorStyles(color)
+    const colorStyles = getColorStyles(color, isDisabled)
 
     return (
       <Button
@@ -150,7 +162,11 @@ export function RouletteGameControls({
       >
         {selected && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <img src={chipSvg} alt="Selected" className="absolute w-full h-full top-0 left-0" />
+            <img
+              src={isDisabled ? chipDisabledSvg : chipSvg}
+              alt="Selected"
+              className="absolute w-full h-full top-0 left-0"
+            />
             <span className="relative z-10 text-white text-[10px]">{number}</span>
           </div>
         )}
@@ -167,7 +183,7 @@ export function RouletteGameControls({
     ].includes(bundle)
 
     const sizeClass = isRowButton ? "flex-1 w-[22px]" : "h-[28px]"
-    const bundleStyles = `${BUNDLE_COLORS.bg} ${BUNDLE_COLORS.hover}`
+    const bundleStyles = getBundleStyles(isDisabled)
 
     return (
       <Button
@@ -193,7 +209,7 @@ export function RouletteGameControls({
 
   const renderColorButton = (bundle: ROULETTE_INPUT_BUNDLE, isRed: boolean) => {
     const color: RouletteColor = isRed ? "red" : "black"
-    const colorStyles = getColorStyles(color)
+    const colorStyles = getColorStyles(color, isDisabled)
 
     return (
       <Button
@@ -209,7 +225,7 @@ export function RouletteGameControls({
   return (
     <>
       <GameMultiplierDisplay multiplier={multiplier} className="top-[23px]" />
-      <div className="absolute bottom-[16px] left-[3.5px] w-[321px] h-[130px]">
+      <div className="absolute bottom-[16px] left-[2.5px] w-[321px] h-[130px]">
         <div className="w-[321px] h-[130px] space-y-0.5">
           <div className="flex gap-0.5">
             <div className="flex flex-col justify-stretch h-[70px]">
@@ -220,12 +236,13 @@ export function RouletteGameControls({
                 disabled={isDisabled}
                 className={`relative w-[22px] h-full p-0 text-[12px] leading-5 font-bold rounded-sm ${getColorStyles(
                   "green",
+                  isDisabled,
                 )} ${COMMON_BUTTON_STYLES} ${DISABLED_STYLES}`}
               >
                 {isNumberSelected(0) && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <img
-                      src={chipSvg}
+                      src={isDisabled ? chipDisabledSvg : chipSvg}
                       alt="chip"
                       className="absolute w-full h-full top-0 left-0 object-contain"
                     />

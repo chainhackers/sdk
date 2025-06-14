@@ -12,6 +12,7 @@ import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
+import { useGameControls } from "./shared/useGameControls"
 
 export interface CoinTossGameProps extends BaseGameProps {}
 
@@ -29,8 +30,8 @@ export function CoinTossGame({
     gameHistory,
     refreshHistory,
     betAmount,
-    selection: selectedSide,
-    setSelection: setSelectedSide,
+    selection,
+    setSelection,
     betStatus,
     gameResult,
     vrfFees,
@@ -49,28 +50,30 @@ export function CoinTossGame({
     isApprovingToken,
   } = useGameLogic({
     gameType: CASINO_GAME_TYPE.COINTOSS,
-    defaultSelection: COINTOSS_FACE.HEADS,
+    defaultSelection: {
+      game: CASINO_GAME_TYPE.COINTOSS,
+      choice: COINTOSS_FACE.HEADS,
+    },
     backgroundImage,
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
+  const isControlsDisabled = useGameControls(
+    isWalletConnected,
+    betStatus,
+    isInGameResultState,
+    isGamePaused,
+  )
 
-  const isControlsDisabled =
-    !isWalletConnected ||
-    betStatus === "pending" ||
-    betStatus === "loading" ||
-    betStatus === "rolling" ||
-    isInGameResultState
+  const selectedSide = (selection as { game: CASINO_GAME_TYPE.COINTOSS; choice: COINTOSS_FACE })
+    .choice
 
   const handleCoinClick = () => {
     if (isControlsDisabled) {
       return
     }
-    setSelectedSide(
-      (selectedSide === COINTOSS_FACE.HEADS
-        ? COINTOSS_FACE.TAILS
-        : COINTOSS_FACE.HEADS) as typeof selectedSide,
-    )
+    const newSide = selectedSide === COINTOSS_FACE.HEADS ? COINTOSS_FACE.TAILS : COINTOSS_FACE.HEADS
+    setSelection({ game: CASINO_GAME_TYPE.COINTOSS, choice: newSide })
   }
 
   return (

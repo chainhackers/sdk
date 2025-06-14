@@ -14,3 +14,18 @@ export interface GameControlsProps {
   multiplier: number
   isDisabled: boolean
 }
+
+export type GameVariant = "default" | "roulette"
+
+export interface VariantConfig {
+  card: {
+    height: string
+  }
+  gameArea: {
+    height: string
+    rounded: string
+    contentClass: string
+  }
+}
+
+export type VariantConfigMap = Record<GameVariant, VariantConfig>

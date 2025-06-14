@@ -30,6 +30,7 @@ const DEBOUNCE_DELAY = 500 // 500ms - Debounce delay for grossMultiplier updates
  *   - maxBetAmount: Maximum allowed bet amount in wei
  *   - formattedMaxBetAmount: Human-readable max bet amount
  *   - maxBetCount: Maximum number of simultaneous bets allowed
+ *   - isLoading: Whether the bet requirements are currently being loaded
  */
 export function useBetRequirements(props: UseBetRequirementsProps) {
   const { appChainId } = useChain()
@@ -52,6 +53,7 @@ export function useBetRequirements(props: UseBetRequirementsProps) {
   })
 
   const isAllowed = Boolean(wagmiHook.data?.[0])
+  const isLoading = wagmiHook.isLoading || wagmiHook.isFetching
 
   const maxBetAmount = wagmiHook.data?.[1] ?? 0n
   const formattedMaxBetAmount = maxBetAmount ? formatUnits(maxBetAmount, props.token.decimals) : "0"
@@ -62,5 +64,6 @@ export function useBetRequirements(props: UseBetRequirementsProps) {
     maxBetAmount,
     formattedMaxBetAmount,
     maxBetCount,
+    isLoading,
   }
 }

@@ -33,6 +33,7 @@ interface BettingPanelProps {
   isGamePaused: boolean
   needsTokenApproval?: boolean
   isApprovingToken?: boolean
+  hasValidSelection?: boolean
 }
 
 const BET_AMOUNT_INPUT_STEP = 0.0001
@@ -53,6 +54,7 @@ export function BettingPanel({
   isGamePaused,
   needsTokenApproval = false,
   isApprovingToken = false,
+  hasValidSelection = true,
 }: BettingPanelProps) {
   const { appChainId } = useChain()
   const [inputValue, setInputValue] = useState<string>("")
@@ -86,6 +88,7 @@ export function BettingPanel({
     maxBetAmount,
     formattedMaxBetAmount,
     maxBetCount,
+    isLoading: isBetRequirementsLoading,
   } = useBetRequirements({
     game,
     token,
@@ -114,9 +117,11 @@ export function BettingPanel({
     !isTotalbetAmountExceedsBalance &&
     !isWaiting &&
     !isGamePaused &&
+    !isBetRequirementsLoading &&
     isTokenAllowed &&
     isBetCountValid &&
-    !isBetAmountExceedsMaxBetAmount
+    !isBetAmountExceedsMaxBetAmount &&
+    hasValidSelection
 
   const isInputDisabled = !isConnected || isWaiting || isBetSuccees || isApprovingToken
 
@@ -144,6 +149,10 @@ export function BettingPanel({
     playButtonText = "Switch chain"
   } else if (isGamePaused) {
     playButtonText = "Game paused"
+  } else if (!hasValidSelection) {
+    playButtonText = "Make your selection"
+  } else if (isBetRequirementsLoading) {
+    playButtonText = "Loading..."
   } else if (!isTokenAllowed) {
     playButtonText = "Token not allowed"
   } else if (isTotalbetAmountExceedsBalance) {
