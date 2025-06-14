@@ -21,3 +21,6 @@ tsconfig.tsbuildinfo
 
 # subgraph type generation
 **/subgraphs/**/documents/**/*.ts
+
+.idea
+.mcp.json

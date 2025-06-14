@@ -6,6 +6,7 @@ import {
   DiceNumber,
   RouletteEncodedInput,
   RouletteNumber,
+  type Token,
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
 
@@ -52,3 +53,7 @@ export type BetStatus =
   | "waiting-error"
   | "internal-error"
   | null
+
+export interface TokenWithImage extends Token {
+  image: string
+}

@@ -2,19 +2,17 @@ import {
   CASINO_GAME_TYPE,
   FORMAT_TYPE,
   GAS_TOKEN_ADDRESS,
-  Token,
   formatRawAmount,
 } from "@betswirl/sdk-core"
-import { TokenImage } from "@coinbase/onchainkit/token"
 import Decimal from "decimal.js"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { parseUnits } from "viem"
 import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
-import { ETH_TOKEN } from "../../lib/tokens"
 import { cn } from "../../lib/utils"
-import { BetStatus } from "../../types"
+import { BetStatus, TokenWithImage } from "../../types"
 import { ChainIcon } from "../ui/ChainIcon"
+import { TokenIcon } from "../ui/TokenIcon"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
@@ -23,7 +21,7 @@ interface BettingPanelProps {
   game: CASINO_GAME_TYPE
   balance: bigint
   isConnected: boolean
-  token: Token
+  token: TokenWithImage
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number
@@ -33,6 +31,8 @@ interface BettingPanelProps {
   onPlayBtnClick: () => void
   areChainsSynced: boolean
   isGamePaused: boolean
+  needsTokenApproval?: boolean
+  isApprovingToken?: boolean
   hasValidSelection?: boolean
 }
 
@@ -52,6 +52,8 @@ export function BettingPanel({
   onPlayBtnClick,
   areChainsSynced,
   isGamePaused,
+  needsTokenApproval = false,
+  isApprovingToken = false,
   hasValidSelection = true,
 }: BettingPanelProps) {
   const { appChainId } = useChain()
@@ -121,12 +123,17 @@ export function BettingPanel({
     !isBetAmountExceedsMaxBetAmount &&
     hasValidSelection
 
-  const isInputDisabled = !isConnected || isWaiting || isBetSuccees
+  const isInputDisabled = !isConnected || isWaiting || isBetSuccees || isApprovingToken
 
-  const isPlayButtonDisabled: boolean = isWaiting || !canInitiateBet
+  const isPlayButtonDisabled: boolean =
+    isWaiting || (!canInitiateBet && !needsTokenApproval) || isApprovingToken
 
   let playButtonText: string
-  if (isError) {
+  if (isApprovingToken) {
+    playButtonText = "Approving Token..."
+  } else if (needsTokenApproval) {
+    playButtonText = "Approve Token"
+  } else if (isError) {
     playButtonText = "Error, try again"
   } else if (isBetSuccees) {
     playButtonText = "Try again"
@@ -233,7 +240,7 @@ export function BettingPanel({
           <span className="font-semibold">{formattedBalance}</span>
           <div className="flex items-center ml-1">
             <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
-            <TokenImage token={ETH_TOKEN} size={18} />
+            <TokenIcon token={token} size={18} />
           </div>
         </div>
 
@@ -254,7 +261,7 @@ export function BettingPanel({
           onChange={handleInputChange}
           className={cn("relative", !isValidInput && "[&_input]:text-muted-foreground")}
           token={{
-            icon: <TokenImage token={ETH_TOKEN} size={18} />,
+            icon: <TokenIcon token={token} size={18} className="mr-1" />,
             symbol: token.symbol,
           }}
           disabled={isInputDisabled}
