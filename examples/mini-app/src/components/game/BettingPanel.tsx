@@ -2,7 +2,6 @@ import {
   CASINO_GAME_TYPE,
   FORMAT_TYPE,
   GAS_TOKEN_ADDRESS,
-  Token,
   formatRawAmount,
 } from "@betswirl/sdk-core"
 import Decimal from "decimal.js"
@@ -11,7 +10,7 @@ import { parseUnits } from "viem"
 import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { cn } from "../../lib/utils"
-import { BetStatus } from "../../types"
+import { BetStatus, TokenWithImage } from "../../types"
 import { ChainIcon } from "../ui/ChainIcon"
 import { TokenIcon } from "../ui/TokenIcon"
 import { Button } from "../ui/button"
@@ -22,7 +21,7 @@ interface BettingPanelProps {
   game: CASINO_GAME_TYPE
   balance: bigint
   isConnected: boolean
-  token: Token
+  token: TokenWithImage
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number

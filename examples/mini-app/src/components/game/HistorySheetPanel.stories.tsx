@@ -2,11 +2,19 @@ import { TokenIcon } from "../ui/TokenIcon"
 import type { Meta, StoryObj } from "@storybook/react"
 import { History as HistoryIcon } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
-import { ETH_TOKEN } from "../../lib/tokens"
+import type { TokenWithImage } from "../../types"
 import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
+
+// Mock token for stories
+const ETH_TOKEN: TokenWithImage = {
+  address: "0x0000000000000000000000000000000000000000",
+  symbol: "ETH",
+  decimals: 18,
+  image: "https://wallet-api-production.s3.amazonaws.com/uploads/tokens/eth_288.png",
+}
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode

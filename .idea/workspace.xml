@@ -5,25 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eb55e2c1-4250-425c-9eaf-dd9033d2a333" name="Changes" comment="refactor: move affiliate adddress to env #50">
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/mini-app/src/components/ui/TokenIcon.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/mini-app/src/hooks/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/mini-app/src/hooks/useTokenAllowance.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/mini-app/src/components/game/BettingPanel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/components/game/BettingPanel.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/mini-app/src/components/game/CoinTossGame.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/components/game/CoinTossGame.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/mini-app/src/components/game/GameFrame.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/components/game/GameFrame.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/mini-app/src/components/game/HistorySheetPanel.stories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/components/game/HistorySheetPanel.stories.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/mini-app/src/components/ui/TokenIcon.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/components/ui/TokenIcon.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/mini-app/src/components/ui/input.stories.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/components/ui/input.stories.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/mini-app/src/context/BetSwirlSDKProvider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/context/BetSwirlSDKProvider.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/mini-app/src/context/configContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/context/configContext.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/mini-app/src/hooks/useGameHistory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/hooks/useGameHistory.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/mini-app/src/hooks/useGameLogic.ts" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/hooks/useGameLogic.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/mini-app/src/hooks/usePlaceBet.ts" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/hooks/usePlaceBet.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/mini-app/src/lib/tokens.ts" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/lib/tokens.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/mini-app/src/lib/tokens.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/examples/mini-app/src/providers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/providers.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/mini-app/src/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mini-app/src/types.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,7 +147,7 @@
       <workItem from="1749639663556" duration="7432000" />
       <workItem from="1749675256618" duration="17595000" />
       <workItem from="1749740160055" duration="886000" />
-      <workItem from="1749755855629" duration="7860000" />
+      <workItem from="1749755855629" duration="21204000" />
     </task>
     <task id="LOCAL-00001" summary="fix: pnpm run build in examples/mini-app #12">
       <option name="closed" value="true" />

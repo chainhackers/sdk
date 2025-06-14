@@ -1,8 +1,8 @@
-import { CASINO_GAME_TYPE, Token } from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 import { cn } from "../../lib/utils"
-import { BetStatus, GameResult } from "../../types"
+import { BetStatus, GameResult, TokenWithImage } from "../../types"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Sheet, SheetTrigger } from "../ui/sheet"
@@ -248,7 +248,7 @@ interface BettingSectionProps {
   game: CASINO_GAME_TYPE
   balance: bigint
   isConnected: boolean
-  token: Token
+  token: TokenWithImage
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number

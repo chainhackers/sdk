@@ -2,7 +2,6 @@ import {
   CASINO_GAME_TYPE,
   COINTOSS_FACE,
   DiceNumber,
-  Token,
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
@@ -12,7 +11,7 @@ import { type Hex, formatGwei } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
-import { BetStatus, GameResult } from "../types"
+import { BetStatus, GameResult, TokenWithImage } from "../types"
 import { useBetCalculations } from "./useBetCalculations"
 import { HistoryEntry, useGameHistory } from "./useGameHistory"
 import { useHouseEdge } from "./useHouseEdge"
@@ -32,7 +31,7 @@ interface UseGameLogicResult<T extends GameSelection> {
   isWalletConnected: boolean
   address: string | undefined
   balance: bigint
-  token: Token
+  token: TokenWithImage
   areChainsSynced: boolean
   gameHistory: HistoryEntry[]
   refreshHistory: () => void
@@ -101,7 +100,10 @@ export function useGameLogic<T extends GameSelection>({
   const { areChainsSynced, appChainId } = useChain()
   const { bankrollToken } = useBettingConfig()
 
-  const token = bankrollToken || chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
+  const token: TokenWithImage = bankrollToken || {
+    ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
+    image: "", // Fallback for native currency - user should configure this
+  }
 
   const { data: balance, refetch: refetchBalance } = useBalance({
     address,

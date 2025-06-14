@@ -1,7 +1,15 @@
-import { TokenIcon } from "./TokenIcon"
 import type { Meta, StoryObj } from "@storybook/react"
-import { ETH_TOKEN } from "../../lib/tokens"
+import type { TokenWithImage } from "../../types"
 import { Input } from "./input"
+import { TokenIcon } from "./TokenIcon"
+
+// Mock token for stories
+const ETH_TOKEN: TokenWithImage = {
+  address: "0x0000000000000000000000000000000000000000",
+  symbol: "ETH",
+  decimals: 18,
+  image: "https://wallet-api-production.s3.amazonaws.com/uploads/tokens/eth_288.png",
+}
 
 const meta = {
   title: "UI/Input",
