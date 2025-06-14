@@ -17,7 +17,8 @@ const DEGEN_TOKEN: TokenWithImage = {
   address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
   symbol: "DEGEN",
   decimals: 18,
-  image: "https://dd.dexscreener.com/ds-data/tokens/base/0x4ed4e862860bed51a9570b96d89af5e1b0efefed.png",
+  image:
+    "https://dd.dexscreener.com/ds-data/tokens/base/0x4ed4e862860bed51a9570b96d89af5e1b0efefed.png",
 }
 
 export function AppProviders({ children }: { children: ReactNode }) {

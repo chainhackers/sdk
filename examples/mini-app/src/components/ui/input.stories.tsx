@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import type { TokenWithImage } from "../../types"
-import { Input } from "./input"
 import { TokenIcon } from "./TokenIcon"
+import { Input } from "./input"
 
 // Mock token for stories
 const ETH_TOKEN: TokenWithImage = {

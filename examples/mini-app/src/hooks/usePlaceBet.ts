@@ -289,7 +289,7 @@ async function _submitBetTransaction(
   const { token, ...betParamsWithoutToken } = betParams
   const placeBetTxData = getPlaceBetFunctionData(
     { ...betParamsWithoutToken, receiver, tokenAddress: token?.address },
-    chainId
+    chainId,
   )
   wagerWriteHook({
     abi: placeBetTxData.data.abi,

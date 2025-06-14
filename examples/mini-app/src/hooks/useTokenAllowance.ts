@@ -1,5 +1,5 @@
 import { Token, getAllowanceFunctionData, getApproveFunctionData } from "@betswirl/sdk-core"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { Address, maxUint256 } from "viem"
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -51,7 +51,10 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
 
   // Check if this is a native token (no approval needed)
   const isNativeToken = useMemo(() => {
-    return !effectiveToken?.address || effectiveToken.address === "0x0000000000000000000000000000000000000000"
+    return (
+      !effectiveToken?.address ||
+      effectiveToken.address === "0x0000000000000000000000000000000000000000"
+    )
   }, [effectiveToken])
 
   // Get current allowance
@@ -70,7 +73,7 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
       enabled: enabled && !!allowanceFunctionData && !isNativeToken,
     },
   })
-  
+
   const allowance = (allowanceData as bigint | undefined) ?? 0n
 
   // Check if approval is needed
@@ -125,9 +128,11 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
   }, [approveFunctionData, writeContract, appChainId])
 
   // Handle successful approval
-  if (isSuccess && !isConfirming) {
-    handleApprovalSuccess()
-  }
+  useEffect(() => {
+    if (isSuccess && !isConfirming) {
+      handleApprovalSuccess()
+    }
+  }, [isSuccess, isConfirming, handleApprovalSuccess])
 
   return {
     allowance,

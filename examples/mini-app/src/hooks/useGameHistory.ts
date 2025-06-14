@@ -14,8 +14,8 @@ import { useAccount } from "wagmi"
 import { TokenIcon } from "../components/ui/TokenIcon"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
-import type { TokenWithImage } from "../types"
 import { toLowerCase } from "../lib/utils"
+import type { TokenWithImage } from "../types"
 
 const logger = createLogger("useGameHistory")
 
@@ -88,14 +88,14 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
 
       const formattedHistory: HistoryEntry[] = result.bets.map((bet: CasinoBet) => {
         // Use the configured bankroll token if it matches, otherwise create a placeholder
-        const tokenWithImage: TokenWithImage = bankrollToken && 
-          bankrollToken.symbol === bet.token.symbol 
-          ? bankrollToken 
-          : {
-              ...bet.token,
-              image: "", // Placeholder image for unknown tokens
-            }
-        
+        const tokenWithImage: TokenWithImage =
+          bankrollToken && bankrollToken.symbol === bet.token.symbol
+            ? bankrollToken
+            : {
+                ...bet.token,
+                image: "", // Placeholder image for unknown tokens
+              }
+
         return {
           id: bet.id.toString(),
           status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,

@@ -40,11 +40,14 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
     [initialAffiliate, appChain],
   )
 
-  const context: ConfigContextValue = {
-    affiliate,
-    affiliateHouseEdge,
-    bankrollToken,
-  }
+  const context: ConfigContextValue = useMemo(
+    () => ({
+      affiliate,
+      affiliateHouseEdge,
+      bankrollToken,
+    }),
+    [affiliate, affiliateHouseEdge, bankrollToken],
+  )
 
   return <ConfigContext.Provider value={context}>{children}</ConfigContext.Provider>
 }
