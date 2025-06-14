@@ -1,6 +1,6 @@
 import { Token, getAllowanceFunctionData, getApproveFunctionData } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo } from "react"
-import { Address, maxUint256 } from "viem"
+import { Address, maxUint256, zeroAddress } from "viem"
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
@@ -50,12 +50,7 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
   const effectiveToken = token || bankrollToken
 
   // Check if this is a native token (no approval needed)
-  const isNativeToken = useMemo(() => {
-    return (
-      !effectiveToken?.address ||
-      effectiveToken.address === "0x0000000000000000000000000000000000000000"
-    )
-  }, [effectiveToken])
+  const isNativeToken = !effectiveToken?.address || effectiveToken.address === zeroAddress
 
   // Get current allowance
   const allowanceFunctionData = useMemo(() => {
