@@ -9,7 +9,6 @@ import { fileURLToPath } from "node:url"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const fontsPath = path.resolve(__dirname, 'src', 'fonts.css')
-const fontsCSS = fs.readFileSync(fontsPath, 'utf-8')
 
 const isProd = process.env.NODE_ENV === 'production'
 let isLayersUnpacked = false
@@ -45,6 +44,7 @@ export default {
                 return
               }
 
+              const fontsCSS = fs.readFileSync(fontsPath, 'utf-8')
               const fontsRoot = postcss.parse(fontsCSS, { from: fontsPath })
               root.append(fontsRoot)
             }
