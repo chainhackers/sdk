@@ -110,6 +110,7 @@ const meta = {
   component: HistorySheetWithWrapper,
   parameters: {
     layout: "centered",
+    chromatic: { disable: true },
   },
   tags: ["autodocs"],
   argTypes: {

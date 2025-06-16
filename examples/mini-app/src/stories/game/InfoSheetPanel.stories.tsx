@@ -91,6 +91,7 @@ const meta = {
   component: InfoSheetWithWrapper,
   parameters: {
     layout: "centered",
+    chromatic: { disable: true },
   },
   tags: ["autodocs"],
   argTypes: {

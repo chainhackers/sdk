@@ -1,18 +1,9 @@
-import {
-  CASINO_GAME_TYPE,
-  COINTOSS_FACE,
-  CoinToss,
-  Dice,
-  DiceNumber,
-  getPayoutDetails,
-} from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, CoinToss, Dice, Roulette, getPayoutDetails } from "@betswirl/sdk-core"
 import { useMemo } from "react"
+import { GameChoice } from "@/types/types"
 
-type GameSelection = COINTOSS_FACE | DiceNumber
-
-interface UseBetCalculationsProps<T extends GameSelection> {
-  gameType: CASINO_GAME_TYPE
-  selection: T
+interface UseBetCalculationsProps {
+  selection: GameChoice
   houseEdge: number
   betAmount: bigint | undefined
   betCount: number | undefined
@@ -29,17 +20,16 @@ interface UseBetCalculationsResult {
   formattedNetMultiplier: number
 }
 
-function getMultiplierForGame<T extends GameSelection>(
-  gameType: CASINO_GAME_TYPE,
-  selection: T,
-): number {
-  switch (gameType) {
+function getMultiplierForGame(selection: GameChoice): number {
+  switch (selection.game) {
     case CASINO_GAME_TYPE.COINTOSS:
-      return CoinToss.getMultiplier(selection as COINTOSS_FACE)
+      return CoinToss.getMultiplier(selection.choice)
     case CASINO_GAME_TYPE.DICE:
-      return Dice.getMultiplier(selection as DiceNumber)
+      return Dice.getMultiplier(selection.choice)
+    case CASINO_GAME_TYPE.ROULETTE:
+      return Roulette.getMultiplier(selection.choice)
     default:
-      throw new Error(`Unsupported game type: ${gameType}`)
+      throw new Error(`Unsupported game type: ${(selection as any).game}`)
   }
 }
 
@@ -64,17 +54,13 @@ function getMultiplierForGame<T extends GameSelection>(
  * })
  * ```
  */
-export function useBetCalculations<T extends GameSelection>({
-  gameType,
+export function useBetCalculations({
   selection,
   houseEdge,
   betAmount,
   betCount = 1,
-}: UseBetCalculationsProps<T>): UseBetCalculationsResult {
-  const grossMultiplier = useMemo(
-    () => getMultiplierForGame(gameType, selection),
-    [gameType, selection],
-  )
+}: UseBetCalculationsProps): UseBetCalculationsResult {
+  const grossMultiplier = useMemo(() => getMultiplierForGame(selection), [selection])
   const totalBetAmount = useMemo(
     () => (betAmount && betAmount > 0n ? betAmount * BigInt(betCount) : 0n),
     [betAmount, betCount],

@@ -1,16 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import gameBg1 from "../assets/game/game-background-9.png"
-import gameBg4 from "../assets/game/game-background-10.png"
-import gameBg2 from "../assets/game/game-background-11.webp"
-import gameBg3 from "../assets/game/game-background-12.png"
-import gameBg5 from "../assets/game/game-background-13.png"
-import gameBg6 from "../assets/game/game-background-14.png"
+import gameBg1 from "../assets/game/game-background-1.jpg"
+import gameBg2 from "../assets/game/game-background-2.jpg"
+import gameBg3 from "../assets/game/game-background-3.jpg"
+import gameBg4 from "../assets/game/game-background-4.jpg"
+import gameBg5 from "../assets/game/game-background-5.png"
+import gameBg6 from "../assets/game/game-background-6.jpg"
+import gameBg7 from "../assets/game/game-background-7.png"
+import gameBg8 from "../assets/game/game-background-8.jpg"
 import { AppProviders } from "../../providers"
-import { DiceGame } from "../../components/game/DiceGame"
+import { RouletteGame } from "../../components/game/RouletteGame"
 
 const meta = {
-  title: "Game/DiceGame",
-  component: DiceGame,
+  title: "Game/RouletteGame",
+  component: RouletteGame,
   parameters: {
     layout: "centered",
     backgrounds: {
@@ -57,13 +59,13 @@ const meta = {
       accept: "image/*",
     },
   },
-} satisfies Meta<typeof DiceGame>
+} satisfies Meta<typeof RouletteGame>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 const Template: Story = {
-  render: (args) => <DiceGame {...args} />,
+  render: (args) => <RouletteGame {...args} />,
 }
 
 export const LightTheme: Story = {
@@ -80,7 +82,7 @@ export const DarkTheme: Story = {
     backgroundImage: gameBg2,
   },
   parameters: {
-    backgrounds: { default: "light" },
+    backgrounds: { default: "dark" },
   },
 }
 
@@ -95,28 +97,13 @@ export const SystemTheme: Story = {
   },
 }
 
-export const DonutRollLightTheme: Story = {
+export const CasinoRedLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
     customTheme: {
-      "--primary": "#7f5058",
-      "--play-btn-font": "rgb(238 231 235)",
-    } as React.CSSProperties,
-    backgroundImage: gameBg5,
-  },
-  parameters: {
-    chromatic: { disable: true },
-  },
-}
-
-export const SatelliteDarkTheme: Story = {
-  ...Template,
-  args: {
-    theme: "dark",
-    customTheme: {
-      "--primary": "#d7caab",
-      "--play-btn-font": "#254450",
+      "--primary": "#dc2626",
+      "--play-btn-font": "#ffffff",
     } as React.CSSProperties,
     backgroundImage: gameBg1,
   },
@@ -125,13 +112,13 @@ export const SatelliteDarkTheme: Story = {
   },
 }
 
-export const SpaceshipDarkTheme: Story = {
+export const GoldenLightTheme: Story = {
   ...Template,
   args: {
-    theme: "dark",
+    theme: "light",
     customTheme: {
-      "--primary": "#595b5c",
-      "--play-btn-font": "#c5c2ab",
+      "--primary": "#d97706",
+      "--play-btn-font": "#ffffff",
     } as React.CSSProperties,
     backgroundImage: gameBg3,
   },
@@ -140,15 +127,60 @@ export const SpaceshipDarkTheme: Story = {
   },
 }
 
-export const MysticForestDarkTheme: Story = {
+export const ElegantDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
     customTheme: {
-      "--primary": "rgb(74 41 24)",
-      "--play-btn-font": "rgb(225 159 31)",
+      "--primary": "#059669",
+      "--play-btn-font": "#ffffff",
+    } as React.CSSProperties,
+    backgroundImage: gameBg5,
+  },
+  parameters: {
+    chromatic: { disable: true },
+  },
+}
+
+export const VelvetDarkTheme: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    customTheme: {
+      "--primary": "#7c2d12",
+      "--play-btn-font": "#fbbf24",
     } as React.CSSProperties,
     backgroundImage: gameBg6,
+  },
+  parameters: {
+    chromatic: { disable: true },
+  },
+}
+
+export const NeonDarkTheme: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    customTheme: {
+      "--primary": "#ec4899",
+      "--play-btn-font": "#ffffff",
+    } as React.CSSProperties,
+    backgroundImage: gameBg7,
+  },
+  parameters: {
+    chromatic: { disable: true },
+  },
+}
+
+export const ClassicDarkTheme: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    customTheme: {
+      "--primary": "#1f2937",
+      "--play-btn-font": "#f9fafb",
+    } as React.CSSProperties,
+    backgroundImage: gameBg8,
   },
   parameters: {
     chromatic: { disable: true },

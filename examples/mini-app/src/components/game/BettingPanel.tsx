@@ -9,10 +9,12 @@ import { TokenImage } from "@coinbase/onchainkit/token"
 import Decimal from "decimal.js"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { parseUnits } from "viem"
+import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { ETH_TOKEN } from "../../lib/tokens"
 import { cn } from "../../lib/utils"
 import { BetStatus } from "../../types/types"
+import { ChainIcon } from "../ui/ChainIcon"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
@@ -31,6 +33,7 @@ interface BettingPanelProps {
   onPlayBtnClick: () => void
   areChainsSynced: boolean
   isGamePaused: boolean
+  hasValidSelection?: boolean
 }
 
 const BET_AMOUNT_INPUT_STEP = 0.0001
@@ -49,7 +52,9 @@ export function BettingPanel({
   onPlayBtnClick,
   areChainsSynced,
   isGamePaused,
+  hasValidSelection = true,
 }: BettingPanelProps) {
+  const { appChainId } = useChain()
   const [inputValue, setInputValue] = useState<string>("")
   const [isValidInput, setIsValidInput] = useState<boolean>(true)
   const [isUserTyping, setIsUserTyping] = useState<boolean>(false)
@@ -81,6 +86,7 @@ export function BettingPanel({
     maxBetAmount,
     formattedMaxBetAmount,
     maxBetCount,
+    isLoading: isBetRequirementsLoading,
   } = useBetRequirements({
     game,
     token,
@@ -109,9 +115,11 @@ export function BettingPanel({
     !isTotalbetAmountExceedsBalance &&
     !isWaiting &&
     !isGamePaused &&
+    !isBetRequirementsLoading &&
     isTokenAllowed &&
     isBetCountValid &&
-    !isBetAmountExceedsMaxBetAmount
+    !isBetAmountExceedsMaxBetAmount &&
+    hasValidSelection
 
   const isInputDisabled = !isConnected || isWaiting || isBetSuccees
 
@@ -134,6 +142,10 @@ export function BettingPanel({
     playButtonText = "Switch chain"
   } else if (isGamePaused) {
     playButtonText = "Game paused"
+  } else if (!hasValidSelection) {
+    playButtonText = "Make your selection"
+  } else if (isBetRequirementsLoading) {
+    playButtonText = "Loading..."
   } else if (!isTokenAllowed) {
     playButtonText = "Token not allowed"
   } else if (isTotalbetAmountExceedsBalance) {
@@ -219,7 +231,10 @@ export function BettingPanel({
         <div className="text-sm font-medium flex items-center">
           <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
           <span className="font-semibold">{formattedBalance}</span>
-          <TokenImage token={ETH_TOKEN} size={18} className="ml-1" />
+          <div className="flex items-center ml-1">
+            <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
+            <TokenImage token={ETH_TOKEN} size={18} />
+          </div>
         </div>
 
         <Label

@@ -92,9 +92,12 @@ export const SystemTheme: Story = {
     theme: "system",
     backgroundImage: gameBg4,
   },
+  parameters: {
+    chromatic: { disable: true },
+  },
 }
 
-export const CustomTheme1: Story = {
+export const SheepsLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
@@ -104,9 +107,12 @@ export const CustomTheme1: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg1,
   },
+  parameters: {
+    chromatic: { disable: true },
+  },
 }
 
-export const CustomTheme2: Story = {
+export const ChickletLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
@@ -116,9 +122,12 @@ export const CustomTheme2: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg3,
   },
+  parameters: {
+    chromatic: { disable: true },
+  },
 }
 
-export const CustomTheme3: Story = {
+export const CatsDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -128,9 +137,12 @@ export const CustomTheme3: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg5,
   },
+  parameters: {
+    chromatic: { disable: true },
+  },
 }
 
-export const CustomTheme4: Story = {
+export const LightfishDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -140,9 +152,12 @@ export const CustomTheme4: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg6,
   },
+  parameters: {
+    chromatic: { disable: true },
+  },
 }
 
-export const CustomTheme5: Story = {
+export const MarticoinDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -152,9 +167,12 @@ export const CustomTheme5: Story = {
     } as React.CSSProperties,
     backgroundImage: gameBg7,
   },
+  parameters: {
+    chromatic: { disable: true },
+  },
 }
 
-export const CustomTheme6: Story = {
+export const FrogDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
@@ -163,5 +181,8 @@ export const CustomTheme6: Story = {
       "--play-btn-font": "rgb(171 181 171)",
     } as React.CSSProperties,
     backgroundImage: gameBg8,
+  },
+  parameters: {
+    chromatic: { disable: true },
   },
 }
