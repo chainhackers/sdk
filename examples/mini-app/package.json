@@ -23,7 +23,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "rm -rf dist && tsc -b && NODE_ENV=production pnpm exec tailwindcss -i ./src/index.css -o ./dist/index.css --postcss --minify && cp -r src/assets dist/ && vite build",
+    "build": "rm -rf dist && tsc -b && vite build && cp -r src/assets dist/",
     "lint": "biome check .",
     "lint:fix": "biome check . --write",
     "format": "biome format . --write",
