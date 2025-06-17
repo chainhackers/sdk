@@ -96,7 +96,8 @@ const BUNDLE_COLORS: ButtonColorConfig = {
 const BUTTON_STYLES = {
   disabled: "disabled:opacity-[0.72]",
   common: "text-white hover:text-white disabled:hover:bg-opacity-100",
-  number: "relative w-[25px] h-[25px] p-0 text-[10px] leading-5 font-semibold rounded-md shadow-none",
+  number:
+    "relative w-[25px] h-[25px] p-0 text-[10px] leading-5 font-semibold rounded-md shadow-none",
   bundle: "px-1 text-[10px] leading-5 font-semibold rounded-md shadow-none",
   rowButton: "w-[25px] h-[25px]",
   regularButton: "h-[25px]",
@@ -116,89 +117,76 @@ const getBundleStyles = (): string => {
   return `${BUNDLE_COLORS.background} ${BUNDLE_COLORS.hover}`
 }
 
-const ChipWithToken = React.memo<ChipWithTokenProps>(({
-  number,
-  chipSize,
-  tokenSize,
-  tokenStyles,
-  textStyles
-}) => (
-  <div className="absolute inset-0 flex items-center justify-center">
-    <img
-      src={chipSvg}
-      alt="Selected"
-      className={`absolute ${chipSize}`}
-    />
-    <span className={`relative z-10 text-white ${textStyles || ""}`}>{number}</span>
-    <div className={`absolute z-20 ${tokenStyles || ""}`}>
-      <TokenImage token={ETH_TOKEN} size={tokenSize} />
+const ChipWithToken = React.memo<ChipWithTokenProps>(
+  ({ number, chipSize, tokenSize, tokenStyles, textStyles }) => (
+    <div className="absolute inset-0 flex items-center justify-center">
+      <img src={chipSvg} alt="Selected" className={`absolute ${chipSize}`} />
+      <span className={`relative z-10 text-white ${textStyles || ""}`}>{number}</span>
+      <div className={`absolute z-20 ${tokenStyles || ""}`}>
+        <TokenImage token={ETH_TOKEN} size={tokenSize} />
+      </div>
     </div>
-  </div>
-))
+  ),
+)
 
-const NumberButton = React.memo<NumberButtonProps>(({
-  number,
-  isSelected,
-  isDisabled,
-  onClick
-}) => {
-  const color = getNumberColor(number)
-  const colorStyles = getColorStyles(color)
-  const buttonClasses = `${BUTTON_STYLES.number} ${colorStyles} ${BUTTON_STYLES.common} ${BUTTON_STYLES.disabled}`
+const NumberButton = React.memo<NumberButtonProps>(
+  ({ number, isSelected, isDisabled, onClick }) => {
+    const color = getNumberColor(number)
+    const colorStyles = getColorStyles(color)
+    const buttonClasses = `${BUTTON_STYLES.number} ${colorStyles} ${BUTTON_STYLES.common} ${BUTTON_STYLES.disabled}`
 
-  return (
-    <Button
-      key={number}
-      variant="ghost"
-      size="sm"
-      onClick={() => onClick(number)}
-      disabled={isDisabled}
-      className={buttonClasses}
-    >
-      {isSelected ? (
-        <ChipWithToken
-          number={number}
-          chipSize={20.45}
-          tokenSize={6.82}
-          tokenStyles="bottom-[1.7px] right-[1.7px]"
-          textStyles="text-[10px]"
-        />
-      ) : (
-        <span>{number}</span>
-      )}
-    </Button>
-  )
-})
+    return (
+      <Button
+        key={number}
+        variant="ghost"
+        size="sm"
+        onClick={() => onClick(number)}
+        disabled={isDisabled}
+        className={buttonClasses}
+      >
+        {isSelected ? (
+          <ChipWithToken
+            number={number}
+            chipSize={20.45}
+            tokenSize={6.82}
+            tokenStyles="bottom-[1.7px] right-[1.7px]"
+            textStyles="text-[10px]"
+          />
+        ) : (
+          <span>{number}</span>
+        )}
+      </Button>
+    )
+  },
+)
 
-const BundleButton = React.memo<BundleButtonProps>(({
-  bundle,
-  label,
-  className,
-  isDisabled,
-  onClick
-}) => {
-  const isRowButton = Object.values(CUSTOM_ROW_BUNDLE).includes(bundle as CUSTOM_ROW_BUNDLE)
-  const sizeClass = isRowButton ? BUTTON_STYLES.rowButton : BUTTON_STYLES.regularButton
+const BundleButton = React.memo<BundleButtonProps>(
+  ({ bundle, label, className, isDisabled, onClick }) => {
+    const isRowButton = Object.values(CUSTOM_ROW_BUNDLE).includes(bundle as CUSTOM_ROW_BUNDLE)
+    const sizeClass = isRowButton ? BUTTON_STYLES.rowButton : BUTTON_STYLES.regularButton
 
-  const isColorButton = [ROULETTE_INPUT_BUNDLE.RED, ROULETTE_INPUT_BUNDLE.BLACK].includes(bundle as ROULETTE_INPUT_BUNDLE)
-  const buttonStyles = isColorButton
-    ? getColorStyles(bundle === ROULETTE_INPUT_BUNDLE.RED ? "red" : "black")
-    : `${getBundleStyles()} roulette-button-border`
+    const isColorButton = [ROULETTE_INPUT_BUNDLE.RED, ROULETTE_INPUT_BUNDLE.BLACK].includes(
+      bundle as ROULETTE_INPUT_BUNDLE,
+    )
+    const buttonStyles = isColorButton
+      ? getColorStyles(bundle === ROULETTE_INPUT_BUNDLE.RED ? "red" : "black")
+      : `${getBundleStyles()} roulette-button-border`
 
-  const buttonClasses = `${sizeClass} ${BUTTON_STYLES.bundle} ${buttonStyles} ${BUTTON_STYLES.common} ${BUTTON_STYLES.disabled} ${className || ""}`
+    const buttonClasses = `${sizeClass} ${BUTTON_STYLES.bundle} ${buttonStyles} ${BUTTON_STYLES.common} ${BUTTON_STYLES.disabled} ${className || ""}`
 
-  return (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => onClick(bundle)}
-      disabled={isDisabled}
-      className={buttonClasses}
-    >
-      {label}
-    </Button>
-  )
-})
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => onClick(bundle)}
+        disabled={isDisabled}
+        className={buttonClasses}
+      >
+        {label}
+      </Button>
+    )
+  },
+)
 
 export function RouletteGameControls({
   selectedNumbers,
@@ -254,11 +242,11 @@ export function RouletteGameControls({
       onNumbersChange(selectedNumbers.filter((n) => !bundleNumbers.includes(n)))
     } else {
       const newNumbers = [...selectedNumbers]
-      bundleNumbers.forEach((num) => {
+      for (const num of bundleNumbers) {
         if (!newNumbers.includes(num)) {
           newNumbers.push(num)
         }
-      })
+      }
       onNumbersChange(newNumbers)
     }
   }
@@ -295,15 +283,13 @@ export function RouletteGameControls({
                     textStyles="text-[12px] font-bold"
                   />
                 )}
-                {!isNumberSelected(0) && (
-                  <span>0</span>
-                )}
+                {!isNumberSelected(0) && <span>0</span>}
               </Button>
             </div>
 
             <div className="grid grid-rows-4 gap-[1px]">
-              {NUMBER_GRID.map((row, rowIndex) => (
-                <div key={rowIndex} className="grid grid-cols-9 gap-[1px]">
+              {NUMBER_GRID.map((row) => (
+                <div key={`row-${row[0]}`} className="grid grid-cols-9 gap-[1px]">
                   {row.map((number) => (
                     <NumberButton
                       key={number}
@@ -318,30 +304,102 @@ export function RouletteGameControls({
             </div>
 
             <div className="flex flex-col gap-[1px]">
-              <BundleButton bundle={CUSTOM_ROW_BUNDLE.ROW_0} label="3:1" isDisabled={isDisabled} onClick={handleBundleClick} />
-              <BundleButton bundle={CUSTOM_ROW_BUNDLE.ROW_1} label="3:1" isDisabled={isDisabled} onClick={handleBundleClick} />
-              <BundleButton bundle={CUSTOM_ROW_BUNDLE.ROW_2} label="3:1" isDisabled={isDisabled} onClick={handleBundleClick} />
-              <BundleButton bundle={CUSTOM_ROW_BUNDLE.ROW_3} label="3:1" isDisabled={isDisabled} onClick={handleBundleClick} />
+              <BundleButton
+                bundle={CUSTOM_ROW_BUNDLE.ROW_0}
+                label="3:1"
+                isDisabled={isDisabled}
+                onClick={handleBundleClick}
+              />
+              <BundleButton
+                bundle={CUSTOM_ROW_BUNDLE.ROW_1}
+                label="3:1"
+                isDisabled={isDisabled}
+                onClick={handleBundleClick}
+              />
+              <BundleButton
+                bundle={CUSTOM_ROW_BUNDLE.ROW_2}
+                label="3:1"
+                isDisabled={isDisabled}
+                onClick={handleBundleClick}
+              />
+              <BundleButton
+                bundle={CUSTOM_ROW_BUNDLE.ROW_3}
+                label="3:1"
+                isDisabled={isDisabled}
+                onClick={handleBundleClick}
+              />
             </div>
           </div>
 
           <div className="space-y-[1px]">
             <div className="flex gap-[1px]">
               <div className="grid grid-cols-3 gap-[1px] flex-1">
-                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.ONE_TO_TWELVE} label="1 to 12" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
-                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.THIRTEEN_TO_TWENTY_FOUR} label="13 to 24" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
-                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.TWENTY_FIVE_TO_THIRTY_SIX} label="25 to 36" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
+                <BundleButton
+                  bundle={ROULETTE_INPUT_BUNDLE.ONE_TO_TWELVE}
+                  label="1 to 12"
+                  className="flex-1"
+                  isDisabled={isDisabled}
+                  onClick={handleBundleClick}
+                />
+                <BundleButton
+                  bundle={ROULETTE_INPUT_BUNDLE.THIRTEEN_TO_TWENTY_FOUR}
+                  label="13 to 24"
+                  className="flex-1"
+                  isDisabled={isDisabled}
+                  onClick={handleBundleClick}
+                />
+                <BundleButton
+                  bundle={ROULETTE_INPUT_BUNDLE.TWENTY_FIVE_TO_THIRTY_SIX}
+                  label="25 to 36"
+                  className="flex-1"
+                  isDisabled={isDisabled}
+                  onClick={handleBundleClick}
+                />
               </div>
             </div>
 
             <div className="flex gap-[1px]">
               <div className="flex gap-[1px] flex-1">
-                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.ONE_TO_EIGHTEEN} label="1 to 18" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
-                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.EVEN} label="Even" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
-                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.RED} className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
-                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.BLACK} className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
-                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.ODD} label="Odd" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
-                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.EIGHTEEN_TO_THIRTY_SIX} label="19 to 36" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
+                <BundleButton
+                  bundle={ROULETTE_INPUT_BUNDLE.ONE_TO_EIGHTEEN}
+                  label="1 to 18"
+                  className="flex-1"
+                  isDisabled={isDisabled}
+                  onClick={handleBundleClick}
+                />
+                <BundleButton
+                  bundle={ROULETTE_INPUT_BUNDLE.EVEN}
+                  label="Even"
+                  className="flex-1"
+                  isDisabled={isDisabled}
+                  onClick={handleBundleClick}
+                />
+                <BundleButton
+                  bundle={ROULETTE_INPUT_BUNDLE.RED}
+                  className="flex-1"
+                  isDisabled={isDisabled}
+                  onClick={handleBundleClick}
+                />
+                <BundleButton
+                  bundle={ROULETTE_INPUT_BUNDLE.BLACK}
+                  className="flex-1"
+                  isDisabled={isDisabled}
+                  onClick={handleBundleClick}
+                />
+                <BundleButton
+                  bundle={ROULETTE_INPUT_BUNDLE.ODD}
+                  label="Odd"
+                  className="flex-1"
+                  isDisabled={isDisabled}
+                  onClick={handleBundleClick}
+                />
+                <BundleButton
+                  bundle={ROULETTE_INPUT_BUNDLE.EIGHTEEN_TO_THIRTY_SIX}
+                  label="19 to 36"
+                  className="flex-1"
+                  isDisabled={isDisabled}
+                  onClick={handleBundleClick}
+                />
               </div>
             </div>
           </div>
