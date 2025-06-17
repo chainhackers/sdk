@@ -1,5 +1,4 @@
 import { ROULETTE_INPUT_BUNDLE, RouletteNumber } from "@betswirl/sdk-core"
-import chipDisabledSvg from "../../assets/game/roulette-chip-disabled.svg"
 import chipSvg from "../../assets/game/roulette-chip.svg"
 import { Button } from "../ui/button"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
@@ -69,7 +68,7 @@ const BUNDLE_COLORS: ButtonColorConfig = {
 }
 
 const BUTTON_STYLES = {
-  disabled: "disabled:bg-roulette-disabled disabled:text-roulette-disabled-text disabled:opacity-100",
+  disabled: "disabled:opacity-[0.72]",
   common: "text-white hover:text-white disabled:hover:bg-opacity-100",
   number: "relative w-[25px] h-[25px] p-0 text-[10px] leading-5 font-semibold rounded-sm shadow-none",
   bundle: "px-1 text-[10px] leading-5 font-semibold rounded-sm shadow-none",
@@ -164,7 +163,7 @@ export function RouletteGameControls({
   const renderChipOverlay = (number: RouletteNumber) => (
     <div className="absolute inset-0 flex items-center justify-center">
       <img
-        src={isDisabled ? chipDisabledSvg : chipSvg}
+        src={chipSvg}
         alt="Selected"
         className="absolute w-full h-full top-0 left-0"
       />
@@ -190,7 +189,7 @@ export function RouletteGameControls({
         {selected ? (
           renderChipOverlay(number)
         ) : (
-          <span className="disabled:text-roulette-disabled-text">{number}</span>
+          <span>{number}</span>
         )}
       </Button>
     )
@@ -249,7 +248,7 @@ export function RouletteGameControls({
                 {isNumberSelected(0) && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <img
-                      src={isDisabled ? chipDisabledSvg : chipSvg}
+                      src={chipSvg}
                       alt="chip"
                       className="absolute w-full h-full top-0 left-0 object-contain"
                     />
@@ -257,7 +256,7 @@ export function RouletteGameControls({
                   </div>
                 )}
                 {!isNumberSelected(0) && (
-                  <span className="disabled:text-roulette-disabled-text">0</span>
+                  <span>0</span>
                 )}
               </Button>
             </div>
