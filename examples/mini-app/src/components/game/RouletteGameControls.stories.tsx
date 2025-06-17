@@ -68,7 +68,7 @@ function InteractiveRouletteGameControls({
 
   return (
     <div className={theme}>
-      <div className="relative w-[328px] h-[194px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
+      <div className="relative w-[304px] h-[206px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
         <RouletteGameControls
           selectedNumbers={selectedNumbers}
           onNumbersChange={handleNumbersChange}
@@ -93,7 +93,7 @@ function StaticRouletteGameControls({
 }) {
   return (
     <div className={theme}>
-      <div className="relative w-[328px] h-[194px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
+      <div className="relative w-[328px] h-[250px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
         <RouletteGameControls
           selectedNumbers={selectedNumbers}
           onNumbersChange={() => {}}
