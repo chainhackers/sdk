@@ -204,7 +204,7 @@ export function RouletteGameControls({
       return getColorStyles(color)
     }
 
-    return getBundleStyles()
+    return `${getBundleStyles()} roulette-button-border`
   }
 
   const renderBundleButton = (
