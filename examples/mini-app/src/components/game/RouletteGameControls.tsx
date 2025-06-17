@@ -11,7 +11,23 @@ interface ChipWithTokenProps {
   number: RouletteNumber
   chipSize: number
   tokenSize: number
-  fontWeight?: string
+  tokenStyles?: string
+  textStyles?: string
+}
+
+interface NumberButtonProps {
+  number: RouletteNumber
+  isSelected: boolean
+  isDisabled: boolean
+  onClick: (number: RouletteNumber) => void
+}
+
+interface BundleButtonProps {
+  bundle: BundleType
+  label?: string
+  className?: string
+  isDisabled: boolean
+  onClick: (bundle: BundleType) => void
 }
 
 interface RouletteGameControlsProps extends GameControlsProps {
@@ -104,31 +120,83 @@ const ChipWithToken = React.memo<ChipWithTokenProps>(({
   number,
   chipSize,
   tokenSize,
-  fontWeight
+  tokenStyles,
+  textStyles
+}) => (
+  <div className="absolute inset-0 flex items-center justify-center">
+    <img
+      src={chipSvg}
+      alt="Selected"
+      className={`absolute ${chipSize}`}
+    />
+    <span className={`relative z-10 text-white ${textStyles || ""}`}>{number}</span>
+    <div className={`absolute z-20 ${tokenStyles || ""}`}>
+      <TokenImage token={ETH_TOKEN} size={tokenSize} />
+    </div>
+  </div>
+))
+
+const NumberButton = React.memo<NumberButtonProps>(({
+  number,
+  isSelected,
+  isDisabled,
+  onClick
 }) => {
-  const isZero = number === 0
-  const textSize = isZero ? "text-[12px]" : "text-[10px]"
-  const tokenOffset = Math.round(chipSize * 0.08) // 8% от размера чипа
+  const color = getNumberColor(number)
+  const colorStyles = getColorStyles(color)
+  const buttonClasses = `${BUTTON_STYLES.number} ${colorStyles} ${BUTTON_STYLES.common} ${BUTTON_STYLES.disabled}`
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <img
-        src={chipSvg}
-        alt="Selected"
-        className="absolute"
-        style={{ width: `${chipSize}px`, height: `${chipSize}px` }}
-      />
-      <span className={`relative z-10 text-white ${textSize} ${fontWeight || ""}`}>{number}</span>
-      <div
-        className="absolute z-20"
-        style={{
-          right: `${tokenOffset}px`,
-          bottom: isZero ? `${chipSize * 2.3}px` : `${tokenOffset}px`
-        }}
-      >
-        <TokenImage token={ETH_TOKEN} size={tokenSize} />
-      </div>
-    </div>
+    <Button
+      key={number}
+      variant="ghost"
+      size="sm"
+      onClick={() => onClick(number)}
+      disabled={isDisabled}
+      className={buttonClasses}
+    >
+      {isSelected ? (
+        <ChipWithToken
+          number={number}
+          chipSize={20.45}
+          tokenSize={6.82}
+          tokenStyles="bottom-[1.7px] right-[1.7px]"
+          textStyles="text-[10px]"
+        />
+      ) : (
+        <span>{number}</span>
+      )}
+    </Button>
+  )
+})
+
+const BundleButton = React.memo<BundleButtonProps>(({
+  bundle,
+  label,
+  className,
+  isDisabled,
+  onClick
+}) => {
+  const isRowButton = Object.values(CUSTOM_ROW_BUNDLE).includes(bundle as CUSTOM_ROW_BUNDLE)
+  const sizeClass = isRowButton ? BUTTON_STYLES.rowButton : BUTTON_STYLES.regularButton
+
+  const isColorButton = [ROULETTE_INPUT_BUNDLE.RED, ROULETTE_INPUT_BUNDLE.BLACK].includes(bundle as ROULETTE_INPUT_BUNDLE)
+  const buttonStyles = isColorButton
+    ? getColorStyles(bundle === ROULETTE_INPUT_BUNDLE.RED ? "red" : "black")
+    : `${getBundleStyles()} roulette-button-border`
+
+  const buttonClasses = `${sizeClass} ${BUTTON_STYLES.bundle} ${buttonStyles} ${BUTTON_STYLES.common} ${BUTTON_STYLES.disabled} ${className || ""}`
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => onClick(bundle)}
+      disabled={isDisabled}
+      className={buttonClasses}
+    >
+      {label}
+    </Button>
   )
 })
 
@@ -202,72 +270,6 @@ export function RouletteGameControls({
     toggleBundleSelection(bundleNumbers)
   }
 
-  const renderChipOverlay = (number: RouletteNumber) => (
-    <ChipWithToken
-      number={number}
-      chipSize={20.45}
-      tokenSize={6.82}
-    />
-  )
-
-  const renderNumberButton = (number: RouletteNumber) => {
-    const color = getNumberColor(number)
-    const selected = isNumberSelected(number)
-    const colorStyles = getColorStyles(color)
-    const buttonClasses = `${BUTTON_STYLES.number} ${colorStyles} ${BUTTON_STYLES.common} ${BUTTON_STYLES.disabled}`
-
-    return (
-      <Button
-        key={number}
-        variant="ghost"
-        size="sm"
-        onClick={() => handleNumberClick(number)}
-        disabled={isDisabled}
-        className={buttonClasses}
-      >
-        {selected ? (
-          renderChipOverlay(number)
-        ) : (
-          <span>{number}</span>
-        )}
-      </Button>
-    )
-  }
-
-  const getBundleButtonStyles = (bundle: BundleType): string => {
-    const isColorButton = [ROULETTE_INPUT_BUNDLE.RED, ROULETTE_INPUT_BUNDLE.BLACK].includes(bundle as ROULETTE_INPUT_BUNDLE)
-
-    if (isColorButton) {
-      const color: RouletteColor = bundle === ROULETTE_INPUT_BUNDLE.RED ? "red" : "black"
-      return getColorStyles(color)
-    }
-
-    return `${getBundleStyles()} roulette-button-border`
-  }
-
-  const renderBundleButton = (
-    bundle: BundleType,
-    label?: string,
-    className?: string,
-  ) => {
-    const isRowButton = Object.values(CUSTOM_ROW_BUNDLE).includes(bundle as CUSTOM_ROW_BUNDLE)
-    const sizeClass = isRowButton ? BUTTON_STYLES.rowButton : BUTTON_STYLES.regularButton
-    const buttonStyles = getBundleButtonStyles(bundle)
-    const buttonClasses = `${sizeClass} ${BUTTON_STYLES.bundle} ${buttonStyles} ${BUTTON_STYLES.common} ${BUTTON_STYLES.disabled} ${className || ""}`
-
-    return (
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => handleBundleClick(bundle)}
-        disabled={isDisabled}
-        className={buttonClasses}
-      >
-        {label}
-      </Button>
-    )
-  }
-
   return (
     <>
       <GameMultiplierDisplay multiplier={multiplier} className="top-[23px]" />
@@ -289,7 +291,8 @@ export function RouletteGameControls({
                     number={0}
                     chipSize={18}
                     tokenSize={6}
-                    fontWeight="font-bold"
+                    tokenStyles="right-[2.5px] bottom-[41px]"
+                    textStyles="text-[12px] font-bold"
                   />
                 )}
                 {!isNumberSelected(0) && (
@@ -301,48 +304,44 @@ export function RouletteGameControls({
             <div className="grid grid-rows-4 gap-[1px]">
               {NUMBER_GRID.map((row, rowIndex) => (
                 <div key={rowIndex} className="grid grid-cols-9 gap-[1px]">
-                  {row.map((number) => renderNumberButton(number))}
+                  {row.map((number) => (
+                    <NumberButton
+                      key={number}
+                      number={number}
+                      isSelected={isNumberSelected(number)}
+                      isDisabled={isDisabled}
+                      onClick={handleNumberClick}
+                    />
+                  ))}
                 </div>
               ))}
             </div>
 
             <div className="flex flex-col gap-[1px]">
-              {renderBundleButton(CUSTOM_ROW_BUNDLE.ROW_0, "3:1")}
-              {renderBundleButton(CUSTOM_ROW_BUNDLE.ROW_1, "3:1")}
-              {renderBundleButton(CUSTOM_ROW_BUNDLE.ROW_2, "3:1")}
-              {renderBundleButton(CUSTOM_ROW_BUNDLE.ROW_3, "3:1")}
+              <BundleButton bundle={CUSTOM_ROW_BUNDLE.ROW_0} label="3:1" isDisabled={isDisabled} onClick={handleBundleClick} />
+              <BundleButton bundle={CUSTOM_ROW_BUNDLE.ROW_1} label="3:1" isDisabled={isDisabled} onClick={handleBundleClick} />
+              <BundleButton bundle={CUSTOM_ROW_BUNDLE.ROW_2} label="3:1" isDisabled={isDisabled} onClick={handleBundleClick} />
+              <BundleButton bundle={CUSTOM_ROW_BUNDLE.ROW_3} label="3:1" isDisabled={isDisabled} onClick={handleBundleClick} />
             </div>
           </div>
 
           <div className="space-y-[1px]">
             <div className="flex gap-[1px]">
               <div className="grid grid-cols-3 gap-[1px] flex-1">
-                {renderBundleButton(ROULETTE_INPUT_BUNDLE.ONE_TO_TWELVE, "1 to 12", "flex-1")}
-                {renderBundleButton(
-                  ROULETTE_INPUT_BUNDLE.THIRTEEN_TO_TWENTY_FOUR,
-                  "13 to 24",
-                  "flex-1",
-                )}
-                {renderBundleButton(
-                  ROULETTE_INPUT_BUNDLE.TWENTY_FIVE_TO_THIRTY_SIX,
-                  "25 to 36",
-                  "flex-1",
-                )}
+                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.ONE_TO_TWELVE} label="1 to 12" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
+                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.THIRTEEN_TO_TWENTY_FOUR} label="13 to 24" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
+                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.TWENTY_FIVE_TO_THIRTY_SIX} label="25 to 36" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
               </div>
             </div>
 
             <div className="flex gap-[1px]">
               <div className="flex gap-[1px] flex-1">
-                {renderBundleButton(ROULETTE_INPUT_BUNDLE.ONE_TO_EIGHTEEN, "1 to 18", "flex-1")}
-                {renderBundleButton(ROULETTE_INPUT_BUNDLE.EVEN, "Even", "flex-1")}
-                {renderBundleButton(ROULETTE_INPUT_BUNDLE.RED, undefined, "flex-1")}
-                {renderBundleButton(ROULETTE_INPUT_BUNDLE.BLACK, undefined, "flex-1")}
-                {renderBundleButton(ROULETTE_INPUT_BUNDLE.ODD, "Odd", "flex-1")}
-                {renderBundleButton(
-                  ROULETTE_INPUT_BUNDLE.EIGHTEEN_TO_THIRTY_SIX,
-                  "19 to 36",
-                  "flex-1",
-                )}
+                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.ONE_TO_EIGHTEEN} label="1 to 18" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
+                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.EVEN} label="Even" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
+                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.RED} className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
+                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.BLACK} className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
+                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.ODD} label="Odd" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
+                <BundleButton bundle={ROULETTE_INPUT_BUNDLE.EIGHTEEN_TO_THIRTY_SIX} label="19 to 36" className="flex-1" isDisabled={isDisabled} onClick={handleBundleClick} />
               </div>
             </div>
           </div>
