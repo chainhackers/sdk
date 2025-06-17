@@ -1,8 +1,18 @@
 import { ROULETTE_INPUT_BUNDLE, RouletteNumber } from "@betswirl/sdk-core"
+import { TokenImage } from "@coinbase/onchainkit/token"
+import React from "react"
 import chipSvg from "../../assets/game/roulette-chip.svg"
+import { ETH_TOKEN } from "../../lib/tokens"
 import { Button } from "../ui/button"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import { GameControlsProps } from "./shared/types"
+
+interface ChipWithTokenProps {
+  number: RouletteNumber
+  chipSize: number
+  tokenSize: number
+  fontWeight?: string
+}
 
 interface RouletteGameControlsProps extends GameControlsProps {
   selectedNumbers: RouletteNumber[]
@@ -70,8 +80,8 @@ const BUNDLE_COLORS: ButtonColorConfig = {
 const BUTTON_STYLES = {
   disabled: "disabled:opacity-[0.72]",
   common: "text-white hover:text-white disabled:hover:bg-opacity-100",
-  number: "relative w-[25px] h-[25px] p-0 text-[10px] leading-5 font-semibold rounded-sm shadow-none",
-  bundle: "px-1 text-[10px] leading-5 font-semibold rounded-sm shadow-none",
+  number: "relative w-[25px] h-[25px] p-0 text-[10px] leading-5 font-semibold rounded-md shadow-none",
+  bundle: "px-1 text-[10px] leading-5 font-semibold rounded-md shadow-none",
   rowButton: "w-[25px] h-[25px]",
   regularButton: "h-[25px]",
 } as const
@@ -89,6 +99,38 @@ const getColorStyles = (color: RouletteColor): string => {
 const getBundleStyles = (): string => {
   return `${BUNDLE_COLORS.background} ${BUNDLE_COLORS.hover}`
 }
+
+const ChipWithToken = React.memo<ChipWithTokenProps>(({
+  number,
+  chipSize,
+  tokenSize,
+  fontWeight
+}) => {
+  const isZero = number === 0
+  const textSize = isZero ? "text-[12px]" : "text-[10px]"
+  const tokenOffset = Math.round(chipSize * 0.08) // 8% от размера чипа
+
+  return (
+    <div className="absolute inset-0 flex items-center justify-center">
+      <img
+        src={chipSvg}
+        alt="Selected"
+        className="absolute"
+        style={{ width: `${chipSize}px`, height: `${chipSize}px` }}
+      />
+      <span className={`relative z-10 text-white ${textSize} ${fontWeight || ""}`}>{number}</span>
+      <div
+        className="absolute z-20"
+        style={{
+          right: `${tokenOffset}px`,
+          bottom: isZero ? `${chipSize * 2.3}px` : `${tokenOffset}px`
+        }}
+      >
+        <TokenImage token={ETH_TOKEN} size={tokenSize} />
+      </div>
+    </div>
+  )
+})
 
 export function RouletteGameControls({
   selectedNumbers,
@@ -161,14 +203,11 @@ export function RouletteGameControls({
   }
 
   const renderChipOverlay = (number: RouletteNumber) => (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <img
-        src={chipSvg}
-        alt="Selected"
-        className="absolute w-full h-full top-0 left-0"
-      />
-      <span className="relative z-10 text-white text-[10px]">{number}</span>
-    </div>
+    <ChipWithToken
+      number={number}
+      chipSize={20.45}
+      tokenSize={6.82}
+    />
   )
 
   const renderNumberButton = (number: RouletteNumber) => {
@@ -241,19 +280,17 @@ export function RouletteGameControls({
                 size="sm"
                 onClick={() => handleNumberClick(0)}
                 disabled={isDisabled}
-                className={`relative w-[25px] h-full p-0 text-[12px] leading-5 font-bold rounded-sm shadow-none ${getColorStyles(
+                className={`relative w-[25px] h-full p-0 text-[12px] leading-5 font-bold rounded-md shadow-none ${getColorStyles(
                   "green",
                 )} ${BUTTON_STYLES.common} ${BUTTON_STYLES.disabled}`}
               >
                 {isNumberSelected(0) && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <img
-                      src={chipSvg}
-                      alt="chip"
-                      className="absolute w-full h-full top-0 left-0 object-contain"
-                    />
-                    <span className="relative z-10 text-white font-bold text-[12px]">0</span>
-                  </div>
+                  <ChipWithToken
+                    number={0}
+                    chipSize={18}
+                    tokenSize={6}
+                    fontWeight="font-bold"
+                  />
                 )}
                 {!isNumberSelected(0) && (
                   <span>0</span>
