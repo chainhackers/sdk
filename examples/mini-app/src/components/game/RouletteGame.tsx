@@ -48,6 +48,11 @@ export function RouletteGame({
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
+    needsTokenApproval,
+    isApprovePending,
+    isApproveConfirming,
+    isRefetchingAllowance,
+    approveError,
   } = useGameLogic({
     gameType: CASINO_GAME_TYPE.ROULETTE,
     defaultSelection: {
@@ -114,6 +119,11 @@ export function RouletteGame({
         areChainsSynced={areChainsSynced}
         isGamePaused={isGamePaused}
         hasValidSelection={selectedNumbers.length > 0}
+        needsTokenApproval={needsTokenApproval}
+        isApprovePending={isApprovePending}
+        isApproveConfirming={isApproveConfirming}
+        isRefetchingAllowance={isRefetchingAllowance}
+        approveError={approveError}
       />
     </GameFrame>
   )
