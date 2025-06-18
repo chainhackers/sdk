@@ -104,7 +104,7 @@ export function DiceGame({
         <GameFrame.ResultWindow
           gameResult={gameResult}
           betAmount={betAmount}
-          currency={nativeCurrencySymbol}
+          currency={token.symbol}
         />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
