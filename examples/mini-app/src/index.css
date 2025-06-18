@@ -70,6 +70,9 @@
   --color-roulette-bundle-hover: var(--roulette-bundle-hover);
   --color-roulette-disabled: var(--roulette-disabled);
   --color-roulette-disabled-text: var(--roulette-disabled-text);
+  --color-keno-unselected-bg: var(--keno-unselected-bg);
+  --color-keno-unselected-border: var(--keno-unselected-border);
+  --color-keno-multiplier-bg: var(--keno-multiplier-bg);
 }
 
 @layer base {
@@ -160,6 +163,10 @@
     --roulette-bundle-hover: oklch(0.2698 0.0062 214.42);
     --roulette-disabled: oklch(0.8523 0.0061 239.83);
     --roulette-disabled-text: oklch(0.6138 0.014 271.18);
+
+    --keno-unselected-bg: oklch(0.9846 0.0017 247.84);
+    --keno-unselected-border: oklch(0.9278 0.0029 264.54);
+    --keno-multiplier-bg: oklch(0.1559 0.02 269.69 / 0.4);
   }
 
   .dark {
