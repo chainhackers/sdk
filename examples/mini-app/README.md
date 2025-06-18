@@ -1,4 +1,4 @@
-# Chainhackers UI - React Casino Game Components
+# BetSwirl UI - React Casino Game Components
 
 This is a **game widget library** for BetSwirl protocol casino games built with React + TypeScript + Vite.
 
@@ -34,10 +34,6 @@ Configuration is in `biome.json` and extends the root workspace configuration.
 setfacl -R -m u:dev-components:rwx /var/www/betswirl-sdk/
 ```
 
-## Running Mini-App from SDK
-
-If you have downloaded the SDK library and want to run the test mini-app:
-
 1. Navigate to the mini-app folder:
 ```shell
 cd examples/mini-app
@@ -48,12 +44,22 @@ cd examples/mini-app
 pnpm install --ignore-workspace
 ```
 
-3. Start Storybook:
+Start Storybook:
 ```shell
 pnpm storybook
 ```
 
-4. Open in browser:
+Start development server:
+```bash
+pnpm dev
 ```
-Local: http://localhost:6006/
+
+Open in browser:
 ```
+Storybook: http://localhost:6006/
+Dev server: http://localhost:5173/
+```
+
+### Building and Publishing
+- `pnpm build` - Build library for production
+- `pnpm prepublishOnly` - Automatically runs build before publishing
