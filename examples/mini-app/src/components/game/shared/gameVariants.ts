@@ -13,12 +13,12 @@ export const VARIANT_CONFIG: VariantConfigMap = {
   },
   roulette: {
     card: {
-      height: "h-[546px]",
+      height: "h-[564px]",
     },
     gameArea: {
-      height: "h-[194px]",
-      rounded: "",
-      contentClass: "flex flex-col gap-4 -mx-3",
+      height: "h-[212px]",
+      rounded: "rounded-[16px]",
+      contentClass: "",
     },
   },
 } as const
