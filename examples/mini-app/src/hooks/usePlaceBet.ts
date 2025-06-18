@@ -178,6 +178,8 @@ export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void) 
     wagerWriteHook.reset()
     setGameResult(null)
     setWatchTarget(null)
+    setInternalError(null)
+    setIsRolling(false)
     resetWatcher()
   }, [resetWatcher, wagerWriteHook.reset])
 

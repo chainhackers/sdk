@@ -1,11 +1,7 @@
-import {
-  CASINO_GAME_TYPE,
-  chainById,
-  chainNativeCurrencyToToken,
-} from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import { casinoChainById } from "@betswirl/sdk-core"
 import React, { useState } from "react"
-import { type Hex, formatGwei } from "viem"
+import { type Hex, formatGwei, zeroAddress } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
@@ -61,8 +57,10 @@ interface UseGameLogicResult {
   handleBetAmountChange: (amount: bigint | undefined) => void
   placeBet: (betAmount: bigint, choice: GameChoice) => void
   needsTokenApproval: boolean
-  isApprovingToken: boolean
+  isApprovePending: boolean
+  isApproveConfirming: boolean
   approveToken: () => Promise<void>
+  isRefetchingAllowance: boolean
 }
 
 /**
@@ -123,11 +121,13 @@ export function useGameLogic({
 
   const {
     needsApproval: needsTokenApproval,
-    isApproving: isApprovingToken,
+    isApprovePending,
+    isApproveConfirming,
     approve: approveToken,
+    isRefetchingAllowance,
   } = useTokenAllowance({
     token,
-    spender: gameContractAddress || "0x0000000000000000000000000000000000000000",
+    spender: gameContractAddress || zeroAddress,
     amount: betAmount || 0n,
     enabled: !!gameContractAddress && !!betAmount && betAmount > 0n,
   })
@@ -171,6 +171,10 @@ export function useGameLogic({
 
   const handleBetAmountChange = (amount: bigint | undefined) => {
     setBetAmount(amount)
+    // Reset error state when user changes bet amount
+    if (betStatus === "error" || betStatus === "waiting-error" || betStatus === "internal-error") {
+      resetBetState()
+    }
   }
 
   return {
@@ -203,7 +207,9 @@ export function useGameLogic({
     handleBetAmountChange,
     placeBet,
     needsTokenApproval,
-    isApprovingToken,
+    isApprovePending,
+    isApproveConfirming,
     approveToken,
+    isRefetchingAllowance,
   }
 }

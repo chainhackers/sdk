@@ -290,8 +290,10 @@ interface BettingSectionProps {
   areChainsSynced: boolean
   isGamePaused: boolean
   needsTokenApproval?: boolean
-  isApprovingToken?: boolean
+  isApprovePending?: boolean
+  isApproveConfirming?: boolean
   hasValidSelection?: boolean
+  isRefetchingAllowance?: boolean
 }
 
 function BettingSection(props: BettingSectionProps) {
