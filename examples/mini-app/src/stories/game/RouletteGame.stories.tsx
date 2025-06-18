@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import { RouletteGame } from "../../components/game/RouletteGame"
+import { AppProviders } from "../../providers"
 import gameBg1 from "../assets/game/game-background-1.jpg"
 import gameBg2 from "../assets/game/game-background-2.jpg"
 import gameBg3 from "../assets/game/game-background-3.jpg"
@@ -7,8 +9,6 @@ import gameBg5 from "../assets/game/game-background-5.png"
 import gameBg6 from "../assets/game/game-background-6.jpg"
 import gameBg7 from "../assets/game/game-background-7.png"
 import gameBg8 from "../assets/game/game-background-8.jpg"
-import { AppProviders } from "../../providers"
-import { RouletteGame } from "../../components/game/RouletteGame"
 
 const meta = {
   title: "Game/RouletteGame",

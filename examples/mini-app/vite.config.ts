@@ -40,7 +40,7 @@ export default defineConfig({
           "wagmi",
         ]
 
-        if (id.includes('?no-inline')) {
+        if (id.includes("?no-inline")) {
           return true
         }
 
