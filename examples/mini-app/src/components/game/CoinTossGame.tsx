@@ -50,6 +50,7 @@ export function CoinTossGame({
     isApprovePending,
     isApproveConfirming,
     isRefetchingAllowance,
+    approveError,
   } = useGameLogic({
     gameType: CASINO_GAME_TYPE.COINTOSS,
     defaultSelection: {
@@ -119,6 +120,7 @@ export function CoinTossGame({
         isApprovePending={isApprovePending}
         isApproveConfirming={isApproveConfirming}
         isRefetchingAllowance={isRefetchingAllowance}
+        approveError={approveError}
       />
     </GameFrame>
   )

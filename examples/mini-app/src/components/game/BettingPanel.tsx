@@ -36,6 +36,7 @@ interface BettingPanelProps {
   isApproveConfirming?: boolean
   hasValidSelection?: boolean
   isRefetchingAllowance?: boolean
+  approveError?: any
 }
 
 const BET_AMOUNT_INPUT_STEP = 0.0001
@@ -59,6 +60,7 @@ export function BettingPanel({
   isApproveConfirming = false,
   hasValidSelection = true,
   isRefetchingAllowance = false,
+  approveError,
 }: BettingPanelProps) {
   const { appChainId } = useChain()
   const [inputValue, setInputValue] = useState<string>("")
@@ -112,7 +114,10 @@ export function BettingPanel({
   const isBetSuccees = betStatus === "success"
   const isWaiting = betStatus === "loading" || betStatus === "pending" || betStatus === "rolling"
   const isError =
-    betStatus === "error" || betStatus === "waiting-error" || betStatus === "internal-error"
+    betStatus === "error" ||
+    betStatus === "waiting-error" ||
+    betStatus === "internal-error" ||
+    !!approveError
 
   const canInitiateBet =
     isConnected &&

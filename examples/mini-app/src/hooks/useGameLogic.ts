@@ -61,6 +61,7 @@ interface UseGameLogicResult {
   isApproveConfirming: boolean
   approveToken: () => Promise<void>
   isRefetchingAllowance: boolean
+  approveError: any
 }
 
 /**
@@ -125,6 +126,8 @@ export function useGameLogic({
     isApproveConfirming,
     approve: approveToken,
     isRefetchingAllowance,
+    approveError,
+    resetApprovalError,
   } = useTokenAllowance({
     token,
     spender: gameContractAddress || zeroAddress,
@@ -149,6 +152,16 @@ export function useGameLogic({
   }
 
   const handlePlayButtonClick = async () => {
+    // Reset approval error if there is one
+    if (approveError) {
+      resetApprovalError()
+      // Try approval again
+      if (needsTokenApproval) {
+        await approveToken()
+      }
+      return
+    }
+
     if (betStatus === "error") {
       resetBetState()
       if (isWalletConnected && betAmount && betAmount > 0n) {
@@ -211,5 +224,6 @@ export function useGameLogic({
     isApproveConfirming,
     approveToken,
     isRefetchingAllowance,
+    approveError,
   }
 }

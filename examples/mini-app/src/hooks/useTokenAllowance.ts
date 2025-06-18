@@ -93,10 +93,15 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
     data: approveTxHash,
     isPending: isApprovePending,
     reset: resetApproval,
+    error: approveError,
   } = useWriteContract()
 
   // Wait for approval transaction
-  const { isSuccess, isLoading: isApproveConfirming } = useWaitForTransactionReceipt({
+  const {
+    isSuccess,
+    isLoading: isApproveConfirming,
+    error: waitError,
+  } = useWaitForTransactionReceipt({
     hash: approveTxHash,
     chainId: appChainId,
   })
@@ -116,18 +121,13 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
   const approve = useCallback(async () => {
     if (!approveFunctionData) return
 
-    try {
-      await writeContract({
-        abi: approveFunctionData.data.abi,
-        address: approveFunctionData.data.to,
-        functionName: approveFunctionData.data.functionName,
-        args: approveFunctionData.data.args,
-        chainId: appChainId,
-      })
-    } catch (error) {
-      console.error("Error approving token:", error)
-      throw error
-    }
+    await writeContract({
+      abi: approveFunctionData.data.abi,
+      address: approveFunctionData.data.to,
+      functionName: approveFunctionData.data.functionName,
+      args: approveFunctionData.data.args,
+      chainId: appChainId,
+    })
   }, [approveFunctionData, writeContract, appChainId])
 
   // Handle successful approval
@@ -136,6 +136,25 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
       handleApprovalSuccess()
     }
   }, [isSuccess, isApproveConfirming, handleApprovalSuccess])
+
+  // Handle approval errors
+  useEffect(() => {
+    if (approveError) {
+      console.error("Token approval error:", approveError)
+    }
+  }, [approveError])
+
+  // Handle transaction wait errors
+  useEffect(() => {
+    if (waitError) {
+      console.error("Token approval transaction error:", waitError)
+    }
+  }, [waitError])
+
+  // Reset function to clear approval errors
+  const resetApprovalError = useCallback(() => {
+    resetApproval()
+  }, [resetApproval])
 
   return {
     allowance,
@@ -146,5 +165,8 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
     isSuccess,
     effectiveToken,
     isRefetchingAllowance,
+    approveError,
+    waitError,
+    resetApprovalError,
   }
 }
