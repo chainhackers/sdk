@@ -1,4 +1,4 @@
-import rouletteBackground from "../../assets/game/game-background-5.png"
+import rouletteBackground from "../../assets/game/game-background.jpg?no-inline"
 
 import {
   CASINO_GAME_TYPE,

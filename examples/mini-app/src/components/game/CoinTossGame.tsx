@@ -1,4 +1,4 @@
-import coinTossBackground from "../../assets/game/game-background.jpg"
+import coinTossBackground from "../../assets/game/game-background.jpg?no-inline"
 
 import {
   CASINO_GAME_TYPE,

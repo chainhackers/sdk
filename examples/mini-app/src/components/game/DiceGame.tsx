@@ -1,4 +1,4 @@
-import diceBackground from "../../assets/game/game-background.jpg"
+import diceBackground from "../../assets/game/game-background.jpg?no-inline"
 
 import {
   CASINO_GAME_TYPE,

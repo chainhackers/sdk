@@ -1,6 +1,6 @@
 import { ROULETTE_INPUT_BUNDLE, RouletteNumber } from "@betswirl/sdk-core"
-import chipDisabledSvg from "../../assets/game/roulette-chip-disabled.svg"
-import chipSvg from "../../assets/game/roulette-chip.svg"
+import chipDisabledSvg from "../../assets/game/roulette-chip-disabled.svg?no-inline"
+import chipSvg from "../../assets/game/roulette-chip.svg?no-inline"
 import { Button } from "../ui/button"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import { GameControlsProps } from "./shared/types"

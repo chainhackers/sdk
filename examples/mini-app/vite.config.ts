@@ -40,6 +40,10 @@ export default defineConfig({
           "wagmi",
         ]
 
+        if (id.includes('?no-inline')) {
+          return true
+        }
+
         return externalPackages.some((pkg) => id === pkg || id.startsWith(`${pkg}/`))
       },
       output: [
