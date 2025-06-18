@@ -261,6 +261,11 @@
     padding-bottom: 1px;
   }
 
+  .roulette-button-border {
+    border: 1px solid oklch(0.4141 0.0043 219.59);
+    box-sizing: border-box;
+  }
+
   .roulette-button-shadow-disabled {
     box-shadow: 0 1px 0 oklch(0.7733 0.0109 247.97);
     padding-bottom: 1px;
