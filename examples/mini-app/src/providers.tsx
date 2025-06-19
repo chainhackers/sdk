@@ -17,7 +17,7 @@ const DEGEN_TOKEN: TokenWithImage = {
   symbol: "DEGEN",
   decimals: 18,
   image:
-    "https://dd.dexscreener.com/ds-data/tokens/base/0x4ed4e862860bed51a9570b96d89af5e1b0efefed.png",
+    "https://www.betswirl.com/img/tokens/DEGEN.svg",
 }
 
 export function AppProviders({ children }: { children: ReactNode }) {
