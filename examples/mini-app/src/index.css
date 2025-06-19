@@ -74,6 +74,7 @@
   --color-keno-unselected-border: var(--keno-unselected-border);
   --color-keno-unselected-hover-bg: var(--keno-unselected-hover-bg);
   --color-keno-multiplier-bg: var(--keno-multiplier-bg);
+  --color-keno-winning-border: var(--keno-winning-border);
 }
 
 @layer base {
@@ -169,6 +170,7 @@
     --keno-unselected-border: oklch(0.9278 0.0029 264.54);
     --keno-unselected-hover-bg: oklch(0.9516 0.0017 247.84);
     --keno-multiplier-bg: oklch(0.1559 0.02 269.69 / 0.4);
+    --keno-winning-border: oklch(0.784 0.1418 166.22);
   }
 
   .dark {

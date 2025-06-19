@@ -36,6 +36,10 @@ const meta: Meta<typeof KenoGameControls> = {
       description: "Maximum number of selections allowed",
       control: { type: "number", min: 1, max: 15, step: 1 },
     },
+    lastGameWinningNumbers: {
+      description: "Array of winning numbers from the last game",
+      control: { type: "object" },
+    },
   },
 }
 
@@ -48,12 +52,14 @@ function InteractiveKenoGameControls({
   isDisabled = false,
   theme = "dark",
   maxSelections = 7,
+  lastGameWinningNumbers = [],
 }: {
   initialSelectedNumbers?: KenoBall[]
   multipliers?: number[]
   isDisabled?: boolean
   theme?: "light" | "dark"
   maxSelections?: number
+  lastGameWinningNumbers?: number[]
 }) {
   const [selectedNumbers, setSelectedNumbers] = useState<KenoBall[]>(initialSelectedNumbers)
 
@@ -70,6 +76,7 @@ function InteractiveKenoGameControls({
           multipliers={multipliers}
           isDisabled={isDisabled}
           maxSelections={maxSelections}
+          lastGameWinningNumbers={lastGameWinningNumbers}
         />
       </div>
     </div>
@@ -94,6 +101,27 @@ export const Disabled: Story = {
     <InteractiveKenoGameControls
       initialSelectedNumbers={[1, 7, 13, 15] as KenoBall[]}
       multipliers={[50, 25, 10, 8.5, 5, 2, 1, 0.5]}
+      isDisabled={true}
+    />
+  ),
+}
+
+export const WithWinningNumbers: Story = {
+  render: () => (
+    <InteractiveKenoGameControls
+      initialSelectedNumbers={[2, 5, 9] as KenoBall[]}
+      lastGameWinningNumbers={[1, 5, 7, 10, 13]}
+      multipliers={[100, 50, 25, 15.2, 10, 5, 2.5, 1]}
+    />
+  ),
+}
+
+export const WithWinningNumbersDisabled: Story = {
+  render: () => (
+    <InteractiveKenoGameControls
+      initialSelectedNumbers={[2, 5, 9] as KenoBall[]}
+      lastGameWinningNumbers={[1, 5, 7, 10, 13]}
+      multipliers={[100, 50, 25, 15.2, 10, 5, 2.5, 1]}
       isDisabled={true}
     />
   ),

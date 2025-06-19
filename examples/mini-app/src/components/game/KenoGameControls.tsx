@@ -8,12 +8,14 @@ interface KenoGameControlsProps {
   maxSelections: number
   multipliers: number[]
   isDisabled: boolean
+  lastGameWinningNumbers?: number[]
 }
 
 interface NumberButtonProps {
   number: KenoBall
   isSelected: boolean
   isDisabled: boolean
+  isWinningNumber: boolean
   onClick: (number: KenoBall) => void
 }
 
@@ -31,6 +33,14 @@ const BUTTON_STYLES = {
     focus:
       "focus:bg-keno-unselected-hover-bg focus:border-primary focus:text-black focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   },
+  unselectedWinning: {
+    background: "bg-keno-unselected-bg",
+    border: "border-2 border-keno-winning-border",
+    text: "text-black",
+    hover: "hover:bg-keno-unselected-hover-bg hover:border-keno-winning-border hover:text-black",
+    focus:
+      "focus:bg-keno-unselected-hover-bg focus:border-keno-winning-border focus:text-black focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+  },
   selected: {
     background: "bg-primary",
     border: "",
@@ -38,6 +48,15 @@ const BUTTON_STYLES = {
     hover: "hover:brightness-105 hover:bg-primary hover:text-primary-foreground",
     focus:
       "focus:brightness-105 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+  },
+  selectedWinning: {
+    background: "bg-primary",
+    border: "border-2 border-keno-winning-border",
+    text: "text-primary-foreground",
+    hover:
+      "hover:brightness-105 hover:bg-primary hover:text-primary-foreground hover:border-keno-winning-border",
+    focus:
+      "focus:brightness-105 focus:border-keno-winning-border focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   },
   disabled: "disabled:opacity-[0.72]",
   common: "w-[40px] h-[40px] p-0 text-[12px] font-medium rounded-md shadow-none",
@@ -48,8 +67,23 @@ const KENO_GRID_COLS = 4
 const KENO_GRID_ROWS = 4
 
 const NumberButton = React.memo<NumberButtonProps>(
-  ({ number, isSelected, isDisabled, onClick }) => {
-    const styles = isSelected ? BUTTON_STYLES.selected : BUTTON_STYLES.unselected
+  ({ number, isSelected, isDisabled, isWinningNumber, onClick }) => {
+    let styles:
+      | typeof BUTTON_STYLES.unselected
+      | typeof BUTTON_STYLES.unselectedWinning
+      | typeof BUTTON_STYLES.selected
+      | typeof BUTTON_STYLES.selectedWinning
+
+    if (isSelected && isWinningNumber) {
+      styles = BUTTON_STYLES.selectedWinning
+    } else if (isSelected) {
+      styles = BUTTON_STYLES.selected
+    } else if (isWinningNumber) {
+      styles = BUTTON_STYLES.unselectedWinning
+    } else {
+      styles = BUTTON_STYLES.unselected
+    }
+
     const buttonClasses = `${BUTTON_STYLES.common} ${styles.background} ${styles.border} ${styles.text} ${styles.hover} ${styles.focus} ${BUTTON_STYLES.disabled}`
 
     return (
@@ -82,8 +116,10 @@ export function KenoGameControls({
   isDisabled,
   maxSelections,
   multipliers,
+  lastGameWinningNumbers = [],
 }: KenoGameControlsProps) {
   const isNumberSelected = (number: KenoBall) => selectedNumbers.includes(number)
+  const isWinningNumber = (number: KenoBall) => lastGameWinningNumbers.includes(number)
 
   const handleNumberClick = (number: KenoBall) => {
     if (isDisabled) return
@@ -116,6 +152,7 @@ export function KenoGameControls({
             number={number}
             isSelected={isNumberSelected(number)}
             isDisabled={isDisabled}
+            isWinningNumber={isWinningNumber(number)}
             onClick={handleNumberClick}
           />,
         )
