@@ -5,8 +5,12 @@ import gameBg2 from "../../assets/game/game-background-11.webp"
 import gameBg3 from "../../assets/game/game-background-12.png"
 import gameBg5 from "../../assets/game/game-background-13.png"
 import gameBg6 from "../../assets/game/game-background-14.png"
-import { AppProviders } from "../../providers"
-import { DiceGame } from "./DiceGame"
+import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
+import { DiceGame, type DiceGameProps } from "./DiceGame"
+
+interface StoryArgs extends DiceGameProps {
+  token?: keyof typeof STORYBOOK_TOKENS
+}
 
 const meta = {
   title: "Game/DiceGame",
@@ -25,17 +29,25 @@ const meta = {
     },
   },
   decorators: [
-    (Story) => (
-      <AppProviders>
-        <Story />
-      </AppProviders>
-    ),
+    (Story, context) => {
+      const token = context.args.token ? STORYBOOK_TOKENS[context.args.token] : STORYBOOK_TOKENS.ETH
+      return (
+        <StorybookProviders token={token}>
+          <Story />
+        </StorybookProviders>
+      )
+    },
   ],
   tags: ["autodocs"],
   argTypes: {
     theme: {
       control: "radio",
       options: ["light", "dark", "system"],
+    },
+    token: {
+      control: "radio",
+      options: ["ETH", "DEGEN"],
+      description: "Token to use for betting",
     },
     customTheme: {
       control: "object",
@@ -57,7 +69,7 @@ const meta = {
       accept: "image/*",
     },
   },
-} satisfies Meta<typeof DiceGame>
+} satisfies Meta<StoryArgs>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -70,6 +82,7 @@ export const LightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
+    token: "ETH",
   },
 }
 
@@ -77,6 +90,7 @@ export const DarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "ETH",
     backgroundImage: gameBg2,
   },
   parameters: {
@@ -88,6 +102,7 @@ export const SystemTheme: Story = {
   ...Template,
   args: {
     theme: "system",
+    token: "ETH",
     backgroundImage: gameBg4,
   },
   parameters: {
@@ -99,6 +114,7 @@ export const DonutRollLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
+    token: "DEGEN",
     customTheme: {
       "--primary": "#7f5058",
       "--play-btn-font": "rgb(238 231 235)",
@@ -114,6 +130,7 @@ export const SatelliteDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "ETH",
     customTheme: {
       "--primary": "#d7caab",
       "--play-btn-font": "#254450",
@@ -129,6 +146,7 @@ export const SpaceshipDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "DEGEN",
     customTheme: {
       "--primary": "#595b5c",
       "--play-btn-font": "#c5c2ab",
@@ -144,6 +162,7 @@ export const MysticForestDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "ETH",
     customTheme: {
       "--primary": "rgb(74 41 24)",
       "--play-btn-font": "rgb(225 159 31)",

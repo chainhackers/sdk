@@ -1,7 +1,15 @@
-import { TokenImage } from "@coinbase/onchainkit/token"
 import type { Meta, StoryObj } from "@storybook/react"
-import { ETH_TOKEN } from "../../lib/tokens"
+import type { TokenWithImage } from "../../types"
+import { TokenIcon } from "./TokenIcon"
 import { Input } from "./input"
+
+// Mock token for stories
+const ETH_TOKEN: TokenWithImage = {
+  address: "0x0000000000000000000000000000000000000000",
+  symbol: "ETH",
+  decimals: 18,
+  image: "https://wallet-api-production.s3.amazonaws.com/uploads/tokens/eth_288.png",
+}
 
 const meta = {
   title: "UI/Input",
@@ -35,7 +43,7 @@ export const Default: Story = {
     placeholder: "0",
     value: "10.5",
     token: {
-      icon: <TokenImage token={ETH_TOKEN} size={18} className="mr-1" />,
+      icon: <TokenIcon token={ETH_TOKEN} size={18} className="mr-1" />,
       symbol: "ETH",
     },
   },
@@ -47,7 +55,7 @@ export const Disabled: Story = {
     placeholder: "0",
     value: "10.5",
     token: {
-      icon: <TokenImage token={ETH_TOKEN} size={18} className="mr-1" />,
+      icon: <TokenIcon token={ETH_TOKEN} size={18} className="mr-1" />,
       symbol: "ETH",
     },
     disabled: true,

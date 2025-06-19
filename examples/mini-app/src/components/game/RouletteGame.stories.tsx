@@ -7,8 +7,12 @@ import gameBg5 from "../../assets/game/game-background-5.png"
 import gameBg6 from "../../assets/game/game-background-6.jpg"
 import gameBg7 from "../../assets/game/game-background-7.png"
 import gameBg8 from "../../assets/game/game-background-8.jpg"
-import { AppProviders } from "../../providers"
-import { RouletteGame } from "./RouletteGame"
+import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
+import { RouletteGame, type RouletteGameProps } from "./RouletteGame"
+
+interface StoryArgs extends RouletteGameProps {
+  token?: keyof typeof STORYBOOK_TOKENS
+}
 
 const meta = {
   title: "Game/RouletteGame",
@@ -27,17 +31,25 @@ const meta = {
     },
   },
   decorators: [
-    (Story) => (
-      <AppProviders>
-        <Story />
-      </AppProviders>
-    ),
+    (Story, context) => {
+      const token = context.args.token ? STORYBOOK_TOKENS[context.args.token] : STORYBOOK_TOKENS.ETH
+      return (
+        <StorybookProviders token={token}>
+          <Story />
+        </StorybookProviders>
+      )
+    },
   ],
   tags: ["autodocs"],
   argTypes: {
     theme: {
       control: "radio",
       options: ["light", "dark", "system"],
+    },
+    token: {
+      control: "radio",
+      options: ["ETH", "DEGEN"],
+      description: "Token to use for betting",
     },
     customTheme: {
       control: "object",
@@ -59,7 +71,7 @@ const meta = {
       accept: "image/*",
     },
   },
-} satisfies Meta<typeof RouletteGame>
+} satisfies Meta<StoryArgs>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -72,6 +84,7 @@ export const LightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
+    token: "ETH",
   },
 }
 
@@ -79,6 +92,7 @@ export const DarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "ETH",
     backgroundImage: gameBg2,
   },
   parameters: {
@@ -90,6 +104,7 @@ export const SystemTheme: Story = {
   ...Template,
   args: {
     theme: "system",
+    token: "ETH",
     backgroundImage: gameBg4,
   },
   parameters: {
@@ -101,6 +116,7 @@ export const CasinoRedLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
+    token: "DEGEN",
     customTheme: {
       "--primary": "#dc2626",
       "--play-btn-font": "#ffffff",
@@ -116,6 +132,7 @@ export const GoldenLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
+    token: "ETH",
     customTheme: {
       "--primary": "#d97706",
       "--play-btn-font": "#ffffff",
@@ -131,6 +148,7 @@ export const ElegantDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "DEGEN",
     customTheme: {
       "--primary": "#059669",
       "--play-btn-font": "#ffffff",
@@ -146,6 +164,7 @@ export const VelvetDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "ETH",
     customTheme: {
       "--primary": "#7c2d12",
       "--play-btn-font": "#fbbf24",
@@ -161,6 +180,7 @@ export const NeonDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "DEGEN",
     customTheme: {
       "--primary": "#ec4899",
       "--play-btn-font": "#ffffff",
@@ -176,6 +196,7 @@ export const ClassicDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "ETH",
     customTheme: {
       "--primary": "#1f2937",
       "--play-btn-font": "#f9fafb",

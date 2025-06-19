@@ -1,11 +1,12 @@
+import { chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import { OnchainKitProvider } from "@coinbase/onchainkit"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { type ReactNode } from "react"
 import { http, type Hex } from "viem"
 import { WagmiProvider, createConfig } from "wagmi"
 import { base } from "wagmi/chains"
-import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
-import type { TokenWithImage } from "./types"
+import { BetSwirlSDKProvider } from "../context/BetSwirlSDKProvider"
+import type { TokenWithImage } from "../types"
 
 const CHAIN = base
 
@@ -19,7 +20,22 @@ const DEGEN_TOKEN: TokenWithImage = {
   image: "https://www.betswirl.com/img/tokens/DEGEN.svg",
 }
 
-export function AppProviders({ children }: { children: ReactNode }) {
+const ETH_TOKEN: TokenWithImage = {
+  ...chainNativeCurrencyToToken(CHAIN.nativeCurrency),
+  image: "https://www.betswirl.com/img/tokens/ETH.svg",
+}
+
+export const STORYBOOK_TOKENS = {
+  ETH: ETH_TOKEN,
+  DEGEN: DEGEN_TOKEN,
+}
+
+interface StorybookProvidersProps {
+  children: ReactNode
+  token?: TokenWithImage
+}
+
+export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookProvidersProps) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
   const rpcUrl = import.meta.env.VITE_RPC_URL
   const config = createConfig({
@@ -49,7 +65,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
           <BetSwirlSDKProvider
             initialChainId={CHAIN.id}
             affiliate={affiliate}
-            bankrollToken={DEGEN_TOKEN}
+            bankrollToken={token}
           >
             {children}
           </BetSwirlSDKProvider>
