@@ -65,7 +65,7 @@ const NumberButton = React.memo<NumberButtonProps>(
         variant="ghost"
         size="sm"
         onClick={() => onClick(number)}
-        disabled={isDisabled && !isSelected}
+        disabled={isDisabled}
         className={buttonClasses}
       >
         {number}

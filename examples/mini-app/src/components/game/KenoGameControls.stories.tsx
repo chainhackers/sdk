@@ -89,26 +89,6 @@ export const WithSelectedNumbers: Story = {
   ),
 }
 
-export const Disabled: Story = {
-  render: () => (
-    <InteractiveKenoGameControls
-      initialSelectedNumbers={[1, 7, 13, 15] as KenoBall[]}
-      multiplier={8.5}
-      isDisabled={true}
-    />
-  ),
-}
-
-export const LightTheme: Story = {
-  render: () => (
-    <InteractiveKenoGameControls
-      initialSelectedNumbers={[2, 5, 9, 14] as KenoBall[]}
-      multiplier={12.8}
-      theme="light"
-    />
-  ),
-}
-
 export const MaxSelection: Story = {
   render: () => (
     <InteractiveKenoGameControls
@@ -118,12 +98,12 @@ export const MaxSelection: Story = {
   ),
 }
 
-export const LimitedSelections: Story = {
+export const Disabled: Story = {
   render: () => (
     <InteractiveKenoGameControls
-      initialSelectedNumbers={[1, 2, 3] as KenoBall[]}
-      multiplier={12.5}
-      maxSelections={5}
+      initialSelectedNumbers={[1, 7, 13, 15] as KenoBall[]}
+      multiplier={8.5}
+      isDisabled={true}
     />
   ),
 }
