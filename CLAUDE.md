@@ -27,6 +27,7 @@ When working in `examples/mini-app/`:
 
 ## Memories
 - When working with mini-app, run pnpm commands in examples/mini-app, not project root
+- Avoid using the word "implement" in commit messages, use "add" and keep commit messages brief
 
 ## Architecture Overview
 

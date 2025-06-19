@@ -68,35 +68,10 @@ function InteractiveRouletteGameControls({
 
   return (
     <div className={theme}>
-      <div className="relative w-[328px] h-[194px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
+      <div className="relative w-[304px] h-[206px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
         <RouletteGameControls
           selectedNumbers={selectedNumbers}
           onNumbersChange={handleNumbersChange}
-          multiplier={multiplier}
-          isDisabled={isDisabled}
-        />
-      </div>
-    </div>
-  )
-}
-
-function StaticRouletteGameControls({
-  selectedNumbers = [],
-  multiplier = 35.1,
-  isDisabled = false,
-  theme = "dark",
-}: {
-  selectedNumbers?: RouletteNumber[]
-  multiplier?: number
-  isDisabled?: boolean
-  theme?: "light" | "dark"
-}) {
-  return (
-    <div className={theme}>
-      <div className="relative w-[328px] h-[194px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
-        <RouletteGameControls
-          selectedNumbers={selectedNumbers}
-          onNumbersChange={() => {}}
           multiplier={multiplier}
           isDisabled={isDisabled}
         />
@@ -140,8 +115,8 @@ export const LightThemeMultipleNumbers: Story = {
 export const LightThemeDisabled: Story = {
   name: "Light Theme - Disabled (With Selections)",
   render: () => (
-    <StaticRouletteGameControls
-      selectedNumbers={[0, 7, 14, 21]}
+    <InteractiveRouletteGameControls
+      initialSelectedNumbers={[0, 7, 14, 21]}
       isDisabled={true}
       multiplier={8.75}
       theme="light"
@@ -194,8 +169,8 @@ export const DarkThemeMultipleNumbers: Story = {
 export const DarkThemeDisabled: Story = {
   name: "Dark Theme - Disabled (With Selections)",
   render: () => (
-    <StaticRouletteGameControls
-      selectedNumbers={[0, 7, 14, 21]}
+    <InteractiveRouletteGameControls
+      initialSelectedNumbers={[0, 7, 14, 21]}
       isDisabled={true}
       multiplier={8.75}
       theme="dark"

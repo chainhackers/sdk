@@ -1,14 +1,24 @@
 name: "Chromatic"
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   chromatic:
     name: Run Chromatic
     runs-on: ubuntu-latest
-    if: "github.event_name == 'workflow_dispatch' || (!contains(github.event.pull_request.title, '[draft]') && github.event.pull_request.draft == false)"
+    # Run chromatic on:
+    # - Pushes to main branch (after merge)
+    # - Non-draft pull requests to main
+    # - Manual workflow dispatch
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && github.base_ref == 'main' && github.event.pull_request.draft == false) ||
+      (github.event_name == 'workflow_dispatch')
     defaults:
       run:
         working-directory: ./examples/mini-app
