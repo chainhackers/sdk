@@ -1,8 +1,8 @@
 import { ROULETTE_INPUT_BUNDLE, RouletteNumber } from "@betswirl/sdk-core"
 import { TokenImage } from "@coinbase/onchainkit/token"
 import React from "react"
+import { zeroAddress } from "viem"
 import chipSvg from "../../assets/game/roulette-chip.svg"
-import { ETH_TOKEN } from "../../lib/tokens"
 import { Button } from "../ui/button"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import { GameControlsProps } from "./shared/types"
@@ -118,15 +118,27 @@ const getBundleStyles = (): string => {
 }
 
 const ChipWithToken = React.memo<ChipWithTokenProps>(
-  ({ number, chipSize, tokenSize, tokenStyles, textStyles }) => (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <img src={chipSvg} alt="Selected" className={`absolute ${chipSize}`} />
-      <span className={`relative z-10 text-white ${textStyles || ""}`}>{number}</span>
-      <div className={`absolute z-20 ${tokenStyles || ""}`}>
-        <TokenImage token={ETH_TOKEN} size={tokenSize} />
+  ({ number, chipSize, tokenSize, tokenStyles, textStyles }) => {
+    // TODO: Pass actual token from game context instead of hardcoding
+    const tempToken = {
+      address: zeroAddress,
+      symbol: "ETH",
+      decimals: 18,
+      image: "https://www.betswirl.com/img/tokens/ETH.svg",
+      chainId: 8453,
+      name: "Ethereum"
+    }
+    
+    return (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <img src={chipSvg} alt="Selected" className={`absolute ${chipSize}`} />
+        <span className={`relative z-10 text-white ${textStyles || ""}`}>{number}</span>
+        <div className={`absolute z-20 ${tokenStyles || ""}`}>
+          <TokenImage token={tempToken} size={tokenSize} />
+        </div>
       </div>
-    </div>
-  ),
+    )
+  }
 )
 
 const NumberButton = React.memo<NumberButtonProps>(
