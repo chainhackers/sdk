@@ -122,12 +122,11 @@ export function useGameLogic({
 
   const {
     needsApproval: needsTokenApproval,
-    isApprovePending,
-    isApproveConfirming,
+    approveWriteWagmiHook,
+    approveWaitingWagmiHook,
+    allowanceReadWagmiHook,
     approve: approveToken,
-    isRefetchingAllowance,
-    approveError,
-    resetApprovalError,
+    resetApprovalState,
   } = useTokenAllowance({
     token,
     spender: gameContractAddress || zeroAddress,
@@ -153,8 +152,8 @@ export function useGameLogic({
 
   const handlePlayButtonClick = async () => {
     // Reset approval error if there is one
-    if (approveError) {
-      resetApprovalError()
+    if (approveWriteWagmiHook.error) {
+      resetApprovalState()
       // Try approval again
       if (needsTokenApproval) {
         await approveToken()
@@ -220,10 +219,10 @@ export function useGameLogic({
     handleBetAmountChange,
     placeBet,
     needsTokenApproval,
-    isApprovePending,
-    isApproveConfirming,
+    isApprovePending: approveWriteWagmiHook.isPending,
+    isApproveConfirming: approveWaitingWagmiHook.isLoading,
     approveToken,
-    isRefetchingAllowance,
-    approveError,
+    isRefetchingAllowance: allowanceReadWagmiHook.isRefetching,
+    approveError: approveWriteWagmiHook.error || approveWaitingWagmiHook.error,
   }
 }

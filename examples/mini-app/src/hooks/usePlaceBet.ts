@@ -300,6 +300,8 @@ export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void) 
     vrfFees,
     gasPrice,
     formattedVrfFees,
+    wagerWriteHook,
+    wagerWaitingHook
   }
 }
 
