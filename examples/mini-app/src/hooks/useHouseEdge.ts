@@ -54,8 +54,5 @@ export function useHouseEdge(props: UseHouseEdgeProps) {
     wagmiHook,
     houseEdge,
     houseEdgePercent,
-    isLoading: wagmiHook.isLoading,
-    isError: wagmiHook.isError,
-    error: wagmiHook.error,
   }
 }

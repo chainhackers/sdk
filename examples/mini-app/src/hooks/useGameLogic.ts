@@ -61,7 +61,7 @@ interface UseGameLogicResult {
   isApproveConfirming: boolean
   approveToken: () => Promise<void>
   isRefetchingAllowance: boolean
-  approveError: any
+  approveError: Error | null
 }
 
 /**
