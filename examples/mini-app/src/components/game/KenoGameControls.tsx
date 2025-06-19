@@ -28,14 +28,16 @@ const BUTTON_STYLES = {
     border: "border border-keno-unselected-border border-inset",
     text: "text-black",
     hover: "hover:bg-keno-unselected-hover-bg hover:border-primary hover:text-black",
-    focus: "focus:bg-keno-unselected-hover-bg focus:border-primary focus:text-black focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+    focus:
+      "focus:bg-keno-unselected-hover-bg focus:border-primary focus:text-black focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   },
   selected: {
     background: "bg-primary",
     border: "",
     text: "text-primary-foreground",
     hover: "hover:brightness-105 hover:bg-primary hover:text-primary-foreground",
-    focus: "focus:brightness-105 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+    focus:
+      "focus:brightness-105 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   },
   disabled: "disabled:opacity-[0.72]",
   common: "w-[40px] h-[40px] p-0 text-[12px] font-medium rounded-md shadow-none",
@@ -94,7 +96,10 @@ export function KenoGameControls({
   }
 
   const visibleMultipliersCount = selectedNumbers.length > 0 ? selectedNumbers.length + 1 : 0
-  const numbers: KenoBall[] = Array.from({ length: KENO_NUMBERS_COUNT }, (_, i) => (i + 1) as KenoBall)
+  const numbers: KenoBall[] = Array.from(
+    { length: KENO_NUMBERS_COUNT },
+    (_, i) => (i + 1) as KenoBall,
+  )
 
   const renderNumberGrid = () => {
     const rows = []
@@ -112,13 +117,13 @@ export function KenoGameControls({
             isSelected={isNumberSelected(number)}
             isDisabled={isDisabled}
             onClick={handleNumberClick}
-          />
+          />,
         )
       }
       rows.push(
         <div key={row} className="flex gap-[2px]">
           {rowNumbers}
-        </div>
+        </div>,
       )
     }
     return rows
@@ -126,17 +131,11 @@ export function KenoGameControls({
 
   return (
     <div className="absolute top-[16px] bottom-[16px] left-[69px] right-0 flex gap-[13px]">
-      <div className="flex flex-col gap-[2px]">
-        {renderNumberGrid()}
-      </div>
+      <div className="flex flex-col gap-[2px]">{renderNumberGrid()}</div>
 
       <div className="flex flex-col gap-[2px] pt-[32px]">
         {multipliers.map((value, index) => (
-          <MultiplierItem
-            key={index}
-            value={value}
-            isVisible={index < visibleMultipliersCount}
-          />
+          <MultiplierItem key={value} value={value} isVisible={index < visibleMultipliersCount} />
         ))}
       </div>
     </div>

@@ -44,7 +44,7 @@ type Story = StoryObj<typeof meta>
 
 function InteractiveKenoGameControls({
   initialSelectedNumbers = [],
-  multipliers = [480.48, 9.61, 1.07, 0.40, 0.46, 1.91, 1.02, 0.87],
+  multipliers = [480.48, 9.61, 1.07, 0.4, 0.46, 1.91, 1.02, 0.87],
   isDisabled = false,
   theme = "dark",
   maxSelections = 7,
