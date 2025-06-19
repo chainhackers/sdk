@@ -1,7 +1,7 @@
 import { RouletteNumber } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
-import { RouletteGameControls } from "./RouletteGameControls"
+import { RouletteGameControls } from "../../components/game/RouletteGameControls"
 
 const meta = {
   title: "Game/Controls/RouletteGameControls",

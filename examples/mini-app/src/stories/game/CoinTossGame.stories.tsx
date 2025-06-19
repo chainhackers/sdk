@@ -1,22 +1,22 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import gameBg1 from "../../assets/game/game-background-1.jpg"
-import gameBg2 from "../../assets/game/game-background-2.jpg"
-import gameBg3 from "../../assets/game/game-background-3.jpg"
-import gameBg4 from "../../assets/game/game-background-4.jpg"
-import gameBg5 from "../../assets/game/game-background-5.png"
-import gameBg6 from "../../assets/game/game-background-6.jpg"
-import gameBg7 from "../../assets/game/game-background-7.png"
-import gameBg8 from "../../assets/game/game-background-8.jpg"
+import gameBg1 from "../assets/game/game-background-1.jpg"
+import gameBg2 from "../assets/game/game-background-2.jpg"
+import gameBg3 from "../assets/game/game-background-3.jpg"
+import gameBg4 from "../assets/game/game-background-4.jpg"
+import gameBg5 from "../assets/game/game-background-5.png"
+import gameBg6 from "../assets/game/game-background-6.jpg"
+import gameBg7 from "../assets/game/game-background-7.png"
+import gameBg8 from "../assets/game/game-background-8.jpg"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
-import { RouletteGame, type RouletteGameProps } from "./RouletteGame"
+import { CoinTossGame, type CoinTossGameProps } from "../../components/game/CoinTossGame"
 
-interface StoryArgs extends RouletteGameProps {
+interface StoryArgs extends CoinTossGameProps {
   token?: keyof typeof STORYBOOK_TOKENS
 }
 
 const meta = {
-  title: "Game/RouletteGame",
-  component: RouletteGame,
+  title: "Game/CoinTossGame",
+  component: CoinTossGame,
   parameters: {
     layout: "centered",
     backgrounds: {
@@ -77,7 +77,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 const Template: Story = {
-  render: (args) => <RouletteGame {...args} />,
+  render: (args) => <CoinTossGame {...args} />,
 }
 
 export const LightTheme: Story = {
@@ -112,14 +112,14 @@ export const SystemTheme: Story = {
   },
 }
 
-export const CasinoRedLightTheme: Story = {
+export const SheepsLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
-    token: "DEGEN",
+    token: "ETH",
     customTheme: {
-      "--primary": "#dc2626",
-      "--play-btn-font": "#ffffff",
+      "--primary": "#4dae52",
+      "--play-btn-font": "#1B5E20",
     } as React.CSSProperties,
     backgroundImage: gameBg1,
   },
@@ -128,13 +128,13 @@ export const CasinoRedLightTheme: Story = {
   },
 }
 
-export const GoldenLightTheme: Story = {
+export const ChickletLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
-    token: "ETH",
+    token: "DEGEN",
     customTheme: {
-      "--primary": "#d97706",
+      "--primary": "rgb(239 185 1)",
       "--play-btn-font": "#ffffff",
     } as React.CSSProperties,
     backgroundImage: gameBg3,
@@ -144,14 +144,14 @@ export const GoldenLightTheme: Story = {
   },
 }
 
-export const ElegantDarkTheme: Story = {
+export const CatsDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
-    token: "DEGEN",
+    token: "ETH",
     customTheme: {
-      "--primary": "#059669",
-      "--play-btn-font": "#ffffff",
+      "--primary": "#ffb74d",
+      "--play-btn-font": "#3e2723",
     } as React.CSSProperties,
     backgroundImage: gameBg5,
   },
@@ -160,14 +160,14 @@ export const ElegantDarkTheme: Story = {
   },
 }
 
-export const VelvetDarkTheme: Story = {
+export const LightfishDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
-    token: "ETH",
+    token: "DEGEN",
     customTheme: {
-      "--primary": "#7c2d12",
-      "--play-btn-font": "#fbbf24",
+      "--primary": "#b8d32f",
+      "--play-btn-font": "#002a47",
     } as React.CSSProperties,
     backgroundImage: gameBg6,
   },
@@ -176,13 +176,13 @@ export const VelvetDarkTheme: Story = {
   },
 }
 
-export const NeonDarkTheme: Story = {
+export const MarticoinDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
-    token: "DEGEN",
+    token: "ETH",
     customTheme: {
-      "--primary": "#ec4899",
+      "--primary": "hsl(13.9deg 83.1% 41.76%)",
       "--play-btn-font": "#ffffff",
     } as React.CSSProperties,
     backgroundImage: gameBg7,
@@ -192,14 +192,14 @@ export const NeonDarkTheme: Story = {
   },
 }
 
-export const ClassicDarkTheme: Story = {
+export const FrogDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
-    token: "ETH",
+    token: "DEGEN",
     customTheme: {
-      "--primary": "#1f2937",
-      "--play-btn-font": "#f9fafb",
+      "--primary": "rgb(44 52 51)",
+      "--play-btn-font": "rgb(171 181 171)",
     } as React.CSSProperties,
     backgroundImage: gameBg8,
   },

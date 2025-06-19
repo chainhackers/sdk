@@ -57,3 +57,17 @@ export type BetStatus =
 export interface TokenWithImage extends Token {
   image: string
 }
+
+export enum HistoryEntryStatus {
+  WonBet = "Won bet",
+  Busted = "Busted",
+}
+
+export interface HistoryEntry {
+  id: string
+  status: HistoryEntryStatus
+  multiplier: number | string
+  payoutAmount: number | string
+  payoutCurrencyIcon: React.ReactElement
+  timestamp: string
+}

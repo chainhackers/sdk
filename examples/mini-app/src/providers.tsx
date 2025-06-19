@@ -5,7 +5,7 @@ import { http, type Hex } from "viem"
 import { WagmiProvider, createConfig } from "wagmi"
 import { base } from "wagmi/chains"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
-import type { TokenWithImage } from "./types"
+import type { TokenWithImage } from "./types/types"
 
 const CHAIN = base
 

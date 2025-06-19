@@ -15,23 +15,9 @@ import { TokenIcon } from "../components/ui/TokenIcon"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
 import { toLowerCase } from "../lib/utils"
-import type { TokenWithImage } from "../types"
+import { HistoryEntry, HistoryEntryStatus, TokenWithImage } from "../types/types"
 
 const logger = createLogger("useGameHistory")
-
-enum HistoryEntryStatus {
-  WonBet = "Won bet",
-  Busted = "Busted",
-}
-
-export interface HistoryEntry {
-  id: string
-  status: HistoryEntryStatus
-  multiplier: number | string
-  payoutAmount: number | string
-  payoutCurrencyIcon: React.ReactElement
-  timestamp: string
-}
 
 function formatRelativeTime(timestampSecs: number): string {
   const now = new Date()

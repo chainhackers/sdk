@@ -1,7 +1,7 @@
 import { TokenImage } from "@coinbase/onchainkit/token"
 import type { Token as OnchainKitToken } from "@coinbase/onchainkit/token"
 import { useChain } from "../../context/chainContext"
-import type { TokenWithImage } from "../../types"
+import type { TokenWithImage } from "../../types/types"
 
 interface TokenIconProps {
   token: TokenWithImage

@@ -2,10 +2,10 @@ import { chainByKey, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { Info } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
+import { InfoSheetPanel } from "../../components/game/InfoSheetPanel"
+import { Button } from "../../components/ui/button"
+import { Sheet, SheetTrigger } from "../../components/ui/sheet"
 import { cn } from "../../lib/utils"
-import { Button } from "../ui/button"
-import { Sheet, SheetTrigger } from "../ui/sheet"
-import { InfoSheetPanel } from "./InfoSheetPanel"
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode

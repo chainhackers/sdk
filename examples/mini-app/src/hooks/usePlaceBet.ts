@@ -22,12 +22,26 @@ import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteCont
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
-import { BetStatus, GameChoice, GameEncodedInput, GameResult } from "../types"
+import { BetStatus, GameChoice, GameEncodedInput, GameResult } from "../types/types"
 import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
 
 const logger = createLogger("usePlaceBet")
+
+export interface IUsePlaceBetReturn {
+  placeBet: (betAmount: bigint, choice: GameChoice) => Promise<void>
+  betStatus: BetStatus
+  isWaiting: boolean
+  isError: unknown
+  gameResult: GameResult | null
+  resetBetState: () => void
+  vrfFees: bigint
+  gasPrice: bigint
+  formattedVrfFees: number
+  wagerWriteHook: ReturnType<typeof useWriteContract>
+  wagerWaitingHook: ReturnType<typeof useWaitForTransactionReceipt>
+}
 
 function _encodeGameInput(choice: GameChoice): GameEncodedInput {
   switch (choice.game) {
@@ -93,7 +107,7 @@ function _encodeGameInput(choice: GameChoice): GameEncodedInput {
  * }
  * ```
  */
-export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void) {
+export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void): IUsePlaceBetReturn {
   const { appChainId } = useChain()
   const { bankrollToken } = useBettingConfig()
   const publicClient = usePublicClient({ chainId: appChainId })
