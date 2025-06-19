@@ -190,7 +190,7 @@ export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void) 
         game,
         gameEncodedInput: encodedInput.encodedInput,
         betAmount,
-        token,
+        tokenAddress: token.address,
       }
 
       if (!publicClient || !appChainId || !connectedAddress || !wagerWriteHook.writeContract) {
@@ -311,9 +311,8 @@ async function _submitBetTransaction(
 ) {
   logger.debug("_submitBetTransaction: Preparing and sending transaction...")
   // Extract tokenAddress from token for getPlaceBetFunctionData
-  const { token, ...betParamsWithoutToken } = betParams
   const placeBetTxData = getPlaceBetFunctionData(
-    { ...betParamsWithoutToken, receiver, tokenAddress: token?.address },
+    { ...betParams, receiver },
     chainId,
   )
   wagerWriteHook({
