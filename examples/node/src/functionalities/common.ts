@@ -445,7 +445,7 @@ export async function _placeBet(
   const commonParams = {
     betCount,
     betAmount,
-    token: casinoGameToken,
+    tokenAddress: casinoGameToken.address,
   };
   const callbacks = {
     onApprovePending: (_tx: Hash, _result: ApproveResult) => {
