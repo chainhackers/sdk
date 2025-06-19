@@ -27,15 +27,17 @@ const BUTTON_STYLES = {
     border: "border border-keno-unselected-border border-inset",
     text: "text-black",
     hover: "hover:bg-keno-unselected-hover-bg hover:border-primary hover:text-black",
+    focus: "focus:bg-keno-unselected-hover-bg focus:border-primary focus:text-black focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   },
   selected: {
     background: "bg-primary",
     border: "",
     text: "text-primary-foreground",
-    hover: "hover:brightness-105",
+    hover: "hover:brightness-105 hover:bg-primary hover:text-primary-foreground",
+    focus: "focus:brightness-105 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   },
   disabled: "disabled:opacity-[0.72]",
-  common: "w-[40px] h-[40px] p-0 text-[12px] font-medium rounded-md shadow-none transition-all duration-150",
+  common: "w-[40px] h-[40px] p-0 text-[12px] font-medium rounded-md shadow-none",
 } as const
 
 const KENO_NUMBERS_COUNT = 15
@@ -56,7 +58,7 @@ const MULTIPLIER_VALUES = [
 const NumberButton = React.memo<NumberButtonProps>(
   ({ number, isSelected, isDisabled, onClick }) => {
     const styles = isSelected ? BUTTON_STYLES.selected : BUTTON_STYLES.unselected
-    const buttonClasses = `${BUTTON_STYLES.common} ${styles.background} ${styles.border} ${styles.text} ${styles.hover} ${BUTTON_STYLES.disabled}`
+    const buttonClasses = `${BUTTON_STYLES.common} ${styles.background} ${styles.border} ${styles.text} ${styles.hover} ${styles.focus} ${BUTTON_STYLES.disabled}`
 
     return (
       <Button
