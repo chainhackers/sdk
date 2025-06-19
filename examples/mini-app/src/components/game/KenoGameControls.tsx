@@ -26,7 +26,7 @@ const BUTTON_STYLES = {
     background: "bg-keno-unselected-bg",
     border: "border border-keno-unselected-border border-inset",
     text: "text-black",
-    hover: "hover:brightness-105",
+    hover: "hover:bg-keno-unselected-hover-bg hover:border-primary hover:text-black",
   },
   selected: {
     background: "bg-primary",
