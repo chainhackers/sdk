@@ -1,5 +1,5 @@
 import { Token, getAllowanceFunctionData, getApproveFunctionData } from "@betswirl/sdk-core"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { Address, maxUint256, zeroAddress } from "viem"
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -46,7 +46,6 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
   const { appChainId } = useChain()
   const { address: userAddress } = useAccount()
   const { bankrollToken } = useBettingConfig()
-  const [isRefetchingAllowance, setIsRefetchingAllowance] = useState(false)
 
   // Use bankroll token if no token is provided
   const effectiveToken = token || bankrollToken
@@ -60,7 +59,7 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
     return getAllowanceFunctionData(effectiveToken.address as Address, userAddress, spender)
   }, [effectiveToken, userAddress, spender, isNativeToken])
 
-  const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
+  const allowanceReadWagmiHook = useReadContract({
     abi: allowanceFunctionData?.data.abi,
     address: allowanceFunctionData?.data.to,
     functionName: allowanceFunctionData?.data.functionName,
@@ -71,14 +70,14 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
     },
   })
 
-  const allowance = (allowanceData as bigint | undefined) ?? 0n
+  const allowance = (allowanceReadWagmiHook.data as bigint | undefined) ?? 0n
 
   // Check if approval is needed
   const needsApproval = useMemo(() => {
     if (isNativeToken) return false
-    if (isRefetchingAllowance) return false // Don't show "needs approval" while refetching
+    if (allowanceReadWagmiHook.isRefetching) return false // Don't show "needs approval" while refetching
     return allowance < amount
-  }, [allowance, amount, isNativeToken, isRefetchingAllowance])
+  }, [allowance, amount, isNativeToken, allowanceReadWagmiHook.isRefetching])
 
   // Prepare approve function data
   const approveFunctionData = useMemo(() => {
@@ -88,85 +87,70 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
   }, [effectiveToken, spender, isNativeToken])
 
   // Write contract for approval
-  const {
-    writeContract,
-    data: approveTxHash,
-    isPending: isApprovePending,
-    reset: resetApproval,
-    error: approveError,
-  } = useWriteContract()
+  const approveWriteWagmiHook = useWriteContract()
 
   // Wait for approval transaction
-  const {
-    isSuccess,
-    isLoading: isApproveConfirming,
-    error: waitError,
-  } = useWaitForTransactionReceipt({
-    hash: approveTxHash,
+  const approveWaitingWagmiHook = useWaitForTransactionReceipt({
+    hash: approveWriteWagmiHook.data,
     chainId: appChainId,
   })
 
+  // Reset function to clear approval errors
+  const resetApprovalState = useCallback(() => {
+    approveWriteWagmiHook.reset()
+  }, [approveWriteWagmiHook.reset])
+
   // Refetch allowance after successful approval
   const handleApprovalSuccess = useCallback(async () => {
-    setIsRefetchingAllowance(true)
     try {
-      await refetchAllowance()
+      await allowanceReadWagmiHook.refetch()
     } finally {
-      setIsRefetchingAllowance(false)
-      resetApproval()
+      resetApprovalState()
     }
-  }, [refetchAllowance, resetApproval])
+  }, [allowanceReadWagmiHook.refetch, resetApprovalState])
 
   // Approve function
   const approve = useCallback(async () => {
     if (!approveFunctionData) return
 
-    await writeContract({
+    await approveWriteWagmiHook.writeContract({
       abi: approveFunctionData.data.abi,
       address: approveFunctionData.data.to,
       functionName: approveFunctionData.data.functionName,
       args: approveFunctionData.data.args,
       chainId: appChainId,
     })
-  }, [approveFunctionData, writeContract, appChainId])
+  }, [approveFunctionData, approveWriteWagmiHook.writeContract, appChainId])
 
   // Handle successful approval
   useEffect(() => {
-    if (isSuccess && !isApproveConfirming) {
+    if (approveWaitingWagmiHook.isSuccess && !approveWaitingWagmiHook.isPending) {
       handleApprovalSuccess()
     }
-  }, [isSuccess, isApproveConfirming, handleApprovalSuccess])
+  }, [approveWaitingWagmiHook.isSuccess, approveWaitingWagmiHook.isPending, handleApprovalSuccess])
 
   // Handle approval errors
   useEffect(() => {
-    if (approveError) {
-      console.error("Token approval error:", approveError)
+    if (approveWriteWagmiHook.error) {
+      console.error("Token approval error:", approveWriteWagmiHook.error)
     }
-  }, [approveError])
+  }, [approveWriteWagmiHook.error])
 
   // Handle transaction wait errors
   useEffect(() => {
-    if (waitError) {
-      console.error("Token approval transaction error:", waitError)
+    if (approveWaitingWagmiHook.error) {
+      console.error("Token approval transaction error:", approveWaitingWagmiHook.error)
     }
-  }, [waitError])
-
-  // Reset function to clear approval errors
-  const resetApprovalError = useCallback(() => {
-    resetApproval()
-  }, [resetApproval])
+  }, [approveWaitingWagmiHook.error])
 
   return {
     allowance,
     needsApproval,
     approve,
-    isApprovePending,
-    isApproveConfirming,
-    isSuccess,
     effectiveToken,
-    isRefetchingAllowance,
-    approveError,
-    waitError,
-    resetApprovalError,
+    resetApprovalState,
+    approveWriteWagmiHook,
+    approveWaitingWagmiHook,
+    allowanceReadWagmiHook,
   }
 }
