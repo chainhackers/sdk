@@ -24,9 +24,9 @@ const meta: Meta<typeof KenoGameControls> = {
       description: "Callback function when numbers selection changes",
       action: "numbers changed",
     },
-    multiplier: {
-      description: "Current game multiplier",
-      control: { type: "number", min: 0, max: 1000, step: 0.01 },
+    multipliers: {
+      description: "Array of multiplier values",
+      control: { type: "object" },
     },
     isDisabled: {
       description: "Whether the controls are disabled",
@@ -44,13 +44,13 @@ type Story = StoryObj<typeof meta>
 
 function InteractiveKenoGameControls({
   initialSelectedNumbers = [],
-  multiplier = 2.5,
+  multipliers = [480.48, 9.61, 1.07, 0.40, 0.46, 1.91, 1.02, 0.87],
   isDisabled = false,
   theme = "dark",
   maxSelections = 7,
 }: {
   initialSelectedNumbers?: KenoBall[]
-  multiplier?: number
+  multipliers?: number[]
   isDisabled?: boolean
   theme?: "light" | "dark"
   maxSelections?: number
@@ -67,7 +67,7 @@ function InteractiveKenoGameControls({
         <KenoGameControls
           selectedNumbers={selectedNumbers}
           onNumbersChange={handleNumbersChange}
-          multiplier={multiplier}
+          multipliers={multipliers}
           isDisabled={isDisabled}
           maxSelections={maxSelections}
         />
@@ -84,16 +84,7 @@ export const WithSelectedNumbers: Story = {
   render: () => (
     <InteractiveKenoGameControls
       initialSelectedNumbers={[3, 4, 5, 6, 8, 10, 12] as KenoBall[]}
-      multiplier={15.2}
-    />
-  ),
-}
-
-export const MaxSelection: Story = {
-  render: () => (
-    <InteractiveKenoGameControls
-      initialSelectedNumbers={[1, 2, 3, 4, 5, 6, 7, 8] as KenoBall[]}
-      multiplier={480.48}
+      multipliers={[100, 50, 25, 15.2, 10, 5, 2.5, 1]}
     />
   ),
 }
@@ -102,7 +93,7 @@ export const Disabled: Story = {
   render: () => (
     <InteractiveKenoGameControls
       initialSelectedNumbers={[1, 7, 13, 15] as KenoBall[]}
-      multiplier={8.5}
+      multipliers={[50, 25, 10, 8.5, 5, 2, 1, 0.5]}
       isDisabled={true}
     />
   ),

@@ -1,12 +1,13 @@
 import { KenoBall } from "@betswirl/sdk-core"
 import React from "react"
 import { Button } from "../ui/button"
-import { GameControlsProps } from "./shared/types"
 
-interface KenoGameControlsProps extends GameControlsProps {
+interface KenoGameControlsProps {
   selectedNumbers: KenoBall[]
   onNumbersChange: (numbers: KenoBall[]) => void
   maxSelections: number
+  multipliers: number[]
+  isDisabled: boolean
 }
 
 interface NumberButtonProps {
@@ -17,7 +18,7 @@ interface NumberButtonProps {
 }
 
 interface MultiplierItemProps {
-  value: string
+  value: number
   isVisible: boolean
 }
 
@@ -44,17 +45,6 @@ const KENO_NUMBERS_COUNT = 15
 const KENO_GRID_COLS = 4
 const KENO_GRID_ROWS = 4
 
-const MULTIPLIER_VALUES = [
-  "480.48x",
-  "9.61x",
-  "1.07x",
-  "0.40x",
-  "0.46x",
-  "1.91x",
-  "1.02x",
-  "0.87x",
-]
-
 const NumberButton = React.memo<NumberButtonProps>(
   ({ number, isSelected, isDisabled, onClick }) => {
     const styles = isSelected ? BUTTON_STYLES.selected : BUTTON_STYLES.unselected
@@ -79,7 +69,7 @@ const MultiplierItem = React.memo<MultiplierItemProps>(({ value, isVisible }) =>
 
   return (
     <div className="w-[48px] h-[15px] flex items-center justify-center text-[10px] font-medium rounded-[4px] bg-keno-multiplier-bg text-white">
-      {value}
+      {value}x
     </div>
   )
 })
@@ -89,6 +79,7 @@ export function KenoGameControls({
   onNumbersChange,
   isDisabled,
   maxSelections,
+  multipliers,
 }: KenoGameControlsProps) {
   const isNumberSelected = (number: KenoBall) => selectedNumbers.includes(number)
 
@@ -140,7 +131,7 @@ export function KenoGameControls({
       </div>
 
       <div className="flex flex-col gap-[2px] pt-[32px]">
-        {MULTIPLIER_VALUES.map((value, index) => (
+        {multipliers.map((value, index) => (
           <MultiplierItem
             key={index}
             value={value}
