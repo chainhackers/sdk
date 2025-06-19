@@ -214,7 +214,7 @@
     font-display: swap;
     src: url("./assets/fonts/Inter-Medium.woff2") format("woff2");
   }
-  
+
   @font-face {
     font-family: "Inter";
     font-style: normal;
@@ -222,7 +222,7 @@
     font-display: swap;
     src: url("./assets/fonts/Inter-SemiBold.woff2") format("woff2");
   }
-  
+
   @font-face {
     font-family: "Inter";
     font-style: normal;
