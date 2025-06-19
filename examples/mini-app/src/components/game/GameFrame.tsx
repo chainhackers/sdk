@@ -1,21 +1,10 @@
-import { CASINO_GAME_TYPE, Token } from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"
-import { cn } from "../../lib/utils"
-import { BetStatus, GameResult, GameRolledResult, HistoryEntry } from "../../types/types"
+import { zeroAddress } from "viem"
 
-function formatRolledResult(rolled: GameRolledResult): string {
-  switch (rolled.game) {
-    case CASINO_GAME_TYPE.COINTOSS:
-      return rolled.rolled
-    case CASINO_GAME_TYPE.DICE:
-      return rolled.rolled.toString()
-    case CASINO_GAME_TYPE.ROULETTE:
-      return rolled.rolled.toString()
-    default:
-      return ""
-  }
-}
+import { cn } from "../../lib/utils"
+import { BetStatus, GameResult, GameRolledResult, TokenWithImage, HistoryEntry } from "../../types/types"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Sheet, SheetTrigger } from "../ui/sheet"
@@ -60,6 +49,19 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   themeSettings: ThemeSettings
   children: React.ReactNode
   variant?: GameVariant
+}
+
+function formatRolledResult(rolled: GameRolledResult): string {
+  switch (rolled.game) {
+    case CASINO_GAME_TYPE.COINTOSS:
+      return rolled.rolled
+    case CASINO_GAME_TYPE.DICE:
+      return rolled.rolled.toString()
+    case CASINO_GAME_TYPE.ROULETTE:
+      return rolled.rolled.toString()
+    default:
+      return ""
+  }
 }
 
 function GameFrameRoot({ themeSettings, children, variant = "default", ...props }: GameFrameProps) {
@@ -201,7 +203,7 @@ function InfoButton({
           token={{
             symbol: "ETH",
             decimals: tokenDecimals,
-            address: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+            address: zeroAddress,
           }}
           nativeCurrencySymbol={nativeCurrencySymbol}
         />
@@ -279,7 +281,7 @@ interface BettingSectionProps {
   game: CASINO_GAME_TYPE
   balance: bigint
   isConnected: boolean
-  token: Token
+  token: TokenWithImage
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number
@@ -289,7 +291,12 @@ interface BettingSectionProps {
   onPlayBtnClick: () => void
   areChainsSynced: boolean
   isGamePaused: boolean
+  needsTokenApproval?: boolean
+  isApprovePending?: boolean
+  isApproveConfirming?: boolean
   hasValidSelection?: boolean
+  isRefetchingAllowance?: boolean
+  approveError?: any
 }
 
 function BettingSection(props: BettingSectionProps) {

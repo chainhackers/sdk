@@ -20,6 +20,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { Hex, decodeEventLog } from "viem"
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
+import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
 import { BetStatus, GameChoice, GameEncodedInput, GameResult } from "../types/types"
 import type { WatchTarget } from "./types"
@@ -38,6 +39,8 @@ export interface IUsePlaceBetReturn {
   vrfFees: bigint
   gasPrice: bigint
   formattedVrfFees: number
+  wagerWriteHook: ReturnType<typeof useWriteContract>
+  wagerWaitingHook: ReturnType<typeof useWaitForTransactionReceipt>
 }
 
 function _encodeGameInput(choice: GameChoice): GameEncodedInput {
@@ -104,14 +107,14 @@ function _encodeGameInput(choice: GameChoice): GameEncodedInput {
  * }
  * ```
  */
-export function usePlaceBet(
-  game: CASINO_GAME_TYPE,
-  refetchBalance: () => void,
-): IUsePlaceBetReturn {
+export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void): IUsePlaceBetReturn {
   const { appChainId } = useChain()
+  const { bankrollToken } = useBettingConfig()
   const publicClient = usePublicClient({ chainId: appChainId })
   const { address: connectedAddress } = useAccount()
   const wagerWriteHook = useWriteContract()
+
+  const token = bankrollToken || chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
 
   const wagerWaitingHook = useWaitForTransactionReceipt({
     hash: wagerWriteHook.data,
@@ -124,7 +127,7 @@ export function usePlaceBet(
     gasPrice,
   } = useEstimateVRFFees({
     game,
-    token: chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency), // TODO make this token dynamic when the token list is integrated
+    token,
     betCount: 1, // TODO make this number dynamic when multi betting is integrated
   })
   const [gameResult, setGameResult] = useState<GameResult | null>(null)
@@ -189,6 +192,8 @@ export function usePlaceBet(
     wagerWriteHook.reset()
     setGameResult(null)
     setWatchTarget(null)
+    setInternalError(null)
+    setIsRolling(false)
     resetWatcher()
   }, [resetWatcher, wagerWriteHook.reset])
 
@@ -201,6 +206,7 @@ export function usePlaceBet(
         game,
         gameEncodedInput: encodedInput.encodedInput,
         betAmount,
+        tokenAddress: token.address,
       }
 
       if (!publicClient || !appChainId || !connectedAddress || !wagerWriteHook.writeContract) {
@@ -237,6 +243,7 @@ export function usePlaceBet(
       formattedVrfFees,
       vrfFees,
       gasPrice,
+      token,
     ],
   )
 
@@ -307,6 +314,8 @@ export function usePlaceBet(
     vrfFees,
     gasPrice,
     formattedVrfFees,
+    wagerWriteHook,
+    wagerWaitingHook
   }
 }
 
@@ -319,13 +328,17 @@ async function _submitBetTransaction(
   wagerWriteHook: ReturnType<typeof useWriteContract>["writeContract"],
 ) {
   logger.debug("_submitBetTransaction: Preparing and sending transaction...")
-  const placeBetTxData = getPlaceBetFunctionData({ ...betParams, receiver }, chainId)
+  // Extract tokenAddress from token for getPlaceBetFunctionData
+  const placeBetTxData = getPlaceBetFunctionData(
+    { ...betParams, receiver },
+    chainId,
+  )
   wagerWriteHook({
     abi: placeBetTxData.data.abi,
     address: placeBetTxData.data.to,
     functionName: placeBetTxData.data.functionName,
     args: placeBetTxData.data.args,
-    value: placeBetTxData.extraData.getValue(betParams.betAmount + vrfCost),
+    value: placeBetTxData.extraData.getValue(vrfCost),
     gasPrice,
     chainId,
   })

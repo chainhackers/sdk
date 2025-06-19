@@ -1,6 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { CoinTossGame } from "../../components/game/CoinTossGame"
-import { AppProviders } from "../../providers"
 import gameBg1 from "../assets/game/game-background-1.jpg"
 import gameBg2 from "../assets/game/game-background-2.jpg"
 import gameBg3 from "../assets/game/game-background-3.jpg"
@@ -9,6 +7,12 @@ import gameBg5 from "../assets/game/game-background-5.png"
 import gameBg6 from "../assets/game/game-background-6.jpg"
 import gameBg7 from "../assets/game/game-background-7.png"
 import gameBg8 from "../assets/game/game-background-8.jpg"
+import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
+import { CoinTossGame, type CoinTossGameProps } from "../../components/game/CoinTossGame"
+
+interface StoryArgs extends CoinTossGameProps {
+  token?: keyof typeof STORYBOOK_TOKENS
+}
 
 const meta = {
   title: "Game/CoinTossGame",
@@ -27,17 +31,25 @@ const meta = {
     },
   },
   decorators: [
-    (Story) => (
-      <AppProviders>
-        <Story />
-      </AppProviders>
-    ),
+    (Story, context) => {
+      const token = context.args.token ? STORYBOOK_TOKENS[context.args.token] : STORYBOOK_TOKENS.ETH
+      return (
+        <StorybookProviders token={token}>
+          <Story />
+        </StorybookProviders>
+      )
+    },
   ],
   tags: ["autodocs"],
   argTypes: {
     theme: {
       control: "radio",
       options: ["light", "dark", "system"],
+    },
+    token: {
+      control: "radio",
+      options: ["ETH", "DEGEN"],
+      description: "Token to use for betting",
     },
     customTheme: {
       control: "object",
@@ -59,7 +71,7 @@ const meta = {
       accept: "image/*",
     },
   },
-} satisfies Meta<typeof CoinTossGame>
+} satisfies Meta<StoryArgs>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -72,6 +84,7 @@ export const LightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
+    token: "ETH",
   },
 }
 
@@ -79,6 +92,7 @@ export const DarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "ETH",
     backgroundImage: gameBg2,
   },
   parameters: {
@@ -90,6 +104,7 @@ export const SystemTheme: Story = {
   ...Template,
   args: {
     theme: "system",
+    token: "ETH",
     backgroundImage: gameBg4,
   },
   parameters: {
@@ -101,6 +116,7 @@ export const SheepsLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
+    token: "ETH",
     customTheme: {
       "--primary": "#4dae52",
       "--play-btn-font": "#1B5E20",
@@ -116,6 +132,7 @@ export const ChickletLightTheme: Story = {
   ...Template,
   args: {
     theme: "light",
+    token: "DEGEN",
     customTheme: {
       "--primary": "rgb(239 185 1)",
       "--play-btn-font": "#ffffff",
@@ -131,6 +148,7 @@ export const CatsDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "ETH",
     customTheme: {
       "--primary": "#ffb74d",
       "--play-btn-font": "#3e2723",
@@ -146,6 +164,7 @@ export const LightfishDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "DEGEN",
     customTheme: {
       "--primary": "#b8d32f",
       "--play-btn-font": "#002a47",
@@ -161,6 +180,7 @@ export const MarticoinDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "ETH",
     customTheme: {
       "--primary": "hsl(13.9deg 83.1% 41.76%)",
       "--play-btn-font": "#ffffff",
@@ -176,6 +196,7 @@ export const FrogDarkTheme: Story = {
   ...Template,
   args: {
     theme: "dark",
+    token: "DEGEN",
     customTheme: {
       "--primary": "rgb(44 52 51)",
       "--play-btn-font": "rgb(171 181 171)",

@@ -1,14 +1,17 @@
-import { CASINO_GAME_TYPE, Token, chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
+import { casinoChainById } from "@betswirl/sdk-core"
 import React, { useState } from "react"
-import { formatGwei } from "viem"
+import { type Hex, formatGwei, zeroAddress } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
-import { BetStatus, GameChoice, GameResult, HistoryEntry } from "../types/types"
+import { useBettingConfig } from "../context/configContext"
+import { BetStatus, GameChoice, GameResult, HistoryEntry, TokenWithImage } from "../types/types"
 import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
 import { useHouseEdge } from "./useHouseEdge"
 import { useIsGamePaused } from "./useIsGamePaused"
 import { usePlaceBet } from "./usePlaceBet"
+import { useTokenAllowance } from "./useTokenAllowance"
 
 interface UseGameLogicProps {
   gameType: CASINO_GAME_TYPE
@@ -20,7 +23,7 @@ interface UseGameLogicResult {
   isWalletConnected: boolean
   address: string | undefined
   balance: bigint
-  token: Token
+  token: TokenWithImage
   areChainsSynced: boolean
   gameHistory: HistoryEntry[]
   refreshHistory: () => void
@@ -53,6 +56,12 @@ interface UseGameLogicResult {
   handlePlayButtonClick: () => void
   handleBetAmountChange: (amount: bigint | undefined) => void
   placeBet: (betAmount: bigint, choice: GameChoice) => void
+  needsTokenApproval: boolean
+  isApprovePending: boolean
+  isApproveConfirming: boolean
+  approveToken: () => Promise<void>
+  isRefetchingAllowance: boolean
+  approveError: Error | null
 }
 
 /**
@@ -83,10 +92,18 @@ export function useGameLogic({
 }: UseGameLogicProps): UseGameLogicResult {
   const { isConnected: isWalletConnected, address } = useAccount()
   const { gameHistory, refreshHistory } = useGameHistory(gameType)
-  const { data: balance, refetch: refetchBalance } = useBalance({ address })
   const { areChainsSynced, appChainId } = useChain()
+  const { bankrollToken } = useBettingConfig()
 
-  const token = chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
+  const token: TokenWithImage = bankrollToken || {
+    ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
+    image: "", // Fallback for native currency - user should configure this
+  }
+
+  const { data: balance, refetch: refetchBalance } = useBalance({
+    address,
+    token: token.address === zeroAddress ? undefined : (token.address as Hex),
+  })
   const { houseEdge } = useHouseEdge({
     game: gameType,
     token,
@@ -100,6 +117,22 @@ export function useGameLogic({
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
     usePlaceBet(gameType, refetchBalance)
+
+  const gameContractAddress = casinoChainById[appChainId]?.contracts.games[gameType]?.address
+
+  const {
+    needsApproval: needsTokenApproval,
+    approveWriteWagmiHook,
+    approveWaitingWagmiHook,
+    allowanceReadWagmiHook,
+    approve: approveToken,
+    resetApprovalState,
+  } = useTokenAllowance({
+    token,
+    spender: gameContractAddress || zeroAddress,
+    amount: betAmount || 0n,
+    enabled: !!gameContractAddress && !!betAmount && betAmount > 0n,
+  })
 
   const { netPayout, formattedNetMultiplier, grossMultiplier } = useBetCalculations({
     selection,
@@ -117,21 +150,43 @@ export function useGameLogic({
     backgroundImage,
   }
 
-  const handlePlayButtonClick = () => {
+  const handlePlayButtonClick = async () => {
+    // Reset approval error if there is one
+    if (approveWriteWagmiHook.error) {
+      resetApprovalState()
+      // Try approval again
+      if (needsTokenApproval) {
+        await approveToken()
+      }
+      return
+    }
+
     if (betStatus === "error") {
       resetBetState()
       if (isWalletConnected && betAmount && betAmount > 0n) {
-        placeBet(betAmount, selection)
+        if (needsTokenApproval) {
+          await approveToken()
+        } else {
+          placeBet(betAmount, selection)
+        }
       }
     } else if (isInGameResultState) {
       resetBetState()
     } else if (isWalletConnected && betAmount && betAmount > 0n) {
-      placeBet(betAmount, selection)
+      if (needsTokenApproval) {
+        await approveToken()
+      } else {
+        placeBet(betAmount, selection)
+      }
     }
   }
 
   const handleBetAmountChange = (amount: bigint | undefined) => {
     setBetAmount(amount)
+    // Reset error state when user changes bet amount
+    if (betStatus === "error" || betStatus === "waiting-error" || betStatus === "internal-error") {
+      resetBetState()
+    }
   }
 
   return {
@@ -163,5 +218,11 @@ export function useGameLogic({
     handlePlayButtonClick,
     handleBetAmountChange,
     placeBet,
+    needsTokenApproval,
+    isApprovePending: approveWriteWagmiHook.isPending,
+    isApproveConfirming: approveWaitingWagmiHook.isLoading,
+    approveToken,
+    isRefetchingAllowance: allowanceReadWagmiHook.isRefetching,
+    approveError: approveWriteWagmiHook.error || approveWaitingWagmiHook.error,
   }
 }

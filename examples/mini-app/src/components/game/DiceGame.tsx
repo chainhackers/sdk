@@ -48,6 +48,11 @@ export function DiceGame({
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
+    needsTokenApproval,
+    isApprovePending,
+    isApproveConfirming,
+    isRefetchingAllowance,
+    approveError,
   } = useGameLogic({
     gameType: CASINO_GAME_TYPE.DICE,
     defaultSelection: {
@@ -99,7 +104,7 @@ export function DiceGame({
         <GameFrame.ResultWindow
           gameResult={gameResult}
           betAmount={betAmount}
-          currency={nativeCurrencySymbol}
+          currency={token.symbol}
         />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
@@ -116,6 +121,11 @@ export function DiceGame({
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
         isGamePaused={isGamePaused}
+        needsTokenApproval={needsTokenApproval}
+        isApprovePending={isApprovePending}
+        isApproveConfirming={isApproveConfirming}
+        isRefetchingAllowance={isRefetchingAllowance}
+        approveError={approveError}
       />
     </GameFrame>
   )

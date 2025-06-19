@@ -2,19 +2,17 @@ import {
   CASINO_GAME_TYPE,
   FORMAT_TYPE,
   GAS_TOKEN_ADDRESS,
-  Token,
   formatRawAmount,
 } from "@betswirl/sdk-core"
-import { TokenImage } from "@coinbase/onchainkit/token"
 import Decimal from "decimal.js"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { parseUnits } from "viem"
 import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
-import { ETH_TOKEN } from "../../lib/tokens"
 import { cn } from "../../lib/utils"
-import { BetStatus } from "../../types/types"
+import { BetStatus, TokenWithImage } from "../../types/types"
 import { ChainIcon } from "../ui/ChainIcon"
+import { TokenIcon } from "../ui/TokenIcon"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
@@ -23,7 +21,7 @@ interface BettingPanelProps {
   game: CASINO_GAME_TYPE
   balance: bigint
   isConnected: boolean
-  token: Token
+  token: TokenWithImage
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number
@@ -33,7 +31,12 @@ interface BettingPanelProps {
   onPlayBtnClick: () => void
   areChainsSynced: boolean
   isGamePaused: boolean
+  needsTokenApproval?: boolean
+  isApprovePending?: boolean
+  isApproveConfirming?: boolean
   hasValidSelection?: boolean
+  isRefetchingAllowance?: boolean
+  approveError?: any
 }
 
 const BET_AMOUNT_INPUT_STEP = 0.0001
@@ -52,7 +55,12 @@ export function BettingPanel({
   onPlayBtnClick,
   areChainsSynced,
   isGamePaused,
+  needsTokenApproval = false,
+  isApprovePending = false,
+  isApproveConfirming = false,
   hasValidSelection = true,
+  isRefetchingAllowance = false,
+  approveError,
 }: BettingPanelProps) {
   const { appChainId } = useChain()
   const [inputValue, setInputValue] = useState<string>("")
@@ -106,7 +114,10 @@ export function BettingPanel({
   const isBetSuccees = betStatus === "success"
   const isWaiting = betStatus === "loading" || betStatus === "pending" || betStatus === "rolling"
   const isError =
-    betStatus === "error" || betStatus === "waiting-error" || betStatus === "internal-error"
+    betStatus === "error" ||
+    betStatus === "waiting-error" ||
+    betStatus === "internal-error" ||
+    !!approveError
 
   const canInitiateBet =
     isConnected &&
@@ -121,12 +132,20 @@ export function BettingPanel({
     !isBetAmountExceedsMaxBetAmount &&
     hasValidSelection
 
-  const isInputDisabled = !isConnected || isWaiting || isBetSuccees
+  const isApprovingToken = isApprovePending || isApproveConfirming
+  const isInputDisabled = !isConnected || isWaiting || isBetSuccees || isApprovingToken
 
-  const isPlayButtonDisabled: boolean = isWaiting || !canInitiateBet
+  const isPlayButtonDisabled: boolean =
+    isWaiting || (!canInitiateBet && !needsTokenApproval) || isApprovingToken
 
   let playButtonText: string
-  if (isError) {
+  if (isApprovePending) {
+    playButtonText = "Sign Approval..."
+  } else if (isApproveConfirming || isRefetchingAllowance) {
+    playButtonText = "Confirming Approval..."
+  } else if (needsTokenApproval) {
+    playButtonText = "Approve Token"
+  } else if (isError) {
     playButtonText = "Error, try again"
   } else if (isBetSuccees) {
     playButtonText = "Try again"
@@ -233,7 +252,7 @@ export function BettingPanel({
           <span className="font-semibold">{formattedBalance}</span>
           <div className="flex items-center ml-1">
             <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
-            <TokenImage token={ETH_TOKEN} size={18} />
+            <TokenIcon token={token} size={18} />
           </div>
         </div>
 
@@ -254,7 +273,7 @@ export function BettingPanel({
           onChange={handleInputChange}
           className={cn("relative", !isValidInput && "[&_input]:text-muted-foreground")}
           token={{
-            icon: <TokenImage token={ETH_TOKEN} size={18} />,
+            icon: <TokenIcon token={token} size={18} className="mr-1" />,
             symbol: token.symbol,
           }}
           disabled={isInputDisabled}

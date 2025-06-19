@@ -15,6 +15,7 @@ export * from "./hooks/useGameHistory"
 export * from "./hooks/useBetCalculations"
 export * from "./hooks/useDebounce"
 export * from "./hooks/useIsGamePaused"
+export * from "./hooks/useTokenAllowance"
 
 export * from "./components/game/BettingPanel"
 export * from "./components/game/CoinTossGame"
