@@ -1,5 +1,5 @@
 import { Token, getAllowanceFunctionData, getApproveFunctionData } from "@betswirl/sdk-core"
-import { useCallback, useEffect, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Address, maxUint256, zeroAddress } from "viem"
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -24,12 +24,13 @@ type UseTokenAllowanceProps = {
  * - allowance: Current allowance amount
  * - needsApproval: Whether approval is needed
  * - approve: Function to approve max amount
- * - isApproving: Whether approval is in progress
+ * - isApprovePending: Whether user needs to sign the approval transaction
+ * - isApproveConfirming: Whether approval transaction is being confirmed on-chain
  * - isSuccess: Whether approval was successful
  *
  * @example
  * ```ts
- * const { needsApproval, approve, isApproving } = useTokenAllowance({
+ * const { needsApproval, approve, isApprovePending, isApproveConfirming } = useTokenAllowance({
  *   token: selectedToken,
  *   spender: gameContractAddress,
  *   amount: betAmount
@@ -45,6 +46,7 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
   const { appChainId } = useChain()
   const { address: userAddress } = useAccount()
   const { bankrollToken } = useBettingConfig()
+  const [isRefetchingAllowance, setIsRefetchingAllowance] = useState(false)
 
   // Use bankroll token if no token is provided
   const effectiveToken = token || bankrollToken
@@ -74,8 +76,9 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
   // Check if approval is needed
   const needsApproval = useMemo(() => {
     if (isNativeToken) return false
+    if (isRefetchingAllowance) return false // Don't show "needs approval" while refetching
     return allowance < amount
-  }, [allowance, amount, isNativeToken])
+  }, [allowance, amount, isNativeToken, isRefetchingAllowance])
 
   // Prepare approve function data
   const approveFunctionData = useMemo(() => {
@@ -88,53 +91,82 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
   const {
     writeContract,
     data: approveTxHash,
-    isPending: isApproving,
+    isPending: isApprovePending,
     reset: resetApproval,
+    error: approveError,
   } = useWriteContract()
 
   // Wait for approval transaction
-  const { isSuccess, isLoading: isConfirming } = useWaitForTransactionReceipt({
+  const {
+    isSuccess,
+    isLoading: isApproveConfirming,
+    error: waitError,
+  } = useWaitForTransactionReceipt({
     hash: approveTxHash,
     chainId: appChainId,
   })
 
   // Refetch allowance after successful approval
   const handleApprovalSuccess = useCallback(async () => {
-    await refetchAllowance()
-    resetApproval()
+    setIsRefetchingAllowance(true)
+    try {
+      await refetchAllowance()
+    } finally {
+      setIsRefetchingAllowance(false)
+      resetApproval()
+    }
   }, [refetchAllowance, resetApproval])
 
   // Approve function
   const approve = useCallback(async () => {
     if (!approveFunctionData) return
 
-    try {
-      await writeContract({
-        abi: approveFunctionData.data.abi,
-        address: approveFunctionData.data.to,
-        functionName: approveFunctionData.data.functionName,
-        args: approveFunctionData.data.args,
-        chainId: appChainId,
-      })
-    } catch (error) {
-      console.error("Error approving token:", error)
-      throw error
-    }
+    await writeContract({
+      abi: approveFunctionData.data.abi,
+      address: approveFunctionData.data.to,
+      functionName: approveFunctionData.data.functionName,
+      args: approveFunctionData.data.args,
+      chainId: appChainId,
+    })
   }, [approveFunctionData, writeContract, appChainId])
 
   // Handle successful approval
   useEffect(() => {
-    if (isSuccess && !isConfirming) {
+    if (isSuccess && !isApproveConfirming) {
       handleApprovalSuccess()
     }
-  }, [isSuccess, isConfirming, handleApprovalSuccess])
+  }, [isSuccess, isApproveConfirming, handleApprovalSuccess])
+
+  // Handle approval errors
+  useEffect(() => {
+    if (approveError) {
+      console.error("Token approval error:", approveError)
+    }
+  }, [approveError])
+
+  // Handle transaction wait errors
+  useEffect(() => {
+    if (waitError) {
+      console.error("Token approval transaction error:", waitError)
+    }
+  }, [waitError])
+
+  // Reset function to clear approval errors
+  const resetApprovalError = useCallback(() => {
+    resetApproval()
+  }, [resetApproval])
 
   return {
     allowance,
     needsApproval,
     approve,
-    isApproving: isApproving || isConfirming,
+    isApprovePending,
+    isApproveConfirming,
     isSuccess,
     effectiveToken,
+    isRefetchingAllowance,
+    approveError,
+    waitError,
+    resetApprovalError,
   }
 }

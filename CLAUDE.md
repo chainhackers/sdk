@@ -57,7 +57,7 @@ This is a pnpm workspace monorepo with three main areas:
 2. **Function Data Pattern**: All blockchain interactions return "function data" objects that can be executed by the provider, keeping the core SDK chain-agnostic.
 
 3. **Token Handling**: 
-   - Native tokens (ETH, MATIC) use address `0x0000...0000`
+   - Native tokens (ETH, MATIC) use address `0x0000...0000` and `zeroAddress` with Viem
    - ERC20 tokens require approval before betting
    - Token allowances are managed via the `useTokenAllowance` hook
 

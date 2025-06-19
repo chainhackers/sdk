@@ -47,7 +47,10 @@ export function CoinTossGame({
     handlePlayButtonClick,
     handleBetAmountChange,
     needsTokenApproval,
-    isApprovingToken,
+    isApprovePending,
+    isApproveConfirming,
+    isRefetchingAllowance,
+    approveError,
   } = useGameLogic({
     gameType: CASINO_GAME_TYPE.COINTOSS,
     defaultSelection: {
@@ -97,7 +100,7 @@ export function CoinTossGame({
             isDisabled={isControlsDisabled}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow gameResult={gameResult} betAmount={betAmount} currency="ETH" />
+        <GameFrame.ResultWindow gameResult={gameResult} betAmount={betAmount} currency={token.symbol} />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.COINTOSS}
@@ -114,7 +117,10 @@ export function CoinTossGame({
         areChainsSynced={areChainsSynced}
         isGamePaused={isGamePaused}
         needsTokenApproval={needsTokenApproval}
-        isApprovingToken={isApprovingToken}
+        isApprovePending={isApprovePending}
+        isApproveConfirming={isApproveConfirming}
+        isRefetchingAllowance={isRefetchingAllowance}
+        approveError={approveError}
       />
     </GameFrame>
   )

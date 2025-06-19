@@ -48,6 +48,11 @@ export function RouletteGame({
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
+    needsTokenApproval,
+    isApprovePending,
+    isApproveConfirming,
+    isRefetchingAllowance,
+    approveError,
   } = useGameLogic({
     gameType: CASINO_GAME_TYPE.ROULETTE,
     defaultSelection: {
@@ -97,7 +102,7 @@ export function RouletteGame({
             isDisabled={isControlsDisabled}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow gameResult={gameResult} betAmount={betAmount} currency="ETH" />
+        <GameFrame.ResultWindow gameResult={gameResult} betAmount={betAmount} currency={token.symbol} />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.ROULETTE}
@@ -114,6 +119,11 @@ export function RouletteGame({
         areChainsSynced={areChainsSynced}
         isGamePaused={isGamePaused}
         hasValidSelection={selectedNumbers.length > 0}
+        needsTokenApproval={needsTokenApproval}
+        isApprovePending={isApprovePending}
+        isApproveConfirming={isApproveConfirming}
+        isRefetchingAllowance={isRefetchingAllowance}
+        approveError={approveError}
       />
     </GameFrame>
   )

@@ -32,8 +32,11 @@ interface BettingPanelProps {
   areChainsSynced: boolean
   isGamePaused: boolean
   needsTokenApproval?: boolean
-  isApprovingToken?: boolean
+  isApprovePending?: boolean
+  isApproveConfirming?: boolean
   hasValidSelection?: boolean
+  isRefetchingAllowance?: boolean
+  approveError?: any
 }
 
 const BET_AMOUNT_INPUT_STEP = 0.0001
@@ -53,8 +56,11 @@ export function BettingPanel({
   areChainsSynced,
   isGamePaused,
   needsTokenApproval = false,
-  isApprovingToken = false,
+  isApprovePending = false,
+  isApproveConfirming = false,
   hasValidSelection = true,
+  isRefetchingAllowance = false,
+  approveError,
 }: BettingPanelProps) {
   const { appChainId } = useChain()
   const [inputValue, setInputValue] = useState<string>("")
@@ -108,7 +114,10 @@ export function BettingPanel({
   const isBetSuccees = betStatus === "success"
   const isWaiting = betStatus === "loading" || betStatus === "pending" || betStatus === "rolling"
   const isError =
-    betStatus === "error" || betStatus === "waiting-error" || betStatus === "internal-error"
+    betStatus === "error" ||
+    betStatus === "waiting-error" ||
+    betStatus === "internal-error" ||
+    !!approveError
 
   const canInitiateBet =
     isConnected &&
@@ -123,14 +132,17 @@ export function BettingPanel({
     !isBetAmountExceedsMaxBetAmount &&
     hasValidSelection
 
+  const isApprovingToken = isApprovePending || isApproveConfirming
   const isInputDisabled = !isConnected || isWaiting || isBetSuccees || isApprovingToken
 
   const isPlayButtonDisabled: boolean =
     isWaiting || (!canInitiateBet && !needsTokenApproval) || isApprovingToken
 
   let playButtonText: string
-  if (isApprovingToken) {
-    playButtonText = "Approving Token..."
+  if (isApprovePending) {
+    playButtonText = "Sign Approval..."
+  } else if (isApproveConfirming || isRefetchingAllowance) {
+    playButtonText = "Confirming Approval..."
   } else if (needsTokenApproval) {
     playButtonText = "Approve Token"
   } else if (isError) {

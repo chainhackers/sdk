@@ -87,13 +87,15 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
       }
 
       const formattedHistory: HistoryEntry[] = result.bets.map((bet: CasinoBet) => {
-        // Use the configured bankroll token if it matches, otherwise create a placeholder
+        // TODO: Implement proper dynamic token loading for all supported tokens #107
+        // For now, dynamically generate token image URL based on symbol
         const tokenWithImage: TokenWithImage =
           bankrollToken && bankrollToken.symbol === bet.token.symbol
             ? bankrollToken
             : {
                 ...bet.token,
-                image: "", // Placeholder image for unknown tokens
+                // Use BetSwirl's token image URL pattern
+                image: `https://www.betswirl.com/img/tokens/${bet.token.symbol.toUpperCase()}.svg`,
               }
 
         return {

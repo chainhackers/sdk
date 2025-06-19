@@ -31,7 +31,7 @@ type UseHouseEdgeProps = {
  */
 export function useHouseEdge(props: UseHouseEdgeProps) {
   const { appChainId } = useChain()
-  const { affiliate, affiliateHouseEdge } = useBettingConfig()
+  const { affiliate } = useBettingConfig()
   const functionData = useMemo(() => {
     return getAffiliateHouseEdgeFunctionData(props.game, props.token.address, affiliate, appChainId)
   }, [props.game, props.token.address, affiliate, appChainId])
@@ -42,12 +42,9 @@ export function useHouseEdge(props: UseHouseEdgeProps) {
     functionName: functionData.data.functionName,
     args: functionData.data.args,
     chainId: appChainId,
-    query: {
-      initialData: affiliateHouseEdge,
-    },
   })
 
-  const houseEdge = wagmiHook.data ?? affiliateHouseEdge
+  const houseEdge = wagmiHook.data ?? 0
 
   const houseEdgePercent = useMemo(() => {
     return houseEdge / 100

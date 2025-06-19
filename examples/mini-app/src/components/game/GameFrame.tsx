@@ -1,6 +1,8 @@
 import { CASINO_GAME_TYPE } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"
+import { zeroAddress } from "viem"
+
 import { cn } from "../../lib/utils"
 import { BetStatus, GameResult, GameRolledResult, TokenWithImage } from "../../types"
 import { Button } from "../ui/button"
@@ -201,7 +203,7 @@ function InfoButton({
           token={{
             symbol: "ETH",
             decimals: tokenDecimals,
-            address: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+            address: zeroAddress,
           }}
           nativeCurrencySymbol={nativeCurrencySymbol}
         />
@@ -290,8 +292,11 @@ interface BettingSectionProps {
   areChainsSynced: boolean
   isGamePaused: boolean
   needsTokenApproval?: boolean
-  isApprovingToken?: boolean
+  isApprovePending?: boolean
+  isApproveConfirming?: boolean
   hasValidSelection?: boolean
+  isRefetchingAllowance?: boolean
+  approveError?: any
 }
 
 function BettingSection(props: BettingSectionProps) {
