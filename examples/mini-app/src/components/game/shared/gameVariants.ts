@@ -21,6 +21,16 @@ export const VARIANT_CONFIG: VariantConfigMap = {
       contentClass: "",
     },
   },
+  keno: {
+    card: {
+      height: "h-[550px]",
+    },
+    gameArea: {
+      height: "h-[198px]",
+      rounded: "rounded-[16px]",
+      contentClass: "",
+    },
+  },
 } as const
 
 export function getVariantConfig(variant: GameVariant) {

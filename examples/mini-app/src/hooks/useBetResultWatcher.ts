@@ -3,6 +3,7 @@ import {
   CoinToss,
   Dice,
   DiceNumber,
+  KenoBall,
   Roulette,
   RouletteNumber,
 } from "@betswirl/sdk-core"
@@ -43,7 +44,7 @@ function _extractEventData(
   decodedRollLog: DecodedEventLog,
   gameType: CASINO_GAME_TYPE,
 ): {
-  rolledData: boolean[] | DiceNumber | RouletteNumber
+  rolledData: boolean[] | DiceNumber | RouletteNumber | KenoBall[]
   payout: bigint
   id: bigint
 } {
@@ -84,24 +85,36 @@ function _extractEventData(
         id: rouletteRollArgs.id,
       }
     }
+    case CASINO_GAME_TYPE.KENO: {
+      const kenoRollArgs = decodedRollLog.args as unknown as {
+        id: bigint
+        payout: bigint
+        rolled: KenoBall[]
+      }
+      return {
+        rolledData: kenoRollArgs.rolled,
+        payout: kenoRollArgs.payout,
+        id: kenoRollArgs.id,
+      }
+    }
     default:
       throw new Error(`Unsupported game type for event extraction: ${gameType}`)
   }
 }
 
 function _decodeRolled(
-  rolled: boolean[] | DiceNumber | RouletteNumber,
+  rolled: boolean[] | DiceNumber | RouletteNumber | KenoBall[],
   game: CASINO_GAME_TYPE,
 ): GameRolledResult {
   switch (game) {
     case CASINO_GAME_TYPE.COINTOSS:
-      if (Array.isArray(rolled)) {
-        return {
-          game: CASINO_GAME_TYPE.COINTOSS,
-          rolled: CoinToss.decodeRolled(rolled[0]),
-        }
+      if (!Array.isArray(rolled)) {
+        throw new Error(`Invalid rolled data for COINTOSS: expected boolean array, got ${rolled}`)
       }
-      throw new Error(`Invalid rolled data for COINTOSS: expected boolean array, got ${rolled}`)
+      return {
+        game: CASINO_GAME_TYPE.COINTOSS,
+        rolled: CoinToss.decodeRolled(rolled[0] as boolean),
+      }
     case CASINO_GAME_TYPE.DICE:
       return {
         game: CASINO_GAME_TYPE.DICE,
@@ -111,6 +124,14 @@ function _decodeRolled(
       return {
         game: CASINO_GAME_TYPE.ROULETTE,
         rolled: Roulette.decodeRolled(rolled as RouletteNumber),
+      }
+    case CASINO_GAME_TYPE.KENO:
+      if (!Array.isArray(rolled)) {
+        throw new Error(`Invalid rolled data for KENO: expected array, got ${rolled}`)
+      }
+      return {
+        game: CASINO_GAME_TYPE.KENO,
+        rolled: rolled as KenoBall[],
       }
     default:
       logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
