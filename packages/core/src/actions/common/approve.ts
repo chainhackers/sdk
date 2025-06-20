@@ -56,7 +56,7 @@ export async function approve(
     }
 
     return { receipt: null, result: null };
-  } catch (error) {
+  } catch (_error) {
     throw new TransactionError(
       `Error checking and approving token ${tokenAddress} on chain ${wallet.getChainId()}`,
       ERROR_CODES.TRANSACTION.TOKEN_APPROVAL_ERROR,

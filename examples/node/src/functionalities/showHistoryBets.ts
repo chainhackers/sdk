@@ -1,20 +1,20 @@
 import { InMemoryCache } from "@apollo/client/core/index.js";
 import {
-  BetSwirlError,
   Bet_OrderBy,
+  BetSwirlError,
+  bigIntFormatter,
   type CasinoBet,
   type CasinoChain,
-  FORMAT_TYPE,
-  OrderDirection,
-  WEIGHTED_CASINO_GAME_TYPES,
-  WeightedGame,
-  bigIntFormatter,
   casinoChains,
+  FORMAT_TYPE,
   formatTxnUrl,
   getBetSwirlBetUrl,
   labelCasinoGameByType,
+  OrderDirection,
+  WEIGHTED_CASINO_GAME_TYPES,
+  WeightedGame,
 } from "@betswirl/sdk-core";
-import { WagmiBetSwirlClient, initWagmiBetSwirlClient } from "@betswirl/wagmi-provider";
+import { initWagmiBetSwirlClient, WagmiBetSwirlClient } from "@betswirl/wagmi-provider";
 import { select } from "@inquirer/prompts";
 import chalk from "chalk";
 import type { Hex } from "viem/_types/types/misc";

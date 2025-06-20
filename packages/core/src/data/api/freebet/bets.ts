@@ -1,7 +1,7 @@
-import { type Address, type Hex, formatUnits } from "viem";
-import type { CasinoChainId } from "../..";
+import { type Address, formatUnits, type Hex } from "viem";
 import type { Token } from "../../../interfaces";
 import { getBetSwirlApiUrl } from "../../../utils/api";
+import type { CasinoChainId } from "../..";
 
 export type GetFreebetsRawResponse = SignedRawFreebet[];
 

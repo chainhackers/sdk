@@ -1,7 +1,7 @@
 import { type Address, formatUnits } from "viem";
-import type { CasinoChainId } from "../..";
 import type { Token } from "../../../interfaces";
 import { getBetSwirlApiUrl } from "../../../utils/api";
+import type { CasinoChainId } from "../..";
 
 export enum FREEBET_CAMPAIGN_STATUS {
   PENDING = "pending",

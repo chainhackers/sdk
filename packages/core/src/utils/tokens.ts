@@ -1,7 +1,7 @@
 import { type Address, zeroAddress } from "viem";
 import { GAS_TOKEN_ADDRESS } from "../constants";
-import { casinoChainById, chainById } from "../data";
 import type { CasinoChainId, ChainId } from "../data";
+import { casinoChainById, chainById } from "../data";
 import type { RawToken, Token } from "../interfaces";
 
 type ChainNativeCurrency = {

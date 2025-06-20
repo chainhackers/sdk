@@ -1,4 +1,4 @@
-import { type WeightedGameConfiguration, generateRandomHexColor, getNetMultiplier } from "../..";
+import { generateRandomHexColor, getNetMultiplier, type WeightedGameConfiguration } from "../..";
 import { WeightedGame, type WeightedGameChoiceInput } from "./weightedGame";
 
 export interface WheelChoiceInput extends WeightedGameChoiceInput {}

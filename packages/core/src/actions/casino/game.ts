@@ -1,12 +1,12 @@
 import {
   type Address,
+  decodeEventLog,
   type EncodeAbiParametersReturnType,
+  encodeFunctionData,
   type Hash,
   type Hex,
   type TransactionReceipt,
-  encodeFunctionData,
 } from "viem";
-import { decodeEventLog } from "viem";
 import { coinTossAbi } from "../../abis/v2/casino/cointoss";
 import { freebetAbi } from "../../abis/v2/casino/freebet";
 import { GAS_TOKEN_ADDRESS } from "../../constants";
@@ -15,10 +15,10 @@ import {
   CASINO_GAME_PLACE_BET_ABI,
   CASINO_GAME_TYPE,
   type CasinoChainId,
+  casinoChainById,
   MAX_SDK_HOUSE_EGDE,
   type NORMAL_CASINO_GAME_TYPE,
   type WEIGHTED_CASINO_GAME_TYPE,
-  casinoChainById,
 } from "../../data/casino";
 import type { KenoEncodedInput, WeightedGameEncodedInput } from "../../entities";
 import type { CoinTossEncodedInput } from "../../entities/casino/cointoss";

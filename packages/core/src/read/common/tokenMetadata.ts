@@ -1,9 +1,9 @@
 import {
   type Address,
-  type Hex,
   encodeFunctionData,
   erc20Abi,
   getAddress,
+  type Hex,
   zeroAddress,
 } from "viem";
 import { type ChainId, chainById } from "../../data/chains";
@@ -39,7 +39,7 @@ export async function getTokenMetadata(
       decimals: tokenMetadata[0],
       symbol: tokenMetadata[1] || "UNKNOWN",
     };
-  } catch (error) {
+  } catch (_error) {
     throw new TransactionError(
       `Error checking metdata of ${tokenAddress} on chain ${chainId}`,
       ERROR_CODES.TRANSACTION.TOKEN_METADATA_ERROR,

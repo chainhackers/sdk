@@ -5,7 +5,7 @@ import {
   casinoChains,
 } from "@betswirl/sdk-core";
 import { createConfig, webSocket } from "@wagmi/core";
-import { http, type Hex, createPublicClient, createWalletClient } from "viem";
+import { createPublicClient, createWalletClient, type Hex, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export function getWagmiConfigForAllChains() {

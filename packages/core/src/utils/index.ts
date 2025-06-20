@@ -2,12 +2,12 @@ import type { Address, Hash } from "viem";
 import { BETSWIRL_BASE_URL } from "../constants";
 import { CASINO_GAME_TYPE, type ChainId, chainById, slugById } from "../data";
 
-export * from "./chains";
-export * from "./tokens";
-export * from "./bet";
-export * from "./format";
-export * from "./wallet";
 export * from "./api";
+export * from "./bet";
+export * from "./chains";
+export * from "./format";
+export * from "./tokens";
+export * from "./wallet";
 
 export function bigIntFormatter(_key: string | number, value: any) {
   if (typeof value === "bigint") {

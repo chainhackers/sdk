@@ -10,9 +10,8 @@ import type { TokenFragment } from "../documents/fragments/token";
 import { TokenDocument, type TokenQuery, type TokenQueryVariables } from "../documents/token";
 import { TokensDocument, type TokensQuery, type TokensQueryVariables } from "../documents/tokens";
 import { OrderDirection, Token_OrderBy } from "../documents/types";
-import { getGraphqlEndpoint } from "./common";
-import { defaultSubgraphCasinoClient } from "./common";
 import type { SubgraphCasinoClient } from "./common";
+import { defaultSubgraphCasinoClient, getGraphqlEndpoint } from "./common";
 
 export function formatToken(
   token: TokenFragment,
