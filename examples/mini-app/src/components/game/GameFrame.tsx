@@ -65,6 +65,8 @@ function formatRolledResult(rolled: GameRolledResult): string {
       return rolled.rolled.toString()
     case CASINO_GAME_TYPE.ROULETTE:
       return rolled.rolled.toString()
+    case CASINO_GAME_TYPE.KENO:
+      return rolled.rolled.join(", ")
     default:
       return ""
   }
