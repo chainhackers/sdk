@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import gameBg1 from "../../assets/game/game-background-9.png"
-import gameBg4 from "../../assets/game/game-background-10.png"
-import gameBg2 from "../../assets/game/game-background-11.webp"
-import gameBg3 from "../../assets/game/game-background-12.png"
-import gameBg5 from "../../assets/game/game-background-13.png"
-import gameBg6 from "../../assets/game/game-background-14.png"
+import gameBg1 from "../assets/game/game-background-9.png"
+import gameBg4 from "../assets/game/game-background-10.png"
+import gameBg2 from "../assets/game/game-background-11.webp"
+import gameBg3 from "../assets/game/game-background-12.png"
+import gameBg5 from "../assets/game/game-background-13.png"
+import gameBg6 from "../assets/game/game-background-14.png"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
-import { DiceGame, type DiceGameProps } from "./DiceGame"
+import { DiceGame, type DiceGameProps } from "../../components/game/DiceGame"
 
 interface StoryArgs extends DiceGameProps {
   token?: keyof typeof STORYBOOK_TOKENS

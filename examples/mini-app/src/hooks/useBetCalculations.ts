@@ -1,6 +1,6 @@
 import { CASINO_GAME_TYPE, CoinToss, Dice, Roulette, getPayoutDetails } from "@betswirl/sdk-core"
 import { useMemo } from "react"
-import { GameChoice } from "../types"
+import { GameChoice } from "../types/types"
 
 interface UseBetCalculationsProps {
   selection: GameChoice

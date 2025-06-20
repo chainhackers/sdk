@@ -1,6 +1,6 @@
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
-import coinHeadsIcon from "../../assets/game/coin-heads.svg"
-import coinTailsIcon from "../../assets/game/coin-tails.svg"
+import coinHeadsIcon from "../../assets/game/coin-heads.svg?no-inline"
+import coinTailsIcon from "../../assets/game/coin-tails.svg?no-inline"
 import { Button } from "../ui/button"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import { GameControlsProps } from "./shared/types"

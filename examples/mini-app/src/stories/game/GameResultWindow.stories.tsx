@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { parseUnits } from "viem"
-import { GameResultWindow } from "./GameResultWindow"
+import { GameResultWindow } from "../../components/game/GameResultWindow"
 
 const meta = {
   title: "Game/GameResultWindow",

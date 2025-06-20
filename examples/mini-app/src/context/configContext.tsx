@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo } from "react"
 import { Address } from "viem"
-import type { TokenWithImage } from "../types"
+import type { TokenWithImage } from "../types/types"
 import { useChain } from "./chainContext"
 
 export type ConfigContextValue = {

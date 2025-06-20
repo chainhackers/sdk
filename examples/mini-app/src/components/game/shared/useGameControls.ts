@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { BetStatus } from "../../../types"
+import { BetStatus } from "../../../types/types"
 
 export function useGameControls(
   isWalletConnected: boolean,

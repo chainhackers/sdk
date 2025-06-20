@@ -1,7 +1,7 @@
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
-import { CoinTossGameControls } from "./CoinTossGameControls"
+import { CoinTossGameControls } from "../../components/game/CoinTossGameControls"
 
 const meta = {
   title: "Game/Controls/CoinTossGameControls",

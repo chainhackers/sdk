@@ -1,17 +1,8 @@
-import React from "react"
 import { cn } from "../../lib/utils"
+import { HistoryEntry } from "../../types/types"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
-
-export interface HistoryEntry {
-  id: string
-  status: "Won bet" | "Busted"
-  multiplier: number | string
-  payoutAmount: number | string
-  payoutCurrencyIcon: React.ReactElement
-  timestamp: string
-}
 
 interface HistorySheetPanelProps {
   portalContainer: HTMLElement

@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { History as HistoryIcon } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
+import { HistorySheetPanel } from "../../components/game/HistorySheetPanel"
+import { Button } from "../../components/ui/button"
+import { Sheet, SheetTrigger } from "../../components/ui/sheet"
 import { cn } from "../../lib/utils"
-import type { TokenWithImage } from "../../types"
-import { TokenIcon } from "../ui/TokenIcon"
-import { Button } from "../ui/button"
-import { Sheet, SheetTrigger } from "../ui/sheet"
-import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
+import type { TokenWithImage } from "../../types/types"
+import { TokenIcon } from "../../components/ui/TokenIcon"
+import { HistoryEntry, HistoryEntryStatus } from "../../types/types"
 
 // Mock token for stories
 const ETH_TOKEN: TokenWithImage = {
@@ -55,7 +56,7 @@ const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme =
 const mockHistoryDataDefault: HistoryEntry[] = [
   {
     id: "1",
-    status: "Won bet",
+    status: HistoryEntryStatus.WonBet,
     multiplier: 1.94,
     payoutAmount: "1.94675",
     payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
@@ -63,7 +64,7 @@ const mockHistoryDataDefault: HistoryEntry[] = [
   },
   {
     id: "2",
-    status: "Busted",
+    status: HistoryEntryStatus.Busted,
     multiplier: 1.2,
     payoutAmount: 0.0,
     payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
@@ -75,7 +76,7 @@ const mockHistoryDataExtended: HistoryEntry[] = [
   ...mockHistoryDataDefault,
   ...Array.from({ length: 15 }, (_, i) => ({
     id: `ext-${i + 3}`,
-    status: Math.random() > 0.5 ? ("Won bet" as const) : ("Busted" as const),
+    status: Math.random() > 0.5 ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
     multiplier: (Math.random() * 5 + 1).toFixed(2),
     payoutAmount: (Math.random() * 10).toFixed(4),
     payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,

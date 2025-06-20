@@ -11,7 +11,7 @@ import type { AbiEvent, Log } from "viem"
 import { decodeEventLog } from "viem"
 import { usePublicClient, useWatchContractEvent } from "wagmi"
 import { createLogger } from "../lib/logger"
-import { GameResult, GameRolledResult } from "../types"
+import { GameResult, GameRolledResult } from "../types/types"
 import type { WatchTarget } from "./types"
 
 const logger = createLogger("useBetResultWatcher")
