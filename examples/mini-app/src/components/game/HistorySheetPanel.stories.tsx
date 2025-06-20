@@ -1,12 +1,20 @@
-import { TokenImage } from "@coinbase/onchainkit/token"
 import type { Meta, StoryObj } from "@storybook/react"
 import { History as HistoryIcon } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
-import { ETH_TOKEN } from "../../lib/tokens"
 import { cn } from "../../lib/utils"
+import type { TokenWithImage } from "../../types"
+import { TokenIcon } from "../ui/TokenIcon"
 import { Button } from "../ui/button"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { type HistoryEntry, HistorySheetPanel } from "./HistorySheetPanel"
+
+// Mock token for stories
+const ETH_TOKEN: TokenWithImage = {
+  address: "0x0000000000000000000000000000000000000000",
+  symbol: "ETH",
+  decimals: 18,
+  image: "https://wallet-api-production.s3.amazonaws.com/uploads/tokens/eth_288.png",
+}
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode
@@ -50,7 +58,7 @@ const mockHistoryDataDefault: HistoryEntry[] = [
     status: "Won bet",
     multiplier: 1.94,
     payoutAmount: "1.94675",
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
+    payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
     timestamp: "~24h ago",
   },
   {
@@ -58,7 +66,7 @@ const mockHistoryDataDefault: HistoryEntry[] = [
     status: "Busted",
     multiplier: 1.2,
     payoutAmount: 0.0,
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
+    payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
     timestamp: "~2h ago",
   },
 ]
@@ -70,7 +78,7 @@ const mockHistoryDataExtended: HistoryEntry[] = [
     status: Math.random() > 0.5 ? ("Won bet" as const) : ("Busted" as const),
     multiplier: (Math.random() * 5 + 1).toFixed(2),
     payoutAmount: (Math.random() * 10).toFixed(4),
-    payoutCurrencyIcon: <TokenImage token={ETH_TOKEN} size={18} />,
+    payoutCurrencyIcon: <TokenIcon token={ETH_TOKEN} size={18} />,
     timestamp: `~${i * 5 + 10}m ago`,
   })),
 ]
