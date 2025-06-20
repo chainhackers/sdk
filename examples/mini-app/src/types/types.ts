@@ -4,6 +4,8 @@ import {
   CoinTossEncodedInput,
   DiceEncodedInput,
   DiceNumber,
+  KenoBall,
+  KenoEncodedInput,
   RouletteEncodedInput,
   RouletteNumber,
   type Token,
@@ -26,16 +28,19 @@ export type GameChoice =
   | { game: CASINO_GAME_TYPE.COINTOSS; choice: COINTOSS_FACE }
   | { game: CASINO_GAME_TYPE.DICE; choice: DiceNumber }
   | { game: CASINO_GAME_TYPE.ROULETTE; choice: RouletteNumber[] }
+  | { game: CASINO_GAME_TYPE.KENO; choice: KenoBall[] }
 
 export type GameRolledResult =
   | { game: CASINO_GAME_TYPE.COINTOSS; rolled: COINTOSS_FACE }
   | { game: CASINO_GAME_TYPE.DICE; rolled: DiceNumber }
   | { game: CASINO_GAME_TYPE.ROULETTE; rolled: RouletteNumber }
+  | { game: CASINO_GAME_TYPE.KENO; rolled: KenoBall[] }
 
 export type GameEncodedInput =
   | { game: CASINO_GAME_TYPE.COINTOSS; encodedInput: CoinTossEncodedInput }
   | { game: CASINO_GAME_TYPE.DICE; encodedInput: DiceEncodedInput }
   | { game: CASINO_GAME_TYPE.ROULETTE; encodedInput: RouletteEncodedInput }
+  | { game: CASINO_GAME_TYPE.KENO; encodedInput: KenoEncodedInput }
 
 export interface GameResult {
   isWin: boolean

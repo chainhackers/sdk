@@ -107,7 +107,10 @@ function _encodeGameInput(choice: GameChoice): GameEncodedInput {
  * }
  * ```
  */
-export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void): IUsePlaceBetReturn {
+export function usePlaceBet(
+  game: CASINO_GAME_TYPE,
+  refetchBalance: () => void,
+): IUsePlaceBetReturn {
   const { appChainId } = useChain()
   const { bankrollToken } = useBettingConfig()
   const publicClient = usePublicClient({ chainId: appChainId })
@@ -315,7 +318,7 @@ export function usePlaceBet(game: CASINO_GAME_TYPE, refetchBalance: () => void):
     gasPrice,
     formattedVrfFees,
     wagerWriteHook,
-    wagerWaitingHook
+    wagerWaitingHook,
   }
 }
 
@@ -329,10 +332,7 @@ async function _submitBetTransaction(
 ) {
   logger.debug("_submitBetTransaction: Preparing and sending transaction...")
   // Extract tokenAddress from token for getPlaceBetFunctionData
-  const placeBetTxData = getPlaceBetFunctionData(
-    { ...betParams, receiver },
-    chainId,
-  )
+  const placeBetTxData = getPlaceBetFunctionData({ ...betParams, receiver }, chainId)
   wagerWriteHook({
     abi: placeBetTxData.data.abi,
     address: placeBetTxData.data.to,

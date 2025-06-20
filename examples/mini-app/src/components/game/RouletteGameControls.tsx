@@ -126,9 +126,9 @@ const ChipWithToken = React.memo<ChipWithTokenProps>(
       decimals: 18,
       image: "https://www.betswirl.com/img/tokens/ETH.svg",
       chainId: 8453,
-      name: "Ethereum"
+      name: "Ethereum",
     }
-    
+
     return (
       <div className="absolute inset-0 flex items-center justify-center">
         <img src={chipSvg} alt="Selected" className={`absolute ${chipSize}`} />
@@ -138,7 +138,7 @@ const ChipWithToken = React.memo<ChipWithTokenProps>(
         </div>
       </div>
     )
-  }
+  },
 )
 
 const NumberButton = React.memo<NumberButtonProps>(
