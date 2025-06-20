@@ -27,19 +27,19 @@ interface MultiplierItemProps {
 const BUTTON_STYLES = {
   unselected: {
     background: "bg-keno-unselected-bg",
-    border: "border border-keno-unselected-border border-inset",
-    text: "text-black",
-    hover: "hover:bg-keno-unselected-hover-bg hover:border-primary hover:text-black",
+    border: "border border-keno-unselected-border",
+    text: "text-keno-unselected-text",
+    hover: "hover:bg-keno-unselected-hover-bg hover:border-primary hover:text-keno-unselected-text",
     focus:
-      "focus:bg-keno-unselected-hover-bg focus:border-primary focus:text-black focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+      "focus:bg-keno-unselected-hover-bg focus:border-primary focus:text-keno-unselected-text focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   },
   unselectedWinning: {
     background: "bg-keno-unselected-bg",
     border: "border-2 border-keno-winning-border",
-    text: "text-black",
-    hover: "hover:bg-keno-unselected-hover-bg hover:border-keno-winning-border hover:text-black",
+    text: "text-keno-unselected-text",
+    hover: "hover:bg-keno-unselected-hover-bg hover:border-keno-winning-border hover:text-keno-unselected-text",
     focus:
-      "focus:bg-keno-unselected-hover-bg focus:border-keno-winning-border focus:text-black focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
+      "focus:bg-keno-unselected-hover-bg focus:border-keno-winning-border focus:text-keno-unselected-text focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   },
   selected: {
     background: "bg-primary",

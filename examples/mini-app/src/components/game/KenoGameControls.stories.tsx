@@ -3,45 +3,68 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
 import { KenoGameControls } from "./KenoGameControls"
 
-const meta: Meta<typeof KenoGameControls> = {
+const meta = {
   title: "Game/Controls/KenoGameControls",
   component: KenoGameControls,
   parameters: {
     layout: "centered",
-    docs: {
-      description: {
-        component: "Keno game controls with number selection grid and dynamic multipliers",
-      },
+    backgrounds: {
+      default: "dark",
+      values: [
+        { name: "light", value: "#FFFFFF" },
+        { name: "dark", value: "#1a1a1a" },
+        { name: "game", value: "#0a0a0a" },
+      ],
     },
   },
   tags: ["autodocs"],
   argTypes: {
     selectedNumbers: {
+      control: "object",
       description: "Array of selected Keno numbers",
-      control: { type: "object" },
+      table: {
+        type: { summary: "KenoBall[]" },
+        defaultValue: { summary: "[]" },
+      },
     },
     onNumbersChange: {
       description: "Callback function when numbers selection changes",
       action: "numbers changed",
     },
     multipliers: {
+      control: "object",
       description: "Array of multiplier values",
-      control: { type: "object" },
+      table: {
+        type: { summary: "number[]" },
+        defaultValue: { summary: "[]" },
+      },
     },
     isDisabled: {
+      control: "boolean",
       description: "Whether the controls are disabled",
-      control: { type: "boolean" },
+      table: {
+        type: { summary: "boolean" },
+        defaultValue: { summary: "false" },
+      },
     },
     maxSelections: {
-      description: "Maximum number of selections allowed",
       control: { type: "number", min: 1, max: 15, step: 1 },
+      description: "Maximum number of selections allowed",
+      table: {
+        type: { summary: "number" },
+        defaultValue: { summary: "7" },
+      },
     },
     lastGameWinningNumbers: {
+      control: "object",
       description: "Array of winning numbers from the last game",
-      control: { type: "object" },
+      table: {
+        type: { summary: "number[]" },
+        defaultValue: { summary: "[]" },
+      },
     },
   },
-}
+} satisfies Meta<typeof KenoGameControls>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -83,46 +106,208 @@ function InteractiveKenoGameControls({
   )
 }
 
-export const Default: Story = {
-  render: () => <InteractiveKenoGameControls />,
+export const LightThemeDefault: Story = {
+  name: "Light Theme - Default (Empty)",
+  render: () => <InteractiveKenoGameControls initialSelectedNumbers={[]} theme="light" />,
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "light" },
+    docs: {
+      description: {
+        story:
+          "Light theme Keno game controls with no numbers selected. Click numbers to select them.",
+      },
+    },
+  },
 }
 
-export const WithSelectedNumbers: Story = {
+export const LightThemeWithSelectedNumbers: Story = {
+  name: "Light Theme - With Selected Numbers",
   render: () => (
     <InteractiveKenoGameControls
       initialSelectedNumbers={[3, 4, 5, 6, 8, 10, 12] as KenoBall[]}
       multipliers={[100, 50, 25, 15.2, 10, 5, 2.5, 1]}
+      theme="light"
     />
   ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "light" },
+    docs: {
+      description: {
+        story:
+          "Light theme Keno game controls with multiple numbers selected. Demonstrates multi-selection functionality.",
+      },
+    },
+  },
 }
 
-export const Disabled: Story = {
+export const LightThemeDisabled: Story = {
+  name: "Light Theme - Disabled (With Selections)",
   render: () => (
     <InteractiveKenoGameControls
       initialSelectedNumbers={[1, 7, 13, 15] as KenoBall[]}
       multipliers={[50, 25, 10, 8.5, 5, 2, 1, 0.5]}
       isDisabled={true}
+      theme="light"
     />
   ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "light" },
+    docs: {
+      description: {
+        story:
+          "Light theme disabled Keno game controls with existing selections. Shows disabled state styling.",
+      },
+    },
+  },
 }
 
-export const WithWinningNumbers: Story = {
+export const LightThemeWithWinningNumbers: Story = {
+  name: "Light Theme - With Winning Numbers",
   render: () => (
     <InteractiveKenoGameControls
       initialSelectedNumbers={[2, 5, 9] as KenoBall[]}
       lastGameWinningNumbers={[1, 5, 7, 10, 13]}
       multipliers={[100, 50, 25, 15.2, 10, 5, 2.5, 1]}
+      theme="light"
     />
   ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "light" },
+    docs: {
+      description: {
+        story:
+          "Light theme Keno game controls with winning numbers from the last game displayed.",
+      },
+    },
+  },
 }
 
-export const WithWinningNumbersDisabled: Story = {
+export const LightThemeWithWinningNumbersDisabled: Story = {
+  name: "Light Theme - With Winning Numbers (Disabled)",
   render: () => (
     <InteractiveKenoGameControls
       initialSelectedNumbers={[2, 5, 9] as KenoBall[]}
       lastGameWinningNumbers={[1, 5, 7, 10, 13]}
       multipliers={[100, 50, 25, 15.2, 10, 5, 2.5, 1]}
       isDisabled={true}
+      theme="light"
     />
   ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "light" },
+    docs: {
+      description: {
+        story:
+          "Light theme disabled Keno game controls with winning numbers and existing selections.",
+      },
+    },
+  },
+}
+
+export const DarkThemeDefault: Story = {
+  name: "Dark Theme - Default (Empty)",
+  render: () => <InteractiveKenoGameControls initialSelectedNumbers={[]} theme="dark" />,
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Dark theme Keno game controls with no numbers selected. Click numbers to select them.",
+      },
+    },
+  },
+}
+
+export const DarkThemeWithSelectedNumbers: Story = {
+  name: "Dark Theme - With Selected Numbers",
+  render: () => (
+    <InteractiveKenoGameControls
+      initialSelectedNumbers={[3, 4, 5, 6, 8, 10, 12] as KenoBall[]}
+      multipliers={[100, 50, 25, 15.2, 10, 5, 2.5, 1]}
+      theme="dark"
+    />
+  ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Dark theme Keno game controls with multiple numbers selected. Demonstrates multi-selection functionality.",
+      },
+    },
+  },
+}
+
+export const DarkThemeDisabled: Story = {
+  name: "Dark Theme - Disabled (With Selections)",
+  render: () => (
+    <InteractiveKenoGameControls
+      initialSelectedNumbers={[1, 7, 13, 15] as KenoBall[]}
+      multipliers={[50, 25, 10, 8.5, 5, 2, 1, 0.5]}
+      isDisabled={true}
+      theme="dark"
+    />
+  ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Dark theme disabled Keno game controls with existing selections. Shows disabled state styling.",
+      },
+    },
+  },
+}
+
+export const DarkThemeWithWinningNumbers: Story = {
+  name: "Dark Theme - With Winning Numbers",
+  render: () => (
+    <InteractiveKenoGameControls
+      initialSelectedNumbers={[2, 5, 9] as KenoBall[]}
+      lastGameWinningNumbers={[1, 5, 7, 10, 13]}
+      multipliers={[100, 50, 25, 15.2, 10, 5, 2.5, 1]}
+      theme="dark"
+    />
+  ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Dark theme Keno game controls with winning numbers from the last game displayed.",
+      },
+    },
+  },
+}
+
+export const DarkThemeWithWinningNumbersDisabled: Story = {
+  name: "Dark Theme - With Winning Numbers (Disabled)",
+  render: () => (
+    <InteractiveKenoGameControls
+      initialSelectedNumbers={[2, 5, 9] as KenoBall[]}
+      lastGameWinningNumbers={[1, 5, 7, 10, 13]}
+      multipliers={[100, 50, 25, 15.2, 10, 5, 2.5, 1]}
+      isDisabled={true}
+      theme="dark"
+    />
+  ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Dark theme disabled Keno game controls with winning numbers and existing selections.",
+      },
+    },
+  },
 }
