@@ -59,7 +59,7 @@ const BUTTON_STYLES = {
       "focus:brightness-105 focus:border-keno-winning-border focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   },
   disabled: "disabled:opacity-[0.72]",
-  common: "w-[40px] h-[40px] p-0 text-[12px] font-medium rounded-md shadow-none",
+  common: "w-[40px] h-[40px] p-0 text-[12px] font-medium rounded-[6px] shadow-none",
 } as const
 
 const KENO_NUMBERS_COUNT = 15
