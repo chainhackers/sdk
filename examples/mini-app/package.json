@@ -42,7 +42,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "decimal.js": "^10.5.0",
-    "lucide-react": "^0.517.0"
+    "lucide-react": "^0.518.0"
   },
   "peerDependencies": {
     "@betswirl/sdk-core": "^0.1.7",
