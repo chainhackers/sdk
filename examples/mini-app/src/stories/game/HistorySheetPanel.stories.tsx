@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { History as HistoryIcon } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
 import { HistorySheetPanel } from "../../components/game/HistorySheetPanel"
+import { TokenIcon } from "../../components/ui/TokenIcon"
 import { Button } from "../../components/ui/button"
 import { Sheet, SheetTrigger } from "../../components/ui/sheet"
 import { cn } from "../../lib/utils"
 import type { TokenWithImage } from "../../types/types"
-import { TokenIcon } from "../../components/ui/TokenIcon"
 import { HistoryEntry, HistoryEntryStatus } from "../../types/types"
 
 // Mock token for stories

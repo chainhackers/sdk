@@ -37,7 +37,8 @@ const BUTTON_STYLES = {
     background: "bg-keno-unselected-bg",
     border: "border-2 border-keno-winning-border",
     text: "text-keno-unselected-text",
-    hover: "hover:bg-keno-unselected-hover-bg hover:border-keno-winning-border hover:text-keno-unselected-text",
+    hover:
+      "hover:bg-keno-unselected-hover-bg hover:border-keno-winning-border hover:text-keno-unselected-text",
     focus:
       "focus:bg-keno-unselected-hover-bg focus:border-keno-winning-border focus:text-keno-unselected-text focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
   },

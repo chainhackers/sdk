@@ -57,7 +57,7 @@
   "devDependencies": {
     "@betswirl/sdk-core": "^0.1.8",
     "@betswirl/wagmi-provider": "^0.1.8",
-    "@biomejs/biome": "^2.0.0",
+    "@biomejs/biome": "^1.9.4",
     "@chromatic-com/storybook": "^4.0.0",
     "@coinbase/onchainkit": "^0.38.14",
     "@storybook/react": "9.0.12",

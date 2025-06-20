@@ -179,8 +179,7 @@ export const LightThemeWithWinningNumbers: Story = {
     backgrounds: { default: "light" },
     docs: {
       description: {
-        story:
-          "Light theme Keno game controls with winning numbers from the last game displayed.",
+        story: "Light theme Keno game controls with winning numbers from the last game displayed.",
       },
     },
   },
@@ -282,8 +281,7 @@ export const DarkThemeWithWinningNumbers: Story = {
     backgrounds: { default: "dark" },
     docs: {
       description: {
-        story:
-          "Dark theme Keno game controls with winning numbers from the last game displayed.",
+        story: "Dark theme Keno game controls with winning numbers from the last game displayed.",
       },
     },
   },
