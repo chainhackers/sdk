@@ -1,39 +1,11 @@
-import type { Address, Hash, Hex, TransactionReceipt } from "viem";
-import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../constants";
-import type { CASINO_GAME_TYPE, CasinoChainId } from "../data/casino";
-import {
-  type CasinoBetFilterStatus,
-  fetchBet,
-  fetchBetByHash,
-  fetchBets,
-} from "../data/subgraphs/protocol/clients/bet";
-import {
-  Bet_OrderBy,
-  OrderDirection,
-  Token_OrderBy,
-} from "../data/subgraphs/protocol/documents/types";
-import type { SubgraphError } from "../errors";
-import type {
-  BetRequirements,
-  CasinoBet,
-  CasinoGame,
-  CasinoGameToken,
-  CasinoToken,
-  SubgraphToken,
-  Token,
-} from "../interfaces";
-
-import { fetchToken, fetchTokens } from "../data/subgraphs/protocol/clients/token";
-import type { BetSwirlWallet } from "./wallet";
-
 import type { ApolloCache, DefaultOptions } from "@apollo/client/core/index.js";
+import type { Address, Hash, Hex, TransactionReceipt } from "viem";
 import type {
   CoinTossBetParams,
   CoinTossFreebetParams,
   CoinTossPlacedBet,
 } from "../actions/casino/cointoss";
-import type { DiceBetParams, DiceFreebetParams } from "../actions/casino/dice";
-import type { DicePlacedBet } from "../actions/casino/dice";
+import type { DiceBetParams, DiceFreebetParams, DicePlacedBet } from "../actions/casino/dice";
 import type {
   CasinoPlaceBetOptions,
   NormalCasinoPlacedBet,
@@ -49,15 +21,39 @@ import type {
 } from "../actions/casino/roulette";
 import type { WheelBetParams, WheelFreebetParams, WheelPlacedBet } from "../actions/casino/wheel";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../constants";
 import {
   type ChainId,
   FREEBET_CAMPAIGN_STATUS,
   type FreebetCampaign,
-  type SignedFreebet,
   fetchFreebetCampaign,
   fetchFreebetCampaigns,
   fetchFreebets,
+  type SignedFreebet,
 } from "../data";
+import type { CASINO_GAME_TYPE, CasinoChainId } from "../data/casino";
+import {
+  type CasinoBetFilterStatus,
+  fetchBet,
+  fetchBetByHash,
+  fetchBets,
+} from "../data/subgraphs/protocol/clients/bet";
+import { fetchToken, fetchTokens } from "../data/subgraphs/protocol/clients/token";
+import {
+  Bet_OrderBy,
+  OrderDirection,
+  Token_OrderBy,
+} from "../data/subgraphs/protocol/documents/types";
+import type { SubgraphError } from "../errors";
+import type {
+  BetRequirements,
+  CasinoBet,
+  CasinoGame,
+  CasinoGameToken,
+  CasinoToken,
+  SubgraphToken,
+  Token,
+} from "../interfaces";
 import type {
   CasinoRolledBet,
   CasinoWaitRollOptions,
@@ -71,6 +67,7 @@ import type {
 import type { WeightedGameConfiguration } from "../read/casino/weightedGame";
 import type { WheelRolledBet } from "../read/casino/wheel";
 import { FORMAT_TYPE, getCasinoChainId } from "../utils";
+import type { BetSwirlWallet } from "./wallet";
 
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;

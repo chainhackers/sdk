@@ -41,11 +41,10 @@ import type {
 } from "@betswirl/sdk-core";
 import {
   BetSwirlClient,
-  WEIGHTED_CASINO_GAME_TYPES,
   casinoChainById,
   getBetRequirements,
-  getCasinoGameToken,
   getCasinoGames,
+  getCasinoGameToken,
   getCasinoTokens,
   getChainlinkVrfCost,
   getKenoConfiguration,
@@ -60,6 +59,7 @@ import {
   placeRouletteFreebet,
   placeWheelBet,
   placeWheelFreebet,
+  WEIGHTED_CASINO_GAME_TYPES,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
   waitKenoRolledBet,
@@ -67,7 +67,7 @@ import {
   waitRouletteRolledBet,
   waitWheelRolledBet,
 } from "@betswirl/sdk-core";
-import { type Config as WagmiConfig, switchChain } from "@wagmi/core";
+import { switchChain, type Config as WagmiConfig } from "@wagmi/core";
 import type { Hex, TransactionReceipt } from "viem";
 import { WagmiBetSwirlWallet } from "./wallet";
 

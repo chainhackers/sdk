@@ -1,5 +1,4 @@
 import {
-  type Chain,
   arbitrum,
   arbitrumSepolia,
   avalanche,
@@ -8,6 +7,7 @@ import {
   baseSepolia,
   bsc,
   bscTestnet,
+  type Chain,
   gnosis,
   mainnet,
   polygon,

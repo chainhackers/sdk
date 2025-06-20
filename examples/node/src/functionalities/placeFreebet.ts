@@ -1,13 +1,12 @@
 import {
+  BetSwirlError,
+  bigIntFormatter,
+  casinoChainById,
   type NormalCasinoPlacedBet,
   WEIGHTED_CASINO_GAME_TYPES,
   type WeightedCasinoPlacedBet,
   type WeightedGameChoiceInput,
-  bigIntFormatter,
-  casinoChainById,
 } from "@betswirl/sdk-core";
-
-import { BetSwirlError } from "@betswirl/sdk-core";
 import chalk from "chalk";
 import { checkEnvVariables } from "../../utils";
 import {
