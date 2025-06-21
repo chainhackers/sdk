@@ -13,7 +13,7 @@ This is a **game widget library** for BetSwirl protocol casino games built with 
 🚀 **Build a Web3 casino with just 20 lines of React code!**
 
 * 📖 [React Integration Guide](https://github.com/chainhackers/sdk/blob/main/examples/mini-app/docs/react-guide.md) - Step-by-step tutorial
-* 🎮 [Live Demo](https://github.com/chainhackers/betswirl-ui-react-demo) - See what you can build
+* 🎮 [Live Demo](https://betswirl-ui-react-demo.vercel.app/) - See it in action ([source code](https://github.com/chainhackers/betswirl-ui-react-demo))
 * 🎨 [Storybook](http://demo.betswirl-sdk.chainhackers.xyz/) - Explore all components interactively
 
 
