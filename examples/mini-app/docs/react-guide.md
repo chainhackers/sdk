@@ -35,7 +35,7 @@ Add all providers directly or create an AppProviders component:
 ```tsx
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { OnchainKitProvider } from '@coinbase/onchainkit'
+import { OnchainKitProvider, type AppConfig } from '@coinbase/onchainkit'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, type Hex } from 'viem'
 import { WagmiProvider, createConfig } from 'wagmi'
@@ -53,24 +53,17 @@ const config = createConfig({
   },
 })
 
+const onChainKitConfig: AppConfig = {
+  wallet: {
+    display: "modal",
+  }
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <OnchainKitProvider 
-          chain={base}
-          config={{
-            wallet: {
-              display: "modal",
-              termsUrl: "https://example.com/terms",
-              privacyUrl: "https://example.com/privacy",
-            },
-            appearance: {
-              name: "CoinToss Game",
-              mode: "auto",
-            },
-          }}
-        >
+        <OnchainKitProvider chain={base} config={onChainKitConfig}>
           <BetSwirlSDKProvider initialChainId={base.id}>
             <App />
           </BetSwirlSDKProvider>
