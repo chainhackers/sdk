@@ -60,17 +60,15 @@ const onChainKitConfig: AppConfig = {
 }
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <OnchainKitProvider chain={base} config={onChainKitConfig}>
-          <BetSwirlSDKProvider initialChainId={base.id}>
-            <App />
-          </BetSwirlSDKProvider>
-        </OnchainKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
-  </StrictMode>,
+  <WagmiProvider config={config}>
+    <QueryClientProvider client={queryClient}>
+      <OnchainKitProvider chain={base} config={onChainKitConfig}>
+        <BetSwirlSDKProvider initialChainId={base.id}>
+          <App />
+        </BetSwirlSDKProvider>
+      </OnchainKitProvider>
+    </QueryClientProvider>
+  </WagmiProvider>,
 )
 ```
 
