@@ -55,7 +55,6 @@ export function GameResultWindow({
     return null
   }
 
-  console.log({ payout, amount, isWin })
   const formattedAmount = formatRawAmount(
     isWin ? payout - amount : amount - payout,
     18,

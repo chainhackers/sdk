@@ -92,7 +92,6 @@ function _extractEventData(
         payout: bigint
         rolled: KenoEncodedRolled
       }
-      console.log({ kenoRollArgs })
       return {
         rolledData: kenoRollArgs.rolled,
         payout: kenoRollArgs.payout,
@@ -131,7 +130,6 @@ function _decodeRolled(
       if (!Array.isArray(rolled)) {
         throw new Error(`Invalid rolled data for KENO: expected array, got ${rolled}`)
       }
-      console.log({ rolled })
       return {
         game: CASINO_GAME_TYPE.KENO,
         rolled: Keno.decodeRolled(rolled as KenoEncodedRolled),
@@ -347,8 +345,6 @@ export function useBetResultWatcher({
       logger.debug(`useEffect[status]: Final status reached: ${status}. Watcher inactive.`)
     }
   }, [status])
-
-  console.log({ internalGameResult })
 
   return { gameResult: internalGameResult, status, error, reset }
 }
