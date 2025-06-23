@@ -8,4 +8,5 @@ export interface WatchTarget {
   eventAbi: Abi
   eventName: string
   eventArgs: { id: bigint }
+  betAmount: bigint
 }

@@ -156,6 +156,7 @@ export function usePlaceBet(
   const [gameResult, setGameResult] = useState<GameResult | null>(null)
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
   const [isRolling, setIsRolling] = useState(false)
+  const [currentBetAmount, setCurrentBetAmount] = useState<bigint | null>(null)
   // @Kinco advice. The goal is to never have an internal error. In the main frontend, it never happens due to retry system, etc (or maybe 1/100000)
   const [internalError, setInternalError] = useState<string | null>(null)
 
@@ -215,6 +216,7 @@ export function usePlaceBet(
     wagerWriteHook.reset()
     setGameResult(null)
     setWatchTarget(null)
+    setCurrentBetAmount(null)
     setInternalError(null)
     setIsRolling(false)
     resetWatcher()
@@ -223,6 +225,7 @@ export function usePlaceBet(
   const placeBet = useCallback(
     async (betAmount: bigint, choice: GameChoice) => {
       resetBetState()
+      setCurrentBetAmount(betAmount)
 
       const encodedInput = _encodeGameInput(choice, kenoConfig)
       const betParams = {
@@ -312,6 +315,7 @@ export function usePlaceBet(
           eventAbi: rollEventData.abi,
           eventName: rollEventData.eventName,
           eventArgs: rollEventData.args,
+          betAmount: currentBetAmount!,
         })
 
         refetchBalance()
@@ -326,6 +330,7 @@ export function usePlaceBet(
     connectedAddress,
     publicClient,
     refetchBalance,
+    currentBetAmount,
   ])
 
   return {

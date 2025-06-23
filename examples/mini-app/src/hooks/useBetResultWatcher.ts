@@ -3,7 +3,8 @@ import {
   CoinToss,
   Dice,
   DiceNumber,
-  KenoBall,
+  Keno,
+  KenoEncodedRolled,
   Roulette,
   RouletteNumber,
 } from "@betswirl/sdk-core"
@@ -44,7 +45,7 @@ function _extractEventData(
   decodedRollLog: DecodedEventLog,
   gameType: CASINO_GAME_TYPE,
 ): {
-  rolledData: boolean[] | DiceNumber | RouletteNumber | KenoBall[]
+  rolledData: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled
   payout: bigint
   id: bigint
 } {
@@ -89,8 +90,9 @@ function _extractEventData(
       const kenoRollArgs = decodedRollLog.args as unknown as {
         id: bigint
         payout: bigint
-        rolled: KenoBall[]
+        rolled: KenoEncodedRolled
       }
+      console.log({ kenoRollArgs })
       return {
         rolledData: kenoRollArgs.rolled,
         payout: kenoRollArgs.payout,
@@ -103,7 +105,7 @@ function _extractEventData(
 }
 
 function _decodeRolled(
-  rolled: boolean[] | DiceNumber | RouletteNumber | KenoBall[],
+  rolled: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled,
   game: CASINO_GAME_TYPE,
 ): GameRolledResult {
   switch (game) {
@@ -129,9 +131,10 @@ function _decodeRolled(
       if (!Array.isArray(rolled)) {
         throw new Error(`Invalid rolled data for KENO: expected array, got ${rolled}`)
       }
+      console.log({ rolled })
       return {
         game: CASINO_GAME_TYPE.KENO,
-        rolled: rolled as KenoBall[],
+        rolled: Keno.decodeRolled(rolled as KenoEncodedRolled),
       }
     default:
       logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
@@ -222,7 +225,7 @@ export function useBetResultWatcher({
   }, [enabled, watchParams, status, filterErrorOccurred])
 
   const processEventLogs = useCallback((logs: readonly Log[], currentWatchParams: WatchTarget) => {
-    const { betId, gameType, eventAbi, eventName } = currentWatchParams
+    const { betId, gameType, eventAbi, eventName, betAmount } = currentWatchParams
     logger.debug(`processEventLogs: Processing ${logs.length} logs for betId ${betId}`, {
       eventName,
     })
@@ -246,7 +249,7 @@ export function useBetResultWatcher({
       if (id === betId) {
         const rolledResult = _decodeRolled(rolledData, gameType)
         const result: GameResult = {
-          isWin: payout > 0n,
+          isWin: payout > betAmount,
           payout: payout,
           currency: "ETH",
           rolled: rolledResult,
@@ -344,6 +347,8 @@ export function useBetResultWatcher({
       logger.debug(`useEffect[status]: Final status reached: ${status}. Watcher inactive.`)
     }
   }, [status])
+
+  console.log({ internalGameResult })
 
   return { gameResult: internalGameResult, status, error, reset }
 }
