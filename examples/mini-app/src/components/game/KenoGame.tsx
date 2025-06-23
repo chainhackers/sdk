@@ -7,6 +7,7 @@ import {
   KenoBall,
   formatRawAmount,
 } from "@betswirl/sdk-core"
+import { useEffect, useState } from "react"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { GameFrame } from "./GameFrame"
 import { KenoGameControls } from "./KenoGameControls"
@@ -25,6 +26,7 @@ export function KenoGame({
   backgroundImage = kenoBackground,
   ...props
 }: KenoGameProps) {
+  const [lastWinningNumbers, setLastWinningNumbers] = useState<KenoBall[]>([])
   const {
     isWalletConnected,
     balance,
@@ -75,6 +77,12 @@ export function KenoGame({
     selection as { game: CASINO_GAME_TYPE.KENO; choice: KenoBall[] }
   ).choice
 
+  useEffect(() => {
+    if (gameResult?.rolled?.game === CASINO_GAME_TYPE.KENO) {
+      setLastWinningNumbers(gameResult.rolled.rolled)
+    }
+  }, [gameResult])
+
   const handleNumbersChange = (numbers: KenoBall[]) => {
     if (isControlsDisabled) {
       return
@@ -85,10 +93,7 @@ export function KenoGame({
     })
   }
 
-  const lastGameWinningNumbers =
-    gameResult?.rolled?.game === CASINO_GAME_TYPE.KENO
-      ? gameResult.rolled.rolled
-      : []
+
 
   return (
     <GameFrame themeSettings={themeSettings} variant="keno" {...props}>
@@ -112,7 +117,7 @@ export function KenoGame({
               Keno.getFormattedMultiplier(kenoConfig, selectedNumbers.length, index)
             ).reverse() ?? []}
             isDisabled={isControlsDisabled}
-            lastGameWinningNumbers={lastGameWinningNumbers}
+            lastGameWinningNumbers={lastWinningNumbers}
           />
         </GameFrame.GameControls>
         <GameFrame.ResultWindow
