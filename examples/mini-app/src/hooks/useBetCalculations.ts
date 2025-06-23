@@ -1,4 +1,12 @@
-import { CASINO_GAME_TYPE, CoinToss, Dice, Keno, KenoConfiguration, Roulette, getPayoutDetails } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  CoinToss,
+  Dice,
+  Keno,
+  KenoConfiguration,
+  Roulette,
+  getPayoutDetails,
+} from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { GameChoice } from "../types/types"
 
@@ -72,8 +80,10 @@ export function useBetCalculations({
   betCount = 1,
   kenoConfig,
 }: UseBetCalculationsProps): UseBetCalculationsResult {
-
-  const grossMultiplier = useMemo(() => getMultiplierForGame(selection, kenoConfig), [selection, kenoConfig])
+  const grossMultiplier = useMemo(
+    () => getMultiplierForGame(selection, kenoConfig),
+    [selection, kenoConfig],
+  )
   const totalBetAmount = useMemo(
     () => (betAmount && betAmount > 0n ? betAmount * BigInt(betCount) : 0n),
     [betAmount, betCount],

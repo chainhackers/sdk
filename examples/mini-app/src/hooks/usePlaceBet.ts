@@ -89,7 +89,9 @@ function _encodeGameInput(choice: GameChoice, kenoConfig?: KenoConfiguration): G
       }
 
       if (numbers.length > kenoConfig.maxSelectableBalls) {
-        throw new Error(`Keno bet cannot include more than ${kenoConfig.maxSelectableBalls} numbers`)
+        throw new Error(
+          `Keno bet cannot include more than ${kenoConfig.maxSelectableBalls} numbers`,
+        )
       }
 
       return {

@@ -56,7 +56,11 @@ export function GameResultWindow({
   }
 
   console.log({ payout, amount, isWin })
-  const formattedAmount = formatRawAmount(isWin ? payout - amount : amount - payout, 18, FORMAT_TYPE.PRECISE)
+  const formattedAmount = formatRawAmount(
+    isWin ? payout - amount : amount - payout,
+    18,
+    FORMAT_TYPE.PRECISE,
+  )
   const formattedPayout = formatRawAmount(payout, 18, FORMAT_TYPE.PRECISE) //TODO use tokenDecimals
 
   return (

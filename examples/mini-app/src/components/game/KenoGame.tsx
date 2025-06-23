@@ -1,12 +1,6 @@
 import kenoBackground from "../../assets/game/game-background.jpg?no-inline"
 
-import {
-  CASINO_GAME_TYPE,
-  FORMAT_TYPE,
-  Keno,
-  KenoBall,
-  formatRawAmount,
-} from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, FORMAT_TYPE, Keno, KenoBall, formatRawAmount } from "@betswirl/sdk-core"
 import { useEffect, useState } from "react"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { GameFrame } from "./GameFrame"
@@ -73,9 +67,7 @@ export function KenoGame({
     isGamePaused,
   )
 
-  const selectedNumbers = (
-    selection as { game: CASINO_GAME_TYPE.KENO; choice: KenoBall[] }
-  ).choice
+  const selectedNumbers = (selection as { game: CASINO_GAME_TYPE.KENO; choice: KenoBall[] }).choice
 
   useEffect(() => {
     if (gameResult?.rolled?.game === CASINO_GAME_TYPE.KENO) {
@@ -92,8 +84,6 @@ export function KenoGame({
       choice: numbers,
     })
   }
-
-
 
   return (
     <GameFrame themeSettings={themeSettings} variant="keno" {...props}>
@@ -113,9 +103,13 @@ export function KenoGame({
             selectedNumbers={selectedNumbers}
             onNumbersChange={handleNumbersChange}
             maxSelections={kenoConfig?.maxSelectableBalls ?? DEFAULT_MAX_SELECTIONS}
-            multipliers={kenoConfig?.mutliplierTable[selectedNumbers.length]?.map((_, index) =>
-              Keno.getFormattedMultiplier(kenoConfig, selectedNumbers.length, index)
-            ).reverse() ?? []}
+            multipliers={
+              kenoConfig?.mutliplierTable[selectedNumbers.length]
+                ?.map((_, index) =>
+                  Keno.getFormattedMultiplier(kenoConfig, selectedNumbers.length, index),
+                )
+                .reverse() ?? []
+            }
             isDisabled={isControlsDisabled}
             lastGameWinningNumbers={lastWinningNumbers}
           />
