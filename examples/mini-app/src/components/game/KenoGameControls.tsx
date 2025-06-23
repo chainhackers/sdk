@@ -132,6 +132,10 @@ export function KenoGameControls({
     }
   }
 
+  const isNumberDisabled = (number: KenoBall) => {
+    return isDisabled || (!isNumberSelected(number) && selectedNumbers.length >= maxSelections)
+  }
+
   const visibleMultipliersCount = selectedNumbers.length > 0 ? selectedNumbers.length + 1 : 0
   const numbers: KenoBall[] = Array.from(
     { length: KENO_NUMBERS_COUNT },
@@ -152,7 +156,7 @@ export function KenoGameControls({
             key={number}
             number={number}
             isSelected={isNumberSelected(number)}
-            isDisabled={isDisabled}
+            isDisabled={isNumberDisabled(number)}
             isWinningNumber={isWinningNumber(number)}
             onClick={handleNumberClick}
           />,
