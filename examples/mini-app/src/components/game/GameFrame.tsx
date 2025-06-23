@@ -168,7 +168,7 @@ function GameArea({ children, variant = "default" }: GameAreaProps) {
 }
 
 interface InfoButtonProps {
-  winChance: number
+  winChance?: number
   rngFee: number | string
   targetPayout: string
   gasPrice: number | string

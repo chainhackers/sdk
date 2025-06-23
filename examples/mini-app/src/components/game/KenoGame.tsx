@@ -13,11 +13,9 @@ import { KenoGameControls } from "./KenoGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
 import { useGameControls } from "./shared/useGameControls"
-import { useChain } from "../../context/chainContext"
 
 const DEFAULT_KENO_SELECTION: KenoBall[] = []
-const DEFAULT_MAX_SELECTIONS = 10
-const DEFAULT_MULTIPLIERS = [0, 3.6, 12.0, 42.0, 100.0, 200.0, 450.0, 1000.0, 1800.0, 3600.0, 10000.0]
+const DEFAULT_MAX_SELECTIONS = 0
 
 export interface KenoGameProps extends BaseGameProps {}
 
@@ -55,6 +53,7 @@ export function KenoGame({
     isApproveConfirming,
     isRefetchingAllowance,
     approveError,
+    kenoConfig,
   } = useGameLogic({
     gameType: CASINO_GAME_TYPE.KENO,
     defaultSelection: {
@@ -76,16 +75,6 @@ export function KenoGame({
     selection as { game: CASINO_GAME_TYPE.KENO; choice: KenoBall[] }
   ).choice
 
-  const { appChainId } = useChain()
-
-  const kenoConfig = {
-    token: token,
-    chainId: appChainId,
-    biggestSelectableBall: 15,
-    maxSelectableBalls: 7,
-    mutliplierTable: [],
-  }
-
   const handleNumbersChange = (numbers: KenoBall[]) => {
     if (isControlsDisabled) {
       return
@@ -106,7 +95,7 @@ export function KenoGame({
       <GameFrame.Header title="Keno" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea variant="keno">
         <GameFrame.InfoButton
-          winChance={Keno.getWinChancePercent(kenoConfig, selectedNumbers.length, Math.ceil(selectedNumbers.length / 2))}
+          winChance={undefined}
           rngFee={formattedVrfFees}
           targetPayout={formatRawAmount(targetPayoutAmount, token.decimals, FORMAT_TYPE.PRECISE)}
           gasPrice={gasPrice}
@@ -118,8 +107,10 @@ export function KenoGame({
           <KenoGameControls
             selectedNumbers={selectedNumbers}
             onNumbersChange={handleNumbersChange}
-            maxSelections={DEFAULT_MAX_SELECTIONS}
-            multipliers={DEFAULT_MULTIPLIERS}
+            maxSelections={kenoConfig?.maxSelectableBalls ?? DEFAULT_MAX_SELECTIONS}
+            multipliers={kenoConfig?.mutliplierTable[selectedNumbers.length]?.map((_, index) =>
+              Keno.getFormattedMultiplier(kenoConfig, selectedNumbers.length, index)
+            ).reverse() ?? []}
             isDisabled={isControlsDisabled}
             lastGameWinningNumbers={lastGameWinningNumbers}
           />

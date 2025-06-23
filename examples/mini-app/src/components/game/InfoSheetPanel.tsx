@@ -4,7 +4,7 @@ import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 
 interface InfoSheetPanelProps {
   portalContainer: HTMLElement
-  winChance: number
+  winChance?: number
   rngFee: number | string // formatted
   targetPayout: number | string // formatted
   gasPrice: number | string // gwei formatted
@@ -28,7 +28,9 @@ export function InfoSheetPanel({
         <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm font-medium text-text-on-surface-variant">
           <div>
             <p>Win chance:</p>
-            <p className="text-text-on-surface">{winChance}%</p>
+            <p className="text-text-on-surface">
+              {winChance !== undefined ? `${winChance}%` : "See game screen"}
+            </p>
           </div>
           <div>
             <p>RNG fee:</p>

@@ -5,6 +5,7 @@ import {
   Dice,
   GenericCasinoBetParams,
   Keno,
+  KenoConfiguration,
   MAX_SELECTABLE_DICE_NUMBER,
   MAX_SELECTABLE_ROULETTE_NUMBER,
   MIN_SELECTABLE_DICE_NUMBER,
@@ -16,7 +17,6 @@ import {
   getPlaceBetEventData,
   getPlaceBetFunctionData,
   getRollEventData,
-  Token,
 } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Hex, decodeEventLog } from "viem"
@@ -45,7 +45,7 @@ export interface IUsePlaceBetReturn {
   wagerWaitingHook: ReturnType<typeof useWaitForTransactionReceipt>
 }
 
-function _encodeGameInput(choice: GameChoice, token: Token, appChainId: CasinoChainId): GameEncodedInput {
+function _encodeGameInput(choice: GameChoice, kenoConfig?: KenoConfiguration): GameEncodedInput {
   switch (choice.game) {
     case CASINO_GAME_TYPE.COINTOSS:
       return {
@@ -83,16 +83,18 @@ function _encodeGameInput(choice: GameChoice, token: Token, appChainId: CasinoCh
     case CASINO_GAME_TYPE.KENO: {
       const numbers = choice.choice
       if (numbers.length === 0) throw new Error("Keno bet must include at least one number")
-      if (numbers.length > 7) throw new Error("Keno bet cannot include more than 7 numbers")
+
+      if (!kenoConfig) {
+        throw new Error("Keno configuration is required for Keno bets")
+      }
+
+      if (numbers.length > kenoConfig.maxSelectableBalls) {
+        throw new Error(`Keno bet cannot include more than ${kenoConfig.maxSelectableBalls} numbers`)
+      }
+
       return {
         game: CASINO_GAME_TYPE.KENO,
-        encodedInput: Keno.encodeInput(numbers, {
-          token: token,
-          chainId: appChainId,
-          biggestSelectableBall: 15,
-          maxSelectableBalls: 7,
-          mutliplierTable: [],
-        }),
+        encodedInput: Keno.encodeInput(numbers, kenoConfig),
       }
     }
     default:
@@ -127,6 +129,7 @@ function _encodeGameInput(choice: GameChoice, token: Token, appChainId: CasinoCh
 export function usePlaceBet(
   game: CASINO_GAME_TYPE,
   refetchBalance: () => void,
+  kenoConfig?: KenoConfiguration,
 ): IUsePlaceBetReturn {
   const { appChainId } = useChain()
   const { bankrollToken } = useBettingConfig()
@@ -221,7 +224,7 @@ export function usePlaceBet(
     async (betAmount: bigint, choice: GameChoice) => {
       resetBetState()
 
-      const encodedInput = _encodeGameInput(choice, token, appChainId)
+      const encodedInput = _encodeGameInput(choice, kenoConfig)
       const betParams = {
         game,
         gameEncodedInput: encodedInput.encodedInput,
@@ -264,6 +267,7 @@ export function usePlaceBet(
       vrfFees,
       gasPrice,
       token,
+      kenoConfig,
     ],
   )
 
