@@ -41,6 +41,7 @@
   --color-control-panel-background: var(--control-panel-background);
   --color-transparent-button-border: var(--transparent-button-border);
   --color-neutral-background: var(--neutral-background);
+  --color-neutral-background-hover: var(--neutral-background-hover);
   --color-game-win: var(--game-win);
   --color-game-loss: var(--game-loss);
   --color-play-btn-font: var(--play-btn-font);
@@ -133,6 +134,7 @@
     --control-panel-background: var(--light-stroke);
     --transparent-button-border: oklch(0.91 0.0029 264.54 / 11.37%);
     --neutral-background: oklch(0.16 0.02 269.69 / 10%);
+    --neutral-background-hover: oklch(0.16 0.02 269.69 / 12%);
 
     --title-color: var(--dark-surface);
     --text-on-surface-variant: oklch(0.61 0.014 271.18);
@@ -199,6 +201,7 @@
     --control-panel-background: var(--dark-stroke);
     --transparent-button-border: var(--dark-gray);
     --neutral-background: oklch(1 0 0 / 10%);
+    --neutral-background-hover: oklch(1 0 0 / 12%);
     --title-color: var(--white);
     --text-on-surface-variant: var(--dark-on-surface-variant);
     --text-on-surface: oklch(0.93 0.0058 264.53);
