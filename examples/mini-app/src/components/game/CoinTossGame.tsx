@@ -8,24 +8,31 @@ import {
   formatRawAmount,
 } from "@betswirl/sdk-core"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { TokenWithImage } from "../../types/types"
+import { TokenSelector } from "../ui/TokenSelector"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
 import { useGameControls } from "./shared/useGameControls"
 
-export interface CoinTossGameProps extends BaseGameProps {}
+export interface CoinTossGameProps extends BaseGameProps {
+  filteredTokens?: TokenWithImage[]
+}
 
 export function CoinTossGame({
   theme = "system",
   customTheme,
   backgroundImage = coinTossBackground,
+  filteredTokens,
   ...props
 }: CoinTossGameProps) {
   const {
     isWalletConnected,
     balance,
     token,
+    selectedToken,
+    setSelectedToken,
     areChainsSynced,
     gameHistory,
     refreshHistory,
@@ -58,6 +65,7 @@ export function CoinTossGame({
       choice: COINTOSS_FACE.HEADS,
     },
     backgroundImage,
+    filteredTokens,
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
@@ -81,7 +89,18 @@ export function CoinTossGame({
 
   return (
     <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header title="CoinToss" connectWalletButton={<GameConnectWallet />} />
+      <GameFrame.Header
+        title="CoinToss"
+        connectWalletButton={<GameConnectWallet />}
+        tokenSelector={
+          <TokenSelector
+            selectedToken={selectedToken}
+            onTokenSelect={setSelectedToken}
+            filteredTokens={filteredTokens}
+            className="min-w-[120px]"
+          />
+        }
+      />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={CoinToss.getWinChancePercent(selectedSide)}

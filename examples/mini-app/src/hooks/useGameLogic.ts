@@ -18,11 +18,13 @@ import { useIsGamePaused } from "./useIsGamePaused"
 import { useKenoConfiguration } from "./useKenoConfiguration"
 import { usePlaceBet } from "./usePlaceBet"
 import { useTokenAllowance } from "./useTokenAllowance"
+import { useTokenSelection } from "./useTokenSelection"
 
 interface UseGameLogicProps {
   gameType: CASINO_GAME_TYPE
   defaultSelection: GameChoice
   backgroundImage: string
+  filteredTokens?: TokenWithImage[]
 }
 
 interface UseGameLogicResult {
@@ -30,6 +32,9 @@ interface UseGameLogicResult {
   address: string | undefined
   balance: bigint
   token: TokenWithImage
+  selectedToken: TokenWithImage | undefined
+  setSelectedToken: (token: TokenWithImage) => void
+  filteredTokens?: TokenWithImage[]
   areChainsSynced: boolean
   gameHistory: HistoryEntry[]
   refreshHistory: () => void
@@ -98,13 +103,18 @@ export function useGameLogic({
   gameType,
   defaultSelection,
   backgroundImage,
+  filteredTokens,
 }: UseGameLogicProps): UseGameLogicResult {
   const { isConnected: isWalletConnected, address } = useAccount()
   const { gameHistory, refreshHistory } = useGameHistory(gameType)
   const { areChainsSynced, appChainId } = useChain()
   const { bankrollToken } = useBettingConfig()
 
-  const token: TokenWithImage = bankrollToken || {
+  // Token selection with session storage
+  const { selectedToken, setSelectedToken } = useTokenSelection(gameType)
+
+  // Determine the effective token to use
+  const token: TokenWithImage = selectedToken || bankrollToken || {
     ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
     image: "", // Fallback for native currency - user should configure this
   }
@@ -209,6 +219,9 @@ export function useGameLogic({
     address,
     balance: balance?.value ?? 0n,
     token,
+    selectedToken,
+    setSelectedToken,
+    filteredTokens,
     areChainsSynced,
     gameHistory,
     refreshHistory,

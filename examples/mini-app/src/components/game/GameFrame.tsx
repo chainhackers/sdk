@@ -121,12 +121,16 @@ function GameFrameRoot({ themeSettings, children, variant = "default", ...props 
 interface HeaderProps {
   title: string
   connectWalletButton: React.ReactNode
+  tokenSelector?: React.ReactNode
 }
 
-function Header({ title, connectWalletButton }: HeaderProps) {
+function Header({ title, connectWalletButton, tokenSelector }: HeaderProps) {
   return (
     <CardHeader className="flex flex-row justify-between items-center h-[44px]">
-      <CardTitle className="text-lg text-title-color font-bold">{title}</CardTitle>
+      <div className="flex items-center gap-3">
+        <CardTitle className="text-lg text-title-color font-bold">{title}</CardTitle>
+        {tokenSelector}
+      </div>
       {connectWalletButton}
     </CardHeader>
   )

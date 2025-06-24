@@ -3,6 +3,8 @@ import kenoBackground from "../../assets/game/game-background.jpg?no-inline"
 import { CASINO_GAME_TYPE, FORMAT_TYPE, Keno, KenoBall, formatRawAmount } from "@betswirl/sdk-core"
 import { useEffect, useState } from "react"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { TokenWithImage } from "../../types/types"
+import { TokenSelector } from "../ui/TokenSelector"
 import { GameFrame } from "./GameFrame"
 import { KenoGameControls } from "./KenoGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -12,12 +14,15 @@ import { useGameControls } from "./shared/useGameControls"
 const DEFAULT_KENO_SELECTION: KenoBall[] = []
 const DEFAULT_MAX_SELECTIONS = 0
 
-export interface KenoGameProps extends BaseGameProps {}
+export interface KenoGameProps extends BaseGameProps {
+  filteredTokens?: TokenWithImage[]
+}
 
 export function KenoGame({
   theme = "system",
   customTheme,
   backgroundImage = kenoBackground,
+  filteredTokens,
   ...props
 }: KenoGameProps) {
   const [lastWinningNumbers, setLastWinningNumbers] = useState<KenoBall[]>([])
@@ -25,6 +30,8 @@ export function KenoGame({
     isWalletConnected,
     balance,
     token,
+    selectedToken,
+    setSelectedToken,
     areChainsSynced,
     gameHistory,
     refreshHistory,
@@ -57,6 +64,7 @@ export function KenoGame({
       choice: DEFAULT_KENO_SELECTION,
     },
     backgroundImage,
+    filteredTokens,
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
@@ -87,7 +95,18 @@ export function KenoGame({
 
   return (
     <GameFrame themeSettings={themeSettings} variant="keno" {...props}>
-      <GameFrame.Header title="Keno" connectWalletButton={<GameConnectWallet />} />
+      <GameFrame.Header
+        title="Keno"
+        connectWalletButton={<GameConnectWallet />}
+        tokenSelector={
+          <TokenSelector
+            selectedToken={selectedToken}
+            onTokenSelect={setSelectedToken}
+            filteredTokens={filteredTokens}
+            className="min-w-[120px]"
+          />
+        }
+      />
       <GameFrame.GameArea variant="keno">
         <GameFrame.InfoButton
           winChance={undefined}

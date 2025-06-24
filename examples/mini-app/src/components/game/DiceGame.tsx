@@ -8,6 +8,8 @@ import {
   formatRawAmount,
 } from "@betswirl/sdk-core"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { TokenWithImage } from "../../types/types"
+import { TokenSelector } from "../ui/TokenSelector"
 import { DiceGameControls } from "./DiceGameControls"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -16,18 +18,23 @@ import { useGameControls } from "./shared/useGameControls"
 
 const DEFAULT_DICE_NUMBER = 20 as DiceNumber
 
-export interface DiceGameProps extends BaseGameProps {}
+export interface DiceGameProps extends BaseGameProps {
+  filteredTokens?: TokenWithImage[]
+}
 
 export function DiceGame({
   theme = "system",
   customTheme,
   backgroundImage = diceBackground,
+  filteredTokens,
   ...props
 }: DiceGameProps) {
   const {
     isWalletConnected,
     balance,
     token,
+    selectedToken,
+    setSelectedToken,
     areChainsSynced,
     gameHistory,
     refreshHistory,
@@ -60,6 +67,7 @@ export function DiceGame({
       choice: DEFAULT_DICE_NUMBER,
     },
     backgroundImage,
+    filteredTokens,
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
@@ -82,7 +90,18 @@ export function DiceGame({
 
   return (
     <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header title="Dice" connectWalletButton={<GameConnectWallet />} />
+      <GameFrame.Header
+        title="Dice"
+        connectWalletButton={<GameConnectWallet />}
+        tokenSelector={
+          <TokenSelector
+            selectedToken={selectedToken}
+            onTokenSelect={setSelectedToken}
+            filteredTokens={filteredTokens}
+            className="min-w-[120px]"
+          />
+        }
+      />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={Dice.getWinChancePercent(selectedDiceNumber)}

@@ -8,6 +8,8 @@ import {
   formatRawAmount,
 } from "@betswirl/sdk-core"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { TokenWithImage } from "../../types/types"
+import { TokenSelector } from "../ui/TokenSelector"
 import { GameFrame } from "./GameFrame"
 import { RouletteGameControls } from "./RouletteGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -16,18 +18,23 @@ import { useGameControls } from "./shared/useGameControls"
 
 const DEFAULT_ROULETTE_SELECTION: RouletteNumber[] = []
 
-export interface RouletteGameProps extends BaseGameProps {}
+export interface RouletteGameProps extends BaseGameProps {
+  filteredTokens?: TokenWithImage[]
+}
 
 export function RouletteGame({
   theme = "system",
   customTheme,
   backgroundImage = rouletteBackground,
+  filteredTokens,
   ...props
 }: RouletteGameProps) {
   const {
     isWalletConnected,
     balance,
     token,
+    selectedToken,
+    setSelectedToken,
     areChainsSynced,
     gameHistory,
     refreshHistory,
@@ -60,6 +67,7 @@ export function RouletteGame({
       choice: DEFAULT_ROULETTE_SELECTION,
     },
     backgroundImage,
+    filteredTokens,
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
@@ -83,7 +91,18 @@ export function RouletteGame({
 
   return (
     <GameFrame themeSettings={themeSettings} variant="roulette" {...props}>
-      <GameFrame.Header title="Roulette" connectWalletButton={<GameConnectWallet />} />
+      <GameFrame.Header
+        title="Roulette"
+        connectWalletButton={<GameConnectWallet />}
+        tokenSelector={
+          <TokenSelector
+            selectedToken={selectedToken}
+            onTokenSelect={setSelectedToken}
+            filteredTokens={filteredTokens}
+            className="min-w-[120px]"
+          />
+        }
+      />
       <GameFrame.GameArea variant="roulette">
         <GameFrame.InfoButton
           winChance={Roulette.getWinChancePercent(selectedNumbers)}
