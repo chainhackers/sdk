@@ -4,7 +4,6 @@ import { CASINO_GAME_TYPE, FORMAT_TYPE, Keno, KenoBall, formatRawAmount } from "
 import { useEffect, useState } from "react"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { TokenWithImage } from "../../types/types"
-import { TokenSelector } from "../ui/TokenSelector"
 import { GameFrame } from "./GameFrame"
 import { KenoGameControls } from "./KenoGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -95,18 +94,7 @@ export function KenoGame({
 
   return (
     <GameFrame themeSettings={themeSettings} variant="keno" {...props}>
-      <GameFrame.Header
-        title="Keno"
-        connectWalletButton={<GameConnectWallet />}
-        tokenSelector={
-          <TokenSelector
-            selectedToken={selectedToken}
-            onTokenSelect={setSelectedToken}
-            filteredTokens={filteredTokens}
-            className="min-w-[120px]"
-          />
-        }
-      />
+      <GameFrame.Header title="Keno" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea variant="keno">
         <GameFrame.InfoButton
           winChance={undefined}
@@ -146,6 +134,9 @@ export function KenoGame({
         balance={balance}
         isConnected={isWalletConnected}
         token={token}
+        selectedToken={selectedToken}
+        onTokenSelect={setSelectedToken}
+        filteredTokens={filteredTokens}
         betStatus={betStatus}
         betAmount={betAmount}
         vrfFees={vrfFees}

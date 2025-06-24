@@ -9,7 +9,6 @@ import {
 } from "@betswirl/sdk-core"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { TokenWithImage } from "../../types/types"
-import { TokenSelector } from "../ui/TokenSelector"
 import { GameFrame } from "./GameFrame"
 import { RouletteGameControls } from "./RouletteGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -91,18 +90,7 @@ export function RouletteGame({
 
   return (
     <GameFrame themeSettings={themeSettings} variant="roulette" {...props}>
-      <GameFrame.Header
-        title="Roulette"
-        connectWalletButton={<GameConnectWallet />}
-        tokenSelector={
-          <TokenSelector
-            selectedToken={selectedToken}
-            onTokenSelect={setSelectedToken}
-            filteredTokens={filteredTokens}
-            className="min-w-[120px]"
-          />
-        }
-      />
+      <GameFrame.Header title="Roulette" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea variant="roulette">
         <GameFrame.InfoButton
           winChance={Roulette.getWinChancePercent(selectedNumbers)}
@@ -134,6 +122,9 @@ export function RouletteGame({
         balance={balance}
         isConnected={isWalletConnected}
         token={token}
+        selectedToken={selectedToken}
+        onTokenSelect={setSelectedToken}
+        filteredTokens={filteredTokens}
         betStatus={betStatus}
         betAmount={betAmount}
         vrfFees={vrfFees}

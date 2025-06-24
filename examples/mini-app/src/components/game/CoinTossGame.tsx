@@ -9,7 +9,6 @@ import {
 } from "@betswirl/sdk-core"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { TokenWithImage } from "../../types/types"
-import { TokenSelector } from "../ui/TokenSelector"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -89,18 +88,7 @@ export function CoinTossGame({
 
   return (
     <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header
-        title="CoinToss"
-        connectWalletButton={<GameConnectWallet />}
-        tokenSelector={
-          <TokenSelector
-            selectedToken={selectedToken}
-            onTokenSelect={setSelectedToken}
-            filteredTokens={filteredTokens}
-            className="min-w-[120px]"
-          />
-        }
-      />
+      <GameFrame.Header title="CoinToss" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
           winChance={CoinToss.getWinChancePercent(selectedSide)}
@@ -132,6 +120,9 @@ export function CoinTossGame({
         balance={balance}
         isConnected={isWalletConnected}
         token={token}
+        selectedToken={selectedToken}
+        onTokenSelect={setSelectedToken}
+        filteredTokens={filteredTokens}
         betStatus={betStatus}
         betAmount={betAmount}
         vrfFees={vrfFees}
