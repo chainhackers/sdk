@@ -1,16 +1,26 @@
-import { KenoConfiguration, getKenoConfiguration } from "@betswirl/sdk-core"
-import { WagmiBetSwirlWallet } from "@betswirl/wagmi-provider"
-import { useQuery } from "@tanstack/react-query"
-import { useConfig } from "wagmi"
+import {
+  KenoConfiguration,
+  type RawKenoConfiguration,
+  getKenoConfigurationFunctionData,
+  parseRawKenoConfiguration,
+} from "@betswirl/sdk-core"
+import { useMemo } from "react"
+import { useReadContract } from "wagmi"
 import { useChain } from "../context/chainContext"
-import { QueryParameter, TokenWithImage } from "../types/types"
+import { TokenWithImage } from "../types/types"
 
 type UseKenoConfigurationProps = {
   token: TokenWithImage
-  query?: QueryParameter<KenoConfiguration>
+  query?: {
+    enabled?: boolean
+    refetchInterval?: number
+    staleTime?: number
+    refetchOnWindowFocus?: boolean
+  }
 }
 
 type UseKenoConfigurationResult = {
+  wagmiHook: ReturnType<typeof useReadContract>
   config: KenoConfiguration | undefined
   loading: boolean
   error: Error | null
@@ -41,26 +51,36 @@ type UseKenoConfigurationResult = {
  * ```
  */
 export function useKenoConfiguration(props: UseKenoConfigurationProps): UseKenoConfigurationResult {
-  const config = useConfig()
-  const { appChain } = useChain()
+  const { appChainId } = useChain()
   const { token, query = {} } = props
 
-  const queryFn = async (): Promise<KenoConfiguration> => {
-    const betswirlWallet = new WagmiBetSwirlWallet(config)
-    return getKenoConfiguration(betswirlWallet, token)
-  }
+  const functionData = useMemo(() => {
+    return getKenoConfigurationFunctionData(token.address, appChainId)
+  }, [token.address, appChainId])
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["/keno-configuration", token.address, appChain.id],
-    queryFn,
-    refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes - configuration rarely changes
-    ...query,
+  const wagmiHook = useReadContract({
+    abi: functionData.data.abi,
+    address: functionData.data.to,
+    functionName: functionData.data.functionName,
+    args: functionData.data.args,
+    chainId: appChainId,
+    query: {
+      staleTime: query?.staleTime ?? 5 * 60 * 1000, // 5 minutes - configuration rarely changes
+      refetchOnWindowFocus: query?.refetchOnWindowFocus ?? false,
+      enabled: query?.enabled,
+      refetchInterval: query?.refetchInterval,
+    },
   })
 
+  const config = useMemo(() => {
+    if (!wagmiHook.data) return undefined
+    return parseRawKenoConfiguration(wagmiHook.data as RawKenoConfiguration, token, appChainId)
+  }, [wagmiHook.data, token, appChainId])
+
   return {
-    config: data,
-    loading: isLoading,
-    error: error as Error | null,
+    wagmiHook,
+    config,
+    loading: wagmiHook.isLoading || wagmiHook.isFetching,
+    error: wagmiHook.error as Error | null,
   }
 }
