@@ -4,6 +4,8 @@ import {
   CoinToss,
   Dice,
   GenericCasinoBetParams,
+  Keno,
+  KenoConfiguration,
   MAX_SELECTABLE_DICE_NUMBER,
   MAX_SELECTABLE_ROULETTE_NUMBER,
   MIN_SELECTABLE_DICE_NUMBER,
@@ -43,7 +45,7 @@ export interface IUsePlaceBetReturn {
   wagerWaitingHook: ReturnType<typeof useWaitForTransactionReceipt>
 }
 
-function _encodeGameInput(choice: GameChoice): GameEncodedInput {
+function _encodeGameInput(choice: GameChoice, kenoConfig?: KenoConfiguration): GameEncodedInput {
   switch (choice.game) {
     case CASINO_GAME_TYPE.COINTOSS:
       return {
@@ -78,6 +80,25 @@ function _encodeGameInput(choice: GameChoice): GameEncodedInput {
         encodedInput: Roulette.encodeInput(numbers),
       }
     }
+    case CASINO_GAME_TYPE.KENO: {
+      const numbers = choice.choice
+      if (numbers.length === 0) throw new Error("Keno bet must include at least one number")
+
+      if (!kenoConfig) {
+        throw new Error("Keno configuration is required for Keno bets")
+      }
+
+      if (numbers.length > kenoConfig.maxSelectableBalls) {
+        throw new Error(
+          `Keno bet cannot include more than ${kenoConfig.maxSelectableBalls} numbers`,
+        )
+      }
+
+      return {
+        game: CASINO_GAME_TYPE.KENO,
+        encodedInput: Keno.encodeInput(numbers, kenoConfig),
+      }
+    }
     default:
       throw new Error(`Unsupported game type for encoding input: ${(choice as any).game}`)
   }
@@ -110,6 +131,7 @@ function _encodeGameInput(choice: GameChoice): GameEncodedInput {
 export function usePlaceBet(
   game: CASINO_GAME_TYPE,
   refetchBalance: () => void,
+  kenoConfig?: KenoConfiguration,
 ): IUsePlaceBetReturn {
   const { appChainId } = useChain()
   const { bankrollToken } = useBettingConfig()
@@ -136,6 +158,7 @@ export function usePlaceBet(
   const [gameResult, setGameResult] = useState<GameResult | null>(null)
   const [watchTarget, setWatchTarget] = useState<WatchTarget | null>(null)
   const [isRolling, setIsRolling] = useState(false)
+  const [currentBetAmount, setCurrentBetAmount] = useState<bigint | null>(null)
   // @Kinco advice. The goal is to never have an internal error. In the main frontend, it never happens due to retry system, etc (or maybe 1/100000)
   const [internalError, setInternalError] = useState<string | null>(null)
 
@@ -195,6 +218,7 @@ export function usePlaceBet(
     wagerWriteHook.reset()
     setGameResult(null)
     setWatchTarget(null)
+    setCurrentBetAmount(null)
     setInternalError(null)
     setIsRolling(false)
     resetWatcher()
@@ -203,8 +227,9 @@ export function usePlaceBet(
   const placeBet = useCallback(
     async (betAmount: bigint, choice: GameChoice) => {
       resetBetState()
+      setCurrentBetAmount(betAmount)
 
-      const encodedInput = _encodeGameInput(choice)
+      const encodedInput = _encodeGameInput(choice, kenoConfig)
       const betParams = {
         game,
         gameEncodedInput: encodedInput.encodedInput,
@@ -247,6 +272,7 @@ export function usePlaceBet(
       vrfFees,
       gasPrice,
       token,
+      kenoConfig,
     ],
   )
 
@@ -291,6 +317,7 @@ export function usePlaceBet(
           eventAbi: rollEventData.abi,
           eventName: rollEventData.eventName,
           eventArgs: rollEventData.args,
+          betAmount: currentBetAmount!,
         })
 
         refetchBalance()
@@ -305,6 +332,7 @@ export function usePlaceBet(
     connectedAddress,
     publicClient,
     refetchBalance,
+    currentBetAmount,
   ])
 
   return {

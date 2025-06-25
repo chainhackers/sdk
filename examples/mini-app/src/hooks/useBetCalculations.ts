@@ -1,4 +1,12 @@
-import { CASINO_GAME_TYPE, CoinToss, Dice, Roulette, getPayoutDetails } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  CoinToss,
+  Dice,
+  Keno,
+  KenoConfiguration,
+  Roulette,
+  getPayoutDetails,
+} from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { GameChoice } from "../types/types"
 
@@ -7,6 +15,7 @@ interface UseBetCalculationsProps {
   houseEdge: number
   betAmount: bigint | undefined
   betCount: number | undefined
+  kenoConfig?: KenoConfiguration
 }
 
 interface UseBetCalculationsResult {
@@ -20,7 +29,7 @@ interface UseBetCalculationsResult {
   formattedNetMultiplier: number
 }
 
-function getMultiplierForGame(selection: GameChoice): number {
+function getMultiplierForGame(selection: GameChoice, kenoConfig?: KenoConfiguration): number {
   switch (selection.game) {
     case CASINO_GAME_TYPE.COINTOSS:
       return CoinToss.getMultiplier(selection.choice)
@@ -28,6 +37,16 @@ function getMultiplierForGame(selection: GameChoice): number {
       return Dice.getMultiplier(selection.choice)
     case CASINO_GAME_TYPE.ROULETTE:
       return Roulette.getMultiplier(selection.choice)
+    case CASINO_GAME_TYPE.KENO: {
+      const selectedCount = selection.choice.length
+      if (selectedCount === 0) return 0
+
+      if (!kenoConfig) {
+        throw new Error("Keno configuration is required for Keno multiplier calculation")
+      }
+
+      return Keno.getMultiplier(kenoConfig, selectedCount, Math.ceil(selectedCount / 2))
+    }
     default:
       throw new Error(`Unsupported game type: ${(selection as any).game}`)
   }
@@ -59,8 +78,12 @@ export function useBetCalculations({
   houseEdge,
   betAmount,
   betCount = 1,
+  kenoConfig,
 }: UseBetCalculationsProps): UseBetCalculationsResult {
-  const grossMultiplier = useMemo(() => getMultiplierForGame(selection), [selection])
+  const grossMultiplier = useMemo(
+    () => getMultiplierForGame(selection, kenoConfig),
+    [selection, kenoConfig],
+  )
   const totalBetAmount = useMemo(
     () => (betAmount && betAmount > 0n ? betAmount * BigInt(betCount) : 0n),
     [betAmount, betCount],

@@ -13,8 +13,8 @@ import { cn } from "../../lib/utils"
 import { BetStatus, TokenWithImage } from "../../types/types"
 import { ChainIcon } from "../ui/ChainIcon"
 import { TokenIcon } from "../ui/TokenIcon"
+import { TokenAmountInput } from "../ui/TokenAmountInput"
 import { Button } from "../ui/button"
-import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 
 interface BettingPanelProps {
@@ -22,6 +22,9 @@ interface BettingPanelProps {
   balance: bigint
   isConnected: boolean
   token: TokenWithImage
+  selectedToken?: TokenWithImage
+  onTokenSelect?: (token: TokenWithImage) => void
+  filteredTokens?: TokenWithImage[]
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number
@@ -46,6 +49,9 @@ export function BettingPanel({
   balance,
   isConnected,
   token,
+  selectedToken,
+  onTokenSelect,
+  filteredTokens,
   betStatus,
   betAmount,
   betCount,
@@ -262,22 +268,48 @@ export function BettingPanel({
         >
           Bet amount
         </Label>
-        <Input
-          id="betAmount"
-          type="number"
-          placeholder="0"
-          min={0}
-          max={Number.parseFloat(formattedBalance)}
-          step={BET_AMOUNT_INPUT_STEP}
-          value={inputValue}
-          onChange={handleInputChange}
-          className={cn("relative", !isValidInput && "[&_input]:text-muted-foreground")}
-          token={{
-            icon: <TokenIcon token={token} size={18} className="mr-1" />,
-            symbol: token.symbol,
-          }}
-          disabled={isInputDisabled}
-        />
+        {onTokenSelect ? (
+          <TokenAmountInput
+            value={inputValue}
+            onChange={(value) => handleInputChange({ target: { value } } as ChangeEvent<HTMLInputElement>)}
+            selectedToken={selectedToken || token}
+            onTokenSelect={onTokenSelect}
+            filteredTokens={filteredTokens}
+            placeholder="0"
+            min={0}
+            max={Number.parseFloat(formattedBalance)}
+            step={BET_AMOUNT_INPUT_STEP}
+            disabled={isInputDisabled}
+            className={cn("relative", !isValidInput && "opacity-60")}
+          />
+        ) : (
+          <div className="relative flex h-12 w-full items-center text-sm">
+            <input
+              id="betAmount"
+              type="number"
+              placeholder="0"
+              min={0}
+              max={Number.parseFloat(formattedBalance)}
+              step={BET_AMOUNT_INPUT_STEP}
+              value={inputValue}
+              onChange={handleInputChange}
+              disabled={isInputDisabled}
+              className={cn(
+                "flex h-full w-full rounded-[12px] border-0",
+                "bg-neutral-background text-foreground font-semibold",
+                "px-4 py-2 pr-16",
+                "text-base placeholder:text-muted-foreground",
+                "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0",
+                "disabled:cursor-not-allowed disabled:opacity-50",
+                !isValidInput && "text-muted-foreground"
+              )}
+            />
+            <div className="absolute right-0 top-1/2 mr-3 flex -translate-y-1/2 transform items-center gap-1 text-foreground pointer-events-none font-medium">
+              <TokenIcon token={token} size={18} className="mr-1" />
+              <span>{token.symbol}</span>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-2">
           <Button
