@@ -31,9 +31,9 @@
     "build-storybook": "storybook build",
     "chromatic": "chromatic --exit-zero-on-changes",
     "prepublishOnly": "pnpm build",
-    "setup:chromium": "pnpm exec playwright install chromium",
-    "test:wallet-cash": "pnpm setup:chromium && pnpm exec synpress",
-    "test:wallet-run": "pnpm test:wallet-cash && pnpm exec playwright test --reporter=line"
+    "install:chromium": "pnpm exec playwright install chromium",
+    "setup:wallet": "pnpm install:chromium && pnpm exec synpress",
+    "test:e2e": "pnpm setup:wallet && pnpm exec playwright test --reporter=line"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
