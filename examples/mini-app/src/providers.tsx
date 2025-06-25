@@ -5,13 +5,22 @@ import { http, type Hex } from "viem"
 import { WagmiProvider, createConfig } from "wagmi"
 import { base } from "wagmi/chains"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
+import type { TokenWithImage } from "./types/types"
 
 const CHAIN = base
 
 const queryClient = new QueryClient()
 
+// Define tokens with images
+const DEGEN_TOKEN: TokenWithImage = {
+  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
+  symbol: "DEGEN",
+  decimals: 18,
+  image: "https://www.betswirl.com/img/tokens/DEGEN.svg",
+}
+
 export function AppProviders({ children }: { children: ReactNode }) {
-  const affiliate = import.meta.env.AFFILIATE_ADDRESS as Hex
+  const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
   const rpcUrl = import.meta.env.VITE_RPC_URL
   const config = createConfig({
     chains: [CHAIN],
@@ -37,7 +46,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
             },
           }}
         >
-          <BetSwirlSDKProvider initialChainId={CHAIN.id} affiliate={affiliate}>
+          <BetSwirlSDKProvider
+            initialChainId={CHAIN.id}
+            affiliate={affiliate}
+            bankrollToken={DEGEN_TOKEN}
+          >
             {children}
           </BetSwirlSDKProvider>
         </OnchainKitProvider>

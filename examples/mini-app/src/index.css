@@ -41,6 +41,7 @@
   --color-control-panel-background: var(--control-panel-background);
   --color-transparent-button-border: var(--transparent-button-border);
   --color-neutral-background: var(--neutral-background);
+  --color-neutral-background-hover: var(--neutral-background-hover);
   --color-game-win: var(--game-win);
   --color-game-loss: var(--game-loss);
   --color-play-btn-font: var(--play-btn-font);
@@ -55,11 +56,32 @@
   --color-close-btn-hovered: var(--close-btn-hovered);
   --color-game-result-icon-bg: var(--game-result-icon-bg);
   --color-table-text: var(--table-text);
+  --color-slider-disabled: var(--slider-disabled);
+  --color-slider-disabled-shadow: var(--slider-disabled-shadow);
+  --color-slider-disabled-tooltip: var(--slider-disabled-tooltip);
+  --color-dice-slider-box: var(--dice-slider-box);
+  --color-text-color: var(--text-color);
+  --color-roulette-red: var(--roulette-red);
+  --color-roulette-red-hover: var(--roulette-red-hover);
+  --color-roulette-black: var(--roulette-black);
+  --color-roulette-black-hover: var(--roulette-black-hover);
+  --color-roulette-green: var(--roulette-green);
+  --color-roulette-green-hover: var(--roulette-green-hover);
+  --color-roulette-bundle: var(--roulette-bundle);
+  --color-roulette-bundle-hover: var(--roulette-bundle-hover);
+  --color-roulette-disabled: var(--roulette-disabled);
+  --color-roulette-disabled-text: var(--roulette-disabled-text);
+  --color-keno-unselected-bg: var(--keno-unselected-bg);
+  --color-keno-unselected-border: var(--keno-unselected-border);
+  --color-keno-unselected-hover-bg: var(--keno-unselected-hover-bg);
+  --color-keno-unselected-text: var(--keno-unselected-text);
+  --color-keno-multiplier-bg: var(--keno-multiplier-bg);
+  --color-keno-winning-border: var(--keno-winning-border);
 }
 
 @layer base {
   :root {
-    --light-surface: oklch(0.98 0.0017 247.84);
+    --light-surface: oklch(0.9846 0.0017 247.84);
     --dark-surface: oklch(0.15 0.0066 236.83);
     --light-stroke: oklch(0.16 0.02 269.69 / 8%);
     --dark-stroke: oklch(1 0 0 / 8%);
@@ -112,12 +134,13 @@
     --control-panel-background: var(--light-stroke);
     --transparent-button-border: oklch(0.91 0.0029 264.54 / 11.37%);
     --neutral-background: oklch(0.16 0.02 269.69 / 10%);
+    --neutral-background-hover: oklch(0.16 0.02 269.69 / 12%);
 
     --title-color: var(--dark-surface);
     --text-on-surface-variant: oklch(0.61 0.014 271.18);
     --text-on-surface: oklch(0.34 0.0139 235.28);
     --border-stroke: var(--light-stroke);
-    --game-window-overlay: oklch(0 0 0 / 40%);
+    --game-window-overlay: transparent;
     --play-btn-font: var(--white);
 
     --game-win: oklch(0.71 0.1322 165.92);
@@ -129,6 +152,29 @@
     --close-btn-hovered: var(--dark-stroke);
     --game-result-icon-bg: var(--white);
     --table-text: var(--dark-surface);
+    --slider-disabled: oklch(0.7774 0.0129 276.04);
+    --slider-disabled-shadow: oklch(0.7774 0.0129 276.04 / 0.2);
+    --slider-disabled-tooltip: oklch(0.6138 0.014 271.18);
+    --dice-slider-box: oklch(1 0 0 / 80%);
+    --text-color: var(--white);
+
+    --roulette-red: oklch(0.6273 0.1893 23.38);
+    --roulette-red-hover: oklch(0.6573 0.1893 23.38);
+    --roulette-black: oklch(0.343 0.0139 235.28);
+    --roulette-black-hover: oklch(0.373 0.0139 235.28);
+    --roulette-green: oklch(0.784 0.1418 166.22);
+    --roulette-green-hover: oklch(0.804 0.1418 166.22);
+    --roulette-bundle: oklch(0.2398 0.0062 214.42);
+    --roulette-bundle-hover: oklch(0.2698 0.0062 214.42);
+    --roulette-disabled: oklch(0.8523 0.0061 239.83);
+    --roulette-disabled-text: oklch(0.6138 0.014 271.18);
+
+    --keno-unselected-bg: var(--light-surface);
+    --keno-unselected-border: oklch(0.9278 0.0029 264.54);
+    --keno-unselected-hover-bg: oklch(0.9516 0.0017 247.84);
+    --keno-unselected-text: oklch(0.1 0 0);
+    --keno-multiplier-bg: oklch(0.1559 0.02 269.69 / 0.4);
+    --keno-winning-border: oklch(0.784 0.1418 166.22);
   }
 
   .dark {
@@ -151,21 +197,15 @@
     --destructive-foreground: oklch(0.9 0 0);
     --border: oklch(0.3 0 0 / 0.5);
     --input: oklch(1 0 0 / 10%);
-    --ring: transparent;
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
 
     --control-panel-background: var(--dark-stroke);
     --transparent-button-border: var(--dark-gray);
     --neutral-background: oklch(1 0 0 / 10%);
+    --neutral-background-hover: oklch(1 0 0 / 12%);
     --title-color: var(--white);
     --text-on-surface-variant: var(--dark-on-surface-variant);
     --text-on-surface: oklch(0.93 0.0058 264.53);
     --border-stroke: var(--dark-stroke);
-    --play-btn-font: var(--white);
 
     --game-win: oklch(0.78 0.1418 166.22);
 
@@ -174,6 +214,19 @@
     --close-btn-color: var(--dark-on-surface-variant);
     --game-result-icon-bg: var(--dark-surface-high);
     --table-text: var(--white);
+
+    --roulette-black: oklch(0.2398 0.0062 214.42);
+    --roulette-black-hover: oklch(0.2698 0.0062 214.42);
+    --roulette-bundle: oklch(0.1551 0.0069 214.42);
+    --roulette-bundle-hover: oklch(0.1851 0.0069 214.42);
+    --roulette-disabled: oklch(0.2746 0.0057 236.74);
+    --roulette-disabled-text: oklch(0.7774 0.0129 276.04);
+
+    --keno-unselected-bg: oklch(0.2398 0.0062 214.42);
+    --keno-unselected-border: oklch(0.311 0.0055 236.69);
+    --keno-unselected-hover-bg: oklch(0.2746 0.0057 236.74);
+    --keno-unselected-text: oklch(1 0 0);
+    --keno-multiplier-bg: oklch(0.9137 0.0153 273.84 / 0.2);
   }
 
   @font-face {
@@ -204,6 +257,8 @@
     font-family: "Inter", sans-serif;
     font-weight: 500;
 
+    text-align: left;
+
     /* Hide arrows for input[type=number] */
     /* Chrome, Safari, Edge, Opera */
     input[type="number"]::-webkit-outer-spin-button,
@@ -227,4 +282,54 @@
 
 @layer components {
   @import "@coinbase/onchainkit/styles.css";
+
+  .mask-overlap-cutout {
+    mask-image: radial-gradient(circle 12px at 23px center, transparent 11.5px, black 12px);
+    -webkit-mask-image: radial-gradient(circle 12px at 23px center, transparent 11.5px, black 12px);
+  }
+
+  .roulette-button-shadow-red {
+    box-shadow: 0 1px 0 oklch(0.519 0.1466 22.27);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-shadow-black {
+    box-shadow: 0 1px 0 oklch(0.3195 0.0141 235.34);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-shadow-green {
+    box-shadow: 0 1px 0 oklch(0.6621 0.1215 165.65);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-shadow-bundle {
+    box-shadow: 0 1px 0 oklch(0.1989 0.0051 248.08);
+    padding-bottom: 1px;
+  }
+
+  .roulette-button-border {
+    border: 1px solid oklch(0.4141 0.0043 219.59);
+    box-sizing: border-box;
+  }
+
+  .roulette-button-shadow-disabled {
+    box-shadow: 0 1px 0 oklch(0.7733 0.0109 247.97);
+    padding-bottom: 1px;
+  }
+
+  .dark .roulette-button-shadow-black {
+    box-shadow: 0 1px 0 oklch(0.188 0.0047 196.76);
+    padding-bottom: 1px;
+  }
+
+  .dark .roulette-button-shadow-bundle {
+    box-shadow: 0 1px 0 oklch(0.1067 0 0);
+    padding-bottom: 1px;
+  }
+
+  .dark .roulette-button-shadow-disabled {
+    box-shadow: 0 1px 0 oklch(0.2165 0.005 248.06);
+    padding-bottom: 1px;
+  }
 }

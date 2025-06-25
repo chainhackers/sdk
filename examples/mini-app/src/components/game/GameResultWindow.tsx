@@ -1,9 +1,9 @@
 import { FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
 import { useEffect } from "react"
-import lossBgWebp from "../../assets/game/game-result/loss-bg.webp"
-import lossIcon from "../../assets/game/game-result/loss-icon.svg"
-import winBgWebp from "../../assets/game/game-result/win-bg.webp"
-import winIcon from "../../assets/game/game-result/win-icon.svg"
+import lossBgWebp from "../../assets/game/game-result/loss-bg.webp?no-inline"
+import lossIcon from "../../assets/game/game-result/loss-icon.svg?no-inline"
+import winBgWebp from "../../assets/game/game-result/win-bg.webp?no-inline"
+import winIcon from "../../assets/game/game-result/win-icon.svg?no-inline"
 
 const images = {
   win: {
@@ -60,7 +60,7 @@ export function GameResultWindow({
 
   return (
     <div
-      className={`w-full h-full flex flex-col items-center py-[12px] px-[42px] absolute left-0 top-0 text-white ${className}`}
+      className={`w-full h-full flex flex-col items-center justify-center px-[42px] absolute left-0 top-0 text-text-color z-20 ${className}`}
     >
       <img
         src={currentImages.bg}

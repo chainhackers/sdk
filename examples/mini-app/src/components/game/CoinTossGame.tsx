@@ -1,33 +1,20 @@
-import React, { useState } from "react"
-import coinTossBackground from "../../assets/game/game-background.png"
-import { cn } from "../../lib/utils"
-
-import { Avatar, Name } from "@coinbase/onchainkit/identity"
-import { ConnectWallet, Wallet } from "@coinbase/onchainkit/wallet"
-import { useAccount, useBalance } from "wagmi"
+import coinTossBackground from "../../assets/game/game-background.jpg?no-inline"
 
 import {
   CASINO_GAME_TYPE,
-  chainById,
-  chainNativeCurrencyToToken,
   COINTOSS_FACE,
+  CoinToss,
+  FORMAT_TYPE,
+  formatRawAmount,
 } from "@betswirl/sdk-core"
-import { useGameHistory } from "../../hooks/useGameHistory"
-import { usePlaceBet } from "../../hooks/usePlaceBet"
+import { useGameLogic } from "../../hooks/useGameLogic"
+import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameFrame } from "./GameFrame"
-import { formatGwei } from "viem"
-import { useChain } from "../../context/chainContext"
+import { GameConnectWallet } from "./shared/GameConnectWallet"
+import { BaseGameProps } from "./shared/types"
+import { useGameControls } from "./shared/useGameControls"
 
-export interface CoinTossGameProps
-  extends React.HTMLAttributes<HTMLDivElement> {
-  theme?: "light" | "dark" | "system"
-  customTheme?: {
-    "--primary"?: string
-    "--play-btn-font"?: string
-    "--game-window-overlay"?: string
-  } & React.CSSProperties
-  backgroundImage?: string
-}
+export interface CoinTossGameProps extends BaseGameProps {}
 
 export function CoinTossGame({
   theme = "system",
@@ -35,104 +22,110 @@ export function CoinTossGame({
   backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
-  const themeSettings = { theme, customTheme, backgroundImage }
-  const { isConnected: isWalletConnected, address } = useAccount()
-  const { gameHistory, refreshHistory } = useGameHistory(
-    CASINO_GAME_TYPE.COINTOSS,
-  )
-  const { data: balance } = useBalance({
-    address,
-  })
-  const { appChainId } = useChain()
-  const token = chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
-
-  const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
-
   const {
-    placeBet,
+    isWalletConnected,
+    balance,
+    token,
+    areChainsSynced,
+    gameHistory,
+    refreshHistory,
+    betAmount,
+    selection,
+    setSelection,
     betStatus,
     gameResult,
-    resetBetState,
+    vrfFees,
     formattedVrfFees,
     gasPrice,
-  } = usePlaceBet(CASINO_GAME_TYPE.COINTOSS)
-  const isInGameResultState = !!gameResult
+    targetPayoutAmount,
+    formattedNetMultiplier,
+    grossMultiplier,
+    isInGameResultState,
+    isGamePaused,
+    nativeCurrencySymbol,
+    themeSettings: baseThemeSettings,
+    handlePlayButtonClick,
+    handleBetAmountChange,
+    needsTokenApproval,
+    isApprovePending,
+    isApproveConfirming,
+    isRefetchingAllowance,
+    approveError,
+  } = useGameLogic({
+    gameType: CASINO_GAME_TYPE.COINTOSS,
+    defaultSelection: {
+      game: CASINO_GAME_TYPE.COINTOSS,
+      choice: COINTOSS_FACE.HEADS,
+    },
+    backgroundImage,
+  })
 
-  const handlePlayButtonClick = (selectedSide: COINTOSS_FACE) => {
-    if (betStatus === "error" || isInGameResultState) {
-      resetBetState()
-    } else if (isWalletConnected && betAmount && betAmount > 0n) {
-      placeBet(betAmount, selectedSide)
-    }
-  }
+  const themeSettings = { ...baseThemeSettings, theme, customTheme }
+  const isControlsDisabled = useGameControls(
+    isWalletConnected,
+    betStatus,
+    isInGameResultState,
+    isGamePaused,
+  )
 
-  const handleHalfBet = () => {
-    const currentAmount = betAmount ?? 0n
-    if (currentAmount > 0n) {
-      setBetAmount(currentAmount / 2n)
-    }
-  }
+  const selectedSide = (selection as { game: CASINO_GAME_TYPE.COINTOSS; choice: COINTOSS_FACE })
+    .choice
 
-  const handleDoubleBet = () => {
-    const currentAmount = betAmount ?? 0n
-    const doubledAmount = currentAmount * 2n
-    // Only limit to balance if connected
-    if (isWalletConnected) {
-      const maxAmount = balance?.value ?? 0n
-      setBetAmount(doubledAmount > maxAmount ? maxAmount : doubledAmount)
-    } else {
-      setBetAmount(doubledAmount)
+  const handleCoinClick = () => {
+    if (isControlsDisabled) {
+      return
     }
-  }
-
-  const handleMaxBet = () => {
-    if (isWalletConnected) {
-      setBetAmount(balance?.value ?? 0n)
-    }
+    const newSide = selectedSide === COINTOSS_FACE.HEADS ? COINTOSS_FACE.TAILS : COINTOSS_FACE.HEADS
+    setSelection({ game: CASINO_GAME_TYPE.COINTOSS, choice: newSide })
   }
 
   return (
-    <GameFrame
-      {...props}
-      onPlayBtnClick={handlePlayButtonClick}
-      historyData={gameHistory}
-      token={token}
-      themeSettings={themeSettings}
-      isConnected={isWalletConnected}
-      balance={balance?.value ?? 0n}
-      betAmount={betAmount}
-      setBetAmount={setBetAmount}
-      onHalfBet={handleHalfBet}
-      onDoubleBet={handleDoubleBet}
-      onMaxBet={handleMaxBet}
-      gameResult={gameResult}
-      betStatus={betStatus}
-      onHistoryOpen={refreshHistory}
-      vrfFees={formattedVrfFees}
-      gasPrice={formatGwei(gasPrice)}
-      connectWallletBtn={
-        <Wallet>
-          <ConnectWallet
-            className={cn(
-              "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-              "bg-neutral-background",
-              "rounded-[12px]",
-              "border border-border-stroke",
-              "px-3 py-1.5 h-[44px]",
-              "text-primary",
-            )}
-            disconnectedLabel="Connect"
-          >
-            <div className="flex items-center">
-              <Avatar
-                className="h-7 w-7 mr-2"
-                address="0x838aD0EAE54F99F1926dA7C3b6bFbF617389B4D9"
-              />
-              <Name className="text-title-color" />
-            </div>
-          </ConnectWallet>
-        </Wallet>
-      }
-    />
+    <GameFrame themeSettings={themeSettings} {...props}>
+      <GameFrame.Header title="CoinToss" connectWalletButton={<GameConnectWallet />} />
+      <GameFrame.GameArea>
+        <GameFrame.InfoButton
+          winChance={CoinToss.getWinChancePercent(selectedSide)}
+          rngFee={formattedVrfFees}
+          targetPayout={formatRawAmount(targetPayoutAmount, token.decimals, FORMAT_TYPE.PRECISE)}
+          gasPrice={gasPrice}
+          tokenDecimals={token.decimals}
+          nativeCurrencySymbol={nativeCurrencySymbol}
+        />
+        <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
+        <GameFrame.GameControls>
+          <CoinTossGameControls
+            selectedSide={selectedSide}
+            onCoinClick={handleCoinClick}
+            multiplier={formattedNetMultiplier}
+            isDisabled={isControlsDisabled}
+          />
+        </GameFrame.GameControls>
+        <GameFrame.ResultWindow
+          gameResult={gameResult}
+          betAmount={betAmount}
+          currency={token.symbol}
+        />
+      </GameFrame.GameArea>
+      <GameFrame.BettingSection
+        game={CASINO_GAME_TYPE.COINTOSS}
+        betCount={1} // TODO: Dynamic bet count support (#64)
+        grossMultiplier={grossMultiplier}
+        balance={balance}
+        isConnected={isWalletConnected}
+        token={token}
+        betStatus={betStatus}
+        betAmount={betAmount}
+        vrfFees={vrfFees}
+        onBetAmountChange={handleBetAmountChange}
+        onPlayBtnClick={handlePlayButtonClick}
+        areChainsSynced={areChainsSynced}
+        isGamePaused={isGamePaused}
+        needsTokenApproval={needsTokenApproval}
+        isApprovePending={isApprovePending}
+        isApproveConfirming={isApproveConfirming}
+        isRefetchingAllowance={isRefetchingAllowance}
+        approveError={approveError}
+      />
+    </GameFrame>
   )
 }

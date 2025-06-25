@@ -9,28 +9,15 @@ import {
   formatAmount,
   formatRawAmount,
 } from "@betswirl/sdk-core"
-import { TokenImage } from "@coinbase/onchainkit/token"
 import React, { useState, useEffect, useCallback } from "react"
 import { useAccount } from "wagmi"
+import { TokenIcon } from "../components/ui/TokenIcon"
+import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
-import { ETH_TOKEN } from "../lib/tokens"
 import { toLowerCase } from "../lib/utils"
+import { HistoryEntry, HistoryEntryStatus, TokenWithImage } from "../types/types"
 
 const logger = createLogger("useGameHistory")
-
-enum HistoryEntryStatus {
-  WonBet = "Won bet",
-  Busted = "Busted",
-}
-
-export interface HistoryEntry {
-  id: string
-  status: HistoryEntryStatus
-  multiplier: number | string
-  payoutAmount: number | string
-  payoutCurrencyIcon: React.ReactElement
-  timestamp: string
-}
 
 function formatRelativeTime(timestampSecs: number): string {
   const now = new Date()
@@ -56,6 +43,7 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | null>(null)
   const { chainId, address } = useAccount()
+  const { bankrollToken } = useBettingConfig()
 
   const fetchHistoryLogic = useCallback(async () => {
     if (!address || !chainId) {
@@ -84,17 +72,30 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
         throw result.error
       }
 
-      const formattedHistory: HistoryEntry[] = result.bets.map((bet: CasinoBet) => ({
-        id: bet.id.toString(),
-        status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
-        multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
-        payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
-        payoutCurrencyIcon: React.createElement(TokenImage, {
-          token: ETH_TOKEN,
-          size: 18,
-        }),
-        timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
-      }))
+      const formattedHistory: HistoryEntry[] = result.bets.map((bet: CasinoBet) => {
+        // TODO: Implement proper dynamic token loading for all supported tokens #107
+        // For now, dynamically generate token image URL based on symbol
+        const tokenWithImage: TokenWithImage =
+          bankrollToken && bankrollToken.symbol === bet.token.symbol
+            ? bankrollToken
+            : {
+                ...bet.token,
+                // Use BetSwirl's token image URL pattern
+                image: `https://www.betswirl.com/img/tokens/${bet.token.symbol.toUpperCase()}.svg`,
+              }
+
+        return {
+          id: bet.id.toString(),
+          status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
+          multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
+          payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
+          payoutCurrencyIcon: React.createElement(TokenIcon, {
+            token: tokenWithImage,
+            size: 18,
+          }),
+          timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
+        }
+      })
 
       setGameHistory(formattedHistory)
       logger.info("Game history fetched", { formattedHistory })
@@ -103,7 +104,7 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
     } finally {
       setIsLoading(false)
     }
-  }, [address, chainId, gameType])
+  }, [address, chainId, gameType, bankrollToken])
 
   useEffect(() => {
     fetchHistoryLogic()

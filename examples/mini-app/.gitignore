@@ -31,6 +31,8 @@ storybook-static
 .env.*
 !/.env.example
 
+tasks/
+
 # Playwright
 /test-results/
 /playwright-report/

@@ -1,0 +1,20 @@
+version: 2
+updates:
+
+  - package-ecosystem: "npm"
+    directory: "/examples/mini-app"
+    schedule:
+      interval: "daily"
+    groups:
+       all-dependencies:
+          patterns:
+            - "*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+       all-dependencies:
+          patterns:
+            - "*"
