@@ -4,13 +4,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import { zeroAddress } from "viem"
 
 import { cn } from "../../lib/utils"
-import {
-  BetStatus,
-  GameResult,
-  GameRolledResult,
-  HistoryEntry,
-  TokenWithImage,
-} from "../../types/types"
+import { BetStatus, GameResult, HistoryEntry, TokenWithImage } from "../../types/types"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Sheet, SheetTrigger } from "../ui/sheet"
@@ -55,21 +49,6 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   themeSettings: ThemeSettings
   children: React.ReactNode
   variant?: GameVariant
-}
-
-function formatRolledResult(rolled: GameRolledResult): string {
-  switch (rolled.game) {
-    case CASINO_GAME_TYPE.COINTOSS:
-      return rolled.rolled
-    case CASINO_GAME_TYPE.DICE:
-      return rolled.rolled.toString()
-    case CASINO_GAME_TYPE.ROULETTE:
-      return rolled.rolled.toString()
-    case CASINO_GAME_TYPE.KENO:
-      return rolled.rolled.join(", ")
-    default:
-      return ""
-  }
 }
 
 function GameFrameRoot({ themeSettings, children, variant = "default", ...props }: GameFrameProps) {
@@ -268,24 +247,11 @@ function GameControls({ children }: GameControlsProps) {
 
 interface ResultWindowProps {
   gameResult: GameResult | null
-  betAmount: bigint | undefined
   currency?: string
 }
 
-function ResultWindow({ gameResult, betAmount, currency = "ETH" }: ResultWindowProps) {
-  return (
-    <GameResultWindow
-      isVisible={!!gameResult}
-      isWin={gameResult?.isWin}
-      amount={betAmount || 0n}
-      payout={gameResult?.payout}
-      totalBetAmount={gameResult?.totalBetAmount}
-      currency={currency}
-      rolled={gameResult?.rolled ? formatRolledResult(gameResult.rolled) : ""}
-      formattedBenefit={gameResult?.formattedBenefit}
-      formattedPayout={gameResult?.formattedPayout}
-    />
-  )
+function ResultWindow({ gameResult, currency = "ETH" }: ResultWindowProps) {
+  return <GameResultWindow result={gameResult} currency={currency} />
 }
 
 interface BettingSectionProps {

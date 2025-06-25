@@ -45,6 +45,7 @@ export type GameEncodedInput =
 
 export type GameResult = CasinoRolledBet & {
   rolled: GameRolledResult
+  formattedRolled: string
 }
 
 export type BetStatus =
