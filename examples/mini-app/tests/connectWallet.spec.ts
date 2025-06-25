@@ -23,14 +23,13 @@ test('should attempt MetaMask connection', async ({
   await page.waitForLoadState('networkidle')
 
   const connectButton = page.getByTestId('ockConnectButton')
-  expect(connectButton).toBeVisible()
+  await expect(connectButton).toBeVisible()
   await connectButton.click()
 
   const onchainkitModal = page.locator('[data-testid="ockModalOverlay"]')
   await expect(onchainkitModal).toBeVisible()
   const metamaskBtn = onchainkitModal.getByRole('button').filter({ hasText: /metamask/i })
-  expect(metamaskBtn).toBeVisible()
-  metamaskBtn.click()
+  await metamaskBtn.click()
 
   await metamask.connectToDapp()
 
@@ -42,6 +41,5 @@ test('should attempt MetaMask connection', async ({
   await expect(walletConectedBtn).toBeVisible()
 
   const identityText = walletConectedBtn.locator('[data-testid="ockIdentity_Text"]')
-  await expect(identityText).toBeVisible()
-  expect(identityText).toContainText(addressStart)
+  await expect(identityText).toContainText(addressStart)
 })
