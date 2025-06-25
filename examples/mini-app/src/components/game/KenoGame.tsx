@@ -1,6 +1,13 @@
 import kenoBackground from "../../assets/game/game-background.jpg?no-inline"
 
-import { CASINO_GAME_TYPE, FORMAT_TYPE, Keno, KenoBall, formatRawAmount } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  FORMAT_TYPE,
+  Keno,
+  KenoBall,
+  formatRawAmount,
+  getFormattedNetMultiplier,
+} from "@betswirl/sdk-core"
 import { useEffect, useState } from "react"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { GameFrame } from "./GameFrame"
@@ -10,7 +17,6 @@ import { BaseGameProps } from "./shared/types"
 import { useGameControls } from "./shared/useGameControls"
 
 const DEFAULT_KENO_SELECTION: KenoBall[] = []
-const DEFAULT_MAX_SELECTIONS = 0
 
 export interface KenoGameProps extends BaseGameProps {}
 
@@ -38,6 +44,7 @@ export function KenoGame({
     gasPrice,
     targetPayoutAmount,
     grossMultiplier,
+    houseEdge,
     isInGameResultState,
     isGamePaused,
     nativeCurrencySymbol,
@@ -99,20 +106,30 @@ export function KenoGame({
         />
         <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
         <GameFrame.GameControls>
-          <KenoGameControls
-            selectedNumbers={selectedNumbers}
-            onNumbersChange={handleNumbersChange}
-            maxSelections={kenoConfig?.maxSelectableBalls ?? DEFAULT_MAX_SELECTIONS}
-            multipliers={
-              kenoConfig?.mutliplierTable[selectedNumbers.length]
-                ?.map((_, index) =>
-                  Keno.getFormattedMultiplier(kenoConfig, selectedNumbers.length, index),
-                )
-                .reverse() ?? []
-            }
-            isDisabled={isControlsDisabled}
-            lastGameWinningNumbers={lastWinningNumbers}
-          />
+          {kenoConfig ? (
+            <KenoGameControls
+              selectedNumbers={selectedNumbers}
+              onNumbersChange={handleNumbersChange}
+              maxSelections={kenoConfig.maxSelectableBalls}
+              biggestSelectableBall={kenoConfig.biggestSelectableBall}
+              multipliers={
+                kenoConfig.mutliplierTable[selectedNumbers.length]
+                  ?.map((_, index) =>
+                    getFormattedNetMultiplier(
+                      Keno.getMultiplier(kenoConfig, selectedNumbers.length, index),
+                      houseEdge,
+                    ),
+                  )
+                  .reverse() ?? []
+              }
+              isDisabled={isControlsDisabled}
+              lastGameWinningNumbers={lastWinningNumbers}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent" />
+            </div>
+          )}
         </GameFrame.GameControls>
         <GameFrame.ResultWindow
           gameResult={gameResult}

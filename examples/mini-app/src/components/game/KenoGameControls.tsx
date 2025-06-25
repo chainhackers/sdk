@@ -6,6 +6,7 @@ interface KenoGameControlsProps {
   selectedNumbers: KenoBall[]
   onNumbersChange: (numbers: KenoBall[]) => void
   maxSelections: number
+  biggestSelectableBall: number
   multipliers: number[]
   isDisabled: boolean
   lastGameWinningNumbers?: number[]
@@ -63,9 +64,7 @@ const BUTTON_STYLES = {
   common: "w-[40px] h-[40px] p-0 text-[12px] font-medium rounded-[6px] shadow-none",
 } as const
 
-const KENO_NUMBERS_COUNT = 15
 const KENO_GRID_COLS = 4
-const KENO_GRID_ROWS = 4
 
 const NumberButton = React.memo<NumberButtonProps>(
   ({ number, isSelected, isDisabled, isWinningNumber, onClick }) => {
@@ -116,6 +115,7 @@ export function KenoGameControls({
   onNumbersChange,
   isDisabled,
   maxSelections,
+  biggestSelectableBall,
   multipliers,
   lastGameWinningNumbers = [],
 }: KenoGameControlsProps) {
@@ -138,17 +138,19 @@ export function KenoGameControls({
 
   const visibleMultipliersCount = selectedNumbers.length > 0 ? selectedNumbers.length + 1 : 0
   const numbers: KenoBall[] = Array.from(
-    { length: KENO_NUMBERS_COUNT },
+    { length: biggestSelectableBall },
     (_, i) => (i + 1) as KenoBall,
   )
 
   const renderNumberGrid = () => {
     const rows = []
-    for (let row = 0; row < KENO_GRID_ROWS; row++) {
+    const gridRows = Math.ceil(biggestSelectableBall / KENO_GRID_COLS)
+
+    for (let row = 0; row < gridRows; row++) {
       const rowNumbers = []
       for (let col = 0; col < KENO_GRID_COLS; col++) {
         const numberIndex = row * KENO_GRID_COLS + col
-        if (numberIndex >= KENO_NUMBERS_COUNT) break
+        if (numberIndex >= biggestSelectableBall) break
 
         const number = numbers[numberIndex]
         rowNumbers.push(
@@ -177,7 +179,8 @@ export function KenoGameControls({
 
       <div className="flex flex-col gap-[2px] pt-[32px]">
         {multipliers.map((value, index) => (
-          <MultiplierItem key={value} value={value} isVisible={index < visibleMultipliersCount} />
+          // biome-ignore lint/suspicious/noArrayIndexKey: Multiplier items are positionally keyed; array length is fixed
+          <MultiplierItem key={index} value={value} isVisible={index < visibleMultipliersCount} />
         ))}
       </div>
     </div>

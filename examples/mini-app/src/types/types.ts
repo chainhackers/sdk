@@ -45,6 +45,7 @@ export type GameEncodedInput =
 export interface GameResult {
   isWin: boolean
   payout: bigint
+  totalBetAmount: bigint
   currency: string
   rolled: GameRolledResult
 }

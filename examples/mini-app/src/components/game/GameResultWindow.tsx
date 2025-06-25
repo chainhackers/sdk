@@ -21,6 +21,7 @@ interface GameResultWindowProps {
   isVisible: boolean
   amount: bigint
   payout?: bigint
+  totalBetAmount?: bigint
   currency: string
   rolled: string
   className?: string
@@ -31,6 +32,7 @@ export function GameResultWindow({
   isVisible,
   amount,
   payout = 0n,
+  totalBetAmount,
   currency,
   rolled,
   className,
@@ -55,11 +57,8 @@ export function GameResultWindow({
     return null
   }
 
-  const formattedAmount = formatRawAmount(
-    isWin ? payout - amount : amount - payout,
-    18,
-    FORMAT_TYPE.PRECISE,
-  )
+  const betAmountToUse = totalBetAmount ?? amount
+  const formattedAmount = formatRawAmount(payout - betAmountToUse, 18, FORMAT_TYPE.PRECISE)
   const formattedPayout = formatRawAmount(payout, 18, FORMAT_TYPE.PRECISE) //TODO use tokenDecimals
 
   return (

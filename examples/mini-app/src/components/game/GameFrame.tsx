@@ -279,6 +279,7 @@ function ResultWindow({ gameResult, betAmount, currency = "ETH" }: ResultWindowP
       isWin={gameResult?.isWin}
       amount={betAmount || 0n}
       payout={gameResult?.payout}
+      totalBetAmount={gameResult?.totalBetAmount}
       currency={currency}
       rolled={gameResult?.rolled ? formatRolledResult(gameResult.rolled) : ""}
     />

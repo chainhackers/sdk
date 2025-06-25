@@ -47,6 +47,7 @@ function _extractEventData(
 ): {
   rolledData: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled
   payout: bigint
+  totalBetAmount: bigint
   id: bigint
 } {
   switch (gameType) {
@@ -54,11 +55,13 @@ function _extractEventData(
       const diceRollArgs = decodedRollLog.args as unknown as {
         id: bigint
         payout: bigint
+        totalBetAmount: bigint
         rolled: DiceNumber
       }
       return {
         rolledData: diceRollArgs.rolled,
         payout: diceRollArgs.payout,
+        totalBetAmount: diceRollArgs.totalBetAmount,
         id: diceRollArgs.id,
       }
     }
@@ -66,11 +69,13 @@ function _extractEventData(
       const coinTossRollArgs = decodedRollLog.args as unknown as {
         id: bigint
         payout: bigint
+        totalBetAmount: bigint
         rolled: boolean[]
       }
       return {
         rolledData: coinTossRollArgs.rolled,
         payout: coinTossRollArgs.payout,
+        totalBetAmount: coinTossRollArgs.totalBetAmount,
         id: coinTossRollArgs.id,
       }
     }
@@ -78,11 +83,13 @@ function _extractEventData(
       const rouletteRollArgs = decodedRollLog.args as unknown as {
         id: bigint
         payout: bigint
+        totalBetAmount: bigint
         rolled: RouletteNumber
       }
       return {
         rolledData: rouletteRollArgs.rolled,
         payout: rouletteRollArgs.payout,
+        totalBetAmount: rouletteRollArgs.totalBetAmount,
         id: rouletteRollArgs.id,
       }
     }
@@ -90,11 +97,13 @@ function _extractEventData(
       const kenoRollArgs = decodedRollLog.args as unknown as {
         id: bigint
         payout: bigint
+        totalBetAmount: bigint
         rolled: KenoEncodedRolled
       }
       return {
         rolledData: kenoRollArgs.rolled,
         payout: kenoRollArgs.payout,
+        totalBetAmount: kenoRollArgs.totalBetAmount,
         id: kenoRollArgs.id,
       }
     }
@@ -223,7 +232,7 @@ export function useBetResultWatcher({
   }, [enabled, watchParams, status, filterErrorOccurred])
 
   const processEventLogs = useCallback((logs: readonly Log[], currentWatchParams: WatchTarget) => {
-    const { betId, gameType, eventAbi, eventName, betAmount } = currentWatchParams
+    const { betId, gameType, eventAbi, eventName } = currentWatchParams
     logger.debug(`processEventLogs: Processing ${logs.length} logs for betId ${betId}`, {
       eventName,
     })
@@ -239,7 +248,7 @@ export function useBetResultWatcher({
       if (!decodedRollLog.eventName || !decodedRollLog.args) continue
       if (decodedRollLog.eventName !== eventName) continue
 
-      const { rolledData, payout, id } = _extractEventData(
+      const { rolledData, payout, totalBetAmount, id } = _extractEventData(
         decodedRollLog as unknown as DecodedEventLog,
         gameType,
       )
@@ -247,8 +256,9 @@ export function useBetResultWatcher({
       if (id === betId) {
         const rolledResult = _decodeRolled(rolledData, gameType)
         const result: GameResult = {
-          isWin: payout > betAmount,
+          isWin: payout >= totalBetAmount,
           payout: payout,
+          totalBetAmount: totalBetAmount,
           currency: "ETH",
           rolled: rolledResult,
         }

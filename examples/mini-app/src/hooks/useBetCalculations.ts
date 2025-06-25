@@ -2,7 +2,6 @@ import {
   CASINO_GAME_TYPE,
   CoinToss,
   Dice,
-  Keno,
   KenoConfiguration,
   Roulette,
   getPayoutDetails,
@@ -45,7 +44,8 @@ function getMultiplierForGame(selection: GameChoice, kenoConfig?: KenoConfigurat
         throw new Error("Keno configuration is required for Keno multiplier calculation")
       }
 
-      return Keno.getMultiplier(kenoConfig, selectedCount, Math.ceil(selectedCount / 2))
+      const multipliers = kenoConfig.mutliplierTable[selectedCount] || []
+      return Math.max(...multipliers, 0)
     }
     default:
       throw new Error(`Unsupported game type: ${(selection as any).game}`)
