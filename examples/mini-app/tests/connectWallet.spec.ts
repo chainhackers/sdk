@@ -1,4 +1,3 @@
-// Import necessary Synpress modules and setup
 import { testWithSynpress } from '@synthetixio/synpress'
 import { MetaMask, metaMaskFixtures } from '@synthetixio/synpress/playwright'
 import basicSetup from '../test/wallet-setup/basic.setup'
