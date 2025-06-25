@@ -25,6 +25,8 @@ interface GameResultWindowProps {
   currency: string
   rolled: string
   className?: string
+  formattedBenefit?: string
+  formattedPayout?: string
 }
 
 export function GameResultWindow({
@@ -36,10 +38,11 @@ export function GameResultWindow({
   currency,
   rolled,
   className,
+  formattedBenefit,
+  formattedPayout,
 }: GameResultWindowProps) {
   const resultType = isWin ? "win" : "loss"
   const currentImages = images[resultType]
-  const sign = isWin ? "+" : "-"
 
   useEffect(() => {
     const preloadImg = (imgSrc: string) => {
@@ -58,8 +61,9 @@ export function GameResultWindow({
   }
 
   const betAmountToUse = totalBetAmount ?? amount
-  const formattedAmount = formatRawAmount(payout - betAmountToUse, 18, FORMAT_TYPE.PRECISE)
-  const formattedPayout = formatRawAmount(payout, 18, FORMAT_TYPE.PRECISE) //TODO use tokenDecimals
+  const formattedAmount =
+    formattedBenefit ?? formatRawAmount(payout - betAmountToUse, 18, FORMAT_TYPE.PRECISE)
+  const formattedPayoutValue = formattedPayout ?? formatRawAmount(payout, 18, FORMAT_TYPE.PRECISE)
 
   return (
     <div
@@ -76,12 +80,12 @@ export function GameResultWindow({
           <img className="absolute" src={currentImages.icon} alt={`${resultType} icon`} />
         </div>
         <p className="text-[16px] leading-[150%] font-bold">
-          {sign}
+          {isWin && "+"}
           {formattedAmount}
           <span className="uppercase"> {currency}</span>
         </p>
         <p className="text-[14px] leading-[157%] font-semibold">
-          Payout: {formattedPayout}
+          Payout: {formattedPayoutValue}
           <span className="uppercase"> {currency}</span>
         </p>
         <p className="text-[12px] leading-[167%] font-medium uppercase">Draw: {rolled}</p>

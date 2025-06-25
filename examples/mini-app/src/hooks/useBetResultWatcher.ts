@@ -3,10 +3,13 @@ import {
   CoinToss,
   Dice,
   DiceNumber,
+  FORMAT_TYPE,
   Keno,
   KenoEncodedRolled,
+  NORMAL_CASINO_GAME_TYPE,
   Roulette,
   RouletteNumber,
+  formatCasinoRolledBet,
 } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { AbiEvent, Log } from "viem"
@@ -232,7 +235,7 @@ export function useBetResultWatcher({
   }, [enabled, watchParams, status, filterErrorOccurred])
 
   const processEventLogs = useCallback((logs: readonly Log[], currentWatchParams: WatchTarget) => {
-    const { betId, gameType, eventAbi, eventName } = currentWatchParams
+    const { betId, gameType, eventAbi, eventName, placedBet } = currentWatchParams
     logger.debug(`processEventLogs: Processing ${logs.length} logs for betId ${betId}`, {
       eventName,
     })
@@ -254,18 +257,35 @@ export function useBetResultWatcher({
       )
 
       if (id === betId) {
+        const rollEvent = {
+          args: {
+            id,
+            payout,
+            totalBetAmount,
+            rolled: Array.isArray(rolledData) ? rolledData : [rolledData],
+          },
+          transactionHash: log.transactionHash!,
+        }
+
+        const casinoRolledBet = formatCasinoRolledBet(
+          { ...placedBet, game: gameType as NORMAL_CASINO_GAME_TYPE },
+          rollEvent,
+          FORMAT_TYPE.PRECISE,
+        )
+
         const rolledResult = _decodeRolled(rolledData, gameType)
+
         const result: GameResult = {
-          isWin: payout >= totalBetAmount,
-          payout: payout,
-          totalBetAmount: totalBetAmount,
-          currency: "ETH",
+          ...casinoRolledBet,
           rolled: rolledResult,
         }
+
         logger.debug("processEventLogs: Bet event processed:", {
-          ...result,
           betId,
           txHash: log.transactionHash,
+          isWin: result.isWin,
+          payout: result.payout,
+          benefit: result.benefit,
         })
         setInternalGameResult(result)
         setStatus("success")
