@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { config } from './app.config'
 
 export default defineConfig({
   testDir: './tests',
@@ -12,7 +13,7 @@ export default defineConfig({
     timeout: 7 * 1000,
   },
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: config.baseUrl,
     trace: 'on-first-retry',
     headless: false,
   },

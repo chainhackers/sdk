@@ -1,11 +1,10 @@
 // Import necessary Synpress modules
 import { defineWalletSetup } from '@synthetixio/synpress'
 import { MetaMask } from '@synthetixio/synpress/playwright'
-import 'dotenv/config'
+import { config } from '../../app.config'
 
-// Define a test seed phrase and password
-const SEED_PHRASE = process.env.SEED_PHRASE || 'test test test test test test test test test test test junk'
-const PASSWORD = process.env.WALLET_PASSWORD || 'Tester@1234'
+const SEED_PHRASE = config.test.seedPhrase
+const PASSWORD = config.test.walletPassword
 
 // Define the basic wallet setup
 export default defineWalletSetup(PASSWORD, async (context, walletPage) => {
