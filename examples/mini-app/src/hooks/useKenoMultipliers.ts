@@ -7,8 +7,13 @@ interface UseKenoMultipliersProps {
   houseEdge: number
 }
 
+interface KenoMultiplierData {
+  multiplier: number
+  winChance: number
+}
+
 interface UseKenoMultipliersResult {
-  multipliers: number[]
+  multipliers: KenoMultiplierData[]
   isLoading: boolean
 }
 
@@ -28,12 +33,18 @@ export function useKenoMultipliers({
     }
 
     return rawMultipliers
-      .map((_, index) =>
-        getFormattedNetMultiplier(
+      .map((_, index) => {
+        const multiplier = getFormattedNetMultiplier(
           Keno.getMultiplier(kenoConfig, selectedNumbersCount, index),
           houseEdge,
-        ),
-      )
+        )
+        const winChance = Keno.getWinChancePercent(kenoConfig, selectedNumbersCount, index)
+
+        return {
+          multiplier,
+          winChance,
+        }
+      })
       .reverse()
   }, [kenoConfig, selectedNumbersCount, houseEdge])
 

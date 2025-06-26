@@ -4,12 +4,17 @@ import React from "react"
 import { Button } from "../ui/button"
 import { Tooltip, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 
+interface KenoMultiplierData {
+  multiplier: number
+  winChance: number
+}
+
 interface KenoGameControlsProps {
   selectedNumbers: KenoBall[]
   onNumbersChange: (numbers: KenoBall[]) => void
   maxSelections: number
   biggestSelectableBall: number
-  multipliers: number[]
+  multipliers: KenoMultiplierData[]
   isDisabled: boolean
   lastGameWinningNumbers?: number[]
 }
@@ -23,7 +28,7 @@ interface NumberButtonProps {
 }
 
 interface MultiplierItemProps {
-  value: number
+  data: KenoMultiplierData
   isVisible: boolean
 }
 
@@ -102,14 +107,14 @@ const NumberButton = React.memo<NumberButtonProps>(
   },
 )
 
-const MultiplierItem = React.memo<MultiplierItemProps>(({ value, isVisible }) => {
+const MultiplierItem = React.memo<MultiplierItemProps>(({ data, isVisible }) => {
   if (!isVisible) return null
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="w-[48px] h-[15px] flex items-center justify-center text-[10px] font-medium rounded-[4px] bg-keno-multiplier-bg text-white cursor-default">
-          {value}x
+          {data.multiplier}x
         </div>
       </TooltipTrigger>
       <TooltipPrimitive.Portal>
@@ -118,7 +123,7 @@ const MultiplierItem = React.memo<MultiplierItemProps>(({ value, isVisible }) =>
           sideOffset={2.5}
           className="h-[15px] px-2 py-0 text-[10px] font-medium rounded-[3px] bg-keno-multiplier-tooltip-bg text-white border-none shadow-none flex items-center z-50"
         >
-          win chance
+          {data.winChance.toFixed(2)}% win chance
           <TooltipPrimitive.Arrow
             className="fill-keno-multiplier-tooltip-bg z-50 rounded-[1px]"
             width={10}
@@ -199,9 +204,9 @@ export function KenoGameControls({
         <div className="flex flex-col gap-[2px]">{renderNumberGrid()}</div>
 
         <div className="flex flex-col gap-[2px] pt-[32px]">
-          {multipliers.map((value, index) => (
+          {multipliers.map((data, index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: Multiplier items are positionally keyed; array length is fixed
-            <MultiplierItem key={index} value={value} isVisible={index < visibleMultipliersCount} />
+            <MultiplierItem key={index} data={data} isVisible={index < visibleMultipliersCount} />
           ))}
         </div>
       </div>
