@@ -117,20 +117,18 @@ const MultiplierItem = React.memo<MultiplierItemProps>(({ data, isVisible }) => 
           {data.multiplier}x
         </div>
       </TooltipTrigger>
-      <TooltipPrimitive.Portal>
-        <TooltipPrimitive.Content
-          side="left"
-          sideOffset={2.5}
-          className="h-[15px] px-2 py-0 text-[10px] font-medium rounded-[3px] bg-keno-multiplier-tooltip-bg text-white border-none shadow-none flex items-center z-50"
-        >
-          {data.winChance.toFixed(2)}% win chance
-          <TooltipPrimitive.Arrow
-            className="fill-keno-multiplier-tooltip-bg z-50 rounded-[1px]"
-            width={10}
-            height={5}
-          />
-        </TooltipPrimitive.Content>
-      </TooltipPrimitive.Portal>
+      <TooltipPrimitive.Content
+        side="left"
+        sideOffset={2.5}
+        className="h-[15px] px-2 py-0 text-[10px] font-medium rounded-[3px] bg-keno-multiplier-tooltip-bg text-keno-multiplier-tooltip-text border-none shadow-none flex items-center z-50"
+      >
+        {data.winChance.toFixed(2)}% win chance
+        <TooltipPrimitive.Arrow
+          className="fill-keno-multiplier-tooltip-bg z-50 rounded-[1px]"
+          width={10}
+          height={5}
+        />
+      </TooltipPrimitive.Content>
     </Tooltip>
   )
 })
