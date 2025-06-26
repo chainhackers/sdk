@@ -21,27 +21,23 @@ export function KenoGame({
   ...props
 }: KenoGameProps) {
   const [lastWinningNumbers, setLastWinningNumbers] = useState<KenoBall[]>([])
-  const gameLogic = useGameLogic({
-    gameType: CASINO_GAME_TYPE.KENO,
-    defaultSelection: {
-      game: CASINO_GAME_TYPE.KENO,
-      choice: DEFAULT_KENO_SELECTION,
-    },
-    backgroundImage,
-  })
-
   const {
     isWalletConnected,
+    balance,
     token,
+    areChainsSynced,
     gameHistory,
     refreshHistory,
+    betAmount,
     selection,
     setSelection,
     betStatus,
     gameResult,
+    vrfFees,
     formattedVrfFees,
     gasPrice,
     targetPayoutAmount,
+    grossMultiplier,
     houseEdge,
     isInGameResultState,
     isGamePaused,
@@ -49,8 +45,20 @@ export function KenoGame({
     themeSettings: baseThemeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
+    needsTokenApproval,
+    isApprovePending,
+    isApproveConfirming,
+    isRefetchingAllowance,
+    approveError,
     kenoConfig,
-  } = gameLogic
+  } = useGameLogic({
+    gameType: CASINO_GAME_TYPE.KENO,
+    defaultSelection: {
+      game: CASINO_GAME_TYPE.KENO,
+      choice: DEFAULT_KENO_SELECTION,
+    },
+    backgroundImage,
+  })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
   const isControlsDisabled = useGameControls(
@@ -65,7 +73,7 @@ export function KenoGame({
   const { multipliers } = useKenoMultipliers({
     kenoConfig,
     selectedNumbersCount: selectedNumbers.length,
-    houseEdge: houseEdge,
+    houseEdge,
   })
 
   useEffect(() => {
@@ -117,13 +125,25 @@ export function KenoGame({
         <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
-        {...gameLogic}
         game={CASINO_GAME_TYPE.KENO}
         betCount={1}
+        grossMultiplier={grossMultiplier}
+        balance={balance}
         isConnected={isWalletConnected}
+        token={token}
+        betStatus={betStatus}
+        betAmount={betAmount}
+        vrfFees={vrfFees}
         onBetAmountChange={handleBetAmountChange}
         onPlayBtnClick={handlePlayButtonClick}
+        areChainsSynced={areChainsSynced}
+        isGamePaused={isGamePaused}
         hasValidSelection={selectedNumbers.length > 0}
+        needsTokenApproval={needsTokenApproval}
+        isApprovePending={isApprovePending}
+        isApproveConfirming={isApproveConfirming}
+        isRefetchingAllowance={isRefetchingAllowance}
+        approveError={approveError}
       />
     </GameFrame>
   )

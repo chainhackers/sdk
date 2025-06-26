@@ -22,7 +22,36 @@ export function CoinTossGame({
   backgroundImage = coinTossBackground,
   ...props
 }: CoinTossGameProps) {
-  const gameLogic = useGameLogic({
+  const {
+    isWalletConnected,
+    balance,
+    token,
+    areChainsSynced,
+    gameHistory,
+    refreshHistory,
+    betAmount,
+    selection,
+    setSelection,
+    betStatus,
+    gameResult,
+    vrfFees,
+    formattedVrfFees,
+    gasPrice,
+    targetPayoutAmount,
+    formattedNetMultiplier,
+    grossMultiplier,
+    isInGameResultState,
+    isGamePaused,
+    nativeCurrencySymbol,
+    themeSettings: baseThemeSettings,
+    handlePlayButtonClick,
+    handleBetAmountChange,
+    needsTokenApproval,
+    isApprovePending,
+    isApproveConfirming,
+    isRefetchingAllowance,
+    approveError,
+  } = useGameLogic({
     gameType: CASINO_GAME_TYPE.COINTOSS,
     defaultSelection: {
       game: CASINO_GAME_TYPE.COINTOSS,
@@ -30,27 +59,6 @@ export function CoinTossGame({
     },
     backgroundImage,
   })
-
-  const {
-    isWalletConnected,
-    token,
-    gameHistory,
-    refreshHistory,
-    selection,
-    setSelection,
-    betStatus,
-    gameResult,
-    formattedVrfFees,
-    gasPrice,
-    targetPayoutAmount,
-    formattedNetMultiplier,
-    isInGameResultState,
-    isGamePaused,
-    nativeCurrencySymbol,
-    themeSettings: baseThemeSettings,
-    handlePlayButtonClick,
-    handleBetAmountChange,
-  } = gameLogic
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
   const isControlsDisabled = useGameControls(
@@ -95,12 +103,24 @@ export function CoinTossGame({
         <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
-        {...gameLogic}
         game={CASINO_GAME_TYPE.COINTOSS}
-        betCount={1}
+        betCount={1} // TODO: Dynamic bet count support (#64)
+        grossMultiplier={grossMultiplier}
+        balance={balance}
         isConnected={isWalletConnected}
+        token={token}
+        betStatus={betStatus}
+        betAmount={betAmount}
+        vrfFees={vrfFees}
         onBetAmountChange={handleBetAmountChange}
         onPlayBtnClick={handlePlayButtonClick}
+        areChainsSynced={areChainsSynced}
+        isGamePaused={isGamePaused}
+        needsTokenApproval={needsTokenApproval}
+        isApprovePending={isApprovePending}
+        isApproveConfirming={isApproveConfirming}
+        isRefetchingAllowance={isRefetchingAllowance}
+        approveError={approveError}
       />
     </GameFrame>
   )
