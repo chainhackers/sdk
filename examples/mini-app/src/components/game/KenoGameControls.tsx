@@ -1,6 +1,8 @@
 import { KenoBall } from "@betswirl/sdk-core"
+import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 import React from "react"
 import { Button } from "../ui/button"
+import { Tooltip, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 
 interface KenoGameControlsProps {
   selectedNumbers: KenoBall[]
@@ -104,9 +106,27 @@ const MultiplierItem = React.memo<MultiplierItemProps>(({ value, isVisible }) =>
   if (!isVisible) return null
 
   return (
-    <div className="w-[48px] h-[15px] flex items-center justify-center text-[10px] font-medium rounded-[4px] bg-keno-multiplier-bg text-white">
-      {value}x
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="w-[48px] h-[15px] flex items-center justify-center text-[10px] font-medium rounded-[4px] bg-keno-multiplier-bg text-white cursor-default">
+          {value}x
+        </div>
+      </TooltipTrigger>
+      <TooltipPrimitive.Portal>
+        <TooltipPrimitive.Content
+          side="left"
+          sideOffset={2.5}
+          className="h-[15px] px-2 py-0 text-[10px] font-medium rounded-[3px] bg-keno-multiplier-tooltip-bg text-white border-none shadow-none flex items-center z-50"
+        >
+          win chance
+          <TooltipPrimitive.Arrow
+            className="fill-keno-multiplier-tooltip-bg z-50 rounded-[1px]"
+            width={10}
+            height={5}
+          />
+        </TooltipPrimitive.Content>
+      </TooltipPrimitive.Portal>
+    </Tooltip>
   )
 })
 
@@ -174,15 +194,17 @@ export function KenoGameControls({
   }
 
   return (
-    <div className="absolute top-[16px] bottom-[16px] left-[69px] right-0 flex gap-[13px]">
-      <div className="flex flex-col gap-[2px]">{renderNumberGrid()}</div>
+    <TooltipProvider>
+      <div className="absolute top-[16px] bottom-[16px] left-[69px] right-0 flex gap-[13px]">
+        <div className="flex flex-col gap-[2px]">{renderNumberGrid()}</div>
 
-      <div className="flex flex-col gap-[2px] pt-[32px]">
-        {multipliers.map((value, index) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: Multiplier items are positionally keyed; array length is fixed
-          <MultiplierItem key={index} value={value} isVisible={index < visibleMultipliersCount} />
-        ))}
+        <div className="flex flex-col gap-[2px] pt-[32px]">
+          {multipliers.map((value, index) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: Multiplier items are positionally keyed; array length is fixed
+            <MultiplierItem key={index} value={value} isVisible={index < visibleMultipliersCount} />
+          ))}
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   )
 }
