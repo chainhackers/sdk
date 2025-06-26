@@ -74,10 +74,12 @@ Open in browser:
 Storybook: http://localhost:6006/
 Dev server: http://localhost:5173/
 ```
-...
-To run e2e tests, follow these steps:
 
-Start development server:
+## Testing
+
+### Run e2e tests:
+
+Start development server (if not already running):
 ```bash
 pnpm dev
 ```
