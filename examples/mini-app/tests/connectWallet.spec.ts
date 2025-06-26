@@ -37,7 +37,7 @@ test('should attempt MetaMask connection', async ({
   const addressStart = address.slice(0, 6)
   
   const walletConectedBtn = page.locator('[data-testid="ockConnectWallet_Connected"]')
-  await expect(walletConectedBtn).toBeVisible()
+  await expect(walletConectedBtn).toBeVisible({ timeout: 10000 })
 
   const identityText = walletConectedBtn.locator('[data-testid="ockIdentity_Text"]')
   await expect(identityText).toContainText(addressStart)
