@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.10
+
+### Patch Changes
+
+- Add credentials to fetchFreebetCampaign
+
 ## 0.1.9
 
 ### Patch Changes
