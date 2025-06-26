@@ -50,7 +50,7 @@ export function parseRawKenoConfiguration(
     chainId: casinoChainId,
     biggestSelectableBall: Number(rawConfiguration[0]),
     maxSelectableBalls: Number(rawConfiguration[1]),
-    mutliplierTable: [
+    multiplierTable: [
       [0],
       ...rawConfiguration[2].map((row) => row.map((multiplier) => Number(multiplier))),
     ],
@@ -62,7 +62,7 @@ export interface KenoConfiguration {
   chainId: CasinoChainId;
   biggestSelectableBall: number;
   maxSelectableBalls: number;
-  mutliplierTable: number[][]; // BP
+  multiplierTable: number[][]; // BP
 }
 
 export async function getKenoConfiguration(

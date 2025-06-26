@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.9
+
+### Patch Changes
+
+- Fix Keno table typo
+
 ## 0.1.8
 
 ### Patch Changes

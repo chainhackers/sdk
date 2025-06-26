@@ -93,6 +93,10 @@ export const fetchFreebetCampaigns = async (
     }
     const res = await fetch(
       `${getBetSwirlApiUrl(testMode)}/affiliate/v1/freebet/campaigns?${params.toString()}`,
+      {
+        // This is needed to get the JWT cookie from the browser
+        credentials: "include",
+      },
     );
     if (!res.ok) {
       throw new Error(`Status ${res.status}: ${res.statusText}`);

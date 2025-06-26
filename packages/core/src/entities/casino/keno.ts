@@ -84,7 +84,7 @@ export class Keno extends AbstractCasinoGame<
     selectedBallsCount: number,
     matchedBallsCount: number,
   ): number {
-    return kenoConfig.mutliplierTable[selectedBallsCount]?.[matchedBallsCount] || 0;
+    return kenoConfig.multiplierTable[selectedBallsCount]?.[matchedBallsCount] || 0;
   }
 
   static getFormattedMultiplier(
