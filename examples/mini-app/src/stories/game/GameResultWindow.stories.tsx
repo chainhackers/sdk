@@ -1,6 +1,8 @@
+import { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { parseUnits } from "viem"
 import { GameResultWindow } from "../../components/game/GameResultWindow"
+import { GameResult } from "../../types/types"
 
 const meta = {
   title: "Game/GameResultWindow",
@@ -17,18 +19,6 @@ const meta = {
   },
   tags: ["autodocs"],
   argTypes: {
-    isVisible: {
-      control: "boolean",
-    },
-    isWin: {
-      control: "boolean",
-    },
-    amount: {
-      control: "number",
-    },
-    payout: {
-      control: "number",
-    },
     currency: {
       control: "text",
     },
@@ -38,11 +28,60 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const createMockGameResult = (isWin: boolean, payout: bigint): GameResult => ({
+  id: 1n,
+  betAmount: parseUnits("1.1234567", 18),
+  betCount: 1,
+  totalBetAmount: parseUnits("1.1234567", 18),
+  chargedVRFCost: 0n,
+  token: {
+    address: "0x0000000000000000000000000000000000000000",
+    symbol: "ETH",
+    decimals: 18,
+  },
+  affiliate: "0x0000000000000000000000000000000000000000",
+  receiver: "0x0000000000000000000000000000000000000000",
+  stopGain: 0n,
+  stopLoss: 0n,
+  betTxnHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+  betBlock: 0n,
+  chainId: 42161,
+  game: CASINO_GAME_TYPE.COINTOSS,
+  isWin,
+  isLost: !isWin,
+  isStopLossTriggered: false,
+  isStopGainTriggered: false,
+  rollBetCount: 1,
+  rollTotalBetAmount: parseUnits("1.1234567", 18),
+  formattedRollTotalBetAmount: "1.1234567",
+  payout,
+  formattedPayout: (Number(payout) / 1e18).toFixed(7),
+  benefit: payout - parseUnits("1.1234567", 18),
+  formattedBenefit: ((Number(payout) - Number(parseUnits("1.1234567", 18))) / 1e18).toFixed(7),
+  formattedPayoutMultiplier: "1.940",
+  rollTxnHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+  encodedRolled: [true],
+  decodedRolled: [true],
+  nativeCurrency: {
+    address: "0x0000000000000000000000000000000000000000",
+    symbol: "ETH",
+    decimals: 18,
+  },
+  formattedBetAmount: "1.1234567",
+  formattedTotalBetAmount: "1.1234567",
+  formattedStopLoss: "0",
+  formattedStopGain: "0",
+  formattedChargedVRFFees: "0",
+  rolled: {
+    game: CASINO_GAME_TYPE.COINTOSS,
+    rolled: isWin ? COINTOSS_FACE.HEADS : COINTOSS_FACE.TAILS,
+  },
+  formattedRolled: isWin ? COINTOSS_FACE.HEADS : COINTOSS_FACE.TAILS,
+})
+
 const Template: Story = {
   args: {
-    isVisible: false,
-    amount: parseUnits("1.1234567", 18),
-    rolled: "HEADS",
+    result: null,
     currency: "ETH",
   },
   render: (args) => (
@@ -56,9 +95,7 @@ export const WinLight: Story = {
   ...Template,
   args: {
     ...Template.args,
-    isVisible: true,
-    isWin: true,
-    payout: (parseUnits("1.1234567", 18) * 194n) / 100n,
+    result: createMockGameResult(true, (parseUnits("1.1234567", 18) * 194n) / 100n),
   },
   render: (args) => (
     <div className="light">
@@ -73,10 +110,7 @@ export const LossLight: Story = {
   ...Template,
   args: {
     ...Template.args,
-    isVisible: true,
-    isWin: false,
-    payout: 0n,
-    rolled: "TAILS",
+    result: createMockGameResult(false, 0n),
   },
   render: (args) => (
     <div className="light">
@@ -94,9 +128,7 @@ export const WinDark: Story = {
   },
   args: {
     ...Template.args,
-    isVisible: true,
-    isWin: true,
-    payout: (parseUnits("1.1234567", 18) * 194n) / 100n,
+    result: createMockGameResult(true, (parseUnits("1.1234567", 18) * 194n) / 100n),
   },
   render: (args) => (
     <div className="dark">
@@ -114,10 +146,7 @@ export const LossDark: Story = {
   },
   args: {
     ...Template.args,
-    isVisible: true,
-    isWin: false,
-    payout: 0n,
-    rolled: "TAILS",
+    result: createMockGameResult(false, 0n),
   },
   render: (args) => (
     <div className="dark">

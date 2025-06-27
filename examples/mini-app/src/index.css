@@ -76,6 +76,8 @@
   --color-keno-unselected-hover-bg: var(--keno-unselected-hover-bg);
   --color-keno-unselected-text: var(--keno-unselected-text);
   --color-keno-multiplier-bg: var(--keno-multiplier-bg);
+  --color-keno-multiplier-tooltip-bg: var(--keno-multiplier-tooltip-bg);
+  --color-keno-multiplier-tooltip-text: var(--keno-multiplier-tooltip-text);
   --color-keno-winning-border: var(--keno-winning-border);
 }
 
@@ -174,6 +176,8 @@
     --keno-unselected-hover-bg: oklch(0.9516 0.0017 247.84);
     --keno-unselected-text: oklch(0.1 0 0);
     --keno-multiplier-bg: oklch(0.1559 0.02 269.69 / 0.4);
+    --keno-multiplier-tooltip-bg: oklch(0.2113 0.0224 240.71 / 0.72);
+    --keno-multiplier-tooltip-text: oklch(1 0 0);
     --keno-winning-border: oklch(0.784 0.1418 166.22);
   }
 
@@ -227,6 +231,8 @@
     --keno-unselected-hover-bg: oklch(0.2746 0.0057 236.74);
     --keno-unselected-text: oklch(1 0 0);
     --keno-multiplier-bg: oklch(0.9137 0.0153 273.84 / 0.2);
+    --keno-multiplier-tooltip-bg: oklch(0.9276 0.0058 264.53 / 0.8);
+    --keno-multiplier-tooltip-text: oklch(0.343 0.0139 235.28);
   }
 
   @font-face {
