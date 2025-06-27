@@ -1,9 +1,9 @@
 import { FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
 import { useEffect } from "react"
-import lossBgWebp from "../../assets/game/game-result/loss-bg.webp?no-inline"
-import lossIcon from "../../assets/game/game-result/loss-icon.svg?no-inline"
-import winBgWebp from "../../assets/game/game-result/win-bg.webp?no-inline"
-import winIcon from "../../assets/game/game-result/win-icon.svg?no-inline"
+import lossBgWebp from "../../assets/game/game-result/loss-bg.webp"
+import lossIcon from "../../assets/game/game-result/loss-icon.svg"
+import winBgWebp from "../../assets/game/game-result/win-bg.webp"
+import winIcon from "../../assets/game/game-result/win-icon.svg"
 
 const images = {
   win: {
