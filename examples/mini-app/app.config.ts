@@ -1,10 +1,26 @@
 import 'dotenv/config'
 
-const port = Number(process.env.PORT) || 5173
+const DEFAULT_URL = 'http://localhost:5173'
+const DEFAULT_PORT = 5173
+
+if (!process.env.BASE_URL) {
+  console.warn('WARNING: BASE_URL is not set in environment variables!')
+}
+
+const baseUrl = process.env.BASE_URL || DEFAULT_URL
+
+const parsedUrl = new URL(baseUrl)
+const server = {
+  isHttps: parsedUrl.protocol === 'https:',
+  host: parsedUrl.hostname,
+  port: Number(parsedUrl.port) || DEFAULT_PORT,
+}
+
+console.log('Base URL: ', baseUrl)
 
 export const config = {
-  port,
-  baseUrl: `http://localhost:${port}`,
+  baseUrl,
+  server,
   test: {
     seedPhrase: process.env.SEED_PHRASE || 'test test test test test test test test test test test junk',
     walletPassword: process.env.WALLET_PASSWORD || 'Tester@1234',

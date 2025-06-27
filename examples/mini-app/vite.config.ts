@@ -16,7 +16,9 @@ const assetFileNames = (assetInfo: any) => {
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: config.port,
+    host: config.server.host,
+    port: config.server.port,
+    https: config.server.isHttps ? {} : undefined,
   },
   resolve: {
     alias: {
