@@ -8,7 +8,6 @@ import {
   formatRawAmount,
 } from "@betswirl/sdk-core"
 import { useGameLogic } from "../../hooks/useGameLogic"
-import { TokenWithImage } from "../../types/types"
 import { DiceGameControls } from "./DiceGameControls"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -17,15 +16,12 @@ import { useGameControls } from "./shared/useGameControls"
 
 const DEFAULT_DICE_NUMBER = 20 as DiceNumber
 
-export interface DiceGameProps extends BaseGameProps {
-  filteredTokens?: TokenWithImage[]
-}
+export interface DiceGameProps extends BaseGameProps {}
 
 export function DiceGame({
   theme = "system",
   customTheme,
   backgroundImage = diceBackground,
-  filteredTokens,
   ...props
 }: DiceGameProps) {
   const {
@@ -66,7 +62,6 @@ export function DiceGame({
       choice: DEFAULT_DICE_NUMBER,
     },
     backgroundImage,
-    filteredTokens,
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
@@ -119,7 +114,6 @@ export function DiceGame({
         token={token}
         selectedToken={selectedToken}
         onTokenSelect={setSelectedToken}
-        filteredTokens={filteredTokens}
         betStatus={betStatus}
         betAmount={betAmount}
         vrfFees={vrfFees}

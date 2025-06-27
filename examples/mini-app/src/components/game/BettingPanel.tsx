@@ -13,9 +13,10 @@ import { cn } from "../../lib/utils"
 import { BetStatus, TokenWithImage } from "../../types/types"
 import { ChainIcon } from "../ui/ChainIcon"
 import { TokenIcon } from "../ui/TokenIcon"
-import { TokenAmountInput } from "../ui/TokenAmountInput"
 import { Button } from "../ui/button"
 import { Label } from "../ui/label"
+import { Sheet, SheetTrigger } from "../ui/sheet"
+import { ChainAndTokenSheetPanel } from "./ChainAndTokenSheetPanel"
 
 interface BettingPanelProps {
   game: CASINO_GAME_TYPE
@@ -24,7 +25,6 @@ interface BettingPanelProps {
   token: TokenWithImage
   selectedToken?: TokenWithImage
   onTokenSelect?: (token: TokenWithImage) => void
-  filteredTokens?: TokenWithImage[]
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number
@@ -40,6 +40,8 @@ interface BettingPanelProps {
   hasValidSelection?: boolean
   isRefetchingAllowance?: boolean
   approveError?: any
+  portalContainer: HTMLElement | null
+  isMounted: boolean
 }
 
 const BET_AMOUNT_INPUT_STEP = 0.0001
@@ -51,7 +53,6 @@ export function BettingPanel({
   token,
   selectedToken,
   onTokenSelect,
-  filteredTokens,
   betStatus,
   betAmount,
   betCount,
@@ -67,11 +68,14 @@ export function BettingPanel({
   hasValidSelection = true,
   isRefetchingAllowance = false,
   approveError,
+  portalContainer,
+  isMounted,
 }: BettingPanelProps) {
   const { appChainId } = useChain()
   const [inputValue, setInputValue] = useState<string>("")
   const [isValidInput, setIsValidInput] = useState<boolean>(true)
   const [isUserTyping, setIsUserTyping] = useState<boolean>(false)
+  const [isChainTokenSheetOpen, setIsChainTokenSheetOpen] = useState<boolean>(false)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
@@ -255,11 +259,31 @@ export function BettingPanel({
       <div className="flex flex-col gap-3">
         <div className="text-sm font-medium flex items-center">
           <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
-          <span className="font-semibold">{formattedBalance}</span>
-          <div className="flex items-center ml-1">
-            <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
-            <TokenIcon token={token} size={18} />
-          </div>
+          <Sheet open={isChainTokenSheetOpen} onOpenChange={setIsChainTokenSheetOpen}>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                className={cn(
+                  "text-sm font-medium flex items-center w-fit",
+                  "bg-[oklch(0.8608_0.0043_271.36)] rounded-[8px] px-2 py-1",
+                  "hover:opacity-80 transition-opacity"
+                )}
+              >
+                <span className="font-semibold">{formattedBalance}</span>
+                <div className="flex items-center ml-1">
+                  <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
+                  <TokenIcon token={token} size={18} />
+                </div>
+              </button>
+            </SheetTrigger>
+            {onTokenSelect && isMounted && portalContainer && (
+              <ChainAndTokenSheetPanel
+                portalContainer={portalContainer}
+                selectedToken={selectedToken || token}
+                onTokenSelect={onTokenSelect}
+              />
+            )}
+          </Sheet>
         </div>
 
         <Label
@@ -268,48 +292,32 @@ export function BettingPanel({
         >
           Bet amount
         </Label>
-        {onTokenSelect ? (
-          <TokenAmountInput
-            value={inputValue}
-            onChange={(value) => handleInputChange({ target: { value } } as ChangeEvent<HTMLInputElement>)}
-            selectedToken={selectedToken || token}
-            onTokenSelect={onTokenSelect}
-            filteredTokens={filteredTokens}
+        <div className="relative flex h-12 w-full items-center text-sm">
+          <input
+            id="betAmount"
+            type="number"
             placeholder="0"
             min={0}
             max={Number.parseFloat(formattedBalance)}
             step={BET_AMOUNT_INPUT_STEP}
+            value={inputValue}
+            onChange={handleInputChange}
             disabled={isInputDisabled}
-            className={cn("relative", !isValidInput && "opacity-60")}
+            className={cn(
+              "flex h-full w-full rounded-[12px] border-0",
+              "bg-neutral-background text-foreground font-semibold",
+              "px-4 py-2 pr-16",
+              "text-base placeholder:text-muted-foreground",
+              "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0",
+              "disabled:cursor-not-allowed disabled:opacity-50",
+              !isValidInput && "text-muted-foreground"
+            )}
           />
-        ) : (
-          <div className="relative flex h-12 w-full items-center text-sm">
-            <input
-              id="betAmount"
-              type="number"
-              placeholder="0"
-              min={0}
-              max={Number.parseFloat(formattedBalance)}
-              step={BET_AMOUNT_INPUT_STEP}
-              value={inputValue}
-              onChange={handleInputChange}
-              disabled={isInputDisabled}
-              className={cn(
-                "flex h-full w-full rounded-[12px] border-0",
-                "bg-neutral-background text-foreground font-semibold",
-                "px-4 py-2 pr-16",
-                "text-base placeholder:text-muted-foreground",
-                "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0",
-                "disabled:cursor-not-allowed disabled:opacity-50",
-                !isValidInput && "text-muted-foreground"
-              )}
-            />
-            <div className="absolute right-0 top-1/2 mr-3 flex -translate-y-1/2 transform items-center gap-1 text-foreground pointer-events-none font-medium">
-              <TokenIcon token={token} size={18} className="mr-1" />
-              <span>{token.symbol}</span>
-            </div>
+          <div className="absolute right-0 top-1/2 mr-3 flex -translate-y-1/2 transform items-center gap-1 text-foreground pointer-events-none font-medium">
+            <TokenIcon token={token} size={18} className="mr-1" />
+            <span>{token.symbol}</span>
           </div>
-        )}
+        </div>
 
         <div className="grid grid-cols-3 gap-2">
           <Button

@@ -5,11 +5,11 @@ import { ConfigProvider, ConfigProviderProps } from "./configContext"
 type BetSwirlSDKProviderProps = ChainProviderProps & ConfigProviderProps
 
 export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) => {
-  const { children, initialChainId, affiliate, bankrollToken } = props
+  const { children, initialChainId, affiliate, bankrollToken, filteredTokens } = props
 
   return (
     <ChainProvider initialChainId={initialChainId}>
-      <ConfigProvider affiliate={affiliate} bankrollToken={bankrollToken}>
+      <ConfigProvider affiliate={affiliate} bankrollToken={bankrollToken} filteredTokens={filteredTokens}>
         {children}
       </ConfigProvider>
     </ChainProvider>

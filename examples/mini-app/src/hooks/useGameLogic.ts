@@ -24,7 +24,6 @@ interface UseGameLogicProps {
   gameType: CASINO_GAME_TYPE
   defaultSelection: GameChoice
   backgroundImage: string
-  filteredTokens?: TokenWithImage[]
 }
 
 interface UseGameLogicResult {
@@ -34,7 +33,6 @@ interface UseGameLogicResult {
   token: TokenWithImage
   selectedToken: TokenWithImage | undefined
   setSelectedToken: (token: TokenWithImage) => void
-  filteredTokens?: TokenWithImage[]
   areChainsSynced: boolean
   gameHistory: HistoryEntry[]
   refreshHistory: () => void
@@ -104,7 +102,6 @@ export function useGameLogic({
   gameType,
   defaultSelection,
   backgroundImage,
-  filteredTokens,
 }: UseGameLogicProps): UseGameLogicResult {
   const { isConnected: isWalletConnected, address } = useAccount()
   const { gameHistory, refreshHistory } = useGameHistory(gameType)
@@ -141,7 +138,7 @@ export function useGameLogic({
       : { config: undefined, loading: false, error: null }
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
-    usePlaceBet(gameType, refetchBalance, kenoConfigResult.config)
+    usePlaceBet(gameType, token, refetchBalance, kenoConfigResult.config)
 
   const gameContractAddress = casinoChainById[appChainId]?.contracts.games[gameType]?.address
 
@@ -222,7 +219,6 @@ export function useGameLogic({
     token,
     selectedToken,
     setSelectedToken,
-    filteredTokens,
     areChainsSynced,
     gameHistory,
     refreshHistory,

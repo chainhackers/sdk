@@ -265,7 +265,6 @@ interface BettingSectionProps {
   token: TokenWithImage
   selectedToken?: TokenWithImage
   onTokenSelect?: (token: TokenWithImage) => void
-  filteredTokens?: TokenWithImage[]
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number
@@ -284,7 +283,8 @@ interface BettingSectionProps {
 }
 
 function BettingSection(props: BettingSectionProps) {
-  return <BettingPanel {...props} />
+  const { portalContainer, isMounted } = useGameFrameContext()
+  return <BettingPanel {...props} portalContainer={portalContainer} isMounted={isMounted} />
 }
 
 export const GameFrame = Object.assign(GameFrameRoot, {

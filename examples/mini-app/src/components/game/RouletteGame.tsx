@@ -8,7 +8,6 @@ import {
   formatRawAmount,
 } from "@betswirl/sdk-core"
 import { useGameLogic } from "../../hooks/useGameLogic"
-import { TokenWithImage } from "../../types/types"
 import { GameFrame } from "./GameFrame"
 import { RouletteGameControls } from "./RouletteGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -17,15 +16,12 @@ import { useGameControls } from "./shared/useGameControls"
 
 const DEFAULT_ROULETTE_SELECTION: RouletteNumber[] = []
 
-export interface RouletteGameProps extends BaseGameProps {
-  filteredTokens?: TokenWithImage[]
-}
+export interface RouletteGameProps extends BaseGameProps {}
 
 export function RouletteGame({
   theme = "system",
   customTheme,
   backgroundImage = rouletteBackground,
-  filteredTokens,
   ...props
 }: RouletteGameProps) {
   const {
@@ -66,7 +62,6 @@ export function RouletteGame({
       choice: DEFAULT_ROULETTE_SELECTION,
     },
     backgroundImage,
-    filteredTokens,
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
@@ -120,7 +115,6 @@ export function RouletteGame({
         token={token}
         selectedToken={selectedToken}
         onTokenSelect={setSelectedToken}
-        filteredTokens={filteredTokens}
         betStatus={betStatus}
         betAmount={betAmount}
         vrfFees={vrfFees}

@@ -3,7 +3,6 @@ import kenoBackground from "../../assets/game/game-background.jpg?no-inline"
 import { CASINO_GAME_TYPE, FORMAT_TYPE, KenoBall, formatRawAmount } from "@betswirl/sdk-core"
 import { useEffect, useState } from "react"
 import { useGameLogic } from "../../hooks/useGameLogic"
-import { TokenWithImage } from "../../types/types"
 import { useKenoMultipliers } from "../../hooks/useKenoMultipliers"
 import { GameFrame } from "./GameFrame"
 import { KenoGameControls } from "./KenoGameControls"
@@ -13,15 +12,12 @@ import { useGameControls } from "./shared/useGameControls"
 
 const DEFAULT_KENO_SELECTION: KenoBall[] = []
 
-export interface KenoGameProps extends BaseGameProps {
-  filteredTokens?: TokenWithImage[]
-}
+export interface KenoGameProps extends BaseGameProps {}
 
 export function KenoGame({
   theme = "system",
   customTheme,
   backgroundImage = kenoBackground,
-  filteredTokens,
   ...props
 }: KenoGameProps) {
   const [lastWinningNumbers, setLastWinningNumbers] = useState<KenoBall[]>([])
@@ -64,7 +60,6 @@ export function KenoGame({
       choice: DEFAULT_KENO_SELECTION,
     },
     backgroundImage,
-    filteredTokens,
   })
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
@@ -140,7 +135,6 @@ export function KenoGame({
         token={token}
         selectedToken={selectedToken}
         onTokenSelect={setSelectedToken}
-        filteredTokens={filteredTokens}
         betStatus={betStatus}
         betAmount={betAmount}
         vrfFees={vrfFees}

@@ -13,8 +13,6 @@ import {
   MIN_SELECTABLE_ROULETTE_NUMBER,
   Roulette,
   casinoChainById,
-  chainById,
-  chainNativeCurrencyToToken,
   getPlaceBetEventData,
   getPlaceBetFunctionData,
   getPlacedBetFromReceipt,
@@ -26,7 +24,7 @@ import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteCont
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
-import { BetStatus, GameChoice, GameEncodedInput, GameResult } from "../types/types"
+import { BetStatus, GameChoice, GameEncodedInput, GameResult, TokenWithImage } from "../types/types"
 import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
@@ -132,16 +130,15 @@ function _encodeGameInput(choice: GameChoice, kenoConfig?: KenoConfiguration): G
  */
 export function usePlaceBet(
   game: CASINO_GAME_TYPE,
+  token: TokenWithImage,
   refetchBalance: () => void,
   kenoConfig?: KenoConfiguration,
 ): IUsePlaceBetReturn {
   const { appChainId } = useChain()
-  const { bankrollToken } = useBettingConfig()
+  const { affiliate } = useBettingConfig()
   const publicClient = usePublicClient({ chainId: appChainId })
   const { address: connectedAddress } = useAccount()
   const wagerWriteHook = useWriteContract()
-
-  const token = bankrollToken || chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency)
 
   const wagerWaitingHook = useWaitForTransactionReceipt({
     hash: wagerWriteHook.data,
@@ -259,6 +256,7 @@ export function usePlaceBet(
         vrfFees,
         gasPrice,
         appChainId,
+        affiliate,
         wagerWriteHook.writeContract,
       )
     },
@@ -274,6 +272,7 @@ export function usePlaceBet(
       vrfFees,
       gasPrice,
       token,
+      affiliate,
       kenoConfig,
     ],
   )
@@ -375,11 +374,12 @@ async function _submitBetTransaction(
   vrfCost: bigint,
   gasPrice: bigint,
   chainId: CasinoChainId,
+  affiliate: Hex,
   wagerWriteHook: ReturnType<typeof useWriteContract>["writeContract"],
 ) {
   logger.debug("_submitBetTransaction: Preparing and sending transaction...")
   // Extract tokenAddress from token for getPlaceBetFunctionData
-  const placeBetTxData = getPlaceBetFunctionData({ ...betParams, receiver }, chainId)
+  const placeBetTxData = getPlaceBetFunctionData({ ...betParams, receiver, affiliate }, chainId)
   wagerWriteHook({
     abi: placeBetTxData.data.abi,
     address: placeBetTxData.data.to,
