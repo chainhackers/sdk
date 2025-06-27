@@ -3,10 +3,13 @@ import {
   CoinToss,
   Dice,
   DiceNumber,
+  FORMAT_TYPE,
   Keno,
   KenoEncodedRolled,
+  NORMAL_CASINO_GAME_TYPE,
   Roulette,
   RouletteNumber,
+  formatCasinoRolledBet,
 } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { AbiEvent, Log } from "viem"
@@ -47,6 +50,7 @@ function _extractEventData(
 ): {
   rolledData: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled
   payout: bigint
+  totalBetAmount: bigint
   id: bigint
 } {
   switch (gameType) {
@@ -54,11 +58,13 @@ function _extractEventData(
       const diceRollArgs = decodedRollLog.args as unknown as {
         id: bigint
         payout: bigint
+        totalBetAmount: bigint
         rolled: DiceNumber
       }
       return {
         rolledData: diceRollArgs.rolled,
         payout: diceRollArgs.payout,
+        totalBetAmount: diceRollArgs.totalBetAmount,
         id: diceRollArgs.id,
       }
     }
@@ -66,11 +72,13 @@ function _extractEventData(
       const coinTossRollArgs = decodedRollLog.args as unknown as {
         id: bigint
         payout: bigint
+        totalBetAmount: bigint
         rolled: boolean[]
       }
       return {
         rolledData: coinTossRollArgs.rolled,
         payout: coinTossRollArgs.payout,
+        totalBetAmount: coinTossRollArgs.totalBetAmount,
         id: coinTossRollArgs.id,
       }
     }
@@ -78,11 +86,13 @@ function _extractEventData(
       const rouletteRollArgs = decodedRollLog.args as unknown as {
         id: bigint
         payout: bigint
+        totalBetAmount: bigint
         rolled: RouletteNumber
       }
       return {
         rolledData: rouletteRollArgs.rolled,
         payout: rouletteRollArgs.payout,
+        totalBetAmount: rouletteRollArgs.totalBetAmount,
         id: rouletteRollArgs.id,
       }
     }
@@ -90,11 +100,13 @@ function _extractEventData(
       const kenoRollArgs = decodedRollLog.args as unknown as {
         id: bigint
         payout: bigint
+        totalBetAmount: bigint
         rolled: KenoEncodedRolled
       }
       return {
         rolledData: kenoRollArgs.rolled,
         payout: kenoRollArgs.payout,
+        totalBetAmount: kenoRollArgs.totalBetAmount,
         id: kenoRollArgs.id,
       }
     }
@@ -137,6 +149,21 @@ function _decodeRolled(
     default:
       logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
       throw new Error(`Unsupported game type for decoding roll: ${game}`)
+  }
+}
+
+function formatRolledResult(rolled: GameRolledResult): string {
+  switch (rolled.game) {
+    case CASINO_GAME_TYPE.COINTOSS:
+      return rolled.rolled
+    case CASINO_GAME_TYPE.DICE:
+      return rolled.rolled.toString()
+    case CASINO_GAME_TYPE.ROULETTE:
+      return rolled.rolled.toString()
+    case CASINO_GAME_TYPE.KENO:
+      return rolled.rolled.join(", ")
+    default:
+      return ""
   }
 }
 
@@ -223,7 +250,7 @@ export function useBetResultWatcher({
   }, [enabled, watchParams, status, filterErrorOccurred])
 
   const processEventLogs = useCallback((logs: readonly Log[], currentWatchParams: WatchTarget) => {
-    const { betId, gameType, eventAbi, eventName, betAmount } = currentWatchParams
+    const { betId, gameType, eventAbi, eventName, placedBet } = currentWatchParams
     logger.debug(`processEventLogs: Processing ${logs.length} logs for betId ${betId}`, {
       eventName,
     })
@@ -239,23 +266,42 @@ export function useBetResultWatcher({
       if (!decodedRollLog.eventName || !decodedRollLog.args) continue
       if (decodedRollLog.eventName !== eventName) continue
 
-      const { rolledData, payout, id } = _extractEventData(
+      const { rolledData, payout, totalBetAmount, id } = _extractEventData(
         decodedRollLog as unknown as DecodedEventLog,
         gameType,
       )
 
       if (id === betId) {
-        const rolledResult = _decodeRolled(rolledData, gameType)
-        const result: GameResult = {
-          isWin: payout > betAmount,
-          payout: payout,
-          currency: "ETH",
-          rolled: rolledResult,
+        const rollEvent = {
+          args: {
+            id,
+            payout,
+            totalBetAmount,
+            rolled: Array.isArray(rolledData) ? rolledData : [rolledData],
+          },
+          transactionHash: log.transactionHash!,
         }
+
+        const casinoRolledBet = formatCasinoRolledBet(
+          { ...placedBet, game: gameType as NORMAL_CASINO_GAME_TYPE },
+          rollEvent,
+          FORMAT_TYPE.PRECISE,
+        )
+
+        const rolledResult = _decodeRolled(rolledData, gameType)
+
+        const result: GameResult = {
+          ...casinoRolledBet,
+          rolled: rolledResult,
+          formattedRolled: formatRolledResult(rolledResult),
+        }
+
         logger.debug("processEventLogs: Bet event processed:", {
-          ...result,
           betId,
           txHash: log.transactionHash,
+          isWin: result.isWin,
+          payout: result.payout,
+          benefit: result.benefit,
         })
         setInternalGameResult(result)
         setStatus("success")

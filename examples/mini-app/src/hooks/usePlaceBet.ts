@@ -1,4 +1,5 @@
 import {
+  BetSwirlWallet,
   CASINO_GAME_TYPE,
   CasinoChainId,
   CoinToss,
@@ -16,6 +17,7 @@ import {
   chainNativeCurrencyToToken,
   getPlaceBetEventData,
   getPlaceBetFunctionData,
+  getPlacedBetFromReceipt,
   getRollEventData,
 } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo, useState } from "react"
@@ -308,6 +310,20 @@ export function usePlaceBet(
           return
         }
 
+        const placedBet = await getPlacedBetFromReceipt(
+          { publicClient } as unknown as BetSwirlWallet,
+          wagerWaitingHook.data!,
+          game,
+          appChainId,
+          token,
+        )
+
+        if (!placedBet) {
+          logger.error("placeBet: PlacedBet could not be extracted from receipt.")
+          setInternalError("placed bet not found")
+          return
+        }
+
         const { data: rollEventData } = getRollEventData(game, appChainId, betId)
         logger.debug("placeBet: Setting up Roll event listener...")
         setWatchTarget({
@@ -318,6 +334,7 @@ export function usePlaceBet(
           eventName: rollEventData.eventName,
           eventArgs: rollEventData.args,
           betAmount: currentBetAmount!,
+          placedBet,
         })
 
         refetchBalance()
@@ -326,6 +343,7 @@ export function usePlaceBet(
     }
   }, [
     wagerWaitingHook.isSuccess,
+    wagerWaitingHook.data,
     wagerWriteHook.data,
     game,
     appChainId,
@@ -333,6 +351,7 @@ export function usePlaceBet(
     publicClient,
     refetchBalance,
     currentBetAmount,
+    token,
   ])
 
   return {

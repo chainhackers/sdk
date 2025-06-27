@@ -1,9 +1,10 @@
 import kenoBackground from "../../assets/game/game-background.jpg?no-inline"
 
-import { CASINO_GAME_TYPE, FORMAT_TYPE, Keno, KenoBall, formatRawAmount } from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, FORMAT_TYPE, KenoBall, formatRawAmount } from "@betswirl/sdk-core"
 import { useEffect, useState } from "react"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { TokenWithImage } from "../../types/types"
+import { useKenoMultipliers } from "../../hooks/useKenoMultipliers"
 import { GameFrame } from "./GameFrame"
 import { KenoGameControls } from "./KenoGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -11,7 +12,6 @@ import { BaseGameProps } from "./shared/types"
 import { useGameControls } from "./shared/useGameControls"
 
 const DEFAULT_KENO_SELECTION: KenoBall[] = []
-const DEFAULT_MAX_SELECTIONS = 0
 
 export interface KenoGameProps extends BaseGameProps {
   filteredTokens?: TokenWithImage[]
@@ -44,6 +44,7 @@ export function KenoGame({
     gasPrice,
     targetPayoutAmount,
     grossMultiplier,
+    houseEdge,
     isInGameResultState,
     isGamePaused,
     nativeCurrencySymbol,
@@ -76,6 +77,12 @@ export function KenoGame({
 
   const selectedNumbers = (selection as { game: CASINO_GAME_TYPE.KENO; choice: KenoBall[] }).choice
 
+  const { multipliers } = useKenoMultipliers({
+    kenoConfig,
+    selectedNumbersCount: selectedNumbers.length,
+    houseEdge,
+  })
+
   useEffect(() => {
     if (gameResult?.rolled?.game === CASINO_GAME_TYPE.KENO) {
       setLastWinningNumbers(gameResult.rolled.rolled)
@@ -106,26 +113,23 @@ export function KenoGame({
         />
         <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
         <GameFrame.GameControls>
-          <KenoGameControls
-            selectedNumbers={selectedNumbers}
-            onNumbersChange={handleNumbersChange}
-            maxSelections={kenoConfig?.maxSelectableBalls ?? DEFAULT_MAX_SELECTIONS}
-            multipliers={
-              kenoConfig?.mutliplierTable[selectedNumbers.length]
-                ?.map((_, index) =>
-                  Keno.getFormattedMultiplier(kenoConfig, selectedNumbers.length, index),
-                )
-                .reverse() ?? []
-            }
-            isDisabled={isControlsDisabled}
-            lastGameWinningNumbers={lastWinningNumbers}
-          />
+          {kenoConfig ? (
+            <KenoGameControls
+              selectedNumbers={selectedNumbers}
+              onNumbersChange={handleNumbersChange}
+              maxSelections={kenoConfig.maxSelectableBalls}
+              biggestSelectableBall={kenoConfig.biggestSelectableBall}
+              multipliers={multipliers}
+              isDisabled={isControlsDisabled}
+              lastGameWinningNumbers={lastWinningNumbers}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent" />
+            </div>
+          )}
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow
-          gameResult={gameResult}
-          betAmount={betAmount}
-          currency={token.symbol}
-        />
+        <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.KENO}

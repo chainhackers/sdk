@@ -52,6 +52,7 @@ interface UseGameLogicResult {
   targetPayoutAmount: bigint
   formattedNetMultiplier: number
   grossMultiplier: number // BP
+  houseEdge: number // BP
   isInGameResultState: boolean
   isGamePaused: boolean
   nativeCurrencySymbol: string
@@ -239,6 +240,7 @@ export function useGameLogic({
     targetPayoutAmount: netPayout,
     formattedNetMultiplier: formattedNetMultiplier,
     grossMultiplier,
+    houseEdge,
     isInGameResultState,
     isGamePaused,
     nativeCurrencySymbol,

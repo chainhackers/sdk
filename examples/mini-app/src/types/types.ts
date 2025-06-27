@@ -1,6 +1,7 @@
 import {
   CASINO_GAME_TYPE,
   COINTOSS_FACE,
+  type CasinoRolledBet,
   CoinTossEncodedInput,
   DiceEncodedInput,
   DiceNumber,
@@ -42,11 +43,9 @@ export type GameEncodedInput =
   | { game: CASINO_GAME_TYPE.ROULETTE; encodedInput: RouletteEncodedInput }
   | { game: CASINO_GAME_TYPE.KENO; encodedInput: KenoEncodedInput }
 
-export interface GameResult {
-  isWin: boolean
-  payout: bigint
-  currency: string
+export type GameResult = CasinoRolledBet & {
   rolled: GameRolledResult
+  formattedRolled: string
 }
 
 export type BetStatus =

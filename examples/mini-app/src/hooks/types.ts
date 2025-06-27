@@ -1,4 +1,4 @@
-import type { CASINO_GAME_TYPE } from "@betswirl/sdk-core"
+import type { CASINO_GAME_TYPE, CasinoPlacedBet } from "@betswirl/sdk-core"
 import type { Abi, Hex } from "viem"
 
 export interface WatchTarget {
@@ -9,4 +9,5 @@ export interface WatchTarget {
   eventName: string
   eventArgs: { id: bigint }
   betAmount: bigint
+  placedBet: CasinoPlacedBet
 }
