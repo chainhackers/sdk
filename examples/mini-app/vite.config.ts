@@ -26,7 +26,6 @@ export default defineConfig({
     },
   },
   build: {
-    assetsInlineLimit: 0,
     cssCodeSplit: false,
 
     lib: {
@@ -45,10 +44,6 @@ export default defineConfig({
           "viem",
           "wagmi",
         ]
-
-        if (id.includes("?no-inline")) {
-          return true
-        }
 
         return externalPackages.some((pkg) => id === pkg || id.startsWith(`${pkg}/`))
       },
