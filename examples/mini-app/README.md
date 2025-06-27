@@ -75,6 +75,22 @@ Storybook: http://localhost:6006/
 Dev server: http://localhost:5173/
 ```
 
+## Testing
+
+### Run e2e tests:
+
+Start development server (if not already running):
+```bash
+pnpm dev
+```
+
+Run tests:
+```bash
+pnpm test:e2e
+```
+
+On the first run, installing Chromium and MetaMask wallet setup may take some time.
+
 ### Building and Publishing
 - `pnpm build` - Build library for production
 - `pnpm prepublishOnly` - Automatically runs build before publishing
