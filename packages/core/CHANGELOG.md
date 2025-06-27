@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.11
+
+### Patch Changes
+
+- Export format functions from campaigns and leaderboards
+
 ## 0.1.10
 
 ### Patch Changes

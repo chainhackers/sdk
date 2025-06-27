@@ -104,7 +104,7 @@ export const fetchFreebetCampaigns = async (
 
     const response: GetCampaignsRawResponse = await res.json();
     return {
-      campaigns: response.campaigns.map((campaign) => _formatRawFreebetCampaign(campaign)),
+      campaigns: response.campaigns.map((campaign) => formatRawFreebetCampaign(campaign)),
       total: response.total,
       offset: response.offset,
       limit: response.limit,
@@ -143,14 +143,16 @@ export const fetchFreebetCampaign = async (
     }
 
     const response: GetCampaignRawResponse = await res.json();
-    return _formatRawFreebetCampaign(response);
+    return formatRawFreebetCampaign(response);
   } catch (error) {
     console.error("An error occured while fetching the freebet campaign", error);
     return null;
   }
 };
 
-const _formatRawFreebetCampaign = (campaign: RawAggregatedFreebetCampaign): FreebetCampaign => ({
+export const formatRawFreebetCampaign = (
+  campaign: RawAggregatedFreebetCampaign,
+): FreebetCampaign => ({
   id: campaign.id,
   affiliateAddress: campaign.affiliate_address,
   chainId: campaign.chain_id,

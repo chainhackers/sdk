@@ -282,7 +282,7 @@ export const fetchLeaderboards = async (
 
     const response: GetLeaderboardsRawResponse = await res.json();
     return {
-      leaderboards: response.leaderboards.map((leaderboard) => _formatRawLeaderboard(leaderboard)),
+      leaderboards: response.leaderboards.map((leaderboard) => formatRawLeaderboard(leaderboard)),
       total: response.total,
       offset: response.offset,
       limit: response.limit,
@@ -350,6 +350,8 @@ export const fetchAffiliateLeaderboards = async (
     }
     const res = await fetch(
       `${getBetSwirlApiUrl(testMode)}/affiliate/v1/leaderboards?${params.toString()}`,
+      // This is needed to get the JWT cookie from the browser
+      { credentials: "include" },
     );
     if (!res.ok) {
       throw new Error(`Status ${res.status}: ${res.statusText}`);
@@ -358,7 +360,7 @@ export const fetchAffiliateLeaderboards = async (
     const response: GetAffiliateLeaderboardsRawResponse = await res.json();
     return {
       leaderboards: response.leaderboards.map((leaderboard) =>
-        _formatRawAffiliateLeaderboard(leaderboard),
+        formatRawAffiliateLeaderboard(leaderboard),
       ),
       total: response.total,
       offset: response.offset,
@@ -397,13 +399,17 @@ export const fetchLeaderboard = async (
     }
     const res = await fetch(
       `${getBetSwirlApiUrl(testMode)}/public/v1/leaderboards/${id}?${params.toString()}`,
+      {
+        // This is needed to get the JWT cookie from the browser
+        credentials: "include",
+      },
     );
     if (!res.ok) {
       throw new Error(`Status ${res.status}: ${res.statusText}`);
     }
 
     const response: GetLeaderboardRawResponse = await res.json();
-    return response ? _formatRawLeaderboard(response) : null;
+    return response ? formatRawLeaderboard(response) : null;
   } catch (error) {
     console.error("An error occured while fetching the leaderboard", error);
     return null;
@@ -431,14 +437,14 @@ export const fetchAffiliateLeaderboard = async (
     }
 
     const response: GetAffiliateLeaderboardRawResponse = await res.json();
-    return response ? _formatRawAffiliateLeaderboard(response) : null;
+    return response ? formatRawAffiliateLeaderboard(response) : null;
   } catch (error) {
     console.error("An error occured while fetching the affiliate leaderboard", error);
     return null;
   }
 };
 
-const _formatRawLeaderboard = (leaderboard: RawCompleteLeaderboard): Leaderboard => {
+export const formatRawLeaderboard = (leaderboard: RawCompleteLeaderboard): Leaderboard => {
   const casinoRules = leaderboard.casino_rules
     ? {
         tokens: leaderboard.casino_rules.tokens,
@@ -545,11 +551,11 @@ const _formatRawLeaderboard = (leaderboard: RawCompleteLeaderboard): Leaderboard
   };
 };
 
-const _formatRawAffiliateLeaderboard = (
+export const formatRawAffiliateLeaderboard = (
   leaderboard: RawAffiliateCompleteLeaderboardWithClaimDetails,
 ): AffiliateLeaderboardWithClaimDetails => {
   return {
-    ..._formatRawLeaderboard(leaderboard),
+    ...formatRawLeaderboard(leaderboard),
     creationTxnHash: leaderboard.creation_tx,
     creatorAddress: leaderboard.creator_address,
     claimDetails: {
