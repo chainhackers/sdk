@@ -399,10 +399,6 @@ export const fetchLeaderboard = async (
     }
     const res = await fetch(
       `${getBetSwirlApiUrl(testMode)}/public/v1/leaderboards/${id}?${params.toString()}`,
-      {
-        // This is needed to get the JWT cookie from the browser
-        credentials: "include",
-      },
     );
     if (!res.ok) {
       throw new Error(`Status ${res.status}: ${res.statusText}`);
@@ -431,7 +427,10 @@ export const fetchAffiliateLeaderboard = async (
   testMode = false,
 ): Promise<AffiliateLeaderboardWithClaimDetails | null> => {
   try {
-    const res = await fetch(`${getBetSwirlApiUrl(testMode)}/affiliate/v1/leaderboards/${id}`);
+    const res = await fetch(`${getBetSwirlApiUrl(testMode)}/affiliate/v1/leaderboards/${id}`, {
+      // This is needed to get the JWT cookie from the browser
+      credentials: "include",
+    });
     if (!res.ok) {
       throw new Error(`Status ${res.status}: ${res.statusText}`);
     }

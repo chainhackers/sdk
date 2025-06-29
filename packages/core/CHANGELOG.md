@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.12
+
+### Patch Changes
+
+- Fix fetchLeaderboard query options$
+
 ## 0.1.11
 
 ### Patch Changes
