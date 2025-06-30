@@ -35,10 +35,9 @@ export function ChainAndTokenSheetPanel({ portalContainer }: ChainAndTokenSheetP
     onlyActive: true,
   })
 
-  // Determine the effective token to use
   const effectiveToken: TokenWithImage = selectedToken || {
     ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
-    image: "", // Fallback for native currency - user should configure this
+    image: "",
   }
 
   const handleTokenSelect = (token: TokenWithImage) => {
@@ -64,10 +63,10 @@ export function ChainAndTokenSheetPanel({ portalContainer }: ChainAndTokenSheetP
                 variant="ghost"
                 onClick={() => setActiveView("chain")}
                 className={cn(
-                  "flex items-center justify-between w-full p-3 rounded-[12px] h-auto",
-                  "bg-neutral-background border-0",
+                  "flex items-center justify-between w-full p-3 rounded-[8px] h-auto",
+                  "bg-surface-selected border-0",
                   "text-foreground font-medium",
-                  "hover:opacity-80 hover:bg-neutral-background transition-opacity",
+                  "hover:bg-token-hovered-bg transition-colors",
                 )}
               >
                 <div className="flex items-center gap-2">
@@ -85,10 +84,10 @@ export function ChainAndTokenSheetPanel({ portalContainer }: ChainAndTokenSheetP
                 variant="ghost"
                 onClick={() => setActiveView("token")}
                 className={cn(
-                  "flex items-center justify-between w-full p-3 rounded-[12px] h-auto",
-                  "bg-neutral-background border-0",
+                  "flex items-center justify-between w-full p-3 rounded-[8px] h-auto",
+                  "bg-surface-selected border-0",
                   "text-foreground font-medium",
-                  "hover:opacity-80 hover:bg-neutral-background transition-opacity",
+                  "hover:bg-token-hovered-bg transition-colors",
                 )}
               >
                 <div className="flex items-center gap-2">
@@ -138,7 +137,7 @@ function ChainSelectionView({ currentChainId, onChainSelect, onBack }: ChainSele
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted transition-colors p-0"
+          className="flex items-center justify-center w-8 h-8 rounded-[8px] hover:bg-surface-hover transition-colors p-0"
         >
           <ChevronDown className="h-4 w-4 !rotate-90" />
         </Button>
@@ -150,8 +149,8 @@ function ChainSelectionView({ currentChainId, onChainSelect, onBack }: ChainSele
           variant="ghost"
           onClick={() => onChainSelect(currentChainId)}
           className={cn(
-            "flex items-center gap-3 p-3 rounded-[12px] w-full text-left h-auto justify-start",
-            "bg-neutral-background hover:opacity-80 hover:bg-neutral-background transition-opacity",
+            "flex items-center gap-3 p-3 rounded-[8px] w-full text-left h-auto justify-start",
+            "bg-surface-selected hover:bg-surface-hover transition-colors",
           )}
         >
           <ChainIcon chainId={currentChainId} size={24} />
@@ -189,7 +188,7 @@ function TokenSelectionView({
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted transition-colors p-0"
+          className="flex items-center justify-center w-8 h-8 rounded-[8px] hover:bg-surface-hover transition-colors p-0"
         >
           <ChevronDown className="h-4 w-4 !rotate-90" />
         </Button>
@@ -213,9 +212,9 @@ function TokenSelectionView({
                 key={token.address}
                 onClick={() => onTokenSelect(token)}
                 className={cn(
-                  "flex items-center justify-between p-3 rounded-[12px] w-full text-left h-auto",
-                  "hover:bg-muted transition-colors",
-                  token.address === selectedToken.address && "bg-muted",
+                  "flex items-center justify-between p-3 rounded-[8px] w-full text-left h-auto",
+                  "hover:bg-surface-hover transition-colors",
+                  token.address === selectedToken.address && "bg-surface-selected",
                 )}
               >
                 <div className="flex items-center gap-3">
