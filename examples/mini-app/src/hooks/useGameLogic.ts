@@ -1,4 +1,9 @@
-import { CASINO_GAME_TYPE, chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
+import {
+  CASINO_GAME_TYPE,
+  KenoConfiguration,
+  chainById,
+  chainNativeCurrencyToToken,
+} from "@betswirl/sdk-core"
 import { casinoChainById } from "@betswirl/sdk-core"
 import React, { useState } from "react"
 import { type Hex, formatGwei, zeroAddress } from "viem"
@@ -10,6 +15,7 @@ import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
 import { useHouseEdge } from "./useHouseEdge"
 import { useIsGamePaused } from "./useIsGamePaused"
+import { useKenoConfiguration } from "./useKenoConfiguration"
 import { usePlaceBet } from "./usePlaceBet"
 import { useTokenAllowance } from "./useTokenAllowance"
 
@@ -41,9 +47,13 @@ interface UseGameLogicResult {
   targetPayoutAmount: bigint
   formattedNetMultiplier: number
   grossMultiplier: number // BP
+  houseEdge: number // BP
   isInGameResultState: boolean
   isGamePaused: boolean
   nativeCurrencySymbol: string
+  kenoConfig?: KenoConfiguration
+  kenoConfigLoading?: boolean
+  kenoConfigError?: Error | null
   themeSettings: {
     theme: "light" | "dark" | "system"
     customTheme?: {
@@ -115,8 +125,13 @@ export function useGameLogic({
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
   const [selection, setSelection] = useState<GameChoice>(defaultSelection)
 
+  const kenoConfigResult =
+    gameType === CASINO_GAME_TYPE.KENO
+      ? useKenoConfiguration({ token })
+      : { config: undefined, loading: false, error: null }
+
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
-    usePlaceBet(gameType, refetchBalance)
+    usePlaceBet(gameType, refetchBalance, kenoConfigResult.config)
 
   const gameContractAddress = casinoChainById[appChainId]?.contracts.games[gameType]?.address
 
@@ -139,6 +154,7 @@ export function useGameLogic({
     houseEdge,
     betAmount,
     betCount: 1, // TODO #64: Use the real bet count
+    kenoConfig: kenoConfigResult.config,
   })
 
   const isInGameResultState = !!gameResult
@@ -211,6 +227,7 @@ export function useGameLogic({
     targetPayoutAmount: netPayout,
     formattedNetMultiplier: formattedNetMultiplier,
     grossMultiplier,
+    houseEdge,
     isInGameResultState,
     isGamePaused,
     nativeCurrencySymbol,
@@ -224,5 +241,8 @@ export function useGameLogic({
     approveToken,
     isRefetchingAllowance: allowanceReadWagmiHook.isRefetching,
     approveError: approveWriteWagmiHook.error || approveWaitingWagmiHook.error,
+    kenoConfig: kenoConfigResult.config,
+    kenoConfigLoading: kenoConfigResult.loading,
+    kenoConfigError: kenoConfigResult.error,
   }
 }

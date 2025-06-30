@@ -102,11 +102,7 @@ export function RouletteGame({
             isDisabled={isControlsDisabled}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow
-          gameResult={gameResult}
-          betAmount={betAmount}
-          currency={token.symbol}
-        />
+        <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.ROULETTE}

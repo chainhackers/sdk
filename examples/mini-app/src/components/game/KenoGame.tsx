@@ -1,29 +1,26 @@
-import diceBackground from "../../assets/game/game-background.jpg"
+import kenoBackground from "../../assets/game/game-background.jpg?no-inline"
 
-import {
-  CASINO_GAME_TYPE,
-  Dice,
-  DiceNumber,
-  FORMAT_TYPE,
-  formatRawAmount,
-} from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, FORMAT_TYPE, KenoBall, formatRawAmount } from "@betswirl/sdk-core"
+import { useEffect, useState } from "react"
 import { useGameLogic } from "../../hooks/useGameLogic"
-import { DiceGameControls } from "./DiceGameControls"
+import { useKenoMultipliers } from "../../hooks/useKenoMultipliers"
 import { GameFrame } from "./GameFrame"
+import { KenoGameControls } from "./KenoGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
 import { useGameControls } from "./shared/useGameControls"
 
-const DEFAULT_DICE_NUMBER = 20 as DiceNumber
+const DEFAULT_KENO_SELECTION: KenoBall[] = []
 
-export interface DiceGameProps extends BaseGameProps {}
+export interface KenoGameProps extends BaseGameProps {}
 
-export function DiceGame({
+export function KenoGame({
   theme = "system",
   customTheme,
-  backgroundImage = diceBackground,
+  backgroundImage = kenoBackground,
   ...props
-}: DiceGameProps) {
+}: KenoGameProps) {
+  const [lastWinningNumbers, setLastWinningNumbers] = useState<KenoBall[]>([])
   const {
     isWalletConnected,
     balance,
@@ -40,8 +37,8 @@ export function DiceGame({
     formattedVrfFees,
     gasPrice,
     targetPayoutAmount,
-    formattedNetMultiplier,
     grossMultiplier,
+    houseEdge,
     isInGameResultState,
     isGamePaused,
     nativeCurrencySymbol,
@@ -53,11 +50,12 @@ export function DiceGame({
     isApproveConfirming,
     isRefetchingAllowance,
     approveError,
+    kenoConfig,
   } = useGameLogic({
-    gameType: CASINO_GAME_TYPE.DICE,
+    gameType: CASINO_GAME_TYPE.KENO,
     defaultSelection: {
-      game: CASINO_GAME_TYPE.DICE,
-      choice: DEFAULT_DICE_NUMBER,
+      game: CASINO_GAME_TYPE.KENO,
+      choice: DEFAULT_KENO_SELECTION,
     },
     backgroundImage,
   })
@@ -70,22 +68,36 @@ export function DiceGame({
     isGamePaused,
   )
 
-  const selectedDiceNumber = (selection as { game: CASINO_GAME_TYPE.DICE; choice: DiceNumber })
-    .choice
+  const selectedNumbers = (selection as { game: CASINO_GAME_TYPE.KENO; choice: KenoBall[] }).choice
 
-  const handleNumberChange = (value: number) => {
+  const { multipliers } = useKenoMultipliers({
+    kenoConfig,
+    selectedNumbersCount: selectedNumbers.length,
+    houseEdge,
+  })
+
+  useEffect(() => {
+    if (gameResult?.rolled?.game === CASINO_GAME_TYPE.KENO) {
+      setLastWinningNumbers(gameResult.rolled.rolled)
+    }
+  }, [gameResult])
+
+  const handleNumbersChange = (numbers: KenoBall[]) => {
     if (isControlsDisabled) {
       return
     }
-    setSelection({ game: CASINO_GAME_TYPE.DICE, choice: value as DiceNumber })
+    setSelection({
+      game: CASINO_GAME_TYPE.KENO,
+      choice: numbers,
+    })
   }
 
   return (
-    <GameFrame themeSettings={themeSettings} {...props}>
-      <GameFrame.Header title="Dice" connectWalletButton={<GameConnectWallet />} />
-      <GameFrame.GameArea>
+    <GameFrame themeSettings={themeSettings} variant="keno" {...props}>
+      <GameFrame.Header title="Keno" connectWalletButton={<GameConnectWallet />} />
+      <GameFrame.GameArea variant="keno">
         <GameFrame.InfoButton
-          winChance={Dice.getWinChancePercent(selectedDiceNumber)}
+          winChance={undefined}
           rngFee={formattedVrfFees}
           targetPayout={formatRawAmount(targetPayoutAmount, token.decimals, FORMAT_TYPE.PRECISE)}
           gasPrice={gasPrice}
@@ -94,18 +106,27 @@ export function DiceGame({
         />
         <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
         <GameFrame.GameControls>
-          <DiceGameControls
-            selectedNumber={selectedDiceNumber}
-            onNumberChange={handleNumberChange}
-            multiplier={formattedNetMultiplier}
-            isDisabled={isControlsDisabled}
-          />
+          {kenoConfig ? (
+            <KenoGameControls
+              selectedNumbers={selectedNumbers}
+              onNumbersChange={handleNumbersChange}
+              maxSelections={kenoConfig.maxSelectableBalls}
+              biggestSelectableBall={kenoConfig.biggestSelectableBall}
+              multipliers={multipliers}
+              isDisabled={isControlsDisabled}
+              lastGameWinningNumbers={lastWinningNumbers}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent" />
+            </div>
+          )}
         </GameFrame.GameControls>
         <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
-        game={CASINO_GAME_TYPE.DICE}
-        betCount={1} // TODO: Dynamic bet count support (#64)
+        game={CASINO_GAME_TYPE.KENO}
+        betCount={1}
         grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
@@ -117,6 +138,7 @@ export function DiceGame({
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
         isGamePaused={isGamePaused}
+        hasValidSelection={selectedNumbers.length > 0}
         needsTokenApproval={needsTokenApproval}
         isApprovePending={isApprovePending}
         isApproveConfirming={isApproveConfirming}

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
-import { RouletteGame, type RouletteGameProps } from "../../components/game/RouletteGame"
+import { KenoGame, type KenoGameProps } from "../../components/game/KenoGame"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
 import gameBg1 from "../assets/game/game-background-1.jpg"
 import gameBg2 from "../assets/game/game-background-2.jpg"
@@ -8,15 +8,14 @@ import gameBg4 from "../assets/game/game-background-4.jpg"
 import gameBg5 from "../assets/game/game-background-5.png"
 import gameBg6 from "../assets/game/game-background-6.jpg"
 import gameBg7 from "../assets/game/game-background-7.png"
-import gameBg8 from "../assets/game/game-background-8.jpg"
 
-interface StoryArgs extends RouletteGameProps {
+interface StoryArgs extends KenoGameProps {
   token?: keyof typeof STORYBOOK_TOKENS
 }
 
 const meta = {
-  title: "Game/RouletteGame",
-  component: RouletteGame,
+  title: "Game/KenoGame",
+  component: KenoGame,
   parameters: {
     layout: "centered",
     backgrounds: {
@@ -25,6 +24,9 @@ const meta = {
         { name: "light", value: "#FFFFFF" },
         { name: "dark", value: "oklch(0.15 0 0)" },
       ],
+    },
+    loki: {
+      skip: true,
     },
   },
   decorators: [
@@ -74,7 +76,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 const Template: Story = {
-  render: (args) => <RouletteGame {...args} />,
+  render: (args) => <KenoGame {...args} />,
 }
 
 export const LightTheme: Story = {
@@ -183,22 +185,6 @@ export const NeonDarkTheme: Story = {
       "--play-btn-font": "#ffffff",
     } as React.CSSProperties,
     backgroundImage: gameBg7,
-  },
-  parameters: {
-    chromatic: { disable: true },
-  },
-}
-
-export const ClassicDarkTheme: Story = {
-  ...Template,
-  args: {
-    theme: "dark",
-    token: "ETH",
-    customTheme: {
-      "--primary": "#1f2937",
-      "--play-btn-font": "#f9fafb",
-    } as React.CSSProperties,
-    backgroundImage: gameBg8,
   },
   parameters: {
     chromatic: { disable: true },
