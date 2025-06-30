@@ -1,7 +1,7 @@
 // Import necessary Synpress modules
-import { defineWalletSetup } from '@synthetixio/synpress'
-import { MetaMask } from '@synthetixio/synpress/playwright'
-import { config } from '../../app.config'
+import { defineWalletSetup } from "@synthetixio/synpress"
+import { MetaMask } from "@synthetixio/synpress/playwright"
+import { config } from "../../app.config"
 
 const SEED_PHRASE = config.test.seedPhrase
 const PASSWORD = config.test.walletPassword
