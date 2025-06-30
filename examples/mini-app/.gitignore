@@ -32,3 +32,16 @@ storybook-static
 !/.env.example
 
 tasks/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Synpress cache
+.cache-synpress/
+
+# Allow test directories (override root .gitignore)
+!test/
+!tests/

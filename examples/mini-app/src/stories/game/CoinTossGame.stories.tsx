@@ -25,10 +25,7 @@ const meta = {
         { name: "light", value: "#FFFFFF" },
         { name: "dark", value: "oklch(0.15 0 0)" },
       ],
-    },
-    loki: {
-      skip: true,
-    },
+    }
   },
   decorators: [
     (Story, context) => {

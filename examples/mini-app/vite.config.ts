@@ -2,6 +2,7 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
+import { config } from "./app.config"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -14,13 +15,17 @@ const assetFileNames = (assetInfo: any) => {
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    host: config.server.host,
+    port: config.server.port,
+    https: config.server.isHttps ? {} : undefined,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   build: {
-    assetsInlineLimit: 0,
     cssCodeSplit: false,
 
     lib: {
@@ -39,10 +44,6 @@ export default defineConfig({
           "viem",
           "wagmi",
         ]
-
-        if (id.includes("?no-inline")) {
-          return true
-        }
 
         return externalPackages.some((pkg) => id === pkg || id.startsWith(`${pkg}/`))
       },
