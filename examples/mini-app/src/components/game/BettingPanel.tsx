@@ -23,8 +23,6 @@ interface BettingPanelProps {
   balance: bigint
   isConnected: boolean
   token: TokenWithImage
-  selectedToken?: TokenWithImage
-  onTokenSelect?: (token: TokenWithImage) => void
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number
@@ -51,8 +49,6 @@ export function BettingPanel({
   balance,
   isConnected,
   token,
-  selectedToken,
-  onTokenSelect,
   betStatus,
   betAmount,
   betCount,
@@ -261,27 +257,27 @@ export function BettingPanel({
           <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
           <Sheet open={isChainTokenSheetOpen} onOpenChange={setIsChainTokenSheetOpen}>
             <SheetTrigger asChild>
-              <button
-                type="button"
+              <Button
+                variant="ghost"
                 className={cn(
-                  "text-sm font-medium flex items-center w-fit",
-                  "bg-[oklch(0.8608_0.0043_271.36)] rounded-[8px] px-2 py-1",
-                  "hover:opacity-80 transition-opacity"
+                  "text-sm font-medium flex items-center w-fit h-auto p-0",
+                  "bg-secondary rounded-[8px] px-2 py-1",
+                  "hover:opacity-80 hover:bg-secondary transition-opacity",
                 )}
               >
                 <span className="font-semibold">{formattedBalance}</span>
                 <div className="flex items-center ml-1">
-                  <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
+                  <ChainIcon
+                    chainId={appChainId}
+                    size={18}
+                    className="-mr-[4px] mask-overlap-cutout"
+                  />
                   <TokenIcon token={token} size={18} />
                 </div>
-              </button>
+              </Button>
             </SheetTrigger>
-            {onTokenSelect && isMounted && portalContainer && (
-              <ChainAndTokenSheetPanel
-                portalContainer={portalContainer}
-                selectedToken={selectedToken || token}
-                onTokenSelect={onTokenSelect}
-              />
+            {isMounted && portalContainer && (
+              <ChainAndTokenSheetPanel portalContainer={portalContainer} />
             )}
           </Sheet>
         </div>
@@ -310,7 +306,7 @@ export function BettingPanel({
               "text-base placeholder:text-muted-foreground",
               "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0",
               "disabled:cursor-not-allowed disabled:opacity-50",
-              !isValidInput && "text-muted-foreground"
+              !isValidInput && "text-muted-foreground",
             )}
           />
           <div className="absolute right-0 top-1/2 mr-3 flex -translate-y-1/2 transform items-center gap-1 text-foreground pointer-events-none font-medium">

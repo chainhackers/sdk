@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo } from "react"
 import { Address, maxUint256, zeroAddress } from "viem"
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
-import { useBettingConfig } from "../context/configContext"
 
 type UseTokenAllowanceProps = {
   token?: Token
@@ -45,19 +44,15 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
   const { token, spender, amount, enabled = true } = props
   const { appChainId } = useChain()
   const { address: userAddress } = useAccount()
-  const { bankrollToken } = useBettingConfig()
-
-  // Use bankroll token if no token is provided
-  const effectiveToken = token || bankrollToken
 
   // Check if this is a native token (no approval needed)
-  const isNativeToken = !effectiveToken?.address || effectiveToken.address === zeroAddress
+  const isNativeToken = !token?.address || token.address === zeroAddress
 
   // Get current allowance
   const allowanceFunctionData = useMemo(() => {
-    if (!effectiveToken?.address || !userAddress || isNativeToken) return null
-    return getAllowanceFunctionData(effectiveToken.address as Address, userAddress, spender)
-  }, [effectiveToken, userAddress, spender, isNativeToken])
+    if (!token?.address || !userAddress || isNativeToken) return null
+    return getAllowanceFunctionData(token.address as Address, userAddress, spender)
+  }, [token, userAddress, spender, isNativeToken])
 
   const allowanceReadWagmiHook = useReadContract({
     abi: allowanceFunctionData?.data.abi,
@@ -81,10 +76,10 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
 
   // Prepare approve function data
   const approveFunctionData = useMemo(() => {
-    if (!effectiveToken?.address || isNativeToken) return null
+    if (!token?.address || isNativeToken) return null
     // Approve max amount to avoid multiple approvals
-    return getApproveFunctionData(effectiveToken.address as Address, spender, maxUint256)
-  }, [effectiveToken, spender, isNativeToken])
+    return getApproveFunctionData(token.address as Address, spender, maxUint256)
+  }, [token, spender, isNativeToken])
 
   // Write contract for approval
   const approveWriteWagmiHook = useWriteContract()
@@ -147,7 +142,7 @@ export function useTokenAllowance(props: UseTokenAllowanceProps) {
     allowance,
     needsApproval,
     approve,
-    effectiveToken,
+    effectiveToken: token,
     resetApprovalState,
     approveWriteWagmiHook,
     approveWaitingWagmiHook,

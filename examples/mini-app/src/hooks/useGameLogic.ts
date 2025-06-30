@@ -9,7 +9,7 @@ import React, { useState } from "react"
 import { type Hex, formatGwei, zeroAddress } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
-import { useBettingConfig } from "../context/configContext"
+import { useTokenContext } from "../context/tokenContext"
 import { BetStatus, GameChoice, GameResult, HistoryEntry, TokenWithImage } from "../types/types"
 import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
@@ -18,7 +18,6 @@ import { useIsGamePaused } from "./useIsGamePaused"
 import { useKenoConfiguration } from "./useKenoConfiguration"
 import { usePlaceBet } from "./usePlaceBet"
 import { useTokenAllowance } from "./useTokenAllowance"
-import { useTokenSelection } from "./useTokenSelection"
 
 interface UseGameLogicProps {
   gameType: CASINO_GAME_TYPE
@@ -31,8 +30,6 @@ interface UseGameLogicResult {
   address: string | undefined
   balance: bigint
   token: TokenWithImage
-  selectedToken: TokenWithImage | undefined
-  setSelectedToken: (token: TokenWithImage) => void
   areChainsSynced: boolean
   gameHistory: HistoryEntry[]
   refreshHistory: () => void
@@ -106,13 +103,11 @@ export function useGameLogic({
   const { isConnected: isWalletConnected, address } = useAccount()
   const { gameHistory, refreshHistory } = useGameHistory(gameType)
   const { areChainsSynced, appChainId } = useChain()
-  const { bankrollToken } = useBettingConfig()
 
-  // Token selection with session storage
-  const { selectedToken, setSelectedToken } = useTokenSelection(gameType)
+  const { selectedToken } = useTokenContext()
 
   // Determine the effective token to use
-  const token: TokenWithImage = selectedToken || bankrollToken || {
+  const token: TokenWithImage = selectedToken || {
     ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
     image: "", // Fallback for native currency - user should configure this
   }
@@ -217,8 +212,6 @@ export function useGameLogic({
     address,
     balance: balance?.value ?? 0n,
     token,
-    selectedToken,
-    setSelectedToken,
     areChainsSynced,
     gameHistory,
     refreshHistory,

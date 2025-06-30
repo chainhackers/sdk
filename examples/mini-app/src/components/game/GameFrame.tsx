@@ -263,8 +263,6 @@ interface BettingSectionProps {
   balance: bigint
   isConnected: boolean
   token: TokenWithImage
-  selectedToken?: TokenWithImage
-  onTokenSelect?: (token: TokenWithImage) => void
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number

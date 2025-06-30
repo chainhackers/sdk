@@ -50,17 +50,19 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
     ...query,
   })
 
-  const tokens: TokenWithImage[] = useMemo(() =>
-    tokensQuery.data?.map(token => ({
-      ...token,
-      image: `https://www.betswirl.com/img/tokens/${token.symbol}.svg`,
-    })) || [], [tokensQuery.data]
+  const tokens: TokenWithImage[] = useMemo(
+    () =>
+      tokensQuery.data?.map((token) => ({
+        ...token,
+        image: `https://www.betswirl.com/img/tokens/${token.symbol}.svg`,
+      })) || [],
+    [tokensQuery.data],
   )
 
   // Apply filtering if filteredTokens is provided
-  const finalTokens = useMemo(() =>
-    filteredTokens ? filterTokensByAllowed(tokens, filteredTokens) : tokens,
-    [tokens, filteredTokens]
+  const finalTokens = useMemo(
+    () => (filteredTokens ? filterTokensByAllowed(tokens, filteredTokens) : tokens),
+    [tokens, filteredTokens],
   )
 
   return {

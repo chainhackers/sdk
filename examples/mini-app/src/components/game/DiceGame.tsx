@@ -28,8 +28,6 @@ export function DiceGame({
     isWalletConnected,
     balance,
     token,
-    selectedToken,
-    setSelectedToken,
     areChainsSynced,
     gameHistory,
     refreshHistory,
@@ -112,8 +110,6 @@ export function DiceGame({
         balance={balance}
         isConnected={isWalletConnected}
         token={token}
-        selectedToken={selectedToken}
-        onTokenSelect={setSelectedToken}
         betStatus={betStatus}
         betAmount={betAmount}
         vrfFees={vrfFees}

@@ -2,8 +2,8 @@ import { TokenSelectDropdown } from "@coinbase/onchainkit/token"
 import type { Token as OnchainKitToken } from "@coinbase/onchainkit/token"
 import { useMemo } from "react"
 import { useChain } from "../../context/chainContext"
-import { TokenWithImage } from "../../types/types"
 import { useTokens } from "../../hooks/useTokens"
+import { TokenWithImage } from "../../types/types"
 import { convertToOnchainKitToken } from "../../utils/tokenUtils"
 
 interface TokenSelectorProps {
@@ -30,20 +30,20 @@ export function TokenSelector({
   })
 
   // Convert BetSwirl tokens to OnchainKit format
-  const onchainKitTokens: OnchainKitToken[] = useMemo(() =>
-    tokens.map(token => convertToOnchainKitToken(token, appChainId)),
-    [tokens, appChainId]
+  const onchainKitTokens: OnchainKitToken[] = useMemo(
+    () => tokens.map((token) => convertToOnchainKitToken(token, appChainId)),
+    [tokens, appChainId],
   )
 
-  const selectedOnchainKitToken: OnchainKitToken | undefined = useMemo(() =>
-    selectedToken ? convertToOnchainKitToken(selectedToken, appChainId) : undefined,
-    [selectedToken, appChainId]
+  const selectedOnchainKitToken: OnchainKitToken | undefined = useMemo(
+    () => (selectedToken ? convertToOnchainKitToken(selectedToken, appChainId) : undefined),
+    [selectedToken, appChainId],
   )
 
   const handleTokenSelect = (onchainKitToken: OnchainKitToken) => {
     // Find the corresponding BetSwirl token
-    const betswirlToken = tokens.find(token =>
-      token.address.toLowerCase() === onchainKitToken.address.toLowerCase()
+    const betswirlToken = tokens.find(
+      (token) => token.address.toLowerCase() === onchainKitToken.address.toLowerCase(),
     )
 
     if (betswirlToken) {

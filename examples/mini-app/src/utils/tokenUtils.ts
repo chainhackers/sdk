@@ -6,22 +6,17 @@ import { TokenWithImage } from "../types/types"
  */
 export function filterTokensByAllowed(
   tokens: TokenWithImage[],
-  allowedTokens: TokenWithImage[]
+  allowedTokens: TokenWithImage[],
 ): TokenWithImage[] {
-  return tokens.filter(token =>
-    allowedTokens.some(allowed =>
-      allowed.address.toLowerCase() === token.address.toLowerCase()
-    )
+  return tokens.filter((token) =>
+    allowedTokens.some((allowed) => allowed.address.toLowerCase() === token.address.toLowerCase()),
   )
 }
 
 /**
  * Converts BetSwirl token to OnchainKit token format
  */
-export function convertToOnchainKitToken(
-  token: TokenWithImage,
-  chainId: number
-): OnchainKitToken {
+export function convertToOnchainKitToken(token: TokenWithImage, chainId: number): OnchainKitToken {
   return {
     name: token.symbol,
     address: token.address || "",

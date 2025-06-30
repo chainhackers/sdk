@@ -28,8 +28,6 @@ export function RouletteGame({
     isWalletConnected,
     balance,
     token,
-    selectedToken,
-    setSelectedToken,
     areChainsSynced,
     gameHistory,
     refreshHistory,
@@ -113,8 +111,6 @@ export function RouletteGame({
         balance={balance}
         isConnected={isWalletConnected}
         token={token}
-        selectedToken={selectedToken}
-        onTokenSelect={setSelectedToken}
         betStatus={betStatus}
         betAmount={betAmount}
         vrfFees={vrfFees}
