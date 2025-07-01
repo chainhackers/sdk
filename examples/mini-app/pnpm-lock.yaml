@@ -43,11 +43,11 @@ importers:
         version: 0.525.0(react@19.1.0)
     devDependencies:
       '@betswirl/sdk-core':
-        specifier: ^0.1.12
-        version: 0.1.12(@apollo/client@3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(graphql@16.11.0)(typescript@5.8.3)(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(zod@3.25.67)
+        specifier: 0.1.8
+        version: 0.1.8(@apollo/client@3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(graphql@16.11.0)(typescript@5.8.3)(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(zod@3.25.67)
       '@betswirl/wagmi-provider':
-        specifier: ^0.1.12
-        version: 0.1.12(@apollo/client@3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@wagmi/core@2.17.3(@tanstack/query-core@5.81.5)(@types/react@19.1.8)(react@19.1.0)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)))(bufferutil@4.0.9)(graphql@16.11.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
+        specifier: 0.1.8
+        version: 0.1.8(@apollo/client@3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@wagmi/core@2.17.3(@tanstack/query-core@5.81.5)(@types/react@19.1.8)(react@19.1.0)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)))(bufferutil@4.0.9)(graphql@16.11.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       '@biomejs/biome':
         specifier: ^2.0.6
         version: 2.0.6
@@ -68,7 +68,7 @@ importers:
         version: 9.0.14(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)
       '@storybook/react-vite':
         specifier: 9.0.14
-        version: 9.0.14(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.44.0)(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))
+        version: 9.0.14(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.44.1)(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))
       '@synthetixio/synpress':
         specifier: ^4.1.0
         version: 4.1.0(@depay/solana-web3.js@1.98.2)(@depay/web3-blockchains@9.8.6)(@playwright/test@1.53.2)(bufferutil@4.0.9)(ethers@5.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(playwright-core@1.53.2)(postcss@8.5.6)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
@@ -89,10 +89,10 @@ importers:
         version: 19.1.6(@types/react@19.1.8)
       '@vitejs/plugin-react':
         specifier: ^4.6.0
-        version: 4.6.0(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))
+        version: 4.6.0(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))
       '@vitest/browser':
         specifier: ^3.2.4
-        version: 3.2.4(bufferutil@4.0.9)(playwright@1.53.2)(utf-8-validate@5.0.10)(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))(vitest@3.2.4)
+        version: 3.2.4(bufferutil@4.0.9)(playwright@1.53.2)(utf-8-validate@5.0.10)(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))(vitest@3.2.4)
       '@vitest/coverage-v8':
         specifier: ^3.2.4
         version: 3.2.4(@vitest/browser@3.2.4)(vitest@3.2.4)
@@ -275,8 +275,8 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@betswirl/sdk-core@0.1.12':
-    resolution: {integrity: sha512-m9hQbjbnp+VNPnFO74DClZqbNqF9saWYj6femVqyE4xK+qrFYYyeVmv2iPg5XwDDWX6Px8w+GEXOHZQKFb6HxQ==}
+  '@betswirl/sdk-core@0.1.8':
+    resolution: {integrity: sha512-390PUdWLREorf18kNE3BUSXGygrVYk3DuMZ1OY87WjZQBVYTC8cIcZmxC9+42fOMxn+0iVnEoqA8sy40UoNlvA==}
     peerDependencies:
       '@apollo/client': '>=3.12.11'
       typescript: '>=5.0.4'
@@ -285,8 +285,8 @@ packages:
       typescript:
         optional: true
 
-  '@betswirl/wagmi-provider@0.1.12':
-    resolution: {integrity: sha512-v0NLDU22lPhLv3OgJOl8NupWF0BUVMzicdRkpz9DAxK7CIMbjpvTL8BCffvEyK1BuqLb9HOqajcjekF5C4uU5w==}
+  '@betswirl/wagmi-provider@0.1.8':
+    resolution: {integrity: sha512-hy5hMnxJ2UQ2cjkM6J6QD6tWd9oEB0L8o/weuHVp4jle+OMiZOv4QIKYrDEF5G+c3l0co1YvZV/Rn5D132o6Qg==}
     peerDependencies:
       '@wagmi/core': '>=2.16.3'
 
@@ -4962,7 +4962,7 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@betswirl/sdk-core@0.1.12(@apollo/client@3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(graphql@16.11.0)(typescript@5.8.3)(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(zod@3.25.67)':
+  '@betswirl/sdk-core@0.1.8(@apollo/client@3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(graphql@16.11.0)(typescript@5.8.3)(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(zod@3.25.67)':
     dependencies:
       '@apollo/client': 3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       abitype: 1.0.8(typescript@5.8.3)(zod@3.25.67)
@@ -4975,9 +4975,9 @@ snapshots:
       - graphql
       - zod
 
-  '@betswirl/wagmi-provider@0.1.12(@apollo/client@3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@wagmi/core@2.17.3(@tanstack/query-core@5.81.5)(@types/react@19.1.8)(react@19.1.0)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)))(bufferutil@4.0.9)(graphql@16.11.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)':
+  '@betswirl/wagmi-provider@0.1.8(@apollo/client@3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@wagmi/core@2.17.3(@tanstack/query-core@5.81.5)(@types/react@19.1.8)(react@19.1.0)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)))(bufferutil@4.0.9)(graphql@16.11.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)':
     dependencies:
-      '@betswirl/sdk-core': 0.1.12(@apollo/client@3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(graphql@16.11.0)(typescript@5.8.3)(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(zod@3.25.67)
+      '@betswirl/sdk-core': 0.1.8(@apollo/client@3.13.8(@types/react@19.1.8)(graphql@16.11.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(graphql@16.11.0)(typescript@5.8.3)(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(zod@3.25.67)
       '@wagmi/core': 2.17.3(@tanstack/query-core@5.81.5)(@types/react@19.1.8)(react@19.1.0)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@19.1.0))(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))
       viem: 2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
     transitivePeerDependencies:
@@ -5695,12 +5695,12 @@ snapshots:
 
   '@istanbuljs/schema@0.1.3': {}
 
-  '@joshwooding/vite-plugin-react-docgen-typescript@0.6.0(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))':
+  '@joshwooding/vite-plugin-react-docgen-typescript@0.6.0(typescript@5.8.3)(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))':
     dependencies:
       glob: 10.4.5
       magic-string: 0.30.17
       react-docgen-typescript: 2.4.0(typescript@5.8.3)
-      vite: 6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
+      vite: 7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
     optionalDependencies:
       typescript: 5.8.3
 
@@ -6514,13 +6514,13 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-beta.19': {}
 
-  '@rollup/pluginutils@5.2.0(rollup@4.44.0)':
+  '@rollup/pluginutils@5.2.0(rollup@4.44.1)':
     dependencies:
       '@types/estree': 1.0.8
       estree-walker: 2.0.2
       picomatch: 4.0.2
     optionalDependencies:
-      rollup: 4.44.0
+      rollup: 4.44.1
 
   '@rollup/rollup-android-arm-eabi@4.44.0':
     optional: true
@@ -6771,12 +6771,12 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
-  '@storybook/builder-vite@9.0.14(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))':
+  '@storybook/builder-vite@9.0.14(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))':
     dependencies:
       '@storybook/csf-plugin': 9.0.14(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       storybook: 9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       ts-dedent: 2.2.0
-      vite: 6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
+      vite: 7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
 
   '@storybook/csf-plugin@9.0.14(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
@@ -6796,11 +6796,11 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
       storybook: 9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
 
-  '@storybook/react-vite@9.0.14(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.44.0)(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))':
+  '@storybook/react-vite@9.0.14(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.44.1)(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))':
     dependencies:
-      '@joshwooding/vite-plugin-react-docgen-typescript': 0.6.0(typescript@5.8.3)(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))
-      '@rollup/pluginutils': 5.2.0(rollup@4.44.0)
-      '@storybook/builder-vite': 9.0.14(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))
+      '@joshwooding/vite-plugin-react-docgen-typescript': 0.6.0(typescript@5.8.3)(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))
+      '@rollup/pluginutils': 5.2.0(rollup@4.44.1)
+      '@storybook/builder-vite': 9.0.14(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))
       '@storybook/react': 9.0.14(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(storybook@9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)
       find-up: 7.0.0
       magic-string: 0.30.17
@@ -6810,7 +6810,7 @@ snapshots:
       resolve: 1.22.10
       storybook: 9.0.14(@testing-library/dom@10.4.0)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       tsconfig-paths: 4.2.0
-      vite: 6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
+      vite: 7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -7129,7 +7129,7 @@ snapshots:
       - debug
       - utf-8-validate
 
-  '@vitejs/plugin-react@4.6.0(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))':
+  '@vitejs/plugin-react@4.6.0(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))':
     dependencies:
       '@babel/core': 7.27.4
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.27.4)
@@ -7137,15 +7137,15 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.19
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
+      vite: 7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/browser@3.2.4(bufferutil@4.0.9)(playwright@1.53.2)(utf-8-validate@5.0.10)(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))(vitest@3.2.4)':
+  '@vitest/browser@3.2.4(bufferutil@4.0.9)(playwright@1.53.2)(utf-8-validate@5.0.10)(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))(vitest@3.2.4)':
     dependencies:
       '@testing-library/dom': 10.4.0
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
-      '@vitest/mocker': 3.2.4(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))
+      '@vitest/mocker': 3.2.4(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))
       '@vitest/utils': 3.2.4
       magic-string: 0.30.17
       sirv: 3.0.1
@@ -7177,7 +7177,7 @@ snapshots:
       tinyrainbow: 2.0.0
       vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.0.8)(@vitest/browser@3.2.4)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
     optionalDependencies:
-      '@vitest/browser': 3.2.4(bufferutil@4.0.9)(playwright@1.53.2)(utf-8-validate@5.0.10)(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))(vitest@3.2.4)
+      '@vitest/browser': 3.2.4(bufferutil@4.0.9)(playwright@1.53.2)(utf-8-validate@5.0.10)(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))(vitest@3.2.4)
     transitivePeerDependencies:
       - supports-color
 
@@ -7196,6 +7196,14 @@ snapshots:
       magic-string: 0.30.17
     optionalDependencies:
       vite: 6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
+
+  '@vitest/mocker@3.2.4(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))':
+    dependencies:
+      '@vitest/spy': 3.2.4
+      estree-walker: 3.0.3
+      magic-string: 0.30.17
+    optionalDependencies:
+      vite: 7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -10199,7 +10207,7 @@ snapshots:
     optionalDependencies:
       '@types/debug': 4.1.12
       '@types/node': 24.0.8
-      '@vitest/browser': 3.2.4(bufferutil@4.0.9)(playwright@1.53.2)(utf-8-validate@5.0.10)(vite@6.3.5(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))(vitest@3.2.4)
+      '@vitest/browser': 3.2.4(bufferutil@4.0.9)(playwright@1.53.2)(utf-8-validate@5.0.10)(vite@7.0.0(@types/node@24.0.8)(jiti@2.4.2)(lightningcss@1.30.1)(yaml@2.8.0))(vitest@3.2.4)
     transitivePeerDependencies:
       - jiti
       - less
