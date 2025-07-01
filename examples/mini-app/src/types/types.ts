@@ -75,3 +75,5 @@ export interface HistoryEntry {
   payoutCurrencyIcon: React.ReactElement
   timestamp: string
 }
+
+export type ChainTokenPanelView = "main" | "chain" | "token"

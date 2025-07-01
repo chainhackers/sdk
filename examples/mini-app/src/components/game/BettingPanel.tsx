@@ -10,12 +10,12 @@ import { parseUnits } from "viem"
 import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { cn } from "../../lib/utils"
-import { BetStatus, TokenWithImage } from "../../types/types"
+import { BetStatus, ChainTokenPanelView, TokenWithImage } from "../../types/types"
 import { ChainIcon } from "../ui/ChainIcon"
 import { TokenIcon } from "../ui/TokenIcon"
 import { Button } from "../ui/button"
 import { Label } from "../ui/label"
-import { Sheet, SheetTrigger } from "../ui/sheet"
+import { Sheet } from "../ui/sheet"
 import { ChainAndTokenSheetPanel } from "./ChainAndTokenSheetPanel"
 
 interface BettingPanelProps {
@@ -72,6 +72,7 @@ export function BettingPanel({
   const [isValidInput, setIsValidInput] = useState<boolean>(true)
   const [isUserTyping, setIsUserTyping] = useState<boolean>(false)
   const [isChainTokenSheetOpen, setIsChainTokenSheetOpen] = useState<boolean>(false)
+  const [panelInitialView, setPanelInitialView] = useState<ChainTokenPanelView>("main")
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
@@ -187,6 +188,19 @@ export function BettingPanel({
     onPlayBtnClick()
   }
 
+  const openSheetPanel = (view: ChainTokenPanelView) => {
+    setPanelInitialView(view)
+    setIsChainTokenSheetOpen(true)
+  }
+
+  const handleSheetClose = () => {
+    setIsChainTokenSheetOpen(false)
+    setPanelInitialView("main")
+  }
+
+  const handleBalanceClick = () => openSheetPanel("main")
+  const handleTokenClick = () => openSheetPanel("token")
+
   const handleHalfBet = () => {
     const currentAmount = betAmount ?? 0n
     if (currentAmount > 0n) {
@@ -255,31 +269,21 @@ export function BettingPanel({
       <div className="flex flex-col gap-3">
         <div className="text-sm font-medium flex items-center">
           <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
-          <Sheet open={isChainTokenSheetOpen} onOpenChange={setIsChainTokenSheetOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "text-sm font-medium flex items-center w-fit h-auto p-0",
-                  "bg-secondary rounded-[8px] px-2 py-1",
-                  "hover:opacity-80 hover:bg-secondary transition-opacity",
-                )}
-              >
-                <span className="font-semibold">{formattedBalance}</span>
-                <div className="flex items-center ml-1">
-                  <ChainIcon
-                    chainId={appChainId}
-                    size={18}
-                    className="-mr-[4px] mask-overlap-cutout"
-                  />
-                  <TokenIcon token={token} size={18} />
-                </div>
-              </Button>
-            </SheetTrigger>
-            {isMounted && portalContainer && (
-              <ChainAndTokenSheetPanel portalContainer={portalContainer} />
+          <Button
+            variant="ghost"
+            onClick={handleBalanceClick}
+            className={cn(
+              "text-sm font-medium flex items-center w-fit h-auto p-0",
+              "bg-secondary rounded-[8px] px-2 py-1",
+              "hover:opacity-80 hover:bg-secondary transition-opacity",
             )}
-          </Sheet>
+          >
+            <span className="font-semibold">{formattedBalance}</span>
+            <div className="flex items-center ml-1">
+              <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
+              <TokenIcon token={token} size={18} />
+            </div>
+          </Button>
         </div>
 
         <Label
@@ -309,10 +313,20 @@ export function BettingPanel({
               !isValidInput && "text-muted-foreground",
             )}
           />
-          <div className="absolute right-0 top-1/2 mr-3 flex -translate-y-1/2 transform items-center gap-1 text-foreground pointer-events-none font-medium">
-            <TokenIcon token={token} size={18} className="mr-1" />
+          <Button
+            variant="ghost"
+            onClick={handleTokenClick}
+            className={cn(
+              "absolute right-[12px] top-1/2 -translate-y-1/2 transform",
+              "flex items-center text-foreground font-medium gap-1",
+              "h-auto w-fit p-0 bg-transparent hover:bg-transparent hover:opacity-80 transition-opacity",
+              "border-0 shadow-none outline-none focus:outline-none focus-visible:ring-0",
+            )}
+            disabled={isInputDisabled}
+          >
+            <TokenIcon token={token} size={18} />
             <span>{token.symbol}</span>
-          </div>
+          </Button>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
@@ -352,6 +366,22 @@ export function BettingPanel({
       >
         {playButtonText}
       </Button>
+
+      <Sheet
+        open={isChainTokenSheetOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleSheetClose()
+          }
+        }}
+      >
+        {isMounted && portalContainer && (
+          <ChainAndTokenSheetPanel
+            portalContainer={portalContainer}
+            initialView={panelInitialView}
+          />
+        )}
+      </Sheet>
     </div>
   )
 }

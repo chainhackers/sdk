@@ -6,34 +6,40 @@ import {
   formatRawAmount,
 } from "@betswirl/sdk-core"
 import { ChevronDown } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { type Hex, zeroAddress } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useTokens } from "../../hooks/useTokens"
 import { cn } from "../../lib/utils"
-import { TokenWithImage } from "../../types/types"
+import { ChainTokenPanelView, TokenWithImage } from "../../types/types"
 import { ChainIcon } from "../ui/ChainIcon"
 import { TokenIcon } from "../ui/TokenIcon"
 import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 
-type ActiveView = "main" | "chain" | "token"
-
 interface ChainAndTokenSheetPanelProps {
   portalContainer: HTMLElement
+  initialView?: ChainTokenPanelView
 }
 
-export function ChainAndTokenSheetPanel({ portalContainer }: ChainAndTokenSheetPanelProps) {
+export function ChainAndTokenSheetPanel({
+  portalContainer,
+  initialView = "main",
+}: ChainAndTokenSheetPanelProps) {
   const { appChain, appChainId, switchAppChain } = useChain()
   const { selectedToken, setSelectedToken } = useTokenContext()
-  const [activeView, setActiveView] = useState<ActiveView>("main")
+  const [currentView, setCurrentView] = useState<ChainTokenPanelView>(initialView)
   const { address } = useAccount()
   const { tokens, loading: tokensLoading } = useTokens({
     onlyActive: true,
   })
+
+  useEffect(() => {
+    setCurrentView(initialView)
+  }, [initialView])
 
   const effectiveToken: TokenWithImage = selectedToken || {
     ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
@@ -42,26 +48,26 @@ export function ChainAndTokenSheetPanel({ portalContainer }: ChainAndTokenSheetP
 
   const handleTokenSelect = (token: TokenWithImage) => {
     setSelectedToken(token)
-    setActiveView("main")
+    setCurrentView("main")
   }
 
   const handleChainSelect = (chainId: CasinoChainId) => {
     switchAppChain(chainId)
-    setActiveView("main")
+    setCurrentView("main")
   }
 
   return (
     <SheetPortal container={portalContainer}>
       <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
       <SheetBottomPanelContent className={cn("!h-auto !max-h-[70%]", "p-5 sm:p-6")}>
-        {activeView === "main" && (
+        {currentView === "main" && (
           <div className="flex flex-col gap-6">
             {/* Current chain section */}
             <div className="flex flex-col gap-3">
               <p className="text-sm font-medium text-text-on-surface-variant">Current chain</p>
               <Button
                 variant="ghost"
-                onClick={() => setActiveView("chain")}
+                onClick={() => setCurrentView("chain")}
                 className={cn(
                   "flex items-center justify-between w-full p-3 rounded-[8px] h-auto",
                   "bg-surface-selected border-0",
@@ -82,7 +88,7 @@ export function ChainAndTokenSheetPanel({ portalContainer }: ChainAndTokenSheetP
               <p className="text-sm font-medium text-text-on-surface-variant">Balance used</p>
               <Button
                 variant="ghost"
-                onClick={() => setActiveView("token")}
+                onClick={() => setCurrentView("token")}
                 className={cn(
                   "flex items-center justify-between w-full p-3 rounded-[8px] h-auto",
                   "bg-surface-selected border-0",
@@ -100,21 +106,21 @@ export function ChainAndTokenSheetPanel({ portalContainer }: ChainAndTokenSheetP
           </div>
         )}
 
-        {activeView === "chain" && (
+        {currentView === "chain" && (
           <ChainSelectionView
             currentChainId={appChainId}
             onChainSelect={handleChainSelect}
-            onBack={() => setActiveView("main")}
+            onBack={() => setCurrentView("main")}
           />
         )}
 
-        {activeView === "token" && (
+        {currentView === "token" && (
           <TokenSelectionView
             tokens={tokens}
             tokensLoading={tokensLoading}
             selectedToken={effectiveToken}
             onTokenSelect={handleTokenSelect}
-            onBack={() => setActiveView("main")}
+            onBack={() => setCurrentView("main")}
             userAddress={address}
           />
         )}
