@@ -2,7 +2,6 @@ import { type CasinoChainId, chainById, chainNativeCurrencyToToken } from "@bets
 import type { Meta, StoryObj } from "@storybook/react"
 import { ChevronDown, Settings } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
-import { useAccount } from "wagmi"
 import { ChainIcon } from "../../components/ui/ChainIcon"
 import { TokenIcon } from "../../components/ui/TokenIcon"
 import { Button } from "../../components/ui/button"
@@ -88,7 +87,7 @@ const ChainAndTokenSheetWithWrapper = ({
                 <Settings className="h-4 w-4" />
               </Button>
             </SheetTrigger>
-            <ChainAndTokenSheetPanelWithInitialView
+            <ChainAndTokenSheetPanelControlled
               portalContainer={portalContainer}
               initialView={initialView}
             />
@@ -96,22 +95,6 @@ const ChainAndTokenSheetWithWrapper = ({
         )}
       </PanelStoryWrapper>
     </StorybookProviders>
-  )
-}
-
-// Wrapper to control the initial view state
-const ChainAndTokenSheetPanelWithInitialView = ({
-  portalContainer,
-  initialView,
-}: {
-  portalContainer: HTMLElement
-  initialView: "main" | "chain" | "token"
-}) => {
-  return (
-    <ChainAndTokenSheetPanelControlled
-      portalContainer={portalContainer}
-      initialView={initialView}
-    />
   )
 }
 
@@ -126,7 +109,6 @@ const ChainAndTokenSheetPanelControlled = ({
   const { appChain, appChainId, switchAppChain } = useChain()
   const { selectedToken, setSelectedToken } = useTokenContext()
   const [activeView, setActiveView] = useState<"main" | "chain" | "token">(initialView)
-  const { address } = useAccount()
   const { tokens, loading: tokensLoading } = useTokens({
     onlyActive: true,
   })
@@ -181,7 +163,6 @@ const ChainAndTokenSheetPanelControlled = ({
             selectedToken={effectiveToken}
             onTokenSelect={handleTokenSelect}
             onBack={() => setActiveView("main")}
-            userAddress={address}
           />
         )}
       </SheetBottomPanelContent>
@@ -388,7 +369,6 @@ interface TokenSelectionViewContentProps {
   selectedToken: TokenWithImage
   onTokenSelect: (token: TokenWithImage) => void
   onBack: () => void
-  userAddress?: string
 }
 
 const TokenSelectionViewContent: React.FC<TokenSelectionViewContentProps> = ({
