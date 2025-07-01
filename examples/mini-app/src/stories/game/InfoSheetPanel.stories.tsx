@@ -36,9 +36,6 @@ const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme =
       ) : (
         <p>Preparing story...</p>
       )}
-      <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-muted-foreground text-center">
-        This is a mock card container. <br /> Click the button to open the panel.
-      </p>
     </div>
   )
 }
