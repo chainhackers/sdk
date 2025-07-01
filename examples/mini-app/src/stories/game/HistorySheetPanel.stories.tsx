@@ -91,7 +91,7 @@ const HistorySheetWithWrapper = ({
   historyData: HistoryEntry[]
   theme?: "light" | "dark" | "system"
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
 
   return (
     <PanelStoryWrapper theme={theme}>
@@ -106,7 +106,11 @@ const HistorySheetWithWrapper = ({
               <HistoryIcon className="h-4 w-4" />
             </Button>
           </SheetTrigger>
-          <HistorySheetPanel portalContainer={portalContainer} historyData={historyData} />
+          <HistorySheetPanel
+            portalContainer={portalContainer}
+            historyData={historyData}
+            className="data-[state=open]:animate-none data-[state=open]:translate-y-0"
+          />
         </Sheet>
       )}
     </PanelStoryWrapper>

@@ -10,6 +10,7 @@ interface InfoSheetPanelProps {
   gasPrice: number | string // gwei formatted
   token: Token
   nativeCurrencySymbol: string
+  className?: string
 }
 
 export function InfoSheetPanel({
@@ -20,11 +21,12 @@ export function InfoSheetPanel({
   gasPrice,
   token,
   nativeCurrencySymbol,
+  className,
 }: InfoSheetPanelProps) {
   return (
     <SheetPortal container={portalContainer}>
       <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
-      <SheetBottomPanelContent className={cn("!h-auto !max-h-[70%]", "p-5 sm:p-6")}>
+      <SheetBottomPanelContent className={cn("!h-auto !max-h-[70%]", "p-5 sm:p-6", className)}>
         <div className="grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-3 sm:gap-y-4 text-sm font-medium text-text-on-surface-variant">
           <div>
             <p>Win chance:</p>

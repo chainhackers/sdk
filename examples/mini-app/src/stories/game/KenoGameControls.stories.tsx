@@ -1,7 +1,7 @@
 import { KenoBall } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
-import { KenoGameControls } from "./KenoGameControls"
+import { KenoGameControls } from "../../components/game/KenoGameControls"
 
 interface KenoMultiplierData {
   multiplier: number

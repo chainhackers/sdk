@@ -56,7 +56,7 @@ const InfoSheetWithWrapper = ({
   gasPrice: string
   theme?: "light" | "dark" | "system"
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
 
   return (
     <PanelStoryWrapper theme={theme}>
@@ -79,6 +79,7 @@ const InfoSheetWithWrapper = ({
             gasPrice={gasPrice}
             token={chainNativeCurrencyToToken(chainByKey.base.nativeCurrency)}
             nativeCurrencySymbol={chainByKey.base.nativeCurrency.symbol}
+            className="data-[state=open]:animate-none data-[state=open]:translate-y-0"
           />
         </Sheet>
       )}
@@ -108,7 +109,7 @@ const meta = {
     winChance: 50,
     rngFee: "0",
     targetPayout: "1.94",
-    gasPrice: "34.2123 gwei",
+    gasPrice: "34.2123",
     theme: "light",
   },
 } satisfies Meta<typeof InfoSheetWithWrapper>
@@ -121,7 +122,7 @@ export const Default: Story = {
     winChance: 50,
     rngFee: "0",
     targetPayout: "1.94",
-    gasPrice: "34.2123 gwei",
+    gasPrice: "34.2123",
     theme: "light",
   },
   name: "Light Theme",
@@ -132,7 +133,7 @@ export const DarkThemeInfoPanel: Story = {
     winChance: 75,
     rngFee: "0.01",
     targetPayout: "3.50",
-    gasPrice: "40 gwei",
+    gasPrice: "40",
     theme: "dark",
   },
   name: "Dark Theme",
@@ -146,7 +147,7 @@ export const HighValues: Story = {
     winChance: 90,
     rngFee: "100.12345",
     targetPayout: "1999.99",
-    gasPrice: "1000.00005 gwei",
+    gasPrice: "1000.00005",
     theme: "light",
   },
   name: "High Values",
