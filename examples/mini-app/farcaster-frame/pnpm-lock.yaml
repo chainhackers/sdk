@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@betswirl/ui':
-        specifier: ^0.0.17
-        version: 0.0.17(9bfd9cac381dff59921a0f28c90d1c9c)
+        specifier: ^0.0.18
+        version: 0.0.18(9bfd9cac381dff59921a0f28c90d1c9c)
       '@coinbase/onchainkit':
         specifier: latest
         version: 0.38.15(@tanstack/query-core@5.81.5)(@types/react@18.3.23)(@upstash/redis@1.35.0)(bufferutil@4.0.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@5.0.10)(zod@3.25.67)
@@ -120,16 +120,16 @@ packages:
       typescript:
         optional: true
 
-  '@betswirl/ui@0.0.17':
-    resolution: {integrity: sha512-GpoLz3okd4ZzP1SJyA7DA1pgKADNhJ/tKINk/fnKm6UvirkxJlZfC4EOTozee8MRDX0rmuDJBzOYY+KQHCRo4g==}
+  '@betswirl/ui@0.0.18':
+    resolution: {integrity: sha512-m5c0wGjPeLivKtcXnLkFhkC4i3vngX+8PR1/j6gVtrOJI3TS82jmbhEO2GRFIHlljyJaGUrj5kfPNVxdj1yf3Q==}
     peerDependencies:
-      '@betswirl/sdk-core': ^0.1.7
-      '@betswirl/wagmi-provider': ^0.1.7
+      '@betswirl/sdk-core': ^0.1.8
+      '@betswirl/wagmi-provider': ^0.1.8
       '@coinbase/onchainkit': ^0.38.14
-      '@tanstack/react-query': ^5.80.7
+      '@tanstack/react-query': ^5.81.2
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
-      viem: 2.31.3
+      viem: 2.31.4
       wagmi: ^2.15.6
 
   '@betswirl/wagmi-provider@0.1.12':
@@ -2507,8 +2507,8 @@ packages:
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
 
-  lucide-react@0.518.0:
-    resolution: {integrity: sha512-kFg34uQqnVl/7HwAiigxPSpj//43VIVHQbMygQPtS1yT4btMXHCWUipHcgcXHD2pm1Z2nUBA/M+Vnh/YmWXQUw==}
+  lucide-react@0.522.0:
+    resolution: {integrity: sha512-jnJbw974yZ7rQHHEFKJOlWAefG3ATSCZHANZxIdx8Rk/16siuwjgA4fBULpXEAWx/RlTs3FzmKW/udWUuO0aRw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -3717,7 +3717,7 @@ snapshots:
       - graphql
       - zod
 
-  '@betswirl/ui@0.0.17(9bfd9cac381dff59921a0f28c90d1c9c)':
+  '@betswirl/ui@0.0.18(9bfd9cac381dff59921a0f28c90d1c9c)':
     dependencies:
       '@betswirl/sdk-core': 0.1.12(@apollo/client@3.13.8(@types/react@18.3.23)(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(graphql@16.11.0)(typescript@5.8.3)(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(zod@3.25.67)
       '@betswirl/wagmi-provider': 0.1.12(@apollo/client@3.13.8(@types/react@18.3.23)(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@wagmi/core@2.17.3(@tanstack/query-core@5.81.5)(@types/react@18.3.23)(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@18.3.1))(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)))(bufferutil@4.0.9)(graphql@16.11.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
@@ -3733,7 +3733,7 @@ snapshots:
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       decimal.js: 10.5.0
-      lucide-react: 0.518.0(react@18.3.1)
+      lucide-react: 0.522.0(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       viem: 2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
@@ -7145,7 +7145,7 @@ snapshots:
 
   lru-cache@10.4.3: {}
 
-  lucide-react@0.518.0(react@18.3.1):
+  lucide-react@0.522.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 
