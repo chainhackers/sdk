@@ -1,5 +1,5 @@
-import { getNetMultiplier } from "../..";
 import type { WeightedGameConfiguration } from "../..";
+import { getNetMultiplier } from "../..";
 import { generateRandomHexColor } from "../../utils";
 import { WeightedGame, type WeightedGameChoiceInput } from "./weightedGame";
 

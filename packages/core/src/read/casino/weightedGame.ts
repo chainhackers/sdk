@@ -4,8 +4,8 @@ import { chainByKey } from "../../data";
 import {
   CASINO_GAME_TYPE,
   type CasinoChainId,
-  type WEIGHTED_CASINO_GAME_TYPE,
   casinoChainById,
+  type WEIGHTED_CASINO_GAME_TYPE,
 } from "../../data/casino";
 import { ChainError, ERROR_CODES, TransactionError } from "../../errors";
 import type { BetSwirlFunctionData } from "../../interfaces";

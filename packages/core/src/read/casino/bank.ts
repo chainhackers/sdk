@@ -1,12 +1,10 @@
-import { casinoChainById, maxGameBetCountByType } from "../../data/casino";
-
-import { type Hex, encodeFunctionData } from "viem";
+import { encodeFunctionData, type Hex } from "viem";
 import { bankAbi } from "../../abis/v2/casino/bank";
 import type { CASINO_GAME_TYPE, CasinoChainId } from "../../data/casino";
+import { casinoChainById, maxGameBetCountByType } from "../../data/casino";
+import { ERROR_CODES } from "../../errors/codes";
 import { TransactionError } from "../../errors/types";
 import type { BetRequirements, BetSwirlFunctionData, CasinoToken, Token } from "../../interfaces";
-
-import { ERROR_CODES } from "../../errors/codes";
 import type { BetSwirlWallet } from "../../provider";
 import { getCasinoChainId } from "../../utils/chains";
 import { rawTokenToToken } from "../../utils/tokens";

@@ -3,6 +3,7 @@ import * as dotenv from "dotenv";
 import { startPlaceBetProcess } from "./functionalities/placeBet";
 import { startPlaceFreebetProcess } from "./functionalities/placeFreebet";
 import { startShowHistoryBetsProcess } from "./functionalities/showHistoryBets";
+
 dotenv.config();
 
 // Main Menu

@@ -1,4 +1,4 @@
-import { type Address, type Hash, formatUnits } from "viem";
+import { type Address, formatUnits, type Hash } from "viem";
 import type { Token } from "../../../interfaces";
 import { getBetSwirlApiUrl } from "../../../utils";
 import type { ChainId } from "../../chains";

@@ -1,9 +1,9 @@
 import {
   type Address,
-  type Hex,
   encodeFunctionData,
   erc20Abi,
   getAddress,
+  type Hex,
   zeroAddress,
 } from "viem";
 import { type ChainId, chainById } from "../../data/chains";

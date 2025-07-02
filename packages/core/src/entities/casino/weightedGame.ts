@@ -1,16 +1,15 @@
-import { encodeAbiParameters } from "viem";
-import { parseAbiParameters } from "viem";
+import { encodeAbiParameters, parseAbiParameters } from "viem";
 import type { EncodeAbiParametersReturnType } from "viem/_types/utils/abi/encodeAbiParameters";
 import {
   type CasinoChainId,
-  type WEIGHTED_CASINO_GAME_TYPE,
-  type WeightedGameConfiguration,
   generateRandomHexColor,
   getFormattedNetMultiplier,
+  getNetMultiplier,
+  type WEIGHTED_CASINO_GAME_TYPE,
+  type WeightedGameConfiguration,
   weightedGameCachedConfigurations,
   weightedGameCachedConfigurationsByGame,
 } from "../..";
-import { getNetMultiplier } from "../..";
 import { BP_VALUE } from "../../constants";
 import { AbstractCasinoGame, type ChoiceInput } from "./game";
 

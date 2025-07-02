@@ -3,9 +3,9 @@ import { encodeFunctionData } from "viem";
 import { leaderboardAbi } from "../../abis/v2/leaderboard/leaderboard";
 import {
   type CasinoChainId,
+  casinoChainById,
   LEADERBOARD_TYPE,
   type Leaderboard,
-  casinoChainById,
 } from "../../data";
 import { ERROR_CODES } from "../../errors/codes";
 import { TransactionError } from "../../errors/types";

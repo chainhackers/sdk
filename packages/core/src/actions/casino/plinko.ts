@@ -5,12 +5,12 @@ import type { BetSwirlWallet } from "../../provider";
 import type { WeightedGameConfiguration } from "../../read";
 import { type CasinoPlaceBetOptions, type PlaceBetCallbacks } from "./game";
 import {
-  type WeightedGameBetParams,
-  type WeightedGameFreebetParams,
-  type WeightedGamePlacedBet,
   getWeightedGamePlacedBetFromReceipt,
   placeWeightedGameBet,
   placeWeightedGameFreebet,
+  type WeightedGameBetParams,
+  type WeightedGameFreebetParams,
+  type WeightedGamePlacedBet,
 } from "./weightedGame";
 
 export interface PlinkoBetParams extends Omit<WeightedGameBetParams, "game"> {}

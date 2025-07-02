@@ -5,13 +5,13 @@ import {
   wrappedGasTokenById,
 } from "@betswirl/sdk-core";
 import {
-  type Config as WagmiConfig,
   call,
   getPublicClient,
   getTransactionReceipt,
   readContract,
   readContracts,
   simulateContract,
+  type Config as WagmiConfig,
   waitForTransactionReceipt,
   watchContractEvent,
   writeContract,

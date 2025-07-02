@@ -12,13 +12,19 @@ import {
   type ChoiceInput,
   CoinToss,
   type CoinTossChoiceInput,
+  casinoChains,
+  chainById,
   Dice,
   type DiceChoiceInput,
   FORMAT_TYPE,
+  formatRawAmount,
+  formatTxnUrl,
   GAS_PRICE_TYPE,
+  getBetSwirlBetUrl,
   Keno,
   type KenoChoiceInput,
   LEADERBOARD_TYPE,
+  labelCasinoGameByType,
   type NormalCasinoPlacedBet,
   type NormalGameChoiceInput,
   Roulette,
@@ -29,18 +35,12 @@ import {
   WeightedGame,
   type WeightedGameChoiceInput,
   type WeightedGameConfiguration,
-  casinoChains,
-  chainById,
-  formatRawAmount,
-  formatTxnUrl,
-  getBetSwirlBetUrl,
-  labelCasinoGameByType,
 } from "@betswirl/sdk-core";
-import { WagmiBetSwirlClient, initWagmiBetSwirlClient } from "@betswirl/wagmi-provider";
+import { initWagmiBetSwirlClient, WagmiBetSwirlClient } from "@betswirl/wagmi-provider";
 import { checkbox, input, select } from "@inquirer/prompts";
 import { getBalance } from "@wagmi/core";
 import chalk from "chalk";
-import { type Hash, type Hex, type TransactionReceipt, parseUnits, zeroAddress } from "viem";
+import { type Hash, type Hex, parseUnits, type TransactionReceipt, zeroAddress } from "viem";
 import { getWagmiConfigForAllChains, getWagmiConfigFromCasinoChain } from "../../utils";
 
 let wagmiBetSwirlClient: WagmiBetSwirlClient;
