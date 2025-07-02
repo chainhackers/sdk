@@ -27,7 +27,7 @@ export function useKenoMultipliers({
       return []
     }
 
-    const rawMultipliers = kenoConfig.mutliplierTable[selectedNumbersCount]
+    const rawMultipliers = kenoConfig.multiplierTable[selectedNumbersCount]
     if (!rawMultipliers) {
       return []
     }
