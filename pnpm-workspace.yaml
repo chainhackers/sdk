@@ -2,6 +2,7 @@ packages:
   - 'packages/core'
   - 'packages/providers/*'
   - 'examples/node'
+  - 'examples/mini-app'
 
 catalog:
     viem: ^2.22.23

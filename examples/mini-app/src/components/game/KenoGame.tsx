@@ -1,6 +1,6 @@
 import { CASINO_GAME_TYPE, FORMAT_TYPE, formatRawAmount, KenoBall } from "@betswirl/sdk-core"
 import { useEffect, useState } from "react"
-import kenoBackground from "../../assets/game/game-background.jpg?no-inline"
+import kenoBackground from "../../assets/game/game-background.jpg"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { useKenoMultipliers } from "../../hooks/useKenoMultipliers"
 import { GameFrame } from "./GameFrame"
