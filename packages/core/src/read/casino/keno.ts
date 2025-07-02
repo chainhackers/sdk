@@ -1,10 +1,9 @@
-import { type Address, type Hex, type TransactionReceipt, encodeFunctionData } from "viem";
+import { type Address, encodeFunctionData, type Hex, type TransactionReceipt } from "viem";
 import { kenoAbi } from "../../abis";
 import type { KenoPlacedBet } from "../../actions/casino/keno";
 import { CASINO_GAME_TYPE, type CasinoChainId, casinoChainById } from "../../data/casino";
 import { Keno, type KenoBall } from "../../entities/casino/keno";
-import { ERROR_CODES, TransactionError } from "../../errors";
-import { ChainError } from "../../errors";
+import { ChainError, ERROR_CODES, TransactionError } from "../../errors";
 import type { BetSwirlFunctionData, Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
 import { getCasinoChainId } from "../../utils";
@@ -50,7 +49,7 @@ export function parseRawKenoConfiguration(
     chainId: casinoChainId,
     biggestSelectableBall: Number(rawConfiguration[0]),
     maxSelectableBalls: Number(rawConfiguration[1]),
-    mutliplierTable: [
+    multiplierTable: [
       [0],
       ...rawConfiguration[2].map((row) => row.map((multiplier) => Number(multiplier))),
     ],
@@ -62,7 +61,7 @@ export interface KenoConfiguration {
   chainId: CasinoChainId;
   biggestSelectableBall: number;
   maxSelectableBalls: number;
-  mutliplierTable: number[][]; // BP
+  multiplierTable: number[][]; // BP
 }
 
 export async function getKenoConfiguration(

@@ -1,12 +1,12 @@
 import {
   type Address,
+  decodeEventLog,
   type EncodeAbiParametersReturnType,
+  encodeFunctionData,
   type Hash,
   type Hex,
   type TransactionReceipt,
-  encodeFunctionData,
 } from "viem";
-import { decodeEventLog } from "viem";
 import { coinTossAbi } from "../../abis/v2/casino/cointoss";
 import { freebetAbi } from "../../abis/v2/casino/freebet";
 import { GAS_TOKEN_ADDRESS } from "../../constants";
@@ -15,10 +15,10 @@ import {
   CASINO_GAME_PLACE_BET_ABI,
   CASINO_GAME_TYPE,
   type CasinoChainId,
+  casinoChainById,
   MAX_SDK_HOUSE_EGDE,
   type NORMAL_CASINO_GAME_TYPE,
   type WEIGHTED_CASINO_GAME_TYPE,
-  casinoChainById,
 } from "../../data/casino";
 import type { KenoEncodedInput, WeightedGameEncodedInput } from "../../entities";
 import type { CoinTossEncodedInput } from "../../entities/casino/cointoss";
@@ -32,13 +32,12 @@ import { getChainlinkVrfCost } from "../../read/common/chainlinkVrfCost";
 import { GAS_PRICE_TYPE, getGasPrices } from "../../read/common/gasPrice";
 import { getTokenMetadata } from "../../read/common/tokenMetadata";
 import { getCasinoChainId } from "../../utils";
-import { chainNativeCurrencyToToken } from "../../utils/tokens";
 import { ALLOWANCE_TYPE, type ApproveResult, approve } from "../common/approve";
 
 export interface CasinoBetParams {
   betAmount: bigint;
   betCount?: number;
-  token?: Token;
+  tokenAddress?: Address;
   stopGain?: bigint;
   stopLoss?: bigint;
   vrfFees?: bigint;
@@ -147,15 +146,11 @@ export async function placeBet(
       (await getGasPrices(wallet, casinoChainId))[
         options?.gasPriceType || defaultCasinoPlaceBetOptions.gasPriceType
       ];
-    const token =
-      betParams.token || chainNativeCurrencyToToken(casinoChain.viemChain.nativeCurrency);
+    const tokenAddress = betParams.tokenAddress || GAS_TOKEN_ADDRESS;
 
     // Generate function data
     const receiver = betParams.receiver || accountAddress;
-    const functionData = getPlaceBetFunctionData(
-      { ...betParams, receiver, tokenAddress: token.address },
-      casinoChainId,
-    );
+    const functionData = getPlaceBetFunctionData({ ...betParams, receiver }, casinoChainId);
 
     // Approve if needed
 
@@ -164,7 +159,7 @@ export async function placeBet(
 
     const { receipt: approveReceipt, result: approveResult } = await approve(
       wallet,
-      token.address,
+      tokenAddress,
       accountAddress,
       game.address,
       functionData.extraData.totalBetAmount,
@@ -182,7 +177,7 @@ export async function placeBet(
       (await getChainlinkVrfCost(
         wallet,
         betParams.game,
-        token.address,
+        tokenAddress,
         functionData.extraData.betCount,
         gasPrice,
       ));
@@ -204,7 +199,7 @@ export async function placeBet(
           gameAddress: game.address,
           gameType: betParams.game,
           chainId: casinoChainId,
-          token,
+          tokenAddress,
         },
       );
     }
@@ -218,7 +213,7 @@ export async function placeBet(
         gameAddress: game.address,
         gameType: betParams.game,
         chainId: casinoChainId,
-        token: betParams.token,
+        tokenAddress: betParams.tokenAddress,
         betAmount: betParams.betAmount,
         betCount: betParams.betCount,
         stopGain: betParams.stopGain,
@@ -233,15 +228,15 @@ export async function placeBet(
     tokenAddress?: Hex;
   } */
 export interface PlaceBetFunctionDataGameParams {
-  receiver: Hex;
+  receiver: Address;
   game: CASINO_GAME_TYPE;
   gameEncodedInput: GameEncodedInput;
   betAmount: bigint;
-  tokenAddress?: Hex;
+  tokenAddress?: Address;
   betCount?: number;
   stopGain?: bigint;
   stopLoss?: bigint;
-  affiliate?: Hex;
+  affiliate?: Address;
 }
 
 export interface PlaceBetExtraData {

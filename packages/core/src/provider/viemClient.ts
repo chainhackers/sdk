@@ -1,4 +1,4 @@
-import type { Hex, PublicClient, TransactionReceipt, WalletClient } from "viem";
+import type { Address, Hash, Hex, PublicClient, TransactionReceipt, WalletClient } from "viem";
 import {
   type BetRequirements,
   type BetSwirlClientOptions,
@@ -9,16 +9,36 @@ import {
   type CasinoToken,
   type CasinoWaitRollOptions,
   type CoinTossRolledBet,
+  casinoChainById,
   type DiceBetParams,
   type DiceFreebetParams,
   type DicePlacedBet,
   type DiceRolledBet,
   type GAS_PRICE_TYPE,
+  getBetRequirements,
+  getCasinoGames,
+  getCasinoGameToken,
+  getCasinoTokens,
+  getChainlinkVrfCost,
+  getClaimableAmount,
+  getKenoConfiguration,
   type KenoConfiguration,
   type KenoRolledBet,
   type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
   type PlaceFreebetCallbacks,
+  type PlinkoBetParams,
+  type PlinkoFreebetParams,
+  type PlinkoPlacedBet,
+  type PlinkoRolledBet,
+  placeDiceBet,
+  placeDiceFreebet,
+  placePlinkoBet,
+  placePlinkoFreebet,
+  placeRouletteBet,
+  placeRouletteFreebet,
+  placeWeightedGameBet,
+  placeWeightedGameFreebet,
   type RouletteBetParams,
   type RouletteFreebetParams,
   type RoulettePlacedBet,
@@ -26,29 +46,22 @@ import {
   type Token,
   WEIGHTED_CASINO_GAME_TYPES,
   type WeightedCasinoPlacedBet,
-  casinoChainById,
-  getBetRequirements,
-  getCasinoGameToken,
-  getCasinoGames,
-  getCasinoTokens,
-  getChainlinkVrfCost,
-  getKenoConfiguration,
-  placeDiceBet,
-  placeDiceFreebet,
-  placeRouletteBet,
-  placeRouletteFreebet,
+  type WeightedGameBetParams,
+  type WeightedGameFreebetParams,
+  type WeightedGamePlacedBet,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
   waitKenoRolledBet,
+  waitPlinkoRolledBet,
   waitRolledBet,
   waitRouletteRolledBet,
 } from "..";
+import type { CoinTossBetParams, CoinTossFreebetParams } from "../actions/casino/cointoss";
 import {
   type CoinTossPlacedBet,
   placeCoinTossBet,
   placeCoinTossFreebet,
 } from "../actions/casino/cointoss";
-import type { CoinTossBetParams, CoinTossFreebetParams } from "../actions/casino/cointoss";
 import {
   type KenoBetParams,
   type KenoFreebetParams,
@@ -57,16 +70,20 @@ import {
   placeKenoFreebet,
 } from "../actions/casino/keno";
 import {
+  placeWheelBet,
+  placeWheelFreebet,
   type WheelBetParams,
   type WheelFreebetParams,
   type WheelPlacedBet,
-  placeWheelBet,
-  placeWheelFreebet,
 } from "../actions/casino/wheel";
-import type { CASINO_GAME_TYPE } from "../data";
 import {
-  type WeightedGameConfiguration,
+  claimLeaderboardRewards,
+  type LeaderboardClaimRewardsResult,
+} from "../actions/leaderboard/leaderboard";
+import type { CASINO_GAME_TYPE, ChainId, Leaderboard } from "../data";
+import {
   getWeightedGameConfiguration,
+  type WeightedGameConfiguration,
 } from "../read/casino/weightedGame";
 import { type WheelRolledBet, waitWheelRolledBet } from "../read/casino/wheel";
 import { BetSwirlClient } from "./client";
@@ -338,6 +355,88 @@ export class ViemBetSwirlClient extends BetSwirlClient {
     );
   }
 
+  async playPlinko(
+    params: PlinkoBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: PlinkoPlacedBet; receipt: TransactionReceipt }> {
+    return placePlinkoBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetPlinko(
+    params: PlinkoFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: PlinkoPlacedBet; receipt: TransactionReceipt }> {
+    return placePlinkoFreebet(
+      this.betSwirlWallet,
+      params,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async waitPlinko(
+    placedBet: PlinkoPlacedBet,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: number,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: PlinkoRolledBet; receipt: TransactionReceipt }> {
+    return waitPlinkoRolledBet(
+      this.betSwirlWallet,
+      placedBet,
+      weightedGameConfiguration,
+      houseEdge,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+    );
+  }
+
+  async playWeightedGame(
+    params: WeightedGameBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: WeightedGamePlacedBet; receipt: TransactionReceipt }> {
+    return placeWeightedGameBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetWeightedGame(
+    params: WeightedGameFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: WeightedGamePlacedBet; receipt: TransactionReceipt }> {
+    return placeWeightedGameFreebet(
+      this.betSwirlWallet,
+      params,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
   /* Casino Utilities */
 
   async getCasinoGames(onlyActive = false) {
@@ -393,6 +492,30 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   async getWeighedGameConfiguration(configId: number | string): Promise<WeightedGameConfiguration> {
     return getWeightedGameConfiguration(this.betSwirlWallet, configId);
+  }
+
+  /* Leaderboard utilities */
+
+  async getClaimableAmount(
+    leaderboardOnChainId: number | bigint,
+    playerAddress: Address,
+    chainId: ChainId,
+  ): Promise<bigint> {
+    return getClaimableAmount(this.betSwirlWallet, leaderboardOnChainId, playerAddress, chainId);
+  }
+
+  async claimLeaderboardRewards(
+    leaderboard: Leaderboard,
+    receiver: Address,
+    onClaimPending?: (tx: Hash, result: LeaderboardClaimRewardsResult) => void | Promise<void>,
+  ): Promise<{ receipt: TransactionReceipt; result: LeaderboardClaimRewardsResult }> {
+    return claimLeaderboardRewards(
+      this.betSwirlWallet,
+      leaderboard,
+      receiver,
+      this.betSwirlDefaultOptions.pollingInterval,
+      onClaimPending,
+    );
   }
 
   /* Private */

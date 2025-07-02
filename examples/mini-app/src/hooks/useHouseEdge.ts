@@ -1,4 +1,4 @@
-import { CASINO_GAME_TYPE, Token, getAffiliateHouseEdgeFunctionData } from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, getAffiliateHouseEdgeFunctionData, Token } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { useReadContract } from "wagmi"
 import { useChain } from "../context/chainContext"

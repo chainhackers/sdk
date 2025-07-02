@@ -1,10 +1,10 @@
 import {
   type Address,
+  encodeFunctionData,
+  formatUnits,
   type Hash,
   type Hex,
   type TransactionReceipt,
-  encodeFunctionData,
-  formatUnits,
 } from "viem";
 
 import { getLogs } from "viem/actions";
@@ -18,14 +18,13 @@ import {
   CASINO_GAME_ROLL_ABI,
   CASINO_GAME_TYPE,
   type CasinoChainId,
-  type NORMAL_CASINO_GAME_TYPE,
-  type WEIGHTED_CASINO_GAME_TYPE,
   casinoChainById,
   labelCasinoGameByType,
+  type NORMAL_CASINO_GAME_TYPE,
+  type WEIGHTED_CASINO_GAME_TYPE,
 } from "../../data/casino";
 import { ERROR_CODES } from "../../errors/codes";
-import { ChainError } from "../../errors/types";
-import { TransactionError } from "../../errors/types";
+import { ChainError, TransactionError } from "../../errors/types";
 import type {
   BetSwirlEventData,
   BetSwirlFunctionData,

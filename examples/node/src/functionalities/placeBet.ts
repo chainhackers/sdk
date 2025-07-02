@@ -1,16 +1,18 @@
 import {
   BetSwirlError,
+  bigIntFormatter,
   type NormalCasinoPlacedBet,
   WEIGHTED_CASINO_GAME_TYPES,
   type WeightedCasinoPlacedBet,
   type WeightedGameChoiceInput,
-  bigIntFormatter,
 } from "@betswirl/sdk-core";
 import chalk from "chalk";
 import { checkEnvVariables } from "../../utils";
 import {
+  _getBetRequirements,
   _getTokenInfo,
   _placeBet,
+  _refreshLeaderboardsWithBet,
   _selectBetAmount,
   _selectBetCount,
   _selectChain,
@@ -20,7 +22,6 @@ import {
   _waitRoll,
   _waitWeightedRoll,
 } from "./common";
-import { _getBetRequirements } from "./common";
 
 export async function startPlaceBetProcess() {
   try {
@@ -64,6 +65,9 @@ export async function startPlaceBetProcess() {
     } else {
       await _waitRoll(placedBet as NormalCasinoPlacedBet);
     }
+
+    // 11. [OPTIONAL] Refresh leaderboards manually with the placed bet
+    await _refreshLeaderboardsWithBet(placedBet.id, selectedChain.id);
   } catch (error) {
     if (error instanceof BetSwirlError) {
       console.error(

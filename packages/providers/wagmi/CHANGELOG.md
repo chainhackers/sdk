@@ -1,5 +1,129 @@
 # @betswirl/wagmi-provider
 
+## 0.1.12
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.12
+
+## 0.1.11
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.11
+
+## 0.1.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.10
+
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.9
+
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.8
+
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.7
+
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.6
+
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.5
+
+## 0.1.4
+
+### Patch Changes
+
+- Add refreshLeaderboardsWithBets
+
+- [`c3143f9`](https://github.com/BetSwirl/sdk/commit/c3143f99ccd603a860ae33148c619e30521d2b58) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Add getClaimableAmount & claimLeaderboardRewards
+
+- Updated dependencies [[`66d6845`](https://github.com/BetSwirl/sdk/commit/66d6845ecce25ad4cbcfb2c4d504b041e09ec2eb), [`c3143f9`](https://github.com/BetSwirl/sdk/commit/c3143f99ccd603a860ae33148c619e30521d2b58)]:
+  - @betswirl/sdk-core@0.1.4
+
+## 0.1.4-beta.1
+
+### Patch Changes
+
+- Add refreshLeaderboardsWithBets
+
+- [`c3143f9`](https://github.com/BetSwirl/sdk/commit/c3143f99ccd603a860ae33148c619e30521d2b58) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Add getClaimableAmount & claimLeaderboardRewards
+
+- Updated dependencies [[`c3143f9`](https://github.com/BetSwirl/sdk/commit/c3143f99ccd603a860ae33148c619e30521d2b58)]:
+  - @betswirl/sdk-core@0.1.4-beta.1
+
+## 0.1.4-beta.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.4-beta.0
+
+## 0.1.3
+
+### Patch Changes
+
+- [`76197b5`](https://github.com/BetSwirl/sdk/commit/76197b5e5b89c82730d48dd2c79681d2b3d86703) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Add Plinko game
+
+- Updated dependencies [[`76197b5`](https://github.com/BetSwirl/sdk/commit/76197b5e5b89c82730d48dd2c79681d2b3d86703), [`4056f6a`](https://github.com/BetSwirl/sdk/commit/4056f6a242ac5d438cbc90d9a686e06cc245d39e), [`c33ac72`](https://github.com/BetSwirl/sdk/commit/c33ac72cfdbe252b601874f431c02f6e15e4094e), [`addc6f8`](https://github.com/BetSwirl/sdk/commit/addc6f8fa63da599895e106e76a7de5271e2d841)]:
+  - @betswirl/sdk-core@0.1.3
+
+## 0.1.3-beta.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.3-beta.3
+
+## 0.1.3-beta.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.3-beta.2
+
+## 0.1.3-beta.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.3-beta.1
+
+## 0.1.3-beta.0
+
+### Patch Changes
+
+- Add Plinko game
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.3-beta.0
+
 ## 0.1.2
 
 ### Patch Changes

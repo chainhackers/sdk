@@ -1,8 +1,8 @@
 import {
-  KenoConfiguration,
-  type RawKenoConfiguration,
   getKenoConfigurationFunctionData,
+  KenoConfiguration,
   parseRawKenoConfiguration,
+  type RawKenoConfiguration,
 } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { useReadContract } from "wagmi"

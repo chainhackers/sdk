@@ -1,8 +1,8 @@
 import {
   CASINO_GAME_TYPE,
   FORMAT_TYPE,
-  GAS_TOKEN_ADDRESS,
   formatRawAmount,
+  GAS_TOKEN_ADDRESS,
 } from "@betswirl/sdk-core"
 import Decimal from "decimal.js"
 import { ChangeEvent, useEffect, useRef, useState } from "react"

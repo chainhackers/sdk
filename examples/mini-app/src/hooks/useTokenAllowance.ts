@@ -1,4 +1,4 @@
-import { Token, getAllowanceFunctionData, getApproveFunctionData } from "@betswirl/sdk-core"
+import { getAllowanceFunctionData, getApproveFunctionData, Token } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo } from "react"
 import { Address, maxUint256, zeroAddress } from "viem"
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi"

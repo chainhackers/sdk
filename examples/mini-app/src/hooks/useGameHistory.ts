@@ -4,12 +4,12 @@ import {
   CasinoBet,
   CasinoChainId,
   FORMAT_TYPE,
-  OrderDirection,
   fetchBets,
   formatAmount,
   formatRawAmount,
+  OrderDirection,
 } from "@betswirl/sdk-core"
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useAccount } from "wagmi"
 import { TokenIcon } from "../components/ui/TokenIcon"
 import { createLogger } from "../lib/logger"

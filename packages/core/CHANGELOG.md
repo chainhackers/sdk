@@ -1,5 +1,113 @@
 # @betswirl/sdk-core
 
+## 0.1.12
+
+### Patch Changes
+
+- Fix fetchLeaderboard query options$
+
+## 0.1.11
+
+### Patch Changes
+
+- Export format functions from campaigns and leaderboards
+
+## 0.1.10
+
+### Patch Changes
+
+- Add credentials to fetchFreebetCampaign
+
+## 0.1.9
+
+### Patch Changes
+
+- Fix Keno table typo
+
+## 0.1.8
+
+### Patch Changes
+
+- Update CasinoBetParams
+
+## 0.1.7
+
+### Patch Changes
+
+- Add USD sources to Leaderboard
+
+## 0.1.6
+
+### Patch Changes
+
+- Add formattedNetMultiplier to getPayoutDetails
+
+## 0.1.5
+
+### Patch Changes
+
+- Add getPayoutDetails
+
+## 0.1.4
+
+### Patch Changes
+
+- Add refreshLeaderboardsWithBets
+
+- [`66d6845`](https://github.com/BetSwirl/sdk/commit/66d6845ecce25ad4cbcfb2c4d504b041e09ec2eb) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Add fetchLeaderboard, fetchLeaderboards, fetchAffilliateLeaderboard & fetchAffiliateLeaderboards
+
+- [`c3143f9`](https://github.com/BetSwirl/sdk/commit/c3143f99ccd603a860ae33148c619e30521d2b58) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Add getClaimableAmount & claimLeaderboardRewards
+
+## 0.1.4-beta.1
+
+### Patch Changes
+
+- Add refreshLeaderboardsWithBets
+
+- [`c3143f9`](https://github.com/BetSwirl/sdk/commit/c3143f99ccd603a860ae33148c619e30521d2b58) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Add getClaimableAmount & claimLeaderboardRewards
+
+## 0.1.4-beta.0
+
+### Patch Changes
+
+- Add fetchLeaderboard, fetchLeaderboards, fetchAffilliateLeaderboard & fetchAffiliateLeaderboards
+
+## 0.1.3
+
+### Patch Changes
+
+- [`76197b5`](https://github.com/BetSwirl/sdk/commit/76197b5e5b89c82730d48dd2c79681d2b3d86703) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Add Plinko game
+
+- [`4056f6a`](https://github.com/BetSwirl/sdk/commit/4056f6a242ac5d438cbc90d9a686e06cc245d39e) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Force Deploy
+
+- [`c33ac72`](https://github.com/BetSwirl/sdk/commit/c33ac72cfdbe252b601874f431c02f6e15e4094e) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Update getUniqueOutputs & getSortedPlinkoOutputs
+
+- [`addc6f8`](https://github.com/BetSwirl/sdk/commit/addc6f8fa63da599895e106e76a7de5271e2d841) Thanks [@Kinco-dev](https://github.com/Kinco-dev)! - Fix fetchTokens & fetchBets default caching
+
+## 0.1.3-beta.3
+
+### Patch Changes
+
+- Fix fetchTokens & fetchBets default caching
+
+## 0.1.3-beta.2
+
+### Patch Changes
+
+- Force Deploy
+
+## 0.1.3-beta.1
+
+### Patch Changes
+
+- Update getUniqueOutputs & getSortedPlinkoOutputs
+
+## 0.1.3-beta.0
+
+### Patch Changes
+
+- Add Plinko game
+
 ## 0.1.2
 
 ### Patch Changes

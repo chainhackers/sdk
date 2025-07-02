@@ -2,9 +2,9 @@ import {
   CASINO_GAME_TYPE,
   CoinToss,
   Dice,
+  getPayoutDetails,
   KenoConfiguration,
   Roulette,
-  getPayoutDetails,
 } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { GameChoice } from "../types/types"

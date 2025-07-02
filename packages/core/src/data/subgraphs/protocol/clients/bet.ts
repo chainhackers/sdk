@@ -1,5 +1,5 @@
 import { ApolloClient } from "@apollo/client/core/index.js";
-import { type Address, type Hash, getAddress, zeroAddress } from "viem";
+import { type Address, getAddress, type Hash, zeroAddress } from "viem";
 import type { NORMAL_CASINO_GAME_TYPE, WeightedGameConfiguration } from "../../../..";
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../../../../constants";
 import { ERROR_CODES } from "../../../../errors";
@@ -26,9 +26,9 @@ import { BetsDocument, type BetsQuery, type BetsQueryVariables } from "../docume
 import type { BetFragment } from "../documents/fragments/bet";
 import { Bet_OrderBy, OrderDirection } from "../documents/types";
 import {
-  type SubgraphCasinoClient,
   defaultSubgraphCasinoClient,
   getGraphqlEndpoint,
+  type SubgraphCasinoClient,
 } from "./common";
 
 export function formatCasinoBet(
@@ -154,6 +154,7 @@ export async function fetchBets(
   const apolloClient = new ApolloClient({
     uri: getGraphqlEndpoint(client),
     cache: client.cache ?? defaultSubgraphCasinoClient.cache,
+    defaultOptions: client.defaultOptions ?? defaultSubgraphCasinoClient.defaultOptions,
   });
 
   const variables: BetsQueryVariables = {

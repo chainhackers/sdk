@@ -1,8 +1,8 @@
 import {
   CASINO_GAME_TYPE,
-  Token,
   getBetRequirementsFunctionData,
   maxGameBetCountByType,
+  Token,
 } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { formatUnits } from "viem"

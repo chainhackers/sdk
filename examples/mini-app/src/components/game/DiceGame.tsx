@@ -1,5 +1,3 @@
-import diceBackground from "../../assets/game/game-background.jpg"
-
 import {
   CASINO_GAME_TYPE,
   Dice,
@@ -7,6 +5,7 @@ import {
   FORMAT_TYPE,
   formatRawAmount,
 } from "@betswirl/sdk-core"
+import diceBackground from "../../assets/game/game-background.jpg"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { DiceGameControls } from "./DiceGameControls"
 import { GameFrame } from "./GameFrame"

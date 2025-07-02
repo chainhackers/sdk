@@ -1,9 +1,9 @@
-import { type TransactionReceipt, decodeEventLog } from "viem";
+import { decodeEventLog, type TransactionReceipt } from "viem";
 import { weightedGameAbi } from "../../abis/v2/casino/weightedGame";
 import {
   type CasinoChainId,
-  type WEIGHTED_CASINO_GAME_TYPE,
   labelCasinoGameByType,
+  type WEIGHTED_CASINO_GAME_TYPE,
 } from "../../data/casino";
 import {
   WeightedGame,
@@ -19,12 +19,12 @@ import {
   type CasinoBetParams,
   type CasinoFreebetParams,
   type CasinoPlaceBetOptions,
+  getPlacedBetFromReceipt,
   type PlaceBetCallbacks,
   type PlaceFreebetCallbacks,
-  type WeightedCasinoPlacedBet,
-  getPlacedBetFromReceipt,
   placeBet,
   placeFreebet,
+  type WeightedCasinoPlacedBet,
 } from "./game";
 
 export interface WeightedGameBetParams extends CasinoBetParams {
