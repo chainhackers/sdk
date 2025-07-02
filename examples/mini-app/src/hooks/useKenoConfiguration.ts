@@ -46,7 +46,7 @@ type UseKenoConfigurationResult = {
  * })
  * if (config) {
  *   console.log('Max selectable balls:', config.maxSelectableBalls)
- *   console.log('Multiplier table:', config.mutliplierTable)
+ *   console.log('Multiplier table:', config.multiplierTable)
  * }
  * ```
  */
