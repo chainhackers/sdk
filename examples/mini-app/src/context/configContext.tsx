@@ -6,7 +6,7 @@ import { useChain } from "./chainContext"
 export type ConfigContextValue = {
   affiliate: Address
   bankrollToken?: TokenWithImage
-  filteredTokens?: TokenWithImage[]
+  filteredTokens?: Address[]
 }
 
 const ConfigContext = createContext<ConfigContextValue | null>(null)
@@ -21,7 +21,7 @@ export type ConfigProviderProps = {
   children: React.ReactNode
   affiliate?: Address
   bankrollToken?: TokenWithImage
-  filteredTokens?: TokenWithImage[]
+  filteredTokens?: Address[]
 }
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {

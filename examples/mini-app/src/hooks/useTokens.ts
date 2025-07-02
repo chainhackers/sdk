@@ -2,11 +2,63 @@ import { CasinoToken, getCasinoTokens } from "@betswirl/sdk-core"
 import { WagmiBetSwirlWallet } from "@betswirl/wagmi-provider"
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
+import { type Address } from "viem"
 import { useConfig } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
+import { type Logger, createLogger } from "../lib/logger"
 import { QueryParameter, TokenWithImage } from "../types/types"
-import { filterTokensByAllowed } from "../utils/tokenUtils"
+import { type FilterTokensResult, filterTokensByAllowed } from "../utils/tokenUtils"
+
+const logger = createLogger("useTokens")
+
+/**
+ * Formats tokens for logging purposes
+ * @param tokens - Array of tokens to format
+ * @returns Array of objects with symbol and address for logging
+ */
+function formatTokensForLogging(tokens: TokenWithImage[]) {
+  return tokens.map((token) => ({ symbol: token.symbol, address: token.address }))
+}
+
+/**
+ * Validates token filtering results and logs warnings if issues are found
+ * @param filterResult - Result from filterTokensByAllowed function
+ * @param availableTokens - Array of available tokens
+ * @param filteredTokenAddresses - Array of addresses used for filtering
+ * @param logger - Logger instance for warnings
+ */
+function validateTokenFiltering(
+  filterResult: FilterTokensResult,
+  availableTokens: TokenWithImage[],
+  filteredTokenAddresses: Address[],
+  logger: Logger,
+): void {
+  // Warn about unmatched addresses from filteredTokens
+  if (filterResult.unmatched.length > 0) {
+    const unmatchedAddresses = filterResult.unmatched.join(", ")
+    logger.warn(
+      `Some token addresses from filteredTokens were not found in available tokens: ${unmatchedAddresses}`,
+      {
+        unmatchedAddresses: filterResult.unmatched,
+        availableTokens: formatTokensForLogging(availableTokens),
+      },
+    )
+  }
+
+  // Warn if filtering resulted in empty list when tokens are available
+  if (filterResult.filtered.length === 0) {
+    logger.warn(
+      "Token filtering resulted in empty list. Check if filteredTokens configuration is correct.",
+      {
+        filteredTokensCount: filteredTokenAddresses.length,
+        availableTokensCount: availableTokens.length,
+        filteredTokenAddresses,
+        availableTokens: formatTokensForLogging(availableTokens),
+      },
+    )
+  }
+}
 
 type UseTokensProps = {
   onlyActive?: boolean
@@ -20,17 +72,28 @@ type UseTokensResult = {
 }
 
 /**
- * Hook to fetch casino tokens with optional filtering
+ * Hook to fetch casino tokens with optional filtering and validation
  *
  * @param onlyActive - Only return active (non-paused) tokens
  * @param query - Optional query parameters for React Query
  * @returns Object containing tokens array, loading state, and error
+ *
+ * The hook now includes enhanced validation for filteredTokens configuration:
+ * - Warns when token addresses in filteredTokens are not found in available tokens
+ * - Warns when filtering results in an empty list despite available tokens
  *
  * @example
  * ```ts
  * const { tokens, loading, error } = useTokens({
  *   onlyActive: true
  * })
+ * ```
+ *
+ * @example
+ * ```ts
+ * // With filteredTokens in BettingConfig context:
+ * // If filteredTokens contains non-existent addresses, warnings will be logged
+ * const { tokens } = useTokens() // Automatically uses filteredTokens from context
  * ```
  */
 export function useTokens(props: UseTokensProps = {}): UseTokensResult {
@@ -60,10 +123,22 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
   )
 
   // Apply filtering if filteredTokens is provided
-  const finalTokens = useMemo(
-    () => (filteredTokens ? filterTokensByAllowed(tokens, filteredTokens) : tokens),
-    [tokens, filteredTokens],
-  )
+  const finalTokens = useMemo(() => {
+    if (!filteredTokens) {
+      return tokens
+    }
+
+    const filterResult = filterTokensByAllowed(tokens, filteredTokens)
+
+    // Only validate and show warnings if tokens have been loaded and query is successful
+    // (to avoid false positives during loading or when there are errors)
+    const shouldValidate = tokens.length > 0 && !tokensQuery.isLoading && !tokensQuery.error
+    if (shouldValidate) {
+      validateTokenFiltering(filterResult, tokens, filteredTokens, logger)
+    }
+
+    return filterResult.filtered
+  }, [tokens, filteredTokens, tokensQuery.isLoading, tokensQuery.error])
 
   return {
     tokens: finalTokens,
