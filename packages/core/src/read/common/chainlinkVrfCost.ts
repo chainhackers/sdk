@@ -1,6 +1,5 @@
+import { encodeFunctionData, type Hex } from "viem";
 import { casinoGameAbi } from "../../abis/v2/casino/game";
-
-import { type Hex, encodeFunctionData } from "viem";
 import { defaultCasinoPlaceBetOptions } from "../../actions";
 import { type CASINO_GAME_TYPE, type CasinoChainId, casinoChainById } from "../../data/casino";
 import { ERROR_CODES } from "../../errors/codes";

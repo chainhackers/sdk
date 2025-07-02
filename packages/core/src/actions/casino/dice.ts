@@ -1,4 +1,4 @@
-import { type TransactionReceipt, decodeEventLog } from "viem";
+import { decodeEventLog, type TransactionReceipt } from "viem";
 import { diceAbi } from "../../abis/v2/casino/dice";
 import { CASINO_GAME_TYPE, type CasinoChainId } from "../../data/casino";
 import { Dice, type DiceEncodedInput, type DiceNumber } from "../../entities/casino/dice";
@@ -10,10 +10,10 @@ import {
   type CasinoBetParams,
   type CasinoFreebetParams,
   type CasinoPlaceBetOptions,
+  getPlacedBetFromReceipt,
   type NormalCasinoPlacedBet,
   type PlaceBetCallbacks,
   type PlaceFreebetCallbacks,
-  getPlacedBetFromReceipt,
   placeBet,
   placeFreebet,
 } from "./game";

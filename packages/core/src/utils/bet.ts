@@ -11,28 +11,54 @@ import type { WeightedGameConfiguration } from "../read";
 export function getBetSwirlFees(payout: bigint, houseEdge: number): bigint {
   return (payout * BigInt(houseEdge)) / BigInt(BP_VALUE);
 }
-export function getGrossPayout(amount: bigint, betCount: number, multiplier: number): bigint {
-  return (amount * BigInt(betCount) * BigInt(multiplier)) / BigInt(BP_VALUE);
+export function getGrossPayout(amount: bigint, betCount: number, grossMulitplier: number): bigint {
+  return (amount * BigInt(betCount) * BigInt(grossMulitplier)) / BigInt(BP_VALUE);
 }
-// mulitplier and houseEdge are in BP_VALUE
+// grossMultiplier and houseEdge are in BP_VALUE
 export function getNetPayout(
   amount: bigint,
   betCount: number,
-  multiplier: number,
+  grossMultiplier: number,
   houseEdge: number,
 ): bigint {
-  const grossPayout = getGrossPayout(amount, betCount, multiplier);
+  const grossPayout = getGrossPayout(amount, betCount, grossMultiplier);
   return grossPayout - getBetSwirlFees(grossPayout, houseEdge);
 }
 // multiplier and houseEdge are in BP_VALUE
-export function getNetMultiplier(multiplier: number, houseEdge: number): number {
+export function getNetMultiplier(grossMulitplier: number, houseEdge: number): number {
   return Math.round(
-    (Number(getNetPayout(BigInt(10 ** 18), 1, multiplier, houseEdge)) / 10 ** 18) * BP_VALUE,
+    (Number(getNetPayout(BigInt(10 ** 18), 1, grossMulitplier, houseEdge)) / 10 ** 18) * BP_VALUE,
   );
 }
 // multiplier and houseEdge are BP_VALUE
-export function getFormattedNetMultiplier(multiplier: number, houseEdge: number): number {
-  return Number((getNetMultiplier(multiplier, houseEdge) / BP_VALUE).toFixed(3));
+export function getFormattedNetMultiplier(grossMulitplier: number, houseEdge: number): number {
+  return Number((getNetMultiplier(grossMulitplier, houseEdge) / BP_VALUE).toFixed(3));
+}
+
+export function getPayoutDetails(
+  amount: bigint,
+  betCount: number,
+  grossMultiplier: number,
+  houseEdge: number,
+): {
+  grossPayout: bigint;
+  netPayout: bigint;
+  betSwirlFees: bigint;
+  netMultiplier: number;
+  formattedNetMultiplier: number;
+} {
+  const grossPayout = getGrossPayout(amount, betCount, grossMultiplier);
+  const fees = getBetSwirlFees(grossPayout, houseEdge);
+  const netPayout = grossPayout - fees;
+  const netMultiplier = getNetMultiplier(grossMultiplier, houseEdge);
+  const formattedNetMultiplier = getFormattedNetMultiplier(grossMultiplier, houseEdge);
+  return {
+    grossPayout,
+    netPayout,
+    betSwirlFees: fees,
+    netMultiplier,
+    formattedNetMultiplier,
+  };
 }
 
 export function decodeNormalCasinoInput(encodedInput: string, game: NORMAL_CASINO_GAME_TYPE): any {

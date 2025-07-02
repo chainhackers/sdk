@@ -1,14 +1,15 @@
 import {
-  GAS_PRICE_TYPE,
-  RETURN_TYPE_GAS_PRICES,
   chainByKey,
+  GAS_PRICE_TYPE,
   getGasPrices,
+  RETURN_TYPE_GAS_PRICES,
 } from "@betswirl/sdk-core"
 import { WagmiBetSwirlWallet } from "@betswirl/wagmi-provider"
 import { useQuery } from "@tanstack/react-query"
 import { useConfig } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { QueryParameter } from "../types/types"
+
 type GetGasPriceResult = {
   detailedGasPrices: RETURN_TYPE_GAS_PRICES
   optimalGasPrice: bigint

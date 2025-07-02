@@ -1,8 +1,8 @@
 import {
   CASINO_GAME_TYPE,
   FORMAT_TYPE,
-  GAS_TOKEN_ADDRESS,
   formatRawAmount,
+  GAS_TOKEN_ADDRESS,
 } from "@betswirl/sdk-core"
 import Decimal from "decimal.js"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
@@ -11,11 +11,11 @@ import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { cn } from "../../lib/utils"
 import { BetStatus, TokenWithImage } from "../../types/types"
-import { ChainIcon } from "../ui/ChainIcon"
-import { TokenIcon } from "../ui/TokenIcon"
 import { Button } from "../ui/button"
+import { ChainIcon } from "../ui/ChainIcon"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
+import { TokenIcon } from "../ui/TokenIcon"
 
 interface BettingPanelProps {
   game: CASINO_GAME_TYPE

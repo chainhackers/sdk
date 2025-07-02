@@ -1,7 +1,7 @@
 import {
   CASINO_GAME_TYPE,
-  COINTOSS_FACE,
   type CasinoRolledBet,
+  COINTOSS_FACE,
   CoinTossEncodedInput,
   DiceEncodedInput,
   DiceNumber,

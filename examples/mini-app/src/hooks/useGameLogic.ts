@@ -1,12 +1,12 @@
 import {
   CASINO_GAME_TYPE,
-  KenoConfiguration,
+  casinoChainById,
   chainById,
   chainNativeCurrencyToToken,
+  KenoConfiguration,
 } from "@betswirl/sdk-core"
-import { casinoChainById } from "@betswirl/sdk-core"
 import React, { useState } from "react"
-import { type Hex, formatGwei, zeroAddress } from "viem"
+import { formatGwei, type Hex, zeroAddress } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
@@ -125,9 +125,14 @@ export function useGameLogic({
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
   const [selection, setSelection] = useState<GameChoice>(defaultSelection)
 
+  const kenoConfiguration = useKenoConfiguration({
+    token,
+    query: { enabled: gameType === CASINO_GAME_TYPE.KENO },
+  })
+
   const kenoConfigResult =
     gameType === CASINO_GAME_TYPE.KENO
-      ? useKenoConfiguration({ token })
+      ? kenoConfiguration
       : { config: undefined, loading: false, error: null }
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =

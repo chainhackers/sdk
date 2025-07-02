@@ -1,4 +1,4 @@
-import { Keno, KenoConfiguration, getFormattedNetMultiplier } from "@betswirl/sdk-core"
+import { getFormattedNetMultiplier, Keno, KenoConfiguration } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 
 interface UseKenoMultipliersProps {

@@ -1,39 +1,20 @@
-import type { Address, Hash, Hex, TransactionReceipt } from "viem";
-import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../constants";
-import type { CASINO_GAME_TYPE, CasinoChainId } from "../data/casino";
-import {
-  type CasinoBetFilterStatus,
-  fetchBet,
-  fetchBetByHash,
-  fetchBets,
-} from "../data/subgraphs/protocol/clients/bet";
-import {
-  Bet_OrderBy,
-  OrderDirection,
-  Token_OrderBy,
-} from "../data/subgraphs/protocol/documents/types";
-import type { SubgraphError } from "../errors";
-import type {
-  BetRequirements,
-  CasinoBet,
-  CasinoGame,
-  CasinoGameToken,
-  CasinoToken,
-  SubgraphToken,
-  Token,
-} from "../interfaces";
-
-import { fetchToken, fetchTokens } from "../data/subgraphs/protocol/clients/token";
-import type { BetSwirlWallet } from "./wallet";
-
 import type { ApolloCache, DefaultOptions } from "@apollo/client/core/index.js";
+import type { Address, Hash, Hex, TransactionReceipt } from "viem";
+import type {
+  PlinkoBetParams,
+  PlinkoFreebetParams,
+  PlinkoPlacedBet,
+  WeightedGameBetParams,
+  WeightedGameFreebetParams,
+  WeightedGamePlacedBet,
+} from "../actions";
+import { refreshLeaderboardsWithBets } from "../actions/api/leaderboard/leaderboards";
 import type {
   CoinTossBetParams,
   CoinTossFreebetParams,
   CoinTossPlacedBet,
 } from "../actions/casino/cointoss";
-import type { DiceBetParams, DiceFreebetParams } from "../actions/casino/dice";
-import type { DicePlacedBet } from "../actions/casino/dice";
+import type { DiceBetParams, DiceFreebetParams, DicePlacedBet } from "../actions/casino/dice";
 import type {
   CasinoPlaceBetOptions,
   NormalCasinoPlacedBet,
@@ -49,15 +30,48 @@ import type {
 } from "../actions/casino/roulette";
 import type { WheelBetParams, WheelFreebetParams, WheelPlacedBet } from "../actions/casino/wheel";
 import type { ALLOWANCE_TYPE } from "../actions/common/approve";
+import type { LeaderboardClaimRewardsResult } from "../actions/leaderboard/leaderboard";
+import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from "../constants";
 import {
+  type AffiliateLeaderboardWithClaimDetails,
   type ChainId,
   FREEBET_CAMPAIGN_STATUS,
   type FreebetCampaign,
-  type SignedFreebet,
+  fetchAffiliateLeaderboard,
+  fetchAffiliateLeaderboards,
   fetchFreebetCampaign,
   fetchFreebetCampaigns,
   fetchFreebets,
+  fetchLeaderboard,
+  fetchLeaderboards,
+  LEADERBOARD_STATUS,
+  LEADERBOARD_TYPE,
+  type Leaderboard,
+  type SignedFreebet,
 } from "../data";
+import type { CASINO_GAME_TYPE, CasinoChainId } from "../data/casino";
+import {
+  type CasinoBetFilterStatus,
+  fetchBet,
+  fetchBetByHash,
+  fetchBets,
+} from "../data/subgraphs/protocol/clients/bet";
+import { fetchToken, fetchTokens } from "../data/subgraphs/protocol/clients/token";
+import {
+  Bet_OrderBy,
+  OrderDirection,
+  Token_OrderBy,
+} from "../data/subgraphs/protocol/documents/types";
+import type { SubgraphError } from "../errors";
+import type {
+  BetRequirements,
+  CasinoBet,
+  CasinoGame,
+  CasinoGameToken,
+  CasinoToken,
+  SubgraphToken,
+  Token,
+} from "../interfaces";
 import type {
   CasinoRolledBet,
   CasinoWaitRollOptions,
@@ -66,12 +80,13 @@ import type {
   GAS_PRICE_TYPE,
   KenoConfiguration,
   KenoRolledBet,
+  PlinkoRolledBet,
   RouletteRolledBet,
 } from "../read";
 import type { WeightedGameConfiguration } from "../read/casino/weightedGame";
 import type { WheelRolledBet } from "../read/casino/wheel";
 import { FORMAT_TYPE, getCasinoChainId } from "../utils";
-
+import type { BetSwirlWallet } from "./wallet";
 export interface BetSwirlClientOptions {
   gasPriceType?: GAS_PRICE_TYPE;
   gasPrice?: bigint;
@@ -200,6 +215,37 @@ export abstract class BetSwirlClient {
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: WheelRolledBet; receipt: TransactionReceipt }>;
 
+  abstract playPlinko(
+    params: PlinkoBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: PlinkoPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract playFreebetPlinko(
+    params: PlinkoFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: PlinkoPlacedBet; receipt: TransactionReceipt }>;
+
+  abstract waitPlinko(
+    placedBet: PlinkoPlacedBet,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: number,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: PlinkoRolledBet; receipt: TransactionReceipt }>;
+
+  abstract playWeightedGame(
+    params: WeightedGameBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+  ): Promise<{ placedBet: WeightedGamePlacedBet; receipt: TransactionReceipt }>;
+
+  abstract playFreebetWeightedGame(
+    params: WeightedGameFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: WeightedGamePlacedBet; receipt: TransactionReceipt }>;
+
   /* Casino utilities */
 
   abstract getCasinoGames(onlyActive?: boolean): Promise<CasinoGame[]>;
@@ -231,6 +277,20 @@ export abstract class BetSwirlClient {
   abstract getWeighedGameConfiguration(
     configId: number | string,
   ): Promise<WeightedGameConfiguration>;
+
+  /* Leaderboard utilities */
+
+  abstract getClaimableAmount(
+    leaderboardOnChainId: number | bigint,
+    playerAddress: Address,
+    chainId?: ChainId,
+  ): Promise<bigint>;
+
+  abstract claimLeaderboardRewards(
+    leaderboard: Leaderboard,
+    receiver: Address,
+    onClaimPending?: (tx: Hash, result: LeaderboardClaimRewardsResult) => void | Promise<void>,
+  ): Promise<{ receipt: TransactionReceipt; result: LeaderboardClaimRewardsResult }>;
 
   /* Subgraph queries */
 
@@ -353,5 +413,75 @@ export abstract class BetSwirlClient {
 
   async fetchFreebetCampaign(id: number): Promise<FreebetCampaign | null> {
     return fetchFreebetCampaign(id, Boolean(this.betSwirlDefaultOptions.api?.testMode));
+  }
+
+  async fetchLeaderboards(
+    limit = 10,
+    offset = 0,
+    playerAddress?: Address,
+    affiliate?: Address,
+    chainId?: ChainId,
+    withExternalBankrollLeaderboards = false,
+    endDateDirection?: "asc" | "desc",
+    statuses?: LEADERBOARD_STATUS[],
+  ): Promise<{ leaderboards: Leaderboard[]; total: number; offset: number; limit: number }> {
+    return fetchLeaderboards(
+      limit,
+      offset,
+      playerAddress,
+      affiliate,
+      chainId,
+      withExternalBankrollLeaderboards,
+      endDateDirection,
+      statuses,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
+    );
+  }
+
+  async fetchLeaderboard(id: number, playerAddress?: Address): Promise<Leaderboard | null> {
+    return fetchLeaderboard(id, playerAddress, Boolean(this.betSwirlDefaultOptions.api?.testMode));
+  }
+
+  async fetchAffiliateLeaderboards(
+    affiliate: Address,
+    limit = 10,
+    offset = 0,
+    chainId?: ChainId,
+    endDateDirection?: "asc" | "desc",
+    statuses?: LEADERBOARD_STATUS[],
+  ): Promise<{
+    leaderboards: AffiliateLeaderboardWithClaimDetails[];
+    total: number;
+    offset: number;
+    limit: number;
+  }> {
+    return fetchAffiliateLeaderboards(
+      affiliate,
+      limit,
+      offset,
+      chainId,
+      endDateDirection,
+      statuses,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
+    );
+  }
+
+  async fetchAffiliateLeaderboard(
+    id: number,
+  ): Promise<AffiliateLeaderboardWithClaimDetails | null> {
+    return fetchAffiliateLeaderboard(id, Boolean(this.betSwirlDefaultOptions.api?.testMode));
+  }
+
+  async refreshLeaderboardsWithBets(
+    betIds: string[],
+    chainId: ChainId,
+    betType: LEADERBOARD_TYPE,
+  ): Promise<boolean> {
+    return refreshLeaderboardsWithBets(
+      betIds,
+      chainId,
+      betType,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
+    );
   }
 }

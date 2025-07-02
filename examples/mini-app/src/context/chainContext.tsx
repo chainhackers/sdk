@@ -1,8 +1,7 @@
 import { CasinoChain, CasinoChainId, casinoChainById, casinoChainIds } from "@betswirl/sdk-core"
-import React, { useState, useContext, createContext, useEffect, useMemo, useCallback } from "react"
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { type Chain } from "viem"
-import { useSwitchChain } from "wagmi"
-import { useAccount } from "wagmi"
+import { useAccount, useSwitchChain } from "wagmi"
 
 export type ChainContextValue = {
   appChain: CasinoChain

@@ -1,13 +1,12 @@
 import {
+  BetSwirlError,
+  bigIntFormatter,
+  casinoChainById,
   type NormalCasinoPlacedBet,
   WEIGHTED_CASINO_GAME_TYPES,
   type WeightedCasinoPlacedBet,
   type WeightedGameChoiceInput,
-  bigIntFormatter,
-  casinoChainById,
 } from "@betswirl/sdk-core";
-
-import { BetSwirlError } from "@betswirl/sdk-core";
 import chalk from "chalk";
 import { checkEnvVariables } from "../../utils";
 import {
@@ -16,6 +15,7 @@ import {
   _getBetRequirements,
   _getTokenInfo,
   _placeFreebet,
+  _refreshLeaderboardsWithBet,
   _selectFreebet,
   _selectGame,
   _selectInput,
@@ -29,7 +29,6 @@ export async function startPlaceFreebetProcess() {
     checkEnvVariables();
     // 1. Select a freebet to wager
     const selectedFreebet = await _selectFreebet();
-    console.log("selectedFreebet", selectedFreebet);
     if (!selectedFreebet) {
       console.log(
         chalk.bgYellow(
@@ -86,6 +85,9 @@ export async function startPlaceFreebetProcess() {
     } else {
       await _waitRoll(placedFreebet as NormalCasinoPlacedBet);
     }
+
+    // 10. [OPTIONAL] Refresh leaderboards manually with the placed freebet
+    await _refreshLeaderboardsWithBet(placedFreebet.id, selectedGame.chainId);
   } catch (error) {
     if (error instanceof BetSwirlError) {
       console.error(

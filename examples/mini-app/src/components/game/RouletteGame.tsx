@@ -1,12 +1,11 @@
-import rouletteBackground from "../../assets/game/game-background.jpg"
-
 import {
   CASINO_GAME_TYPE,
   FORMAT_TYPE,
+  formatRawAmount,
   Roulette,
   RouletteNumber,
-  formatRawAmount,
 } from "@betswirl/sdk-core"
+import rouletteBackground from "../../assets/game/game-background.jpg"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { GameFrame } from "./GameFrame"
 import { RouletteGameControls } from "./RouletteGameControls"

@@ -1,5 +1,3 @@
-import coinTossBackground from "../../assets/game/game-background.jpg"
-
 import {
   CASINO_GAME_TYPE,
   COINTOSS_FACE,
@@ -7,6 +5,7 @@ import {
   FORMAT_TYPE,
   formatRawAmount,
 } from "@betswirl/sdk-core"
+import coinTossBackground from "../../assets/game/game-background.jpg"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameFrame } from "./GameFrame"
