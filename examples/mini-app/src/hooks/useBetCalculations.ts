@@ -45,7 +45,7 @@ function getMultiplierForGame(selection: GameChoice, kenoConfig?: KenoConfigurat
       const selectedCount = selection.choice.length
       if (selectedCount === 0) return 0
 
-      const multipliers = kenoConfig.mutliplierTable[selectedCount] || []
+      const multipliers = kenoConfig.multiplierTable[selectedCount] || []
       return Math.max(...multipliers, 0)
     }
     default:

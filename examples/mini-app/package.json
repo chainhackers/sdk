@@ -5,7 +5,7 @@
     "url": "https://github.com/chainhackers/sdk.git",
     "directory": "examples/mini-app"
   },
-  "version": "0.0.17",
+  "version": "0.0.18",
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
@@ -47,8 +47,8 @@
     "lucide-react": "^0.522.0"
   },
   "peerDependencies": {
-    "@betswirl/sdk-core": "^0.1.8",
-    "@betswirl/wagmi-provider": "^0.1.8",
+    "@betswirl/sdk-core": "^0.1.12",
+    "@betswirl/wagmi-provider": "^0.1.12",
     "@coinbase/onchainkit": "^0.38.14",
     "@tanstack/react-query": "^5.81.2",
     "react": "^18.0.0 || ^19.0.0",
@@ -57,7 +57,7 @@
     "wagmi": "^2.15.6"
   },
   "devDependencies": {
-    "@betswirl/sdk-core": "^0.1.8",
+    "@betswirl/sdk-core": "^0.1.12",
     "@betswirl/wagmi-provider": "^0.1.8",
     "@biomejs/biome": "^2.0.5",
     "@chromatic-com/storybook": "^4.0.1",
