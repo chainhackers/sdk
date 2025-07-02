@@ -6,9 +6,9 @@ import {
   formatRawAmount,
 } from "@betswirl/sdk-core"
 import { ChevronDown } from "lucide-react"
-import { useEffect, useState } from "react"
-import { type Hex, zeroAddress } from "viem"
-import { useAccount, useBalance } from "wagmi"
+import { useEffect, useMemo, useState } from "react"
+import { type Hex, erc20Abi, zeroAddress } from "viem"
+import { useAccount, useBalance, useReadContracts } from "wagmi"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useTokens } from "../../hooks/useTokens"
@@ -19,6 +19,48 @@ import { TokenIcon } from "../ui/TokenIcon"
 import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
+
+const TOKEN_BALANCE_CACHE_CONFIG = {
+  staleTime: 10_000, // 10 seconds fresh
+  gcTime: 5 * 60_000, // 5 minutes cache
+  refetchInterval: false, // No background refetch
+  refetchOnWindowFocus: true,
+} as const
+
+function combineTokensWithBalances(
+  tokens: TokenWithImage[],
+  nativeToken: TokenWithImage | undefined,
+  nativeBalance: bigint | undefined,
+  erc20Tokens: TokenWithImage[],
+  erc20Balances: readonly { result?: unknown }[] | undefined,
+): TokenWithBalance[] {
+  const result: TokenWithBalance[] = []
+
+  if (nativeToken) {
+    const balance = nativeBalance || 0n
+    result.push({
+      ...nativeToken,
+      balance,
+      formattedBalance: formatRawAmount(balance, nativeToken.decimals, FORMAT_TYPE.PRECISE),
+    })
+  }
+
+  erc20Tokens.forEach((token, index) => {
+    const balance = (erc20Balances?.[index]?.result as bigint) || 0n
+    result.push({
+      ...token,
+      balance,
+      formattedBalance: formatRawAmount(balance, token.decimals, FORMAT_TYPE.PRECISE),
+    })
+  })
+
+  const tokenIndexMap = new Map(tokens.map((token, index) => [token.address, index]))
+  return result.sort((a, b) => {
+    const aIndex = tokenIndexMap.get(a.address) ?? 0
+    const bIndex = tokenIndexMap.get(b.address) ?? 0
+    return aIndex - bIndex
+  })
+}
 
 interface ChainAndTokenSheetPanelProps {
   portalContainer: HTMLElement
@@ -170,6 +212,11 @@ function ChainSelectionView({ currentChainId, onChainSelect, onBack }: ChainSele
   )
 }
 
+interface TokenWithBalance extends TokenWithImage {
+  balance: bigint
+  formattedBalance: string
+}
+
 interface TokenSelectionViewProps {
   tokens: TokenWithImage[]
   tokensLoading: boolean
@@ -187,6 +234,42 @@ function TokenSelectionView({
   onBack,
   userAddress,
 }: TokenSelectionViewProps) {
+  const nativeToken = tokens.find((token) => token.address === zeroAddress)
+  const erc20Tokens = tokens.filter((token) => token.address !== zeroAddress)
+
+  const { data: erc20Balances } = useReadContracts({
+    contracts: erc20Tokens.map((token) => ({
+      address: token.address as Hex,
+      abi: erc20Abi,
+      functionName: "balanceOf",
+      args: [userAddress as Hex],
+    })),
+    query: {
+      ...TOKEN_BALANCE_CACHE_CONFIG,
+      enabled: !!userAddress && erc20Tokens.length > 0,
+    },
+  })
+
+  const { data: nativeBalance } = useBalance({
+    address: userAddress as Hex,
+    query: {
+      ...TOKEN_BALANCE_CACHE_CONFIG,
+      enabled: !!userAddress && !!nativeToken,
+    },
+  })
+
+  const tokensWithBalances = useMemo(
+    () =>
+      combineTokensWithBalances(
+        tokens,
+        nativeToken,
+        nativeBalance?.value,
+        erc20Tokens,
+        erc20Balances,
+      ),
+    [tokens, nativeToken, nativeBalance?.value, erc20Tokens, erc20Balances],
+  )
+
   return (
     <div className="flex flex-col">
       <div className="flex items-center gap-3 mb-6">
@@ -212,7 +295,7 @@ function TokenSelectionView({
               No tokens available
             </div>
           ) : (
-            tokens.map((token) => (
+            tokensWithBalances.map((token) => (
               <Button
                 variant="ghost"
                 key={token.address}
@@ -227,7 +310,7 @@ function TokenSelectionView({
                   <TokenIcon token={token} size={24} />
                   <span className="font-medium text-foreground">{token.symbol}</span>
                 </div>
-                <TokenBalance token={token} userAddress={userAddress} />
+                <TokenBalance formattedBalance={token.formattedBalance} />
               </Button>
             ))
           )}
@@ -238,19 +321,9 @@ function TokenSelectionView({
 }
 
 interface TokenBalanceProps {
-  token: TokenWithImage
-  userAddress?: string
+  formattedBalance: string
 }
 
-function TokenBalance({ token, userAddress }: TokenBalanceProps) {
-  const { data: balance } = useBalance({
-    address: userAddress as Hex,
-    token: token.address === zeroAddress ? undefined : (token.address as Hex),
-  })
-
-  const formattedBalance = balance
-    ? formatRawAmount(balance.value, token.decimals, FORMAT_TYPE.PRECISE)
-    : "0"
-
+function TokenBalance({ formattedBalance }: TokenBalanceProps) {
   return <span className="text-sm text-muted-foreground">{formattedBalance}</span>
 }
