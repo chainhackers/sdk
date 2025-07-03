@@ -19,6 +19,7 @@
   "type": "module",
   "workspaces": [
     "packages/core",
+    "packages/ui-react",
     "packages/providers/*",
     "examples/*"
   ],
