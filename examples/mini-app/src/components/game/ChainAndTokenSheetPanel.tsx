@@ -1,24 +1,24 @@
 import {
   type CasinoChainId,
-  FORMAT_TYPE,
   chainById,
   chainNativeCurrencyToToken,
+  FORMAT_TYPE,
   formatRawAmount,
 } from "@betswirl/sdk-core"
 import { ChevronDown } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
-import { type Hex, erc20Abi, zeroAddress } from "viem"
+import { erc20Abi, type Hex, zeroAddress } from "viem"
 import { useAccount, useBalance, useReadContracts } from "wagmi"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useTokens } from "../../hooks/useTokens"
 import { cn } from "../../lib/utils"
 import { ChainTokenPanelView, TokenWithImage } from "../../types/types"
-import { ChainIcon } from "../ui/ChainIcon"
-import { TokenIcon } from "../ui/TokenIcon"
 import { Button } from "../ui/button"
+import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
+import { TokenIcon } from "../ui/TokenIcon"
 
 const TOKEN_BALANCE_CACHE_CONFIG = {
   staleTime: 10_000, // 10 seconds fresh
@@ -101,7 +101,7 @@ export function ChainAndTokenSheetPanel({
   return (
     <SheetPortal container={portalContainer}>
       <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
-      <SheetBottomPanelContent className={cn("!h-auto !max-h-[70%]", "p-5 sm:p-6")}>
+      <SheetBottomPanelContent className={cn("!h-auto !max-h-[70%]", "p-4")}>
         {currentView === "main" && (
           <div className="flex flex-col gap-6">
             {/* Current chain section */}
@@ -118,7 +118,7 @@ export function ChainAndTokenSheetPanel({
                 )}
               >
                 <div className="flex items-center gap-2">
-                  <ChainIcon chainId={appChainId} size={20} />
+                  <ChainIcon chainId={appChainId} size={18} />
                   <span>{appChain.viemChain.name}</span>
                 </div>
                 <ChevronDown className="h-4 w-4 -rotate-90" />
@@ -139,7 +139,7 @@ export function ChainAndTokenSheetPanel({
                 )}
               >
                 <div className="flex items-center gap-2">
-                  <TokenIcon token={effectiveToken} size={20} />
+                  <TokenIcon token={effectiveToken} size={18} />
                   <span>{effectiveToken.symbol}</span>
                 </div>
                 <ChevronDown className="h-4 w-4 -rotate-90" />
@@ -189,22 +189,22 @@ function ChainSelectionView({ currentChainId, onChainSelect, onBack }: ChainSele
         >
           <ChevronDown className="h-4 w-4 !rotate-90" />
         </Button>
-        <h2 className="text-lg font-semibold">Select Chain</h2>
+        <h2 className="text-base font-semibold">Select Chain</h2>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <Button
           variant="ghost"
           onClick={() => onChainSelect(currentChainId)}
           className={cn(
-            "flex items-center gap-3 p-3 rounded-[8px] w-full text-left h-auto justify-start",
+            "flex items-center gap-3 px-4 py-3 rounded-[8px] w-full text-left h-auto justify-start",
             "bg-surface-selected hover:bg-surface-hover transition-colors",
           )}
         >
-          <ChainIcon chainId={currentChainId} size={24} />
+          <ChainIcon chainId={currentChainId} size={18} />
           <div className="flex flex-col">
             <span className="font-medium text-foreground">Current Chain</span>
-            <span className="text-sm text-muted-foreground">Only current chain is available</span>
+            <span className="text-xs text-muted-foreground">Only current chain is available</span>
           </div>
         </Button>
       </div>
@@ -281,11 +281,11 @@ function TokenSelectionView({
         >
           <ChevronDown className="h-4 w-4 !rotate-90" />
         </Button>
-        <h2 className="text-lg font-semibold">Select Token</h2>
+        <h2 className="text-base font-semibold">Select Token</h2>
       </div>
 
-      <ScrollArea className="h-60">
-        <div className="flex flex-col gap-2 pr-4">
+      <ScrollArea className="h-60 [&>[data-slot=scroll-area-scrollbar]]:w-[6px] [&>[data-slot=scroll-area-scrollbar]]:border-l-0 [&>[data-slot=scroll-area-scrollbar]]:z-10 [&>[data-slot=scroll-area-scrollbar]]:-translate-x-[1px] [&_[data-slot=scroll-area-thumb]]:bg-scrollbar-thumb ">
+        <div className="flex flex-col gap-1">
           {tokensLoading ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
               Loading tokens...
@@ -301,13 +301,13 @@ function TokenSelectionView({
                 key={token.address}
                 onClick={() => onTokenSelect(token)}
                 className={cn(
-                  "flex items-center justify-between p-3 rounded-[8px] w-full text-left h-auto",
+                  "flex items-center justify-between px-4 py-3 rounded-[8px] w-full text-left h-auto",
                   "hover:bg-surface-hover transition-colors",
                   token.address === selectedToken.address && "bg-surface-selected",
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <TokenIcon token={token} size={24} />
+                  <TokenIcon token={token} size={18} />
                   <span className="font-medium text-foreground">{token.symbol}</span>
                 </div>
                 <TokenBalance formattedBalance={token.formattedBalance} />

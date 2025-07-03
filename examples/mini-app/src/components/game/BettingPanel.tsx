@@ -11,11 +11,11 @@ import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { cn } from "../../lib/utils"
 import { BetStatus, ChainTokenPanelView, TokenWithImage } from "../../types/types"
-import { ChainIcon } from "../ui/ChainIcon"
-import { TokenIcon } from "../ui/TokenIcon"
 import { Button } from "../ui/button"
+import { ChainIcon } from "../ui/ChainIcon"
 import { Label } from "../ui/label"
 import { Sheet } from "../ui/sheet"
+import { TokenIcon } from "../ui/TokenIcon"
 import { ChainAndTokenSheetPanel } from "./ChainAndTokenSheetPanel"
 
 interface BettingPanelProps {

@@ -6,7 +6,7 @@ import { type Address } from "viem"
 import { useConfig } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
-import { type Logger, createLogger } from "../lib/logger"
+import { createLogger, type Logger } from "../lib/logger"
 import { QueryParameter, TokenWithImage } from "../types/types"
 import { type FilterTokensResult, filterTokensByAllowed } from "../utils/tokenUtils"
 

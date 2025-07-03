@@ -1,10 +1,9 @@
 import { type CasinoChainId, chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { ChevronDown, Settings } from "lucide-react"
-import React, { useState, useEffect, useRef } from "react"
-import { ChainIcon } from "../../components/ui/ChainIcon"
-import { TokenIcon } from "../../components/ui/TokenIcon"
+import React, { useEffect, useRef, useState } from "react"
 import { Button } from "../../components/ui/button"
+import { ChainIcon } from "../../components/ui/ChainIcon"
 import { ScrollArea } from "../../components/ui/scroll-area"
 import {
   Sheet,
@@ -13,6 +12,7 @@ import {
   SheetPortal,
   SheetTrigger,
 } from "../../components/ui/sheet"
+import { TokenIcon } from "../../components/ui/TokenIcon"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useTokens } from "../../hooks/useTokens"
