@@ -1,5 +1,9 @@
-import { createContext, ReactNode, useContext, useState } from "react"
+import { createContext, ReactNode, useContext, useEffect, useState } from "react"
+import { type Address } from "viem"
+import { useTokens } from "../hooks/useTokens"
 import { TokenWithImage } from "../types/types"
+
+const STORAGE_KEY = "betswirl-selected-token-address"
 
 interface TokenContextValue {
   selectedToken: TokenWithImage | undefined
@@ -13,27 +17,55 @@ interface TokenProviderProps {
   initialToken?: TokenWithImage
 }
 
+function getStoredTokenAddress(): Address | null {
+  if (typeof window === "undefined") {
+    return null
+  }
+
+  try {
+    const stored = sessionStorage.getItem(STORAGE_KEY)
+    return stored as Address | null
+  } catch {
+    return null
+  }
+}
+
+function storeTokenAddress(address: Address): void {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  try {
+    sessionStorage.setItem(STORAGE_KEY, address)
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 export function TokenProvider({ children, initialToken }: TokenProviderProps) {
-  const [selectedToken, setSelectedTokenState] = useState<TokenWithImage | undefined>(() => {
-    if (typeof window !== "undefined") {
-      const stored = sessionStorage.getItem("betswirl-selected-token")
-      if (stored) {
-        try {
-          return JSON.parse(stored)
-        } catch {
-          // Invalid stored data, ignore
-        }
+  const { tokens, loading } = useTokens()
+  const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage | undefined>()
+
+  useEffect(() => {
+    if (loading || tokens.length === 0) {
+      return
+    }
+
+    const storedAddress = getStoredTokenAddress()
+    if (storedAddress) {
+      const foundToken = tokens.find((token) => token.address === storedAddress)
+      if (foundToken) {
+        setSelectedTokenInternal(foundToken)
+        return
       }
     }
-    // Use initialToken if no stored token found
-    return initialToken
-  })
+
+    setSelectedTokenInternal(initialToken)
+  }, [tokens, loading, initialToken])
 
   const setSelectedToken = (token: TokenWithImage) => {
-    setSelectedTokenState(token)
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("betswirl-selected-token", JSON.stringify(token))
-    }
+    setSelectedTokenInternal(token)
+    storeTokenAddress(token.address)
   }
 
   return (
