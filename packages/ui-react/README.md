@@ -51,12 +51,12 @@ setfacl -R -m u:dev-components:rwx /var/www/betswirl-sdk/
 
 1. Navigate to the mini-app folder:
 ```shell
-cd examples/mini-app
+cd packages/ui-react
 ```
 
 2. Install dependencies (ignore workspace):
 ```shell
-pnpm install --ignore-workspace
+pnpm install
 ```
 
 Start Storybook:
