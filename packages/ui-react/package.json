@@ -1,9 +1,9 @@
 {
-  "name": "@betswirl/ui",
+  "name": "@betswirl/ui-react",
   "repository": {
     "type": "git",
     "url": "https://github.com/chainhackers/sdk.git",
-    "directory": "examples/mini-app"
+    "directory": "packages/ui-react"
   },
   "version": "0.0.19",
   "license": "MIT",
