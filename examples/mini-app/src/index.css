@@ -79,6 +79,9 @@
   --color-keno-multiplier-tooltip-bg: var(--keno-multiplier-tooltip-bg);
   --color-keno-multiplier-tooltip-text: var(--keno-multiplier-tooltip-text);
   --color-keno-winning-border: var(--keno-winning-border);
+  --color-surface-selected: var(--surface-selected);
+  --color-surface-hover: var(--surface-hover);
+  --color-scrollbar-thumb: var(--scrollbar-thumb);
 }
 
 @layer base {
@@ -179,6 +182,10 @@
     --keno-multiplier-tooltip-bg: oklch(0.2113 0.0224 240.71 / 0.72);
     --keno-multiplier-tooltip-text: oklch(1 0 0);
     --keno-winning-border: oklch(0.784 0.1418 166.22);
+
+    --surface-selected: oklch(0.9401 0 0);
+    --surface-hover: oklch(0.9672 0 0);
+    --scrollbar-thumb: oklch(0.1559 0.02 269.69 / 0.08);
   }
 
   .dark {
@@ -233,6 +240,10 @@
     --keno-multiplier-bg: oklch(0.9137 0.0153 273.84 / 0.2);
     --keno-multiplier-tooltip-bg: oklch(0.9276 0.0058 264.53 / 0.8);
     --keno-multiplier-tooltip-text: oklch(0.343 0.0139 235.28);
+
+    --surface-selected: oklch(0.311 0.0055 236.69);
+    --surface-hover: oklch(0.311 0.0055 236.69 / 0.5);
+    --scrollbar-thumb: oklch(0.1559 0.02 269.69 / 0.08);
   }
 
   @font-face {

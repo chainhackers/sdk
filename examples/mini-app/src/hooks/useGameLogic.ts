@@ -9,7 +9,7 @@ import React, { useState } from "react"
 import { formatGwei, type Hex, zeroAddress } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
-import { useBettingConfig } from "../context/configContext"
+import { useTokenContext } from "../context/tokenContext"
 import { BetStatus, GameChoice, GameResult, HistoryEntry, TokenWithImage } from "../types/types"
 import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
@@ -103,9 +103,11 @@ export function useGameLogic({
   const { isConnected: isWalletConnected, address } = useAccount()
   const { gameHistory, refreshHistory } = useGameHistory(gameType)
   const { areChainsSynced, appChainId } = useChain()
-  const { bankrollToken } = useBettingConfig()
 
-  const token: TokenWithImage = bankrollToken || {
+  const { selectedToken } = useTokenContext()
+
+  // Determine the effective token to use
+  const token: TokenWithImage = selectedToken || {
     ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
     image: "", // Fallback for native currency - user should configure this
   }
@@ -136,7 +138,7 @@ export function useGameLogic({
       : { config: undefined, loading: false, error: null }
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
-    usePlaceBet(gameType, refetchBalance, kenoConfigResult.config)
+    usePlaceBet(gameType, token, refetchBalance, kenoConfigResult.config)
 
   const gameContractAddress = casinoChainById[appChainId]?.contracts.games[gameType]?.address
 

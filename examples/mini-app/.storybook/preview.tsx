@@ -1,10 +1,12 @@
 import type { Decorator, Preview } from "@storybook/react"
-import React from "react"
 import "../src/index.css"
+import { StorybookProviders } from "../src/storybook/StorybookProviders"
 
-const withAppProviders: Decorator = (StoryComponent: React.ComponentType) => {
-  return <StoryComponent />
-}
+const withAppProviders: Decorator = (Story) => (
+  <StorybookProviders>
+    <Story />
+  </StorybookProviders>
+)
 
 const preview: Preview = {
   parameters: {

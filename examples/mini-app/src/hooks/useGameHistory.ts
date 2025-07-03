@@ -12,10 +12,10 @@ import {
 import React, { useCallback, useEffect, useState } from "react"
 import { useAccount } from "wagmi"
 import { TokenIcon } from "../components/ui/TokenIcon"
-import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
 import { toLowerCase } from "../lib/utils"
 import { HistoryEntry, HistoryEntryStatus, TokenWithImage } from "../types/types"
+import { useTokens } from "./useTokens"
 
 const logger = createLogger("useGameHistory")
 
@@ -43,7 +43,7 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | null>(null)
   const { chainId, address } = useAccount()
-  const { bankrollToken } = useBettingConfig()
+  const { tokens } = useTokens({ onlyActive: false }) // Get all tokens, not just active ones
 
   const fetchHistoryLogic = useCallback(async () => {
     if (!address || !chainId) {
@@ -73,16 +73,15 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
       }
 
       const formattedHistory: HistoryEntry[] = result.bets.map((bet: CasinoBet) => {
-        // TODO: Implement proper dynamic token loading for all supported tokens #107
-        // For now, dynamically generate token image URL based on symbol
-        const tokenWithImage: TokenWithImage =
-          bankrollToken && bankrollToken.symbol === bet.token.symbol
-            ? bankrollToken
-            : {
-                ...bet.token,
-                // Use BetSwirl's token image URL pattern
-                image: `https://www.betswirl.com/img/tokens/${bet.token.symbol.toUpperCase()}.svg`,
-              }
+        const matchingToken = tokens.find(
+          (token) => token.symbol === bet.token.symbol && token.address === bet.token.address,
+        )
+
+        const tokenWithImage: TokenWithImage = matchingToken || {
+          ...bet.token,
+          // Use BetSwirl's token image URL pattern as fallback
+          image: `https://www.betswirl.com/img/tokens/${bet.token.symbol.toUpperCase()}.svg`,
+        }
 
         return {
           id: bet.id.toString(),
@@ -104,7 +103,7 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
     } finally {
       setIsLoading(false)
     }
-  }, [address, chainId, gameType, bankrollToken])
+  }, [address, chainId, gameType, tokens])
 
   useEffect(() => {
     fetchHistoryLogic()

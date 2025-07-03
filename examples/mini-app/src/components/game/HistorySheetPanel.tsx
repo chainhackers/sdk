@@ -7,16 +7,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 interface HistorySheetPanelProps {
   portalContainer: HTMLElement
   historyData: HistoryEntry[]
+  className?: string
 }
 
-export function HistorySheetPanel({ portalContainer, historyData }: HistorySheetPanelProps) {
+export function HistorySheetPanel({
+  portalContainer,
+  historyData,
+  className,
+}: HistorySheetPanelProps) {
   const isEmpty = historyData.length === 0
 
   return (
     <SheetPortal container={portalContainer}>
       <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
       <SheetBottomPanelContent
-        className={cn(isEmpty ? "!h-auto !max-h-[70%]" : "!h-[70%] !max-h-full", "p-0")}
+        className={cn(isEmpty ? "!h-auto !max-h-[70%]" : "!h-[70%] !max-h-full", "p-0", className)}
       >
         <ScrollArea className="h-full w-full rounded-t-[16px] overflow-hidden">
           <div className="p-1 pt-0">

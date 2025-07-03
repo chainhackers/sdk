@@ -46,9 +46,6 @@ const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme =
       ) : (
         <p>Preparing story...</p>
       )}
-      <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-muted-foreground text-center">
-        This is a mock card container. <br /> Click the button to open the panel.
-      </p>
     </div>
   )
 }
@@ -91,7 +88,7 @@ const HistorySheetWithWrapper = ({
   historyData: HistoryEntry[]
   theme?: "light" | "dark" | "system"
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
 
   return (
     <PanelStoryWrapper theme={theme}>
@@ -106,7 +103,11 @@ const HistorySheetWithWrapper = ({
               <HistoryIcon className="h-4 w-4" />
             </Button>
           </SheetTrigger>
-          <HistorySheetPanel portalContainer={portalContainer} historyData={historyData} />
+          <HistorySheetPanel
+            portalContainer={portalContainer}
+            historyData={historyData}
+            className="data-[state=open]:animate-none data-[state=open]:translate-y-0"
+          />
         </Sheet>
       )}
     </PanelStoryWrapper>
