@@ -30,6 +30,7 @@
     "format": "biome format . --write",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
+    "prebuild-storybook": "pnpm --filter @betswirl/sdk-core run build && pnpm --filter @betswirl/wagmi-provider run build",
     "build-storybook": "storybook build",
     "chromatic": "chromatic --exit-zero-on-changes",
     "prepublishOnly": "pnpm build",
