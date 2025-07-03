@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./examples/mini-app
+        working-directory: ./packages/ui-react
 
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            /examples/mini-app/**/*
+            /packages/ui-react/**/*
             .github
           sparse-checkout-cone-mode: false
 
@@ -32,7 +32,7 @@ jobs:
         run: corepack use pnpm@latest-10
 
       - name: Install dependencies
-        run: pnpm install --ignore-workspace
+        run: pnpm install
 
       - name: Build Storybook
         run: pnpm build-storybook
@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: storybook-static
-          path: examples/mini-app/storybook-static/
+          path: packages/ui-react/storybook-static/
           retention-days: 30
 
       - name: Run Ansible playbook
