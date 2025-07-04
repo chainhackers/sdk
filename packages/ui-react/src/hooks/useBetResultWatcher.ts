@@ -27,7 +27,13 @@ interface UseBetResultWatcherProps {
   enabled: boolean
 }
 
-type BetResultWatcherStatus = "idle" | "listening" | "fallback_listening" | "success" | "error"
+type BetResultWatcherStatus =
+  | "idle"
+  | "listening"
+  | "fallback_listening"
+  | "success"
+  | "error"
+  | "timeout"
 
 interface BetResultWatcherOutput {
   gameResult: GameResult | null
@@ -43,6 +49,7 @@ interface DecodedEventLog {
 
 const POLLING_INTERVAL = 2500
 const PRIMARY_WATCHER_TIMEOUT = 30000
+const MAXIMUM_WAIT_TIME = 180000 // 3 minutes total
 
 function _extractEventData(
   decodedRollLog: DecodedEventLog,
@@ -226,6 +233,36 @@ export function useBetResultWatcher({
     }
   }, [enabled, watchParams, publicClient, status, reset])
 
+  // Maximum timeout to prevent infinite waiting
+  useEffect(() => {
+    if (
+      !enabled ||
+      !watchParams ||
+      status === "idle" ||
+      status === "success" ||
+      status === "error" ||
+      status === "timeout"
+    ) {
+      return
+    }
+
+    logger.debug(
+      `useEffect[maxTimeout]: Starting maximum timeout (${MAXIMUM_WAIT_TIME}ms) for betId ${watchParams.betId}`,
+    )
+    const timeoutId = setTimeout(() => {
+      logger.error(
+        `useEffect[maxTimeout]: Maximum wait time exceeded for betId ${watchParams.betId}`,
+      )
+      setStatus("timeout")
+      setError(new Error("Maximum wait time exceeded. Please check your transaction history."))
+    }, MAXIMUM_WAIT_TIME)
+
+    return () => {
+      logger.debug(`useEffect[maxTimeout]: Clearing maximum timeout for betId ${watchParams.betId}`)
+      clearTimeout(timeoutId)
+    }
+  }, [enabled, watchParams, status])
+
   useEffect(() => {
     if (enabled && watchParams && status === "listening" && !filterErrorOccurred) {
       logger.debug(
@@ -361,8 +398,10 @@ export function useBetResultWatcher({
       }
 
       const currentBlock = await publicClient.getBlockNumber()
-      const fromBlock = currentBlock > 100n ? currentBlock - 100n : 0n
-      logger.debug(`fallbackPoller: Querying logs from ${fromBlock} to ${currentBlock}`)
+      const fromBlock = watchParams.transactionBlockNumber
+      logger.debug(
+        `fallbackPoller: Querying logs from tx block ${fromBlock} to current block ${currentBlock}`,
+      )
       const logs = await publicClient.getLogs({
         address: contractAddress,
         event: eventDefinition,

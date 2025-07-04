@@ -13,7 +13,7 @@ import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useTokens } from "../../hooks/useTokens"
 import { cn } from "../../lib/utils"
-import { ChainTokenPanelView, TokenWithImage } from "../../types/types"
+import { type ChainTokenPanelView, type TokenWithImage } from "../../types/types"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
@@ -94,6 +94,12 @@ export function ChainAndTokenSheetPanel({
   }
 
   const handleChainSelect = (chainId: CasinoChainId) => {
+    // Reset token to native token when switching chains
+    const newChainNativeToken: TokenWithImage = {
+      ...chainNativeCurrencyToToken(chainById[chainId].nativeCurrency),
+      image: "",
+    }
+    setSelectedToken(newChainNativeToken)
     switchAppChain(chainId)
     setCurrentView("main")
   }
@@ -178,6 +184,8 @@ interface ChainSelectionViewProps {
 }
 
 function ChainSelectionView({ currentChainId, onChainSelect, onBack }: ChainSelectionViewProps) {
+  const { availableChains } = useChain()
+
   return (
     <div className="flex flex-col">
       <div className="flex items-center gap-3 mb-6">
@@ -192,22 +200,25 @@ function ChainSelectionView({ currentChainId, onChainSelect, onBack }: ChainSele
         <h2 className="text-base font-semibold">Select Chain</h2>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <Button
-          variant="ghost"
-          onClick={() => onChainSelect(currentChainId)}
-          className={cn(
-            "flex items-center gap-3 px-4 py-3 rounded-[8px] w-full text-left h-auto justify-start",
-            "bg-surface-selected hover:bg-surface-hover transition-colors",
-          )}
-        >
-          <ChainIcon chainId={currentChainId} size={18} />
-          <div className="flex flex-col">
-            <span className="font-medium text-foreground">Current Chain</span>
-            <span className="text-xs text-muted-foreground">Only current chain is available</span>
-          </div>
-        </Button>
-      </div>
+      <ScrollArea className="h-60 [&>[data-slot=scroll-area-scrollbar]]:w-[6px] [&>[data-slot=scroll-area-scrollbar]]:border-l-0 [&>[data-slot=scroll-area-scrollbar]]:z-10 [&>[data-slot=scroll-area-scrollbar]]:-translate-x-[1px] [&_[data-slot=scroll-area-thumb]]:bg-scrollbar-thumb">
+        <div className="flex flex-col gap-1">
+          {availableChains.map((chain) => (
+            <Button
+              key={chain.viemChain.id}
+              variant="ghost"
+              onClick={() => onChainSelect(chain.viemChain.id as CasinoChainId)}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-[8px] w-full text-left h-auto justify-start",
+                "hover:bg-surface-hover transition-colors",
+                chain.viemChain.id === currentChainId && "bg-surface-selected",
+              )}
+            >
+              <ChainIcon chainId={chain.viemChain.id as CasinoChainId} size={18} />
+              <span className="font-medium text-foreground">{chain.viemChain.name}</span>
+            </Button>
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   )
 }
