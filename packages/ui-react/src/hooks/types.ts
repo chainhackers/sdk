@@ -10,4 +10,5 @@ export interface WatchTarget {
   eventArgs: { id: bigint }
   betAmount: bigint
   placedBet: CasinoPlacedBet
+  transactionBlockNumber: bigint
 }

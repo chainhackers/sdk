@@ -1,6 +1,6 @@
 # React Integration Guide
 
-## Create Demo Project
+bwonс## Create Demo Project
 
 ```shell
 # node --version
@@ -110,6 +110,30 @@ git commit -m "Add BetSwirl casino game"
 * Select your repository
 * Click "Import" → "Deploy"
 * Get public URL after ~2 minutes
+
+## Advanced Configuration
+
+### Multi-Chain Support
+
+To enable chain selection for players, configure the `supportedChains` prop:
+
+```tsx
+import { base, arbitrum, polygon } from 'wagmi/chains'
+
+<BetSwirlSDKProvider 
+  initialChainId={base.id}
+  supportedChains={[base.id, arbitrum.id, polygon.id]}
+>
+  <App />
+</BetSwirlSDKProvider>
+```
+
+When multiple chains are configured:
+- Players can switch between chains using the chain selector in the betting panel
+- Chain preferences are persisted per wallet address
+- Token balances update automatically when switching chains
+
+If `supportedChains` is not specified, all BetSwirl-supported chains are available.
 
 ## Example Result
 

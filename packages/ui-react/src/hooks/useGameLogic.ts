@@ -5,7 +5,7 @@ import {
   chainNativeCurrencyToToken,
   KenoConfiguration,
 } from "@betswirl/sdk-core"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { formatGwei, type Hex, zeroAddress } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -139,6 +139,12 @@ export function useGameLogic({
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
     usePlaceBet(gameType, token, refetchBalance, kenoConfigResult.config)
+
+  // Reset bet state when chain or token changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
+  useEffect(() => {
+    resetBetState()
+  }, [appChainId, token.address, resetBetState])
 
   const gameContractAddress = casinoChainById[appChainId]?.contracts.games[gameType]?.address
 
