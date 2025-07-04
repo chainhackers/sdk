@@ -3,7 +3,7 @@ import { TokenImage } from "@coinbase/onchainkit/token"
 import { useChain } from "../../context/chainContext"
 import type { TokenWithImage } from "../../types/types"
 
-interface TokenIconProps {
+export interface TokenIconProps {
   token: TokenWithImage
   size?: number
   className?: string
