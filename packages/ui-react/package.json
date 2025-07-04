@@ -1,9 +1,9 @@
 {
-  "name": "@betswirl/ui",
+  "name": "@betswirl/ui-react",
   "repository": {
     "type": "git",
     "url": "https://github.com/chainhackers/sdk.git",
-    "directory": "examples/mini-app"
+    "directory": "packages/ui-react"
   },
   "version": "0.0.19",
   "license": "MIT",
@@ -30,6 +30,7 @@
     "format": "biome format . --write",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
+    "prebuild-storybook": "pnpm -r --filter @betswirl/sdk-core --filter @betswirl/wagmi-provider run build",
     "build-storybook": "storybook build",
     "chromatic": "chromatic --exit-zero-on-changes",
     "prepublishOnly": "pnpm build",

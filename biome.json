@@ -14,7 +14,7 @@
       "!**/.turbo/**/*",
       "!**/tsconfig*.json",
       "!**/documents/**/*.ts",
-      "!**/examples/mini-app/**/*"
+      "!**/packages/ui-react/**/*"
     ]
   },
   "formatter": {

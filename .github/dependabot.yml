@@ -2,7 +2,7 @@ version: 2
 updates:
 
   - package-ecosystem: "npm"
-    directory: "/examples/mini-app"
+    directory: "packages/ui-react"
     schedule:
       interval: "weekly"
     groups:
