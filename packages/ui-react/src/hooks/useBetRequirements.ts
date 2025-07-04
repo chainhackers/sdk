@@ -7,6 +7,7 @@ import {
 import { useMemo } from "react"
 import { formatUnits } from "viem"
 import { useReadContract } from "wagmi"
+import { REFETCH_INTERVALS } from "../constants/queryDefaults"
 import { useChain } from "../context/chainContext"
 import { useDebounce } from "./useDebounce"
 
@@ -16,7 +17,6 @@ type UseBetRequirementsProps = {
   grossMultiplier: number // BP
 }
 
-const MAX_BET_REFETCH_INTERVAL = 120000 // 2 minutes - Max bet depends on bankroll
 const DEBOUNCE_DELAY = 500 // 500ms - Debounce delay for grossMultiplier updates
 
 /**
@@ -47,8 +47,11 @@ export function useBetRequirements(props: UseBetRequirementsProps) {
     args: functionData.data.args,
     chainId: appChainId,
     query: {
-      initialData: [false, 0n, 1n],
-      refetchInterval: MAX_BET_REFETCH_INTERVAL,
+      // Force immediate on-chain read bypassing global cache settings.
+      // This prevents "Token not allowed" state caused by placeholder data
+      // being cached for the global staleTime duration.
+      staleTime: 0,
+      refetchInterval: REFETCH_INTERVALS.BET_REQUIREMENTS,
     },
   })
 
