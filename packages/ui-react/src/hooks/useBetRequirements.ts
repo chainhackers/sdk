@@ -47,10 +47,6 @@ export function useBetRequirements(props: UseBetRequirementsProps) {
     args: functionData.data.args,
     chainId: appChainId,
     query: {
-      // Force immediate on-chain read bypassing global cache settings.
-      // This prevents "Token not allowed" state caused by placeholder data
-      // being cached for the global staleTime duration.
-      staleTime: 0,
       refetchInterval: REFETCH_INTERVALS.BET_REQUIREMENTS,
     },
   })
