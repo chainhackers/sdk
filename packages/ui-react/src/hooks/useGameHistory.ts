@@ -9,12 +9,12 @@ import {
   formatRawAmount,
   OrderDirection,
 } from "@betswirl/sdk-core"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useAccount } from "wagmi"
 import { TokenIcon } from "../components/ui/TokenIcon"
 import { createLogger } from "../lib/logger"
 import { toLowerCase } from "../lib/utils"
-import { HistoryEntry, HistoryEntryStatus, TokenWithImage } from "../types/types"
+import { HistoryEntryStatus, TokenWithImage } from "../types/types"
 import { useTokens } from "./useTokens"
 
 const logger = createLogger("useGameHistory")
@@ -39,17 +39,16 @@ function formatRelativeTime(timestampSecs: number): string {
 }
 
 export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
-  const [gameHistory, setGameHistory] = useState<HistoryEntry[]>([])
+  const [rawBets, setRawBets] = useState<CasinoBet[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | null>(null)
   const { chainId, address } = useAccount()
   const { tokens } = useTokens({ onlyActive: false }) // Get all tokens, not just active ones
 
-  const fetchHistoryLogic = useCallback(async () => {
+  const fetchRawBets = useCallback(async () => {
     if (!address || !chainId) {
-      setGameHistory([])
+      setRawBets([])
       setIsLoading(false)
-      logger.error("No user address or chain id", { address, chainId })
       return
     }
 
@@ -72,46 +71,53 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
         throw result.error
       }
 
-      const formattedHistory: HistoryEntry[] = result.bets.map((bet: CasinoBet) => {
-        const matchingToken = tokens.find(
-          (token) => token.symbol === bet.token.symbol && token.address === bet.token.address,
-        )
-
-        const tokenWithImage: TokenWithImage = matchingToken || {
-          ...bet.token,
-          // Use BetSwirl's token image URL pattern as fallback
-          image: `https://www.betswirl.com/img/tokens/${bet.token.symbol.toUpperCase()}.svg`,
-        }
-
-        return {
-          id: bet.id.toString(),
-          status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
-          multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
-          payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
-          payoutCurrencyIcon: React.createElement(TokenIcon, {
-            token: tokenWithImage,
-            size: 18,
-          }),
-          timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
-        }
-      })
-
-      setGameHistory(formattedHistory)
-      logger.info("Game history fetched", { formattedHistory })
+      setRawBets(result.bets)
+      logger.info("Raw bets fetched", { count: result.bets.length })
     } catch (e) {
       setError(e instanceof Error ? e : new Error("Failed to fetch game history"))
     } finally {
       setIsLoading(false)
     }
-  }, [address, chainId, gameType, tokens])
+  }, [address, chainId, gameType])
+
+  const gameHistory = useMemo(() => {
+    return rawBets.map((bet: CasinoBet) => {
+      const matchingToken = tokens.find(
+        (token) => token.symbol === bet.token.symbol && token.address === bet.token.address,
+      )
+
+      const tokenWithImage: TokenWithImage = matchingToken || {
+        ...bet.token,
+        // Use BetSwirl's token image URL pattern as fallback
+        image: `https://www.betswirl.com/img/tokens/${bet.token.symbol.toUpperCase()}.svg`,
+      }
+
+      return {
+        id: bet.id.toString(),
+        status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
+        multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
+        payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
+        payoutCurrencyIcon: React.createElement(TokenIcon, {
+          token: tokenWithImage,
+          size: 18,
+        }),
+        timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
+      }
+    })
+  }, [rawBets, tokens])
 
   useEffect(() => {
-    fetchHistoryLogic()
-  }, [fetchHistoryLogic])
+    if (address && chainId) {
+      fetchRawBets()
+    } else {
+      setRawBets([])
+      setIsLoading(false)
+    }
+  }, [fetchRawBets, address, chainId])
 
   const refreshHistory = useCallback(async () => {
-    await fetchHistoryLogic()
-  }, [fetchHistoryLogic])
+    await fetchRawBets()
+  }, [fetchRawBets])
 
   return { gameHistory, isLoading, error, refreshHistory }
 }

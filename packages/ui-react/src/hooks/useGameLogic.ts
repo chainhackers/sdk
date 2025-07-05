@@ -5,7 +5,7 @@ import {
   chainNativeCurrencyToToken,
   KenoConfiguration,
 } from "@betswirl/sdk-core"
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { formatGwei, type Hex, zeroAddress } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -106,11 +106,15 @@ export function useGameLogic({
 
   const { selectedToken } = useTokenContext()
 
-  // Determine the effective token to use
-  const token: TokenWithImage = selectedToken || {
-    ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
-    image: "", // Fallback for native currency - user should configure this
-  }
+  // Determine the effective token to use - memoize to prevent unnecessary re-renders
+  const token: TokenWithImage = useMemo(() => {
+    return (
+      selectedToken || {
+        ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
+        image: "", // Fallback for native currency - user should configure this
+      }
+    )
+  }, [selectedToken, appChainId])
 
   const { data: balance, refetch: refetchBalance } = useBalance({
     address,

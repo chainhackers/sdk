@@ -7,6 +7,7 @@ import {
 import { WagmiBetSwirlWallet } from "@betswirl/wagmi-provider"
 import { useQuery } from "@tanstack/react-query"
 import { useConfig } from "wagmi"
+import { QUERY_DEFAULTS } from "../constants/queryDefaults"
 import { useChain } from "../context/chainContext"
 import { QueryParameter } from "../types/types"
 
@@ -18,6 +19,10 @@ type GetGasPriceResult = {
 type UseGasPriceProps = {
   query?: QueryParameter<GetGasPriceResult>
 }
+
+const NORMAL_BUFFER_PERCENT = 5
+// From experience, Polygon & Avalanche works better with a fast gas price
+const FAST_GAS_NETWORKS = [chainByKey.polygon.id, chainByKey.avalanche.id as number]
 
 const defaultGasPriceResult: GetGasPriceResult = {
   detailedGasPrices: {
@@ -39,9 +44,7 @@ const defaultGasPriceResult: GetGasPriceResult = {
  *
  * @example
  * ```ts
- * const { data: gasPriceData } = useGasPrice({
- *   query: { refetchInterval: 10000 } // Refresh every 10 seconds
- * })
+ * const { data: gasPriceData } = useGasPrice()
  * console.log('Optimal gas price:', gasPriceData.optimalGasPrice)
  * ```
  */
@@ -57,14 +60,12 @@ export function useGasPrice(props: UseGasPriceProps = {}) {
 
     return {
       detailedGasPrices: {
-        [GAS_PRICE_TYPE.NORMAL]: (gasPrices[GAS_PRICE_TYPE.NORMAL] * 105n) / 100n, // 5% buffer
+        [GAS_PRICE_TYPE.NORMAL]:
+          (gasPrices[GAS_PRICE_TYPE.NORMAL] * BigInt(100 + NORMAL_BUFFER_PERCENT)) / 100n,
         [GAS_PRICE_TYPE.FAST]: gasPrices[GAS_PRICE_TYPE.FAST], // 20% buffer (already included from sdk)
         [GAS_PRICE_TYPE.INSTANT]: gasPrices[GAS_PRICE_TYPE.INSTANT], // 50% buffer (already included from sdk)
       },
-      // From experience, Polygon & Avalanche works better with a fast gas price
-      optimalGasPrice: [chainByKey.polygon.id, chainByKey.avalanche.id as number].includes(
-        appChain.id,
-      )
+      optimalGasPrice: FAST_GAS_NETWORKS.includes(appChain.id)
         ? gasPrices[GAS_PRICE_TYPE.FAST]
         : gasPrices[GAS_PRICE_TYPE.NORMAL],
     }
@@ -73,7 +74,8 @@ export function useGasPrice(props: UseGasPriceProps = {}) {
   const { data, ...rest } = useQuery({
     queryKey: ["/gas-price", appChain.id],
     queryFn,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: QUERY_DEFAULTS.REFETCH_ON_WINDOW_FOCUS,
+    staleTime: QUERY_DEFAULTS.STALE_TIME,
     ...query,
   })
 

@@ -4,12 +4,22 @@ import { type ReactNode } from "react"
 import { type Hex, http } from "viem"
 import { createConfig, WagmiProvider } from "wagmi"
 import { base } from "wagmi/chains"
+import { QUERY_DEFAULTS } from "./constants/queryDefaults"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
 import type { TokenWithImage } from "./types/types"
 
 const CHAIN = base
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: QUERY_DEFAULTS.STALE_TIME,
+      refetchOnWindowFocus: QUERY_DEFAULTS.REFETCH_ON_WINDOW_FOCUS,
+      refetchOnReconnect: QUERY_DEFAULTS.REFETCH_ON_RECONNECT,
+      retry: QUERY_DEFAULTS.RETRY_COUNT,
+    },
+  },
+})
 
 // Define tokens with images
 const DEGEN_TOKEN: TokenWithImage = {

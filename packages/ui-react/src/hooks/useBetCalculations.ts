@@ -38,7 +38,7 @@ function getMultiplierForGame(selection: GameChoice, kenoConfig?: KenoConfigurat
       return Roulette.getMultiplier(selection.choice)
     case CASINO_GAME_TYPE.KENO: {
       if (!kenoConfig) {
-        console.warn("Keno configuration is required for Keno multiplier calculation")
+        // Configuration is still loading - return 0 until it's available
         return 0
       }
 

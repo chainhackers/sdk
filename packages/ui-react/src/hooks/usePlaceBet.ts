@@ -279,20 +279,20 @@ export function usePlaceBet(
 
   useEffect(() => {
     if (wagerWriteHook.error) {
-      logger.debug("_usePlaceBet: An error occured:", wagerWriteHook.error)
+      logger.debug("_usePlaceBet: An error occurred in wager write:", wagerWriteHook.error)
     }
   }, [wagerWriteHook.error])
 
   useEffect(() => {
     if (wagerWaitingHook.error) {
-      logger.debug("_usePlaceBet: An error occured:", wagerWaitingHook.error)
+      logger.debug("_usePlaceBet: An error occurred in wager waiting:", wagerWaitingHook.error)
     }
   }, [wagerWaitingHook.error])
 
   useEffect(() => {
     if (wagerWaitingHook.isSuccess) {
       setIsRolling(true)
-      const waitRoll = async () => {
+      const handleBetResult = async () => {
         const betId = await _extractBetIdFromReceipt(
           wagerWriteHook.data!,
           game,
@@ -338,7 +338,7 @@ export function usePlaceBet(
 
         refetchBalance()
       }
-      waitRoll()
+      handleBetResult()
     }
   }, [
     wagerWaitingHook.isSuccess,
