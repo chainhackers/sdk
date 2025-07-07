@@ -67,7 +67,7 @@ export function BettingPanel({
   portalContainer,
   isMounted,
 }: BettingPanelProps) {
-  const { appChainId } = useChain()
+  const { appChainId, switchWalletChain } = useChain()
   const [inputValue, setInputValue] = useState<string>("")
   const [isValidInput, setIsValidInput] = useState<boolean>(true)
   const [isUserTyping, setIsUserTyping] = useState<boolean>(false)
@@ -182,7 +182,7 @@ export function BettingPanel({
   const isInputDisabled = !isConnected || isWaiting || isBetSuccees || isApprovingToken
 
   const isPlayButtonDisabled: boolean =
-    isWaiting || (!canInitiateBet && !needsTokenApproval) || isApprovingToken
+    isWaiting || (!canInitiateBet && !needsTokenApproval && areChainsSynced) || isApprovingToken
 
   console.log("[BettingPanel] Button state:", {
     isApprovePending,
@@ -233,6 +233,11 @@ export function BettingPanel({
   }
 
   const handlePlayBtnClick = () => {
+    // Handle chain switching when chains are not synced
+    if (!areChainsSynced && isConnected) {
+      switchWalletChain(appChainId)
+      return
+    }
     onPlayBtnClick()
   }
 

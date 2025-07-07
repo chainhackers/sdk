@@ -92,10 +92,19 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
         }
       }
 
-      // Try to switch the wallet chain
-      switchWalletChain({ chainId })
-
+      // Set app chain immediately for better UX
       setAppChainId(chainId)
+
+      // Try to switch the wallet chain if connected
+      if (address && switchWalletChain) {
+        try {
+          switchWalletChain({ chainId })
+        } catch (error) {
+          console.warn("Failed to switch wallet chain:", error)
+          // Wallet chain switch failed, but app chain is already updated
+          // The UI will show "Switch chain" button for the user to manually switch
+        }
+      }
     },
     [switchWalletChain, availableChainIds, address],
   )

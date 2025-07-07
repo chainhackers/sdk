@@ -170,6 +170,7 @@ export function ChainAndTokenSheetPanel({
             onTokenSelect={handleTokenSelect}
             onBack={() => setCurrentView("main")}
             userAddress={address}
+            appChainId={appChainId}
           />
         )}
       </SheetBottomPanelContent>
@@ -235,6 +236,7 @@ interface TokenSelectionViewProps {
   onTokenSelect: (token: TokenWithImage) => void
   onBack: () => void
   userAddress?: string
+  appChainId: CasinoChainId
 }
 
 function TokenSelectionView({
@@ -244,6 +246,7 @@ function TokenSelectionView({
   onTokenSelect,
   onBack,
   userAddress,
+  appChainId,
 }: TokenSelectionViewProps) {
   const nativeToken = tokens.find((token) => token.address === zeroAddress)
   const erc20Tokens = tokens.filter((token) => token.address !== zeroAddress)
@@ -254,6 +257,7 @@ function TokenSelectionView({
       abi: erc20Abi,
       functionName: "balanceOf",
       args: [userAddress as Hex],
+      chainId: appChainId,
     })),
     query: {
       ...TOKEN_BALANCE_CACHE_CONFIG,
@@ -263,6 +267,7 @@ function TokenSelectionView({
 
   const { data: nativeBalance } = useBalance({
     address: userAddress as Hex,
+    chainId: appChainId,
     query: {
       ...TOKEN_BALANCE_CACHE_CONFIG,
       enabled: !!userAddress && !!nativeToken,

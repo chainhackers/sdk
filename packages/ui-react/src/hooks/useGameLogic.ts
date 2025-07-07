@@ -115,6 +115,7 @@ export function useGameLogic({
   const { data: balance, refetch: refetchBalance } = useBalance({
     address,
     token: token.address === zeroAddress ? undefined : (token.address as Hex),
+    chainId: appChainId,
   })
   const { houseEdge } = useHouseEdge({
     game: gameType,

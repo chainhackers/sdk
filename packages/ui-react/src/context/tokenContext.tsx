@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
-import { type Address } from "viem"
+import { type Address, zeroAddress } from "viem"
 import { useTokens } from "../hooks/useTokens"
 import { TokenWithImage } from "../types/types"
 import { useChain } from "./chainContext"
@@ -43,7 +43,7 @@ function storeTokenAddress(address: Address, chainId: number): void {
   }
 }
 
-export function TokenProvider({ children, initialToken }: TokenProviderProps) {
+export function TokenProvider({ children }: TokenProviderProps) {
   const { tokens, loading } = useTokens()
   const { appChainId } = useChain()
   const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage | undefined>()
@@ -62,8 +62,13 @@ export function TokenProvider({ children, initialToken }: TokenProviderProps) {
       }
     }
 
-    setSelectedTokenInternal(initialToken)
-  }, [tokens, loading, initialToken, appChainId])
+    // Default to native token of the current chain if no stored token
+    const nativeToken = tokens.find((token) => token.address === zeroAddress)
+    if (!nativeToken) {
+      throw new Error(`No native token found for chain ${appChainId}`)
+    }
+    setSelectedTokenInternal(nativeToken)
+  }, [tokens, loading, appChainId])
 
   const setSelectedToken = (token: TokenWithImage) => {
     setSelectedTokenInternal(token)
