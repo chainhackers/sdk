@@ -1,3 +1,34 @@
+# Farcaster MiniKit Integration Guide
+
+## Creating MiniKit Project with BetSwirl
+
+### Using Existing Template
+
+```shell
+# Clone the SDK repository
+git clone https://github.com/betswirl/sdk.git
+cd sdk/examples/mini-app/farcaster-frame
+
+# Install dependencies
+pnpm install --ignore-workspace
+```
+
+### Creating from Scratch
+
+```shell
+# Create new MiniKit project
+npx create-onchain --mini
+cd your-mini-project
+
+# Install BetSwirl UI
+npm install @betswirl/ui
+```
+
+## Setting up Providers
+
+Update `app/providers.tsx`:
+
+```tsx
 "use client";
 
 import { MiniKitProvider } from "@coinbase/onchainkit/minikit";
@@ -49,3 +80,33 @@ export function Providers(props: { children: ReactNode }) {
     </WagmiProvider>
   );
 }
+```
+
+## Adding Game Component
+
+Add the game component in `app/page.tsx`:
+
+```tsx
+import { DiceGame } from "@betswirl/ui";
+import "@betswirl/ui/styles.css";
+
+// ... existing code ...
+
+<main className="flex-1">
+  <DiceGame />
+</main>
+```
+
+## Start dev server
+
+```shell
+npm run dev
+```
+
+Open in browser http://localhost:3000/
+
+
+## Documentation
+
+- [MiniKit Documentation](https://docs.base.org/wallet-app/build-with-minikit/quickstart)
+- [Farcaster Frame Publishing](https://miniapps.farcaster.xyz/docs/guides/publishing)
