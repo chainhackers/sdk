@@ -1,10 +1,10 @@
+import { CASINO_GAME_TYPE, type WEIGHTED_CASINO_GAME_TYPE } from "../../data/casino";
 import type {
   CoinTossChoiceInput,
   DiceChoiceInput,
   KenoChoiceInput,
   RouletteChoiceInput,
 } from "..";
-import { CASINO_GAME_TYPE, type WEIGHTED_CASINO_GAME_TYPE } from "../../data/casino";
 
 type MayBeMultiOutputsValue<T extends CASINO_GAME_TYPE> = T extends
   | CASINO_GAME_TYPE.KENO

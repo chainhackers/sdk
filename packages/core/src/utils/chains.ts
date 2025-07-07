@@ -1,5 +1,5 @@
-import { casinoChainById } from "../data/casino";
 import type { CasinoChainId } from "../data/casino";
+import { casinoChainById } from "../data/casino";
 import { ERROR_CODES } from "../errors/codes";
 import { ChainError } from "../errors/types";
 import type { BetSwirlWallet } from "../provider";

@@ -1,7 +1,7 @@
 import { type Address, formatUnits } from "viem";
-import type { CasinoChainId } from "../..";
 import type { Token } from "../../../interfaces";
 import { getBetSwirlApiUrl } from "../../../utils/api";
+import type { CasinoChainId } from "../..";
 
 export enum FREEBET_CAMPAIGN_STATUS {
   PENDING = "pending",
@@ -93,6 +93,10 @@ export const fetchFreebetCampaigns = async (
     }
     const res = await fetch(
       `${getBetSwirlApiUrl(testMode)}/affiliate/v1/freebet/campaigns?${params.toString()}`,
+      {
+        // This is needed to get the JWT cookie from the browser
+        credentials: "include",
+      },
     );
     if (!res.ok) {
       throw new Error(`Status ${res.status}: ${res.statusText}`);
@@ -100,7 +104,7 @@ export const fetchFreebetCampaigns = async (
 
     const response: GetCampaignsRawResponse = await res.json();
     return {
-      campaigns: response.campaigns.map((campaign) => _formatRawFreebetCampaign(campaign)),
+      campaigns: response.campaigns.map((campaign) => formatRawFreebetCampaign(campaign)),
       total: response.total,
       offset: response.offset,
       limit: response.limit,
@@ -130,20 +134,25 @@ export const fetchFreebetCampaign = async (
   testMode = false,
 ): Promise<FreebetCampaign | null> => {
   try {
-    const res = await fetch(`${getBetSwirlApiUrl(testMode)}/affiliate/v1/freebet/campaigns/${id}`);
+    const res = await fetch(`${getBetSwirlApiUrl(testMode)}/affiliate/v1/freebet/campaigns/${id}`, {
+      // This is needed to get the JWT cookie from the browser
+      credentials: "include",
+    });
     if (!res.ok) {
       throw new Error(`Status ${res.status}: ${res.statusText}`);
     }
 
     const response: GetCampaignRawResponse = await res.json();
-    return _formatRawFreebetCampaign(response);
+    return formatRawFreebetCampaign(response);
   } catch (error) {
-    console.error("An error occured while fetching freebet campaigns", error);
+    console.error("An error occured while fetching the freebet campaign", error);
     return null;
   }
 };
 
-const _formatRawFreebetCampaign = (campaign: RawAggregatedFreebetCampaign) => ({
+export const formatRawFreebetCampaign = (
+  campaign: RawAggregatedFreebetCampaign,
+): FreebetCampaign => ({
   id: campaign.id,
   affiliateAddress: campaign.affiliate_address,
   chainId: campaign.chain_id,

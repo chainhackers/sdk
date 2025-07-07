@@ -1,5 +1,6 @@
 import type { Hash, Hex } from "viem";
-import { encodeFunctionData, erc20Abi, zeroAddress } from "viem";
+import { encodeFunctionData, erc20Abi } from "viem";
+import { GAS_TOKEN_ADDRESS } from "../../constants";
 import { ERROR_CODES } from "../../errors/codes";
 import { TransactionError } from "../../errors/types";
 import type { BetSwirlFunctionData } from "../../interfaces";
@@ -32,7 +33,7 @@ export async function approve(
   onApprovePending?: (tx: Hash, result: ApproveResult) => void | Promise<void>,
 ) {
   try {
-    if (tokenAddress === zeroAddress || allowanceType === ALLOWANCE_TYPE.NONE)
+    if (tokenAddress === GAS_TOKEN_ADDRESS || allowanceType === ALLOWANCE_TYPE.NONE)
       return { receipt: null, result: null };
     let allowance: null | bigint = null;
     if (allowanceType === ALLOWANCE_TYPE.AUTO) {
@@ -56,7 +57,7 @@ export async function approve(
     }
 
     return { receipt: null, result: null };
-  } catch (error) {
+  } catch (_error) {
     throw new TransactionError(
       `Error checking and approving token ${tokenAddress} on chain ${wallet.getChainId()}`,
       ERROR_CODES.TRANSACTION.TOKEN_APPROVAL_ERROR,

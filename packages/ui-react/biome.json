@@ -1,0 +1,9 @@
+{
+  "root": false,
+  "extends": "//",
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded"
+    }
+  }
+}

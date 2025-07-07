@@ -19,14 +19,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm change:version` - Update package versions
 - `pnpm change:publish` - Build and publish packages to npm
 
-### Development in Mini-App Example
-When working in `examples/mini-app/`:
+### Development in UI React Example
+When working in `packages/ui-react/`:
 - `pnpm dev` - Start development server
 - `pnpm build` - Build for production
 - `pnpm storybook` - Run Storybook for component development
 
 ## Memories
-- When working with mini-app, run pnpm commands in examples/mini-app, not project root
+- When working with ui-react, run pnpm commands in packages/ui-react, not project root
 - Avoid using the word "implement" in commit messages, use "add" and keep commit messages brief
 
 ## Architecture Overview
@@ -45,7 +45,7 @@ This is a pnpm workspace monorepo with three main areas:
    - Implements BetSwirlClient and BetSwirlWallet interfaces
    - Bridges core SDK with Wagmi hooks
 
-3. **`examples/mini-app`** - React example application
+3. **`packages/ui-react`** - React example application
    - Demonstrates SDK usage with React hooks
    - Custom hooks for betting logic (usePlaceBet, useBetRequirements, etc.)
    - Context providers for SDK configuration

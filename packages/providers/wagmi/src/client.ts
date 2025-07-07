@@ -24,16 +24,25 @@ import type {
   KenoFreebetParams,
   KenoPlacedBet,
   KenoRolledBet,
+  Leaderboard,
+  LeaderboardClaimRewardsResult,
   NormalCasinoPlacedBet,
   PlaceBetCallbacks,
   PlaceFreebetCallbacks,
+  PlinkoBetParams,
+  PlinkoFreebetParams,
+  PlinkoPlacedBet,
+  PlinkoRolledBet,
   RouletteBetParams,
   RouletteFreebetParams,
   RoulettePlacedBet,
   RouletteRolledBet,
   Token,
   WeightedCasinoPlacedBet,
+  WeightedGameBetParams,
   WeightedGameConfiguration,
+  WeightedGameFreebetParams,
+  WeightedGamePlacedBet,
   WheelBetParams,
   WheelFreebetParams,
   WheelPlacedBet,
@@ -41,13 +50,14 @@ import type {
 } from "@betswirl/sdk-core";
 import {
   BetSwirlClient,
-  WEIGHTED_CASINO_GAME_TYPES,
   casinoChainById,
+  claimLeaderboardRewards,
   getBetRequirements,
-  getCasinoGameToken,
   getCasinoGames,
+  getCasinoGameToken,
   getCasinoTokens,
   getChainlinkVrfCost,
+  getClaimableAmount,
   getKenoConfiguration,
   getWeightedGameConfiguration,
   placeCoinTossBet,
@@ -56,19 +66,25 @@ import {
   placeDiceFreebet,
   placeKenoBet,
   placeKenoFreebet,
+  placePlinkoBet,
+  placePlinkoFreebet,
   placeRouletteBet,
   placeRouletteFreebet,
+  placeWeightedGameBet,
+  placeWeightedGameFreebet,
   placeWheelBet,
   placeWheelFreebet,
+  WEIGHTED_CASINO_GAME_TYPES,
   waitCoinTossRolledBet,
   waitDiceRolledBet,
   waitKenoRolledBet,
+  waitPlinkoRolledBet,
   waitRolledBet,
   waitRouletteRolledBet,
   waitWheelRolledBet,
 } from "@betswirl/sdk-core";
-import { type Config as WagmiConfig, switchChain } from "@wagmi/core";
-import type { Hex, TransactionReceipt } from "viem";
+import { switchChain, type Config as WagmiConfig } from "@wagmi/core";
+import type { Address, Hash, Hex, TransactionReceipt } from "viem";
 import { WagmiBetSwirlWallet } from "./wallet";
 
 export class WagmiBetSwirlClient extends BetSwirlClient {
@@ -357,6 +373,95 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     );
   }
 
+  async playPlinko(
+    params: PlinkoBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+    chainId?: CasinoChainId,
+  ): Promise<{ placedBet: PlinkoPlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(chainId);
+    return placePlinkoBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetPlinko(
+    params: PlinkoFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: PlinkoPlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(params.freebet.chainId);
+    return placePlinkoFreebet(
+      this.betSwirlWallet,
+      params,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async waitPlinko(
+    placedBet: PlinkoPlacedBet,
+    weightedGameConfiguration: WeightedGameConfiguration,
+    houseEdge: number,
+    options?: CasinoWaitRollOptions,
+  ): Promise<{ rolledBet: PlinkoRolledBet; receipt: TransactionReceipt }> {
+    await this._switchChain(placedBet.chainId);
+    return waitPlinkoRolledBet(
+      this.betSwirlWallet,
+      placedBet,
+      weightedGameConfiguration,
+      houseEdge,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+    );
+  }
+
+  async playWeightedGame(
+    params: WeightedGameBetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceBetCallbacks,
+    chainId?: CasinoChainId,
+  ): Promise<{ placedBet: WeightedGamePlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(chainId);
+    return placeWeightedGameBet(
+      this.betSwirlWallet,
+      { ...params, affiliate: this.betSwirlDefaultOptions.affiliate },
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
+  async playFreebetWeightedGame(
+    params: WeightedGameFreebetParams,
+    options?: CasinoPlaceBetOptions,
+    callbacks?: PlaceFreebetCallbacks,
+  ): Promise<{ placedFreebet: PlinkoPlacedBet; receipt: TransactionReceipt }> {
+    await this._switchChain(params.freebet.chainId);
+    return placeWeightedGameFreebet(
+      this.betSwirlWallet,
+      params,
+      {
+        ...this.betSwirlDefaultOptions,
+        ...options,
+      },
+      callbacks,
+    );
+  }
+
   /* Casino Utilities */
 
   async getCasinoGames(onlyActive = false, chainId?: CasinoChainId) {
@@ -424,6 +529,33 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   ): Promise<WeightedGameConfiguration> {
     await this._switchChain(chainId);
     return getWeightedGameConfiguration(this.betSwirlWallet, configId);
+  }
+
+  /* Leaderboard utilities */
+
+  async getClaimableAmount(
+    leaderboardOnChainId: number | bigint,
+    playerAddress: Address,
+    chainId: ChainId,
+  ): Promise<bigint> {
+    await this._switchChain(chainId);
+    return getClaimableAmount(this.betSwirlWallet, leaderboardOnChainId, playerAddress, chainId);
+  }
+
+  async claimLeaderboardRewards(
+    leaderboard: Leaderboard,
+    receiver: Address,
+    onClaimPending?: (tx: Hash, result: LeaderboardClaimRewardsResult) => void | Promise<void>,
+  ): Promise<{ receipt: TransactionReceipt; result: LeaderboardClaimRewardsResult }> {
+    await this._switchChain(leaderboard.chainId);
+
+    return claimLeaderboardRewards(
+      this.betSwirlWallet,
+      leaderboard,
+      receiver,
+      this.betSwirlDefaultOptions.pollingInterval,
+      onClaimPending,
+    );
   }
 
   /* Private */

@@ -1,7 +1,7 @@
 {
   "name": "@betswirl/wagmi-provider",
   "description": "Wagmi client & wallet for Betswirl core SDK",
-  "version": "0.1.2",
+  "version": "0.1.12",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -27,12 +27,21 @@
     "build": "rimraf ./dist && tsup --tsconfig tsconfig.build.json",
     "prepublishOnly": "cross-env NODE_ENV=production npm run build"
   },
-  "contributors": ["kinco_dev"],
-  "keywords": ["betswirl", "wagmi", "casino", "web3"],
+  "contributors": [
+    "kinco_dev"
+  ],
+  "keywords": [
+    "betswirl",
+    "wagmi",
+    "casino",
+    "web3"
+  ],
   "peerDependencies": {
     "@wagmi/core": ">=2.16.3"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@betswirl/sdk-core": "workspace:*",
     "viem": "catalog:"
