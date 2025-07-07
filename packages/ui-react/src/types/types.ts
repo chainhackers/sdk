@@ -77,3 +77,11 @@ export interface HistoryEntry {
 }
 
 export type ChainTokenPanelView = "main" | "chain" | "token"
+
+export interface GameDefinition<T extends GameChoice> {
+  gameType: T["game"]
+  defaultSelection: T
+  getMultiplier: (choice: T["choice"]) => number
+  encodeInput: (choice: T["choice"]) => GameEncodedInput["encodedInput"]
+  getWinChancePercent?: (choice: T["choice"]) => number
+}
