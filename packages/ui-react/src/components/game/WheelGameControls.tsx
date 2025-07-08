@@ -1,0 +1,80 @@
+import { WeightedGameConfiguration } from "@betswirl/sdk-core"
+import { useEffect, useState } from "react"
+import { GameControlsProps } from "./shared/types"
+import { Wheel } from "./wheel/Wheel"
+import { createWheelSegments, getTargetAngleForMultiplier, WheelSegment } from "./wheel/wheelConfig"
+
+interface WheelGameControlsProps extends GameControlsProps {
+  config: WeightedGameConfiguration
+  winningMultiplier?: number
+}
+
+export function WheelGameControls({
+  config,
+  winningMultiplier,
+  multiplier,
+  isDisabled,
+}: WheelGameControlsProps) {
+  const [segments, setSegments] = useState<WheelSegment[]>([])
+  const [rotationAngle, setRotationAngle] = useState(0)
+  const [isSpinning, setIsSpinning] = useState(false)
+
+  useEffect(() => {
+    const wheelSegments = createWheelSegments(config)
+    setSegments(wheelSegments)
+  }, [config])
+
+  useEffect(() => {
+    if (winningMultiplier !== undefined && segments.length > 0) {
+      setIsSpinning(true)
+      const targetAngle = getTargetAngleForMultiplier(segments, winningMultiplier)
+      setRotationAngle(targetAngle)
+
+      const timer = setTimeout(() => {
+        setIsSpinning(false)
+      }, 4000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [winningMultiplier, segments])
+
+  const uniqueMultipliers = segments
+    .filter((segment) => segment.multiplier > 0)
+    .reduce(
+      (acc, segment) => {
+        const existing = acc.find((item) => item.multiplier === segment.multiplier)
+        if (!existing) {
+          acc.push({
+            multiplier: segment.multiplier,
+            formattedMultiplier: segment.formattedMultiplier,
+            color: segment.color,
+          })
+        }
+        return acc
+      },
+      [] as Array<{ multiplier: number; formattedMultiplier: string; color: string }>,
+    )
+    .sort((a, b) => a.multiplier - b.multiplier)
+
+  return (
+    <>
+      <div className="flex flex-col items-center gap-[8px] absolute top-[8px] left-1/2 transform -translate-x-1/2 w-full max-w-lg px-4">
+        <Wheel rotationAngle={rotationAngle} isSpinning={isSpinning} multiplier={multiplier} />
+
+        <div className="flex flex-wrap justify-center gap-[6px] w-full">
+          {uniqueMultipliers.map((item) => {
+            return (
+              <div
+                key={item.multiplier}
+                className="flex h-[24px] w-[49px] items-center justify-center rounded-[2px] bg-white/72 backdrop-blur-sm"
+                style={{ boxShadow: `0px 3px 0px 0px ${item.color}` }}
+              >
+                <span className="text-xs font-bold">{item.formattedMultiplier}</span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </>
+  )
+}
