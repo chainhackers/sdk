@@ -28,7 +28,7 @@ npm install @betswirl/ui
 `Coinbase Developer Platform Client API Key` can be skipped (optional for basic functionality)
 If needed, add to .env: `NEXT_PUBLIC_ONCHAINKIT_API_KEY=your_api_key`
 
-## Setting up Providers
+### Setting up Providers
 
 Update `app/providers.tsx`:
 
@@ -86,7 +86,7 @@ export function Providers(props: { children: ReactNode }) {
 }
 ```
 
-## Adding Game Component
+### Adding Game Component
 
 Add the game component in `app/page.tsx`:
 
@@ -101,7 +101,7 @@ import "@betswirl/ui/styles.css";
 </main>
 ```
 
-## Start dev server
+### Start dev server
 
 ```shell
 npm run dev
@@ -141,7 +141,71 @@ Complete list of all available manifest properties with descriptions - [Define y
 
 All properties are configured through environment variables in the `app/.well-known/farcaster.json/route.ts` file.
 
+## Deploying to Vercel
+
+Choose one of the following deployment methods:
+
+**Vercel CLI**
+```shell
+# Install Vercel CLI
+npm i -g vercel
+
+# Run deployment from root project
+vercel
+```
+
+**Git Integration**
+* Sign in to [vercel.com](https://vercel.com) with GitHub
+* Click "Add New..." → "Project"
+* Select your repository
+* Click "Import" → "Deploy"
+* Get public URL after ~2 minutes
+
+## Publishing and Testing mini-app in Farcaster
+Detailed instructions can be found here - https://miniapps.farcaster.xyz/docs/guides/publishing#steps
+
+After deployment, the manifest can be viewed at this URL - https://your-app.vercel.app/.well-known/farcaster.json
+
+### Testing mini-app:
+To test your mini-app in Farcaster, you don't need to publish the manifest.
+
+1. Go to https://farcaster.xyz/~/developers/mini-apps/manifest
+2. Paste your domain in the field without https and trailing slash (`your-app.vercel.app`)
+
+After that, you'll be able to see your manifest and launch the mini-app in the Farcaster frame. 
+
+If the manifest is valid, you'll see - "Mini App configuration is valid."
+
+You can launch the application by clicking the Launch button.
+![Testing mini-app](screenshots/launchMiniApp.png)
+
+If the manifest is not valid, you'll see - "your-app.vercel.app does not have a valid manifest setup."
+![Testing mini-app](screenshots/notValidManifest.png)
+
+### Publishing Manifest:
+
+1. Go to https://farcaster.xyz/~/developers/mini-apps/manifest
+2. Click the "Manage" button
+![Publishing Manifest](screenshots/manifestManage.png)
+3. Enter the domain address and fill in all necessary fields and click "Submit"
+![Publishing Manifest](screenshots/createManifest.png)
+
+After that, you'll get a URL like - https://api.farcaster.xyz/miniapps/hosted-manifest/YOUR_MANIFEST_ID
+
+**If you're using our "farcaster-frame" template, you need to:**
+* Add the FARCASTER_MANIFEST_URL environment variable with this url to your .env file
+* Update deployment
+
+If you created the application from scratch, then you need to set up a redirect to your manifest in the next.config file.   
+[Next js redirects documentation](https://nextjs.org/docs/app/api-reference/config/next-config-js/redirects)   
+You can find an example at `sdk/examples/farcaster-frame/next.config.mjs`. 
+
+### Posting your mini-app
+
+Once you have a valid manifest, you can share your mini-app by posting its URL in a Farcaster cast. Users will be able to launch it directly from the cast.
+
 ## Documentation
 
 - [MiniKit Documentation](https://docs.base.org/wallet-app/build-with-minikit/quickstart)
 - [Farcaster Frame Publishing](https://miniapps.farcaster.xyz/docs/guides/publishing)
+- [Deploying to Vercel](https://vercel.com/docs/deployments)
