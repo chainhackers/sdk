@@ -1,11 +1,33 @@
-import { KenoBall } from "@betswirl/sdk-core"
+import { KenoBall, KenoConfiguration } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
+import { zeroAddress } from "viem"
 import { KenoGameControls } from "../../components/game/KenoGameControls"
 
 interface KenoMultiplierData {
   multiplier: number
   winChance: number
+}
+
+const mockKenoConfig: KenoConfiguration = {
+  token: {
+    address: zeroAddress,
+    decimals: 18,
+    symbol: "ETH",
+  },
+  chainId: 8453,
+  maxSelectableBalls: 7,
+  biggestSelectableBall: 15,
+  multiplierTable: [
+    [0],
+    [0, 3.6],
+    [0, 1, 14.4],
+    [0, 1, 2, 43.2],
+    [0, 0.5, 2, 5, 129.6],
+    [0, 0.5, 1, 3, 12, 388.8],
+    [0, 0.5, 1, 2, 3, 25, 1166.4],
+    [0, 0.25, 0.5, 1, 2, 6, 50, 3499.2],
+  ],
 }
 
 const meta = {
@@ -52,12 +74,12 @@ const meta = {
         defaultValue: { summary: "false" },
       },
     },
-    maxSelections: {
-      control: { type: "number", min: 1, max: 15, step: 1 },
-      description: "Maximum number of selections allowed",
+    kenoConfig: {
+      control: "object",
+      description: "Keno configuration object",
       table: {
-        type: { summary: "number" },
-        defaultValue: { summary: "7" },
+        type: { summary: "KenoConfiguration" },
+        defaultValue: { summary: "mockKenoConfig" },
       },
     },
     lastGameWinningNumbers: {
@@ -88,14 +110,14 @@ function InteractiveKenoGameControls({
   ],
   isDisabled = false,
   theme = "dark",
-  maxSelections = 7,
+  kenoConfig = mockKenoConfig,
   lastGameWinningNumbers = [],
 }: {
   initialSelectedNumbers?: KenoBall[]
   multipliers?: KenoMultiplierData[]
   isDisabled?: boolean
   theme?: "light" | "dark"
-  maxSelections?: number
+  kenoConfig?: KenoConfiguration
   lastGameWinningNumbers?: number[]
 }) {
   const [selectedNumbers, setSelectedNumbers] = useState<KenoBall[]>(initialSelectedNumbers)
@@ -112,8 +134,7 @@ function InteractiveKenoGameControls({
           onNumbersChange={handleNumbersChange}
           multipliers={multipliers}
           isDisabled={isDisabled}
-          maxSelections={maxSelections}
-          biggestSelectableBall={15}
+          kenoConfig={kenoConfig}
           lastGameWinningNumbers={lastGameWinningNumbers}
         />
       </div>
