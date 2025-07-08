@@ -7,7 +7,7 @@
 ```shell
 # Clone the SDK repository
 git clone https://github.com/betswirl/sdk.git
-cd sdk/examples/mini-app/farcaster-frame
+cd sdk/examples/farcaster-frame
 
 # Install dependencies
 pnpm install --ignore-workspace
@@ -23,6 +23,10 @@ cd your-mini-project
 # Install BetSwirl UI
 npm install @betswirl/ui
 ```
+
+**During installation:**
+`Coinbase Developer Platform Client API Key` can be skipped (optional for basic functionality)
+If needed, add to .env: `NEXT_PUBLIC_ONCHAINKIT_API_KEY=your_api_key`
 
 ## Setting up Providers
 
@@ -105,6 +109,37 @@ npm run dev
 
 Open in browser http://localhost:3000/
 
+## Environment Variables
+
+`.env.example` 
+
+Create a .env file in the root directory, or you can set environment variables in your Vercel project settings
+Public variables (`NEXT_PUBLIC_*`) can be stored in the `.env` file
+
+**How manifest generation works:**
+The manifest file is automatically generated during build through api route `app/.well-known/farcaster.json/route.ts`. This endpoint reads environment variables and returns JSON with your mini-app configuration that Farcaster uses.
+
+**Required variables for manifest:**
+```bash
+NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME="YOUR_PROJECT_NAME"
+NEXT_PUBLIC_URL=https://your-app.vercel.app
+NEXT_PUBLIC_APP_ICON=$NEXT_PUBLIC_URL/icon.png
+NEXT_PUBLIC_APP_SUBTITLE="Your App Subtitle"
+NEXT_PUBLIC_APP_DESCRIPTION="Your app description"
+NEXT_PUBLIC_APP_SPLASH_IMAGE=$NEXT_PUBLIC_URL/splash.png
+NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR="#your-color-in-hex"
+NEXT_PUBLIC_APP_PRIMARY_CATEGORY=games
+```
+
+```bash
+# For app preview
+NEXT_PUBLIC_APP_HERO_IMAGE=$NEXT_PUBLIC_URL/hero.png
+```
+
+**Manifest properties:**
+Complete list of all available manifest properties with descriptions - [Define your application configuration](https://miniapps.farcaster.xyz/docs/guides/publishing#define-your-application-configuration). 
+
+All properties are configured through environment variables in the `app/.well-known/farcaster.json/route.ts` file.
 
 ## Documentation
 
