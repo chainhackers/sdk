@@ -1,8 +1,21 @@
-import { CASINO_GAME_TYPE, FORMAT_TYPE, formatRawAmount, KenoBall } from "@betswirl/sdk-core"
-import { useEffect, useState } from "react"
+import {
+  CASINO_GAME_TYPE,
+  chainById,
+  chainNativeCurrencyToToken,
+  FORMAT_TYPE,
+  formatRawAmount,
+  Keno,
+  KenoBall,
+  KenoConfiguration,
+} from "@betswirl/sdk-core"
+import { useEffect, useMemo, useState } from "react"
 import kenoBackground from "../../assets/game/game-background.jpg"
+import { useChain } from "../../context/chainContext"
+import { useTokenContext } from "../../context/tokenContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { useKenoConfiguration } from "../../hooks/useKenoConfiguration"
 import { useKenoMultipliers } from "../../hooks/useKenoMultipliers"
+import { GameDefinition } from "../../types/types"
 import { GameFrame } from "./GameFrame"
 import { KenoGameControls } from "./KenoGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -13,13 +26,34 @@ const DEFAULT_KENO_SELECTION: KenoBall[] = []
 
 export interface KenoGameProps extends BaseGameProps {}
 
-export function KenoGame({
-  theme = "system",
+function KenoGameContent({
+  theme,
   customTheme,
   backgroundImage = kenoBackground,
+  kenoConfig,
   ...props
-}: KenoGameProps) {
+}: KenoGameProps & { kenoConfig: KenoConfiguration }) {
   const [lastWinningNumbers, setLastWinningNumbers] = useState<KenoBall[]>([])
+
+  const kenoGameDefinition = useMemo((): GameDefinition<{
+    game: CASINO_GAME_TYPE.KENO
+    choice: KenoBall[]
+  }> => {
+    return {
+      gameType: CASINO_GAME_TYPE.KENO,
+      defaultSelection: {
+        game: CASINO_GAME_TYPE.KENO,
+        choice: DEFAULT_KENO_SELECTION,
+      },
+      getMultiplier: (choice) => {
+        const multipliers = kenoConfig.multiplierTable[choice.length] || []
+        const maxMultiplierHits = multipliers.length > 0 ? multipliers.length - 1 : 0
+        return Keno.getMultiplier(kenoConfig, choice.length, maxMultiplierHits)
+      },
+      encodeInput: (choice) => Keno.encodeInput(choice, kenoConfig),
+    }
+  }, [kenoConfig])
+
   const {
     isWalletConnected,
     balance,
@@ -49,13 +83,8 @@ export function KenoGame({
     isApproveConfirming,
     isRefetchingAllowance,
     approveError,
-    kenoConfig,
   } = useGameLogic({
-    gameType: CASINO_GAME_TYPE.KENO,
-    defaultSelection: {
-      game: CASINO_GAME_TYPE.KENO,
-      choice: DEFAULT_KENO_SELECTION,
-    },
+    gameDefinition: kenoGameDefinition,
     backgroundImage,
   })
 
@@ -105,21 +134,14 @@ export function KenoGame({
         />
         <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
         <GameFrame.GameControls>
-          {kenoConfig ? (
-            <KenoGameControls
-              selectedNumbers={selectedNumbers}
-              onNumbersChange={handleNumbersChange}
-              maxSelections={kenoConfig.maxSelectableBalls}
-              biggestSelectableBall={kenoConfig.biggestSelectableBall}
-              multipliers={multipliers}
-              isDisabled={isControlsDisabled}
-              lastGameWinningNumbers={lastWinningNumbers}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent" />
-            </div>
-          )}
+          <KenoGameControls
+            selectedNumbers={selectedNumbers}
+            onNumbersChange={handleNumbersChange}
+            kenoConfig={kenoConfig}
+            multipliers={multipliers}
+            isDisabled={isControlsDisabled}
+            lastGameWinningNumbers={lastWinningNumbers}
+          />
         </GameFrame.GameControls>
         <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
       </GameFrame.GameArea>
@@ -145,5 +167,43 @@ export function KenoGame({
         approveError={approveError}
       />
     </GameFrame>
+  )
+}
+
+export function KenoGame({
+  theme = "system",
+  customTheme,
+  backgroundImage = kenoBackground,
+  ...props
+}: KenoGameProps) {
+  const { selectedToken } = useTokenContext()
+  const { appChainId } = useChain()
+  const token = useMemo(() => {
+    return (
+      selectedToken || {
+        ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
+        image: "",
+      }
+    )
+  }, [selectedToken, appChainId])
+
+  const { config: kenoConfig, loading: kenoConfigLoading } = useKenoConfiguration({ token })
+
+  if (kenoConfigLoading || !kenoConfig) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent" />
+      </div>
+    )
+  }
+
+  return (
+    <KenoGameContent
+      theme={theme}
+      customTheme={customTheme}
+      backgroundImage={backgroundImage}
+      kenoConfig={kenoConfig}
+      {...props}
+    />
   )
 }

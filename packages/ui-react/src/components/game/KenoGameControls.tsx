@@ -1,4 +1,4 @@
-import { KenoBall } from "@betswirl/sdk-core"
+import { KenoBall, KenoConfiguration } from "@betswirl/sdk-core"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 import React from "react"
 import { Button } from "../ui/button"
@@ -12,8 +12,7 @@ interface KenoMultiplierData {
 interface KenoGameControlsProps {
   selectedNumbers: KenoBall[]
   onNumbersChange: (numbers: KenoBall[]) => void
-  maxSelections: number
-  biggestSelectableBall: number
+  kenoConfig: KenoConfiguration
   multipliers: KenoMultiplierData[]
   isDisabled: boolean
   lastGameWinningNumbers?: number[]
@@ -137,8 +136,7 @@ export function KenoGameControls({
   selectedNumbers,
   onNumbersChange,
   isDisabled,
-  maxSelections,
-  biggestSelectableBall,
+  kenoConfig,
   multipliers,
   lastGameWinningNumbers = [],
 }: KenoGameControlsProps) {
@@ -150,30 +148,33 @@ export function KenoGameControls({
 
     if (isNumberSelected(number)) {
       onNumbersChange(selectedNumbers.filter((n) => n !== number))
-    } else if (selectedNumbers.length < maxSelections) {
+    } else if (selectedNumbers.length < kenoConfig.maxSelectableBalls) {
       onNumbersChange([...selectedNumbers, number])
     }
   }
 
   const isNumberDisabled = (number: KenoBall) => {
-    return isDisabled || (!isNumberSelected(number) && selectedNumbers.length >= maxSelections)
+    return (
+      isDisabled ||
+      (!isNumberSelected(number) && selectedNumbers.length >= kenoConfig.maxSelectableBalls)
+    )
   }
 
   const visibleMultipliersCount = selectedNumbers.length > 0 ? selectedNumbers.length + 1 : 0
   const numbers: KenoBall[] = Array.from(
-    { length: biggestSelectableBall },
+    { length: kenoConfig.biggestSelectableBall },
     (_, i) => (i + 1) as KenoBall,
   )
 
   const renderNumberGrid = () => {
     const rows = []
-    const gridRows = Math.ceil(biggestSelectableBall / KENO_GRID_COLS)
+    const gridRows = Math.ceil(kenoConfig.biggestSelectableBall / KENO_GRID_COLS)
 
     for (let row = 0; row < gridRows; row++) {
       const rowNumbers = []
       for (let col = 0; col < KENO_GRID_COLS; col++) {
         const numberIndex = row * KENO_GRID_COLS + col
-        if (numberIndex >= biggestSelectableBall) break
+        if (numberIndex >= kenoConfig.biggestSelectableBall) break
 
         const number = numbers[numberIndex]
         rowNumbers.push(
