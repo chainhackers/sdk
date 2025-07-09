@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react"
 import { useState } from "react"
 import { WheelGameControls } from "../../components/game/WheelGameControls"
 import { Button } from "../../components/ui/button"
+import { Theme } from "../../types/types"
 
 const mockWheelConfig: WeightedGameConfiguration = {
   configId: 0,
@@ -87,7 +88,7 @@ function InteractiveWheelGameControls({
   config?: WeightedGameConfiguration
   multiplier?: number
   isDisabled?: boolean
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
 }) {
   const [winningMultiplier, setWinningMultiplier] = useState<number | undefined>()
   const [isSpinning, setIsSpinning] = useState(false)

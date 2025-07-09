@@ -3,13 +3,14 @@ import { useCallback, useEffect, useState } from "react"
 import wheelArrow from "../../assets/game/wheel-arrow.svg"
 import wheelDark from "../../assets/game/wheel-dark.svg"
 import wheelLight from "../../assets/game/wheel-light.svg"
+import { Theme } from "../../types/types"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import { GameControlsProps } from "./shared/types"
 
 interface WheelGameControlsProps extends GameControlsProps {
   config: WeightedGameConfiguration
   winningMultiplier?: number
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
 }
 
 interface WheelSegment {
@@ -27,7 +28,7 @@ interface WheelProps {
   isSpinning: boolean
   multiplier: number
   hasCompletedSpin?: boolean
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
 }
 
 const SPIN_DURATION = 4000
