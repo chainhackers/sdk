@@ -36,15 +36,14 @@ export function getTargetAngleForMultiplier(
   segments: WheelSegment[],
   winningMultiplier: number,
 ): number {
-  const winningSegment = segments.find((segment) => segment.multiplier === winningMultiplier)
-  if (!winningSegment) {
+  const winningSegments = segments.filter((segment) => segment.multiplier === winningMultiplier)
+  if (winningSegments.length === 0) {
     return 0
   }
 
-  const segmentCenterAngle = (winningSegment.startAngle + winningSegment.endAngle) / 2
-  const randomOffset = (Math.random() - 0.5) * 20
+  const randomSegment = winningSegments[Math.floor(Math.random() * winningSegments.length)]
   const fullRotations = 5 + Math.floor(Math.random() * 3)
-  const targetAngle = fullRotations * 360 + (360 - segmentCenterAngle) + randomOffset
+  const targetAngle = fullRotations * 360 - randomSegment.startAngle
 
   return targetAngle
 }

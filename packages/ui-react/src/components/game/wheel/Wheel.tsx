@@ -31,7 +31,7 @@ export function Wheel({ rotationAngle, isSpinning, multiplier, hasResult = false
         >
           <img src={wheel} alt="Wheel colors" className="w-full h-full object-contain" />
         </div>
-        {hasResult && !isSpinning && multiplier > 0 && (
+        {hasResult && !isSpinning && (
           <GameMultiplierDisplay
             multiplier={multiplier}
             className="absolute text-black top-[80px] text-[18px]"

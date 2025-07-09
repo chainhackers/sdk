@@ -48,7 +48,6 @@ export function WheelGameControls({
   }, [winningMultiplier, segments, currentWinningMultiplier])
 
   const uniqueMultipliers = segments
-    .filter((segment) => segment.multiplier > 0)
     .reduce(
       (acc, segment) => {
         const existing = acc.find((item) => item.multiplier === segment.multiplier)
@@ -71,7 +70,9 @@ export function WheelGameControls({
         <Wheel
           rotationAngle={rotationAngle}
           isSpinning={isSpinning}
-          multiplier={currentWinningMultiplier ? currentWinningMultiplier / 10000 : multiplier}
+          multiplier={
+            currentWinningMultiplier !== undefined ? currentWinningMultiplier / 10000 : multiplier
+          }
           hasResult={hasResult}
         />
 
