@@ -78,11 +78,15 @@ export function WheelGameControls({
 
         <div className="flex flex-wrap justify-center gap-[6px] w-full">
           {uniqueMultipliers.map((item) => {
+            const isWinning = hasResult && currentWinningMultiplier === item.multiplier
             return (
               <div
                 key={item.multiplier}
                 className="flex h-[24px] w-[49px] items-center justify-center rounded-[2px] bg-white/72 backdrop-blur-sm"
-                style={{ boxShadow: `0px 3px 0px 0px ${item.color}` }}
+                style={{
+                  boxShadow: `0px 3px 0px 0px ${item.color}`,
+                  border: isWinning ? `1.5px solid ${item.color}` : "none",
+                }}
               >
                 <span className="text-xs font-bold">{item.formattedMultiplier}</span>
               </div>
