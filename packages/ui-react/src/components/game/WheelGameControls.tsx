@@ -1,7 +1,9 @@
 import { WeightedGameConfiguration } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useState } from "react"
+import wheel from "../../assets/game/wheel.svg"
+import wheelArrow from "../../assets/game/wheel-arrow.svg"
+import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import { GameControlsProps } from "./shared/types"
-import { Wheel } from "./wheel/Wheel"
 
 interface WheelGameControlsProps extends GameControlsProps {
   config: WeightedGameConfiguration
@@ -16,6 +18,13 @@ interface WheelSegment {
   startAngle: number
   endAngle: number
   weight: bigint
+}
+
+interface WheelProps {
+  rotationAngle: number
+  isSpinning: boolean
+  multiplier: number
+  hasCompletedSpin?: boolean
 }
 
 const SPIN_DURATION = 4000
@@ -61,6 +70,40 @@ function getTargetAngleForMultiplier(segments: WheelSegment[], winningMultiplier
   const targetAngle = fullRotations * 360 - randomSegment.startAngle
 
   return targetAngle
+}
+
+function Wheel({ rotationAngle, isSpinning, multiplier, hasCompletedSpin = false }: WheelProps) {
+  const [currentAngle, setCurrentAngle] = useState(0)
+  const shouldShowMultiplier = hasCompletedSpin && !isSpinning
+
+  useEffect(() => {
+    if (rotationAngle !== currentAngle) {
+      setCurrentAngle(rotationAngle)
+    }
+  }, [rotationAngle, currentAngle])
+
+  return (
+    <>
+      <div className="relative w-[192px] h-[148px] mx-auto">
+        <div
+          className="absolute inset-0 flex items-center justify-center top-[12px]"
+          style={{
+            transform: `rotate(${currentAngle}deg)`,
+            transition: isSpinning ? "transform 4s cubic-bezier(0.23, 1, 0.32, 1)" : "none",
+          }}
+        >
+          <img src={wheel} alt="Wheel colors" className="w-full h-full object-contain" />
+        </div>
+        {shouldShowMultiplier && (
+          <GameMultiplierDisplay
+            multiplier={multiplier}
+            className="absolute text-black top-[80px] text-[18px]"
+          />
+        )}
+      </div>
+      <img src={wheelArrow} alt="Wheel arrow" className="absolute" />
+    </>
+  )
 }
 
 export function WheelGameControls({
