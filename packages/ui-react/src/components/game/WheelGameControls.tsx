@@ -43,7 +43,7 @@ const SPIN_DURATION = 4000
 const WHEEL_ANIMATION_CONFIG = {
   MIN_ROTATIONS: 5,
   MAX_ADDITIONAL_ROTATIONS: 3,
-  MAX_RANDOM_OFFSET: 20,
+  MAX_RANDOM_OFFSET: 16,
 } as const
 
 export function createWheelSegments(config: WeightedGameConfiguration): WheelSegment[] {
@@ -78,7 +78,8 @@ function getTargetAngleForMultiplier(segments: WheelSegment[], winningMultiplier
   const fullRotations =
     WHEEL_ANIMATION_CONFIG.MIN_ROTATIONS +
     Math.floor(Math.random() * WHEEL_ANIMATION_CONFIG.MAX_ADDITIONAL_ROTATIONS)
-  const targetAngle = fullRotations * 360 - randomSegment.startAngle
+  const randomOffset = (Math.random() > 0.5 ? 1 : -1) * Math.random() * WHEEL_ANIMATION_CONFIG.MAX_RANDOM_OFFSET
+  const targetAngle = fullRotations * 360 - randomSegment.startAngle + randomOffset
 
   return targetAngle
 }
@@ -92,15 +93,13 @@ function Wheel({
 }: WheelProps) {
   const [currentAngle, setCurrentAngle] = useState(0)
   const shouldShowMultiplier = hasCompletedSpin && !isSpinning
+  const wheelSrc = theme === "dark" ? wheelDark : wheelLight
 
   useEffect(() => {
     if (rotationAngle !== currentAngle) {
       setCurrentAngle(rotationAngle)
     }
   }, [rotationAngle, currentAngle])
-
-  // Choose the correct wheel SVG based on theme
-  const wheelSrc = theme === "dark" ? wheelDark : wheelLight
 
   return (
     <>
