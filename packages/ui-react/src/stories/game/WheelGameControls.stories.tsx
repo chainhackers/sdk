@@ -87,7 +87,7 @@ function InteractiveWheelGameControls({
   config?: WeightedGameConfiguration
   multiplier?: number
   isDisabled?: boolean
-  theme?: "light" | "dark"
+  theme?: "light" | "dark" | "system"
 }) {
   const [winningMultiplier, setWinningMultiplier] = useState<number | undefined>()
   const [isSpinning, setIsSpinning] = useState(false)
@@ -118,6 +118,7 @@ function InteractiveWheelGameControls({
             winningMultiplier={winningMultiplier}
             multiplier={multiplier}
             isDisabled={isDisabled || isSpinning}
+            theme={theme}
           />
         </div>
 
@@ -140,6 +141,20 @@ export const LightThemeDefault: Story = {
     docs: {
       description: {
         story: "Light theme wheel game controls. Click 'Spin Wheel' to see the animation.",
+      },
+    },
+  },
+}
+
+export const DarkThemeDefault: Story = {
+  name: "Dark Theme - Default",
+  render: () => <InteractiveWheelGameControls theme="dark" />,
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story: "Dark theme wheel game controls. Click 'Spin Wheel' to see the animation.",
       },
     },
   },

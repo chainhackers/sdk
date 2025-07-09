@@ -1,13 +1,15 @@
 import { WeightedGameConfiguration } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useState } from "react"
-import wheel from "../../assets/game/wheel.svg"
 import wheelArrow from "../../assets/game/wheel-arrow.svg"
+import wheelDark from "../../assets/game/wheel-dark.svg"
+import wheelLight from "../../assets/game/wheel-light.svg"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import { GameControlsProps } from "./shared/types"
 
 interface WheelGameControlsProps extends GameControlsProps {
   config: WeightedGameConfiguration
   winningMultiplier?: number
+  theme?: "light" | "dark" | "system"
 }
 
 interface WheelSegment {
@@ -25,6 +27,7 @@ interface WheelProps {
   isSpinning: boolean
   multiplier: number
   hasCompletedSpin?: boolean
+  theme?: "light" | "dark" | "system"
 }
 
 const SPIN_DURATION = 4000
@@ -72,7 +75,13 @@ function getTargetAngleForMultiplier(segments: WheelSegment[], winningMultiplier
   return targetAngle
 }
 
-function Wheel({ rotationAngle, isSpinning, multiplier, hasCompletedSpin = false }: WheelProps) {
+function Wheel({
+  rotationAngle,
+  isSpinning,
+  multiplier,
+  hasCompletedSpin = false,
+  theme = "light",
+}: WheelProps) {
   const [currentAngle, setCurrentAngle] = useState(0)
   const shouldShowMultiplier = hasCompletedSpin && !isSpinning
 
@@ -82,22 +91,24 @@ function Wheel({ rotationAngle, isSpinning, multiplier, hasCompletedSpin = false
     }
   }, [rotationAngle, currentAngle])
 
+  // Choose the correct wheel SVG based on theme
+  const wheelSrc = theme === "dark" ? wheelDark : wheelLight
+
   return (
     <>
       <div className="relative w-[192px] h-[148px] mx-auto">
         <div
-          className="absolute inset-0 flex items-center justify-center top-[12px]"
-          style={{
-            transform: `rotate(${currentAngle}deg)`,
-            transition: isSpinning ? "transform 4s cubic-bezier(0.23, 1, 0.32, 1)" : "none",
-          }}
+          className={`absolute inset-0 flex items-center justify-center top-[12px] ${
+            isSpinning ? "wheel-spinning" : ""
+          }`}
+          style={{ transform: `rotate(${currentAngle}deg)` }}
         >
-          <img src={wheel} alt="Wheel colors" className="w-full h-full object-contain" />
+          <img src={wheelSrc} alt="Wheel colors" className="w-full h-full object-contain" />
         </div>
         {shouldShowMultiplier && (
           <GameMultiplierDisplay
             multiplier={multiplier}
-            className="absolute text-black top-[80px] text-[18px]"
+            className="absolute text-wheel-multiplier-text top-[80px] text-[18px]"
           />
         )}
       </div>
@@ -110,6 +121,7 @@ export function WheelGameControls({
   config,
   winningMultiplier,
   multiplier,
+  theme = "light",
 }: WheelGameControlsProps) {
   const [segments, setSegments] = useState<WheelSegment[]>([])
   const [rotationAngle, setRotationAngle] = useState(0)
@@ -180,6 +192,7 @@ export function WheelGameControls({
         isSpinning={isSpinning}
         multiplier={getDisplayMultiplier()}
         hasCompletedSpin={hasResult}
+        theme={theme}
       />
 
       <div className="flex flex-wrap justify-center gap-[6px] w-full">
@@ -188,11 +201,14 @@ export function WheelGameControls({
           return (
             <div
               key={item.multiplier}
-              className="flex h-[24px] w-[49px] items-center justify-center rounded-[2px] bg-white/72 backdrop-blur-sm"
-              style={{
-                boxShadow: `0px 3px 0px 0px ${item.color}`,
-                border: isWinning ? `1.5px solid ${item.color}` : "none",
-              }}
+              className={`flex h-[24px] w-[49px] items-center justify-center rounded-[2px] backdrop-blur-sm bg-wheel-multiplier-bg text-wheel-multiplier-text wheel-multiplier-item ${
+                isWinning ? "wheel-multiplier-winning" : ""
+              }`}
+              style={
+                {
+                  "--wheel-color": item.color,
+                } as React.CSSProperties
+              }
             >
               <span className="text-xs font-bold">{item.formattedMultiplier}</span>
             </div>
