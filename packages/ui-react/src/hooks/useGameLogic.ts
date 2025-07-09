@@ -115,7 +115,10 @@ export function useGameLogic<T extends GameChoice>({
   const { gameType, defaultSelection } = effectiveGameDefinition
 
   const { isConnected: isWalletConnected, address } = useAccount()
-  const { gameHistory, refreshHistory } = useGameHistory(gameType)
+  const { data: gameHistoryData, refetch: refreshHistory } = useGameHistory({
+    gameType,
+    filter: {},
+  })
   const { areChainsSynced, appChainId } = useChain()
 
   const { selectedToken } = useTokenContext()
@@ -226,7 +229,7 @@ export function useGameLogic<T extends GameChoice>({
     balance: balance?.value ?? 0n,
     token,
     areChainsSynced,
-    gameHistory,
+    gameHistory: gameHistoryData?.gameHistory ?? [],
     refreshHistory,
     refetchBalance,
     betAmount,
