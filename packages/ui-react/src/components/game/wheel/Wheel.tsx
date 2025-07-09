@@ -7,9 +7,10 @@ interface WheelProps {
   rotationAngle: number
   isSpinning: boolean
   multiplier: number
+  hasResult?: boolean
 }
 
-export function Wheel({ rotationAngle, isSpinning, multiplier }: WheelProps) {
+export function Wheel({ rotationAngle, isSpinning, multiplier, hasResult = false }: WheelProps) {
   const [currentAngle, setCurrentAngle] = useState(0)
 
   useEffect(() => {
@@ -30,10 +31,12 @@ export function Wheel({ rotationAngle, isSpinning, multiplier }: WheelProps) {
         >
           <img src={wheel} alt="Wheel colors" className="w-full h-full object-contain" />
         </div>
-        <GameMultiplierDisplay
-          multiplier={multiplier}
-          className="absolute text-black top-[80px] text-[18px]"
-        />
+        {hasResult && !isSpinning && multiplier > 0 && (
+          <GameMultiplierDisplay
+            multiplier={multiplier}
+            className="absolute text-black top-[80px] text-[18px]"
+          />
+        )}
       </div>
       <img src={wheelArrow} alt="Wheel arrow" className="absolute" />
     </>

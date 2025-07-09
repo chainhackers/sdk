@@ -18,6 +18,8 @@ export function WheelGameControls({
   const [segments, setSegments] = useState<WheelSegment[]>([])
   const [rotationAngle, setRotationAngle] = useState(0)
   const [isSpinning, setIsSpinning] = useState(false)
+  const [hasResult, setHasResult] = useState(false)
+  const [currentWinningMultiplier, setCurrentWinningMultiplier] = useState<number | undefined>()
 
   useEffect(() => {
     const wheelSegments = createWheelSegments(config)
@@ -25,18 +27,25 @@ export function WheelGameControls({
   }, [config])
 
   useEffect(() => {
-    if (winningMultiplier !== undefined && segments.length > 0) {
+    if (winningMultiplier === undefined) {
+      setHasResult(false)
+      setCurrentWinningMultiplier(undefined)
+    } else if (winningMultiplier !== currentWinningMultiplier && segments.length > 0) {
+      setHasResult(false)
+      setCurrentWinningMultiplier(undefined)
       setIsSpinning(true)
       const targetAngle = getTargetAngleForMultiplier(segments, winningMultiplier)
       setRotationAngle(targetAngle)
 
       const timer = setTimeout(() => {
         setIsSpinning(false)
+        setCurrentWinningMultiplier(winningMultiplier)
+        setHasResult(true)
       }, 4000)
 
       return () => clearTimeout(timer)
     }
-  }, [winningMultiplier, segments])
+  }, [winningMultiplier, segments, currentWinningMultiplier])
 
   const uniqueMultipliers = segments
     .filter((segment) => segment.multiplier > 0)
@@ -59,7 +68,12 @@ export function WheelGameControls({
   return (
     <>
       <div className="flex flex-col items-center gap-[8px] absolute top-[8px] left-1/2 transform -translate-x-1/2 w-full max-w-lg px-4">
-        <Wheel rotationAngle={rotationAngle} isSpinning={isSpinning} multiplier={multiplier} />
+        <Wheel
+          rotationAngle={rotationAngle}
+          isSpinning={isSpinning}
+          multiplier={currentWinningMultiplier ? currentWinningMultiplier / 10000 : multiplier}
+          hasResult={hasResult}
+        />
 
         <div className="flex flex-wrap justify-center gap-[6px] w-full">
           {uniqueMultipliers.map((item) => {
