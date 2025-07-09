@@ -1,9 +1,12 @@
 import { WeightedGameConfiguration } from "@betswirl/sdk-core"
+import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 import { useCallback, useEffect, useState } from "react"
 import wheelArrow from "../../assets/game/wheel-arrow.svg"
 import wheelDark from "../../assets/game/wheel-dark.svg"
 import wheelLight from "../../assets/game/wheel-light.svg"
-import { Theme } from "../../types/types"
+import { Theme, TokenWithImage } from "../../types/types"
+import { TokenIcon } from "../ui/TokenIcon"
+import { Tooltip, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 import { GameControlsProps } from "./shared/types"
 
@@ -11,6 +14,10 @@ interface WheelGameControlsProps extends GameControlsProps {
   config: WeightedGameConfiguration
   winningMultiplier?: number
   theme?: Theme
+  betAmount?: bigint
+  token?: TokenWithImage
+  houseEdge?: number
+  parent?: React.RefObject<HTMLDivElement | null>
 }
 
 interface WheelSegment {
@@ -123,6 +130,9 @@ export function WheelGameControls({
   winningMultiplier,
   multiplier,
   theme = "light",
+  betAmount = 0n,
+  token,
+  parent: containerRef,
 }: WheelGameControlsProps) {
   const [segments, setSegments] = useState<WheelSegment[]>([])
   const [rotationAngle, setRotationAngle] = useState(0)
@@ -186,36 +196,85 @@ export function WheelGameControls({
     )
     .sort((a, b) => a.multiplier - b.multiplier)
 
-  return (
-    <div className="flex flex-col items-center gap-[8px] absolute top-[8px] left-1/2 transform -translate-x-1/2 w-full max-w-lg px-4">
-      <Wheel
-        rotationAngle={rotationAngle}
-        isSpinning={isSpinning}
-        multiplier={getDisplayMultiplier()}
-        hasCompletedSpin={hasResult}
-        theme={theme}
-      />
+  const MultiplierItem = ({
+    item,
+  }: {
+    item: { multiplier: number; formattedMultiplier: string; color: string }
+  }) => {
+    const isWinning = isMultiplierWinning(item.multiplier)
 
-      <div className="flex flex-wrap justify-center gap-[6px] w-full">
-        {uniqueMultipliers.map((item) => {
-          const isWinning = isMultiplierWinning(item.multiplier)
-          return (
-            <div
-              key={item.multiplier}
-              className={`flex h-[24px] w-[49px] items-center justify-center rounded-[2px] backdrop-blur-sm bg-wheel-multiplier-bg text-wheel-multiplier-text wheel-multiplier-item ${
-                isWinning ? "wheel-multiplier-winning" : ""
-              }`}
-              style={
-                {
-                  "--wheel-color": item.color,
-                } as React.CSSProperties
-              }
-            >
-              <span className="text-xs font-bold">{item.formattedMultiplier}</span>
-            </div>
-          )
-        })}
+    if (!token || !betAmount || betAmount === 0n) {
+      return (
+        <div
+          className={`flex h-[24px] w-[49px] items-center justify-center rounded-[2px] backdrop-blur-sm bg-wheel-multiplier-bg text-wheel-multiplier-text wheel-multiplier-item ${
+            isWinning ? "wheel-multiplier-winning" : ""
+          }`}
+          style={
+            {
+              "--wheel-color": item.color,
+            } as React.CSSProperties
+          }
+        >
+          <span className="text-xs font-bold">{item.formattedMultiplier}</span>
+        </div>
+      )
+    }
+
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className={`flex h-[24px] w-[49px] items-center justify-center rounded-[2px] backdrop-blur-sm bg-wheel-multiplier-bg text-wheel-multiplier-text wheel-multiplier-item cursor-default ${
+              isWinning ? "wheel-multiplier-winning" : ""
+            }`}
+            style={
+              {
+                "--wheel-color": item.color,
+              } as React.CSSProperties
+            }
+          >
+            <span className="text-xs font-bold">{item.formattedMultiplier}</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipPrimitive.Content
+          side="top"
+          sideOffset={5}
+          collisionBoundary={containerRef?.current}
+          collisionPadding={19}
+          className="px-2 py-1 text-xs font-medium rounded-[2px] bg-wheel-multiplier-bg text-wheel-multiplier-text border-none shadow-none flex flex-col items-start gap-1 z-50"
+        >
+          <div className="flex items-center gap-1">
+            <span>Chance to draw: </span>
+            <span className="text-game-win font-bold">{20}%</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>Target profit: </span>
+            <span className="font-bold">{1.4}</span>
+            <TokenIcon token={token} size={15} />
+          </div>
+          <TooltipPrimitive.Arrow className="fill-wheel-multiplier-bg z-50" width={10} height={5} />
+        </TooltipPrimitive.Content>
+      </Tooltip>
+    )
+  }
+
+  return (
+    <TooltipProvider>
+      <div className="flex flex-col items-center gap-[8px] absolute top-[8px] left-1/2 transform -translate-x-1/2 w-full max-w-lg px-4">
+        <Wheel
+          rotationAngle={rotationAngle}
+          isSpinning={isSpinning}
+          multiplier={getDisplayMultiplier()}
+          hasCompletedSpin={hasResult}
+          theme={theme}
+        />
+
+        <div className="flex flex-wrap justify-center gap-[6px] w-full">
+          {uniqueMultipliers.map((item) => (
+            <MultiplierItem key={item.multiplier} item={item} />
+          ))}
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   )
 }

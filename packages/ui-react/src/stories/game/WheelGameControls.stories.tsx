@@ -1,9 +1,10 @@
 import { CASINO_GAME_TYPE, WeightedGameConfiguration } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
-import { useState } from "react"
+import { useRef, useState } from "react"
+import { parseUnits } from "viem"
 import { WheelGameControls } from "../../components/game/WheelGameControls"
 import { Button } from "../../components/ui/button"
-import { Theme } from "../../types/types"
+import { Theme, TokenWithImage } from "../../types/types"
 
 const mockWheelConfig: WeightedGameConfiguration = {
   configId: 0,
@@ -24,6 +25,17 @@ const mockWheelConfig: WeightedGameConfiguration = {
     "#EC9E3C",
   ],
 }
+
+const mockToken: TokenWithImage = {
+  address: "0x0000000000000000000000000000000000000000",
+  symbol: "ETH",
+  decimals: 18,
+  image:
+    "https://ethereum.org/static/6b935ac0e6194247347855dc3d328e83/6ed5f/eth-diamond-black.webp",
+}
+
+const mockBetAmount = parseUnits("0.1", 18) // 0.1 ETH
+const mockHouseEdge = 100 // 1% in basis points
 
 const meta = {
   title: "Game/Controls/WheelGameControls",
@@ -73,6 +85,30 @@ const meta = {
         defaultValue: { summary: "false" },
       },
     },
+    betAmount: {
+      control: "text",
+      description: "Bet amount in wei (for tooltip calculations)",
+      table: {
+        type: { summary: "bigint" },
+        defaultValue: { summary: "parseUnits('0.1', 18)" },
+      },
+    },
+    token: {
+      control: "object",
+      description: "Token information for tooltip display",
+      table: {
+        type: { summary: "TokenWithImage" },
+        defaultValue: { summary: "ETH token" },
+      },
+    },
+    houseEdge: {
+      control: "number",
+      description: "House edge in basis points (100 = 1%)",
+      table: {
+        type: { summary: "number" },
+        defaultValue: { summary: "100" },
+      },
+    },
   },
 } satisfies Meta<typeof WheelGameControls>
 
@@ -84,14 +120,21 @@ function InteractiveWheelGameControls({
   multiplier = 2.5,
   isDisabled = false,
   theme = "dark",
+  betAmount = mockBetAmount,
+  token = mockToken,
+  houseEdge = mockHouseEdge,
 }: {
   config?: WeightedGameConfiguration
   multiplier?: number
   isDisabled?: boolean
   theme?: Theme
+  betAmount?: bigint
+  token?: TokenWithImage
+  houseEdge?: number
 }) {
   const [winningMultiplier, setWinningMultiplier] = useState<number | undefined>()
   const [isSpinning, setIsSpinning] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const possibleMultipliers = config.multipliers.map((m) => Number(m))
 
@@ -113,13 +156,20 @@ function InteractiveWheelGameControls({
   return (
     <div className={theme}>
       <div className="flex flex-col items-center space-y-4">
-        <div className="relative w-[304px] h-[198px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden">
+        <div
+          ref={containerRef}
+          className="relative w-[304px] h-[198px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden"
+        >
           <WheelGameControls
             config={config}
             winningMultiplier={winningMultiplier}
             multiplier={multiplier}
             isDisabled={isDisabled || isSpinning}
             theme={theme}
+            betAmount={betAmount}
+            token={token}
+            houseEdge={houseEdge}
+            parent={containerRef}
           />
         </div>
 
@@ -156,6 +206,28 @@ export const DarkThemeDefault: Story = {
     docs: {
       description: {
         story: "Dark theme wheel game controls. Click 'Spin Wheel' to see the animation.",
+      },
+    },
+  },
+}
+
+export const WithTooltips: Story = {
+  name: "With Tooltips - Interactive",
+  render: () => (
+    <InteractiveWheelGameControls
+      theme="dark"
+      betAmount={parseUnits("0.5", 18)}
+      token={mockToken}
+      houseEdge={150}
+    />
+  ),
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Wheel game controls with custom tooltips showing win chance and target profit. Hover over multiplier badges to see tooltips with calculated data based on bet amount (0.5 ETH) and house edge (1.5%).",
       },
     },
   },
