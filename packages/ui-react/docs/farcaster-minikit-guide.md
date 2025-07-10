@@ -144,9 +144,6 @@ FARCASTER_PAYLOAD=
 FARCASTER_SIGNATURE=
 ```
 
-If you added environment variables for the manifest (e.g., NEXT_PUBLIC_URL) in Vercel project settings after deployment, you need to redeploy. Go to deployments, navigate to your project and click redeploy.   
-![Testing mini-app](screenshots/redeploy.png)
-
 **Manifest properties:**
 Complete list of all available manifest properties with descriptions - [Define your application configuration](https://miniapps.farcaster.xyz/docs/guides/publishing#define-your-application-configuration). 
 
@@ -164,6 +161,7 @@ npm i -g vercel
 # Run deployment from root project
 vercel
 ```
+If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find your public domain in the project settings on Vercel.
 
 **Git Integration**
 * Sign in to [vercel.com](https://vercel.com) with GitHub
@@ -171,6 +169,11 @@ vercel
 * Select your repository
 * Click "Import" → "Deploy"
 * Get public URL after ~2 minutes
+
+If you added environment variables for the manifest (e.g., NEXT_PUBLIC_URL) in Vercel project settings after deployment, you need to redeploy. Go to deployments, navigate to your project and click redeploy.   
+![Redeploy](screenshots/redeploy.png)
+
+[Managing Deployments](https://vercel.com/docs/projects/project-dashboard#deployments)
 
 ## Publish and Test mini-app in Farcaster
 Detailed instructions can be found here - https://miniapps.farcaster.xyz/docs/guides/publishing#steps
