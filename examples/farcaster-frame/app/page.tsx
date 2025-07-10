@@ -58,7 +58,7 @@ export default function App() {
           <div>{saveFrameButton}</div>
         </header>
 
-        <main className="flex-1">
+        <main className="flex justify-center">
           <DiceGame />
         </main>
 

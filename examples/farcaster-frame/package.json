@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@betswirl/ui": "^0.0.18",
+    "@betswirl/ui": "^0.0.20",
     "@coinbase/onchainkit": "latest",
     "@farcaster/frame-sdk": "^0.0.60",
     "@tanstack/react-query": "^5",
