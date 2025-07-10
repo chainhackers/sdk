@@ -66,7 +66,7 @@ export async function claimLeaderboardRewards(
     const effectivePollingInterval = pollingInterval || casinoChain?.options.pollingInterval;
     const receipt = await wallet.waitTransaction(tx, effectivePollingInterval);
     return { receipt, result };
-  } catch (error) {
+  } catch (_error) {
     throw new TransactionError(
       `Error claiming rewards from leaderboard #${leaderboard.id} on chain ${leaderboard.chainId}`,
       ERROR_CODES.TRANSACTION.TOKEN_APPROVAL_ERROR,

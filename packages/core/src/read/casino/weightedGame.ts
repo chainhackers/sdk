@@ -156,12 +156,12 @@ export const weightedGameCachedConfigurations: WeightedGameCachedConfigurationsP
 };
 
 export const gameIdByWeightedGameId = {
-  [1]: CASINO_GAME_TYPE.WHEEL,
-  /*[2]: Plinko,
-  [3]: Mines,
-  [4]: Diamonds,
-  [5]: SLIDE,
-  [6]: Slot,*/
+  1: CASINO_GAME_TYPE.WHEEL,
+  /*2: Plinko,
+  3: Mines,
+  4: Diamonds,
+  5: SLIDE,
+  6: Slot,*/
 } as const;
 
 /**
