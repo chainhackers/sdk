@@ -144,7 +144,7 @@ FARCASTER_PAYLOAD=
 FARCASTER_SIGNATURE=
 ```
 
-If you added environment variables for the manifest (e.g., NEXT_PUBLIC_URL) in Vercel project settings after deployment, you need to redeploy. Go to deployments, navigate to your project and click redeploy.
+If you added environment variables for the manifest (e.g., NEXT_PUBLIC_URL) in Vercel project settings after deployment, you need to redeploy. Go to deployments, navigate to your project and click redeploy.   
 ![Testing mini-app](screenshots/redeploy.png)
 
 **Manifest properties:**
