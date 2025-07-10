@@ -1,27 +1,26 @@
-import { defineConfig, devices } from "@playwright/test"
+import { defineConfig } from "@playwright/test"
+import { defineSynpressConfig } from "@synthetixio/synpress"
 import { config } from "./app.config"
 
-export default defineConfig({
-  testDir: "./tests",
-  fullyParallel: false,
-  forbidOnly: false,
-  retries: 2,
-  workers: 1,
-  reporter: "html",
-  timeout: 120 * 1000,
-  expect: {
-    timeout: 7 * 1000,
-  },
-  use: {
-    baseURL: config.baseUrl,
-    trace: "on-first-retry",
-    headless: false,
-  },
-  projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+export default defineConfig(
+  defineSynpressConfig({
+    testDir: "./tests",
+    timeout: 120000,
+    fullyParallel: false,
+    forbidOnly: false,
+    retries: 2,
+    workers: 1,
+    reporter: "html",
+    expect: {
+      timeout: 7000,
     },
-  ],
-  // Additional Synpress-specific configuration can be added here
-})
+    use: {
+      headless: false,
+      chromiumChannel: "chromium",
+      baseURL: config.baseUrl,
+      actionTimeout: 60000,
+      trace: "on-first-retry",
+      video: "retain-on-failure",
+    },
+  }),
+)
