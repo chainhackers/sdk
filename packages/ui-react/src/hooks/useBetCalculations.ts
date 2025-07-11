@@ -1,20 +1,13 @@
-import {
-  CASINO_GAME_TYPE,
-  CoinToss,
-  Dice,
-  getPayoutDetails,
-  KenoConfiguration,
-  Roulette,
-} from "@betswirl/sdk-core"
+import { getPayoutDetails } from "@betswirl/sdk-core"
 import { useMemo } from "react"
-import { GameChoice } from "../types/types"
+import { GameChoice, GameDefinition } from "../types/types"
 
-interface UseBetCalculationsProps {
-  selection: GameChoice
+interface UseBetCalculationsProps<T extends GameChoice> {
+  selection: T
   houseEdge: number
   betAmount: bigint | undefined
   betCount: number | undefined
-  kenoConfig?: KenoConfiguration
+  gameDefinition: GameDefinition<T>
 }
 
 interface UseBetCalculationsResult {
@@ -26,31 +19,6 @@ interface UseBetCalculationsResult {
   netPayout: bigint
   betSwirlFees: bigint
   formattedNetMultiplier: number
-}
-
-function getMultiplierForGame(selection: GameChoice, kenoConfig?: KenoConfiguration): number {
-  switch (selection.game) {
-    case CASINO_GAME_TYPE.COINTOSS:
-      return CoinToss.getMultiplier(selection.choice)
-    case CASINO_GAME_TYPE.DICE:
-      return Dice.getMultiplier(selection.choice)
-    case CASINO_GAME_TYPE.ROULETTE:
-      return Roulette.getMultiplier(selection.choice)
-    case CASINO_GAME_TYPE.KENO: {
-      if (!kenoConfig) {
-        console.warn("Keno configuration is required for Keno multiplier calculation")
-        return 0
-      }
-
-      const selectedCount = selection.choice.length
-      if (selectedCount === 0) return 0
-
-      const multipliers = kenoConfig.multiplierTable[selectedCount] || []
-      return Math.max(...multipliers, 0)
-    }
-    default:
-      throw new Error(`Unsupported game type: ${(selection as any).game}`)
-  }
 }
 
 /**
@@ -74,17 +42,16 @@ function getMultiplierForGame(selection: GameChoice, kenoConfig?: KenoConfigurat
  * })
  * ```
  */
-export function useBetCalculations({
+export function useBetCalculations<T extends GameChoice>({
   selection,
   houseEdge,
   betAmount,
   betCount = 1,
-  kenoConfig,
-}: UseBetCalculationsProps): UseBetCalculationsResult {
-  const grossMultiplier = useMemo(
-    () => getMultiplierForGame(selection, kenoConfig),
-    [selection, kenoConfig],
-  )
+  gameDefinition,
+}: UseBetCalculationsProps<T>): UseBetCalculationsResult {
+  const grossMultiplier = useMemo(() => {
+    return gameDefinition.getMultiplier(selection.choice)
+  }, [selection, gameDefinition])
   const totalBetAmount = useMemo(
     () => (betAmount && betAmount > 0n ? betAmount * BigInt(betCount) : 0n),
     [betAmount, betCount],

@@ -2,21 +2,12 @@ import {
   BetSwirlWallet,
   CASINO_GAME_TYPE,
   CasinoChainId,
-  CoinToss,
   casinoChainById,
-  Dice,
   GenericCasinoBetParams,
   getPlaceBetEventData,
   getPlaceBetFunctionData,
   getPlacedBetFromReceipt,
   getRollEventData,
-  Keno,
-  KenoConfiguration,
-  MAX_SELECTABLE_DICE_NUMBER,
-  MAX_SELECTABLE_ROULETTE_NUMBER,
-  MIN_SELECTABLE_DICE_NUMBER,
-  MIN_SELECTABLE_ROULETTE_NUMBER,
-  Roulette,
 } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { decodeEventLog, Hex } from "viem"
@@ -24,15 +15,15 @@ import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteCont
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
-import { BetStatus, GameChoice, GameEncodedInput, GameResult, TokenWithImage } from "../types/types"
+import { BetStatus, GameChoice, GameDefinition, GameResult, TokenWithImage } from "../types/types"
 import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
 
 const logger = createLogger("usePlaceBet")
 
-export interface IUsePlaceBetReturn {
-  placeBet: (betAmount: bigint, choice: GameChoice) => Promise<void>
+export interface IUsePlaceBetReturn<T extends GameChoice = GameChoice> {
+  placeBet: (betAmount: bigint, choice: T) => Promise<void>
   betStatus: BetStatus
   isWaiting: boolean
   isError: unknown
@@ -43,65 +34,6 @@ export interface IUsePlaceBetReturn {
   formattedVrfFees: number
   wagerWriteHook: ReturnType<typeof useWriteContract>
   wagerWaitingHook: ReturnType<typeof useWaitForTransactionReceipt>
-}
-
-function _encodeGameInput(choice: GameChoice, kenoConfig?: KenoConfiguration): GameEncodedInput {
-  switch (choice.game) {
-    case CASINO_GAME_TYPE.COINTOSS:
-      return {
-        game: CASINO_GAME_TYPE.COINTOSS,
-        encodedInput: CoinToss.encodeInput(choice.choice),
-      }
-    case CASINO_GAME_TYPE.DICE: {
-      const choiceNum = Number(choice.choice)
-      if (choiceNum < MIN_SELECTABLE_DICE_NUMBER || choiceNum > MAX_SELECTABLE_DICE_NUMBER) {
-        throw new Error(
-          `Invalid dice number: ${choiceNum}. Must be between ${MIN_SELECTABLE_DICE_NUMBER} and ${MAX_SELECTABLE_DICE_NUMBER}`,
-        )
-      }
-      return {
-        game: CASINO_GAME_TYPE.DICE,
-        encodedInput: Dice.encodeInput(choice.choice),
-      }
-    }
-    case CASINO_GAME_TYPE.ROULETTE: {
-      const numbers = choice.choice
-      if (numbers.length === 0) throw new Error("Roulette bet must include at least one number")
-      if (
-        numbers.some(
-          (n) => n < MIN_SELECTABLE_ROULETTE_NUMBER || n > MAX_SELECTABLE_ROULETTE_NUMBER,
-        )
-      )
-        throw new Error(
-          `Roulette number out of range (${MIN_SELECTABLE_ROULETTE_NUMBER}-${MAX_SELECTABLE_ROULETTE_NUMBER})`,
-        )
-      return {
-        game: CASINO_GAME_TYPE.ROULETTE,
-        encodedInput: Roulette.encodeInput(numbers),
-      }
-    }
-    case CASINO_GAME_TYPE.KENO: {
-      const numbers = choice.choice
-      if (numbers.length === 0) throw new Error("Keno bet must include at least one number")
-
-      if (!kenoConfig) {
-        throw new Error("Keno configuration is required for Keno bets")
-      }
-
-      if (numbers.length > kenoConfig.maxSelectableBalls) {
-        throw new Error(
-          `Keno bet cannot include more than ${kenoConfig.maxSelectableBalls} numbers`,
-        )
-      }
-
-      return {
-        game: CASINO_GAME_TYPE.KENO,
-        encodedInput: Keno.encodeInput(numbers, kenoConfig),
-      }
-    }
-    default:
-      throw new Error(`Unsupported game type for encoding input: ${(choice as any).game}`)
-  }
 }
 
 /**
@@ -128,12 +60,12 @@ function _encodeGameInput(choice: GameChoice, kenoConfig?: KenoConfiguration): G
  * }
  * ```
  */
-export function usePlaceBet(
+export function usePlaceBet<T extends GameChoice>(
   game: CASINO_GAME_TYPE,
   token: TokenWithImage,
   refetchBalance: () => void,
-  kenoConfig?: KenoConfiguration,
-): IUsePlaceBetReturn {
+  gameDefinition: GameDefinition<T>,
+): IUsePlaceBetReturn<T> {
   const { appChainId } = useChain()
   const { affiliate } = useBettingConfig()
   const publicClient = usePublicClient({ chainId: appChainId })
@@ -228,14 +160,15 @@ export function usePlaceBet(
   }, [resetWatcher, wagerWriteHook.reset])
 
   const placeBet = useCallback(
-    async (betAmount: bigint, choice: GameChoice) => {
+    async (betAmount: bigint, choice: T) => {
       resetBetState()
       setCurrentBetAmount(betAmount)
 
-      const encodedInput = _encodeGameInput(choice, kenoConfig)
+      const encodedInput = gameDefinition.encodeInput(choice.choice)
+
       const betParams = {
         game,
-        gameEncodedInput: encodedInput.encodedInput,
+        gameEncodedInput: encodedInput,
         betAmount,
         tokenAddress: token.address,
       }
@@ -277,26 +210,26 @@ export function usePlaceBet(
       gasPrice,
       token,
       affiliate,
-      kenoConfig,
+      gameDefinition,
     ],
   )
 
   useEffect(() => {
     if (wagerWriteHook.error) {
-      logger.debug("_usePlaceBet: An error occured:", wagerWriteHook.error)
+      logger.debug("_usePlaceBet: An error occurred in wager write:", wagerWriteHook.error)
     }
   }, [wagerWriteHook.error])
 
   useEffect(() => {
     if (wagerWaitingHook.error) {
-      logger.debug("_usePlaceBet: An error occured:", wagerWaitingHook.error)
+      logger.debug("_usePlaceBet: An error occurred in wager waiting:", wagerWaitingHook.error)
     }
   }, [wagerWaitingHook.error])
 
   useEffect(() => {
     if (wagerWaitingHook.isSuccess) {
       setIsRolling(true)
-      const waitRoll = async () => {
+      const handleBetResult = async () => {
         const betId = await _extractBetIdFromReceipt(
           wagerWriteHook.data!,
           game,
@@ -343,7 +276,7 @@ export function usePlaceBet(
 
         refetchBalance()
       }
-      waitRoll()
+      handleBetResult()
     }
   }, [
     wagerWaitingHook.isSuccess,

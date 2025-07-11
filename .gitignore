@@ -25,4 +25,5 @@ tsconfig.tsbuildinfo
 .idea
 .mcp.json
 .npmrc
+
 .secrets

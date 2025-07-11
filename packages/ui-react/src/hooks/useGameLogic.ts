@@ -3,29 +3,34 @@ import {
   casinoChainById,
   chainById,
   chainNativeCurrencyToToken,
-  KenoConfiguration,
 } from "@betswirl/sdk-core"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { formatGwei, type Hex, zeroAddress } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useTokenContext } from "../context/tokenContext"
-import { BetStatus, GameChoice, GameResult, HistoryEntry, TokenWithImage } from "../types/types"
+import {
+  BetStatus,
+  GameChoice,
+  GameDefinition,
+  GameResult,
+  HistoryEntry,
+  TokenWithImage,
+} from "../types/types"
 import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
 import { useHouseEdge } from "./useHouseEdge"
 import { useIsGamePaused } from "./useIsGamePaused"
-import { useKenoConfiguration } from "./useKenoConfiguration"
+
 import { usePlaceBet } from "./usePlaceBet"
 import { useTokenAllowance } from "./useTokenAllowance"
 
-interface UseGameLogicProps {
-  gameType: CASINO_GAME_TYPE
-  defaultSelection: GameChoice
+interface UseGameLogicProps<T extends GameChoice> {
+  gameDefinition?: GameDefinition<T>
   backgroundImage: string
 }
 
-interface UseGameLogicResult {
+interface UseGameLogicResult<T extends GameChoice = GameChoice> {
   isWalletConnected: boolean
   address: string | undefined
   balance: bigint
@@ -36,8 +41,8 @@ interface UseGameLogicResult {
   refetchBalance: () => void
   betAmount: bigint | undefined
   setBetAmount: (amount: bigint | undefined) => void
-  selection: GameChoice
-  setSelection: (selection: GameChoice) => void
+  selection: T
+  setSelection: (selection: T) => void
   betStatus: BetStatus
   gameResult: GameResult | null
   resetBetState: () => void
@@ -51,9 +56,6 @@ interface UseGameLogicResult {
   isInGameResultState: boolean
   isGamePaused: boolean
   nativeCurrencySymbol: string
-  kenoConfig?: KenoConfiguration
-  kenoConfigLoading?: boolean
-  kenoConfigError?: Error | null
   themeSettings: {
     theme: "light" | "dark" | "system"
     customTheme?: {
@@ -65,7 +67,7 @@ interface UseGameLogicResult {
   }
   handlePlayButtonClick: () => void
   handleBetAmountChange: (amount: bigint | undefined) => void
-  placeBet: (betAmount: bigint, choice: GameChoice) => void
+  placeBet: (betAmount: bigint, choice: T) => void
   needsTokenApproval: boolean
   isApprovePending: boolean
   isApproveConfirming: boolean
@@ -95,22 +97,38 @@ interface UseGameLogicResult {
  * gameLogic.handlePlayButtonClick()
  * ```
  */
-export function useGameLogic({
-  gameType,
-  defaultSelection,
+export function useGameLogic<T extends GameChoice>({
+  gameDefinition,
   backgroundImage,
-}: UseGameLogicProps): UseGameLogicResult {
+}: UseGameLogicProps<T>): UseGameLogicResult<T> {
+  const defaultGameDefinition: GameDefinition<T> = useMemo(
+    () => ({
+      gameType: CASINO_GAME_TYPE.DICE,
+      defaultSelection: { game: CASINO_GAME_TYPE.DICE, choice: 20 } as T,
+      getMultiplier: () => 1,
+      encodeInput: () => 0,
+    }),
+    [],
+  )
+
+  const effectiveGameDefinition = gameDefinition || defaultGameDefinition
+  const { gameType, defaultSelection } = effectiveGameDefinition
+
   const { isConnected: isWalletConnected, address } = useAccount()
   const { gameHistory, refreshHistory } = useGameHistory(gameType)
   const { areChainsSynced, appChainId } = useChain()
 
   const { selectedToken } = useTokenContext()
 
-  // Determine the effective token to use
-  const token: TokenWithImage = selectedToken || {
-    ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
-    image: "", // Fallback for native currency - user should configure this
-  }
+  // Determine the effective token to use - memoize to prevent unnecessary re-renders
+  const token: TokenWithImage = useMemo(() => {
+    return (
+      selectedToken || {
+        ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
+        image: "", // Fallback for native currency - user should configure this
+      }
+    )
+  }, [selectedToken, appChainId])
 
   const { data: balance, refetch: refetchBalance } = useBalance({
     address,
@@ -126,20 +144,10 @@ export function useGameLogic({
   })
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
-  const [selection, setSelection] = useState<GameChoice>(defaultSelection)
-
-  const kenoConfiguration = useKenoConfiguration({
-    token,
-    query: { enabled: gameType === CASINO_GAME_TYPE.KENO },
-  })
-
-  const kenoConfigResult =
-    gameType === CASINO_GAME_TYPE.KENO
-      ? kenoConfiguration
-      : { config: undefined, loading: false, error: null }
+  const [selection, setSelection] = useState<T>(defaultSelection as T)
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
-    usePlaceBet(gameType, token, refetchBalance, kenoConfigResult.config)
+    usePlaceBet(gameType, token, refetchBalance, effectiveGameDefinition)
 
   // Reset bet state when chain or token changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
@@ -168,7 +176,7 @@ export function useGameLogic({
     houseEdge,
     betAmount,
     betCount: 1, // TODO #64: Use the real bet count
-    kenoConfig: kenoConfigResult.config,
+    gameDefinition: effectiveGameDefinition,
   })
 
   const isInGameResultState = !!gameResult
@@ -255,8 +263,5 @@ export function useGameLogic({
     approveToken,
     isRefetchingAllowance: allowanceReadWagmiHook.isRefetching,
     approveError: approveWriteWagmiHook.error || approveWaitingWagmiHook.error,
-    kenoConfig: kenoConfigResult.config,
-    kenoConfigLoading: kenoConfigResult.loading,
-    kenoConfigError: kenoConfigResult.error,
   }
 }

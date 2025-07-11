@@ -8,17 +8,10 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./packages/ui-react
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            /packages/ui-react/**/*
-            .github
-          sparse-checkout-cone-mode: false
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,7 +27,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build libs
+        run: pnpm build:libs
+
       - name: Build Storybook
+        working-directory: packages/ui-react
         run: pnpm build-storybook
 
       - name: Upload build artifacts

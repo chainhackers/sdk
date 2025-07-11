@@ -7,6 +7,7 @@ import {
 } from "@betswirl/sdk-core"
 import rouletteBackground from "../../assets/game/game-background.jpg"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { GameDefinition } from "../../types/types"
 import { GameFrame } from "./GameFrame"
 import { RouletteGameControls } from "./RouletteGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -14,6 +15,20 @@ import { BaseGameProps } from "./shared/types"
 import { useGameControls } from "./shared/useGameControls"
 
 const DEFAULT_ROULETTE_SELECTION: RouletteNumber[] = []
+
+const rouletteGameDefinition: GameDefinition<{
+  game: CASINO_GAME_TYPE.ROULETTE
+  choice: RouletteNumber[]
+}> = {
+  gameType: CASINO_GAME_TYPE.ROULETTE,
+  defaultSelection: {
+    game: CASINO_GAME_TYPE.ROULETTE,
+    choice: DEFAULT_ROULETTE_SELECTION,
+  },
+  getMultiplier: (choice) => Roulette.getMultiplier(choice),
+  encodeInput: (choice) => Roulette.encodeInput(choice),
+  getWinChancePercent: (choice) => Roulette.getWinChancePercent(choice),
+}
 
 export interface RouletteGameProps extends BaseGameProps {}
 
@@ -53,11 +68,7 @@ export function RouletteGame({
     isRefetchingAllowance,
     approveError,
   } = useGameLogic({
-    gameType: CASINO_GAME_TYPE.ROULETTE,
-    defaultSelection: {
-      game: CASINO_GAME_TYPE.ROULETTE,
-      choice: DEFAULT_ROULETTE_SELECTION,
-    },
+    gameDefinition: rouletteGameDefinition,
     backgroundImage,
   })
 
