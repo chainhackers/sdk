@@ -1,26 +1,14 @@
-import { WeightedGameConfiguration } from "@betswirl/sdk-core"
-import * as TooltipPrimitive from "@radix-ui/react-tooltip"
-import { useCallback, useEffect, useState } from "react"
+import { BP_VALUE, WeightedGameConfiguration } from "@betswirl/sdk-core"
+import { RefObject, useEffect, useState } from "react"
 import wheelArrow from "../../assets/game/wheel-arrow.svg"
 import wheelDark from "../../assets/game/wheel-dark.svg"
 import wheelLight from "../../assets/game/wheel-light.svg"
-import { Theme, TokenWithImage } from "../../types/types"
-import { TokenIcon } from "../ui/TokenIcon"
-import { Tooltip, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
+import { useWheelAnimation } from "../../hooks/useWheelAnimation"
+import { Theme } from "../../types/types"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
-import { GameControlsProps } from "./shared/types"
 
-interface WheelGameControlsProps extends GameControlsProps {
-  config: WeightedGameConfiguration
-  winningMultiplier?: number
-  theme?: Theme
-  betAmount?: bigint
-  token?: TokenWithImage
-  houseEdge?: number
-  parent?: React.RefObject<HTMLDivElement | null>
-}
-
-interface WheelSegment {
+export interface WheelSegment {
   index: number
   multiplier: number
   formattedMultiplier: string
@@ -30,31 +18,56 @@ interface WheelSegment {
   weight: bigint
 }
 
+interface WheelGameControlsProps {
+  config: WeightedGameConfiguration
+  isSpinning: boolean
+  winningMultiplier?: number
+  theme?: Theme
+  parent?: RefObject<HTMLDivElement>
+  onSpinComplete?: () => void
+  tooltipContent?: Record<
+    number,
+    {
+      chance?: string
+      profit?: React.ReactNode
+    }
+  >
+}
+
 interface WheelProps {
   rotationAngle: number
   isSpinning: boolean
   multiplier: number
   hasCompletedSpin?: boolean
   theme?: Theme
+  winningMultiplier?: number
 }
 
-const SPIN_DURATION = 4000
+const SPIN_DURATION = 3000
+const CONTINUOUS_SPIN_DURATION = 1000
 
-const WHEEL_ANIMATION_CONFIG = {
-  MIN_ROTATIONS: 5,
-  MAX_ADDITIONAL_ROTATIONS: 3,
-  MAX_RANDOM_OFFSET: 16,
-} as const
+/**
+ * Formats a multiplier value for display
+ * @param multiplier - The multiplier value as bigint
+ * @returns Formatted string representation (e.g., "1.50x", "0.00x")
+ */
+function formatMultiplier(multiplier: bigint): string {
+  return multiplier === 0n ? "0.00x" : `${(Number(multiplier) / BP_VALUE).toFixed(2)}x`
+}
 
-export function createWheelSegments(config: WeightedGameConfiguration): WheelSegment[] {
+/**
+ * Creates wheel segments from game configuration
+ * @param config - The weighted game configuration
+ * @returns Array of wheel segments with calculated angles and formatting
+ */
+function createWheelSegments(config: WeightedGameConfiguration): WheelSegment[] {
   const totalSegments = config.multipliers.length
   const anglePerSegment = 360 / totalSegments
 
   return config.multipliers.map((multiplier, index) => {
     const startAngle = index * anglePerSegment
     const endAngle = (index + 1) * anglePerSegment
-    const formattedMultiplier =
-      multiplier === 0n ? "0.00x" : `${(Number(multiplier) / 10000).toFixed(2)}x`
+    const formattedMultiplier = formatMultiplier(multiplier)
 
     return {
       index,
@@ -68,54 +81,39 @@ export function createWheelSegments(config: WeightedGameConfiguration): WheelSeg
   })
 }
 
-function getTargetAngleForMultiplier(segments: WheelSegment[], winningMultiplier: number): number {
-  const winningSegments = segments.filter((segment) => segment.multiplier === winningMultiplier)
-  if (winningSegments.length === 0) {
-    return 0
-  }
-
-  const randomSegment = winningSegments[Math.floor(Math.random() * winningSegments.length)]
-  const fullRotations =
-    WHEEL_ANIMATION_CONFIG.MIN_ROTATIONS +
-    Math.floor(Math.random() * WHEEL_ANIMATION_CONFIG.MAX_ADDITIONAL_ROTATIONS)
-  const randomOffset = (Math.random() > 0.5 ? 1 : -1) * Math.random() * WHEEL_ANIMATION_CONFIG.MAX_RANDOM_OFFSET
-  const targetAngle = fullRotations * 360 - randomSegment.startAngle + randomOffset
-
-  return targetAngle
-}
-
 function Wheel({
   rotationAngle,
   isSpinning,
   multiplier,
   hasCompletedSpin = false,
   theme = "light",
+  winningMultiplier,
 }: WheelProps) {
-  const [currentAngle, setCurrentAngle] = useState(0)
   const shouldShowMultiplier = hasCompletedSpin && !isSpinning
   const wheelSrc = theme === "dark" ? wheelDark : wheelLight
 
-  useEffect(() => {
-    if (rotationAngle !== currentAngle) {
-      setCurrentAngle(rotationAngle)
-    }
-  }, [rotationAngle, currentAngle])
+  // Determine if we should use transition (only when decelerating to final position with a result)
+  const shouldUseTransition = isSpinning && winningMultiplier !== undefined
 
   return (
     <>
-      <div className="relative w-[192px] h-[148px] mx-auto">
+      <div className={"relative w-[192px] h-[148px] mx-auto"}>
         <div
-          className={`absolute inset-0 flex items-center justify-center top-[12px] ${
-            isSpinning ? "wheel-spinning" : ""
-          }`}
-          style={{ transform: `rotate(${currentAngle}deg)` }}
+          className={"absolute inset-0 flex items-center justify-center top-[12px]"}
+          style={{
+            transform: `rotate(${rotationAngle}deg)`,
+            transition: shouldUseTransition
+              ? `transform ${SPIN_DURATION}ms cubic-bezier(0.25, 0.1, 0.25, 1)`
+              : "none",
+            transformOrigin: "center center",
+          }}
         >
           <img src={wheelSrc} alt="Wheel colors" className="w-full h-full object-contain" />
         </div>
         {shouldShowMultiplier && (
           <GameMultiplierDisplay
             multiplier={multiplier}
-            className="absolute text-wheel-multiplier-text top-[80px] text-[18px]"
+            className={"absolute text-wheel-multiplier-text top-[80px] text-[18px]"}
           />
         )}
       </div>
@@ -126,57 +124,32 @@ function Wheel({
 
 export function WheelGameControls({
   config,
+  isSpinning,
   winningMultiplier,
-  multiplier,
   theme = "light",
-  betAmount = 0n,
-  token,
   parent: containerRef,
+  onSpinComplete,
+  tooltipContent,
 }: WheelGameControlsProps) {
   const [segments, setSegments] = useState<WheelSegment[]>([])
-  const [rotationAngle, setRotationAngle] = useState(0)
-  const [isSpinning, setIsSpinning] = useState(false)
-  const [hasResult, setHasResult] = useState(false)
-  const [displayedWinningMultiplier, setDisplayedWinningMultiplier] = useState<number | undefined>()
-
-  const resetWheelState = useCallback(() => {
-    setHasResult(false)
-    setDisplayedWinningMultiplier(undefined)
-  }, [])
-
-  const getDisplayMultiplier = (): number => {
-    return displayedWinningMultiplier !== undefined
-      ? displayedWinningMultiplier / 10000
-      : multiplier
-  }
-
-  const isMultiplierWinning = (itemMultiplier: number): boolean => {
-    return hasResult && displayedWinningMultiplier === itemMultiplier
-  }
 
   useEffect(() => {
     const wheelSegments = createWheelSegments(config)
     setSegments(wheelSegments)
   }, [config])
 
-  useEffect(() => {
-    if (winningMultiplier === undefined) {
-      resetWheelState()
-    } else if (winningMultiplier !== displayedWinningMultiplier && segments.length > 0) {
-      resetWheelState()
-      setIsSpinning(true)
-      const targetAngle = getTargetAngleForMultiplier(segments, winningMultiplier)
-      setRotationAngle(targetAngle)
+  const { rotationAngle, displayedMultiplier, hasResult } = useWheelAnimation({
+    spinDuration: SPIN_DURATION,
+    continuousSpinDuration: CONTINUOUS_SPIN_DURATION,
+    isSpinning,
+    winningMultiplier: winningMultiplier ?? null,
+    segments,
+    onSpinComplete: onSpinComplete ?? (() => {}),
+  })
 
-      const timer = setTimeout(() => {
-        setIsSpinning(false)
-        setDisplayedWinningMultiplier(winningMultiplier)
-        setHasResult(true)
-      }, SPIN_DURATION)
-
-      return () => clearTimeout(timer)
-    }
-  }, [winningMultiplier, segments, displayedWinningMultiplier, resetWheelState])
+  const isMultiplierWinning = (itemMultiplier: number): boolean => {
+    return hasResult && winningMultiplier === itemMultiplier
+  }
 
   const uniqueMultipliers = segments
     .reduce(
@@ -201,58 +174,42 @@ export function WheelGameControls({
     item: { multiplier: number; formattedMultiplier: string; color: string }
   }) => {
     const isWinning = isMultiplierWinning(item.multiplier)
+    const itemTooltipContent = tooltipContent?.[item.multiplier]
+    const hasTooltip =
+      itemTooltipContent && (itemTooltipContent.chance || itemTooltipContent.profit)
 
-    if (!token || !betAmount || betAmount === 0n) {
-      return (
-        <div
-          className={`flex h-[24px] w-[49px] items-center justify-center rounded-[2px] backdrop-blur-sm bg-wheel-multiplier-bg text-wheel-multiplier-text wheel-multiplier-item ${
-            isWinning ? "wheel-multiplier-winning" : ""
-          }`}
-          style={
-            {
-              "--wheel-color": item.color,
-            } as React.CSSProperties
-          }
-        >
-          <span className="text-xs font-bold">{item.formattedMultiplier}</span>
-        </div>
-      )
+    const multiplierContent = (
+      <div
+        className={`flex h-[24px] w-[49px] items-center justify-center rounded-[2px] backdrop-blur-sm bg-wheel-multiplier-bg text-wheel-multiplier-text wheel-multiplier-item ${
+          isWinning ? "wheel-multiplier-winning" : ""
+        }`}
+        style={
+          {
+            "--wheel-color": item.color,
+          } as React.CSSProperties
+        }
+      >
+        <span className="text-xs font-bold">{item.formattedMultiplier}</span>
+      </div>
+    )
+
+    if (!hasTooltip) {
+      return multiplierContent
     }
 
     return (
       <Tooltip>
-        <TooltipTrigger asChild>
-          <div
-            className={`flex h-[24px] w-[49px] items-center justify-center rounded-[2px] backdrop-blur-sm bg-wheel-multiplier-bg text-wheel-multiplier-text wheel-multiplier-item cursor-default ${
-              isWinning ? "wheel-multiplier-winning" : ""
-            }`}
-            style={
-              {
-                "--wheel-color": item.color,
-              } as React.CSSProperties
-            }
-          >
-            <span className="text-xs font-bold">{item.formattedMultiplier}</span>
+        <TooltipTrigger asChild>{multiplierContent}</TooltipTrigger>
+        <TooltipContent side="top" collisionBoundary={containerRef?.current} collisionPadding={19}>
+          <div className="flex flex-col gap-1">
+            {itemTooltipContent.chance && (
+              <div className="text-xs">Chance to draw: {itemTooltipContent.chance}</div>
+            )}
+            {itemTooltipContent.profit && (
+              <div className="text-xs">Target profit: {itemTooltipContent.profit}</div>
+            )}
           </div>
-        </TooltipTrigger>
-        <TooltipPrimitive.Content
-          side="top"
-          sideOffset={5}
-          collisionBoundary={containerRef?.current}
-          collisionPadding={19}
-          className="px-2 py-1 text-xs font-medium rounded-[2px] bg-wheel-multiplier-bg text-wheel-multiplier-text border-none shadow-none flex flex-col items-start gap-1 z-50"
-        >
-          <div className="flex items-center gap-1">
-            <span>Chance to draw: </span>
-            <span className="text-game-win font-bold">{20}%</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span>Target profit: </span>
-            <span className="font-bold">{1.4}</span>
-            <TokenIcon token={token} size={15} />
-          </div>
-          <TooltipPrimitive.Arrow className="fill-wheel-multiplier-bg z-50" width={10} height={5} />
-        </TooltipPrimitive.Content>
+        </TooltipContent>
       </Tooltip>
     )
   }
@@ -263,12 +220,13 @@ export function WheelGameControls({
         <Wheel
           rotationAngle={rotationAngle}
           isSpinning={isSpinning}
-          multiplier={getDisplayMultiplier()}
+          multiplier={displayedMultiplier}
           hasCompletedSpin={hasResult}
           theme={theme}
+          winningMultiplier={winningMultiplier}
         />
 
-        <div className="flex flex-wrap justify-center gap-[6px] w-full">
+        <div className={"flex flex-wrap justify-center gap-[6px] w-full"}>
           {uniqueMultipliers.map((item) => (
             <MultiplierItem key={item.multiplier} item={item} />
           ))}

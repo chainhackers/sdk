@@ -1,10 +1,8 @@
 import { CASINO_GAME_TYPE, WeightedGameConfiguration } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { useRef, useState } from "react"
-import { parseUnits } from "viem"
 import { WheelGameControls } from "../../components/game/WheelGameControls"
 import { Button } from "../../components/ui/button"
-import { Theme, TokenWithImage } from "../../types/types"
 
 const mockWheelConfig: WeightedGameConfiguration = {
   configId: 0,
@@ -25,17 +23,6 @@ const mockWheelConfig: WeightedGameConfiguration = {
     "#EC9E3C",
   ],
 }
-
-const mockToken: TokenWithImage = {
-  address: "0x0000000000000000000000000000000000000000",
-  symbol: "ETH",
-  decimals: 18,
-  image:
-    "https://ethereum.org/static/6b935ac0e6194247347855dc3d328e83/6ed5f/eth-diamond-black.webp",
-}
-
-const mockBetAmount = parseUnits("0.1", 18) // 0.1 ETH
-const mockHouseEdge = 100 // 1% in basis points
 
 const meta = {
   title: "Game/Controls/WheelGameControls",
@@ -61,6 +48,14 @@ const meta = {
         defaultValue: { summary: "mockWheelConfig" },
       },
     },
+    isSpinning: {
+      control: "boolean",
+      description: "Controls whether the wheel is spinning",
+      table: {
+        type: { summary: "boolean" },
+        defaultValue: { summary: "false" },
+      },
+    },
     winningMultiplier: {
       control: { type: "number", min: 0, max: 31250, step: 1 },
       description: "Winning multiplier to animate to (in BP)",
@@ -69,44 +64,37 @@ const meta = {
         defaultValue: { summary: "undefined" },
       },
     },
-    multiplier: {
-      control: { type: "number", min: 1, max: 10, step: 0.01 },
-      description: "Current multiplier displayed above the wheel",
+    theme: {
+      control: { type: "radio" },
+      options: ["light", "dark"],
+      description: "Visual theme of the wheel",
       table: {
-        type: { summary: "number" },
-        defaultValue: { summary: "2.5" },
+        type: { summary: '"light" | "dark"' },
+        defaultValue: { summary: '"dark"' },
       },
     },
-    isDisabled: {
-      control: "boolean",
-      description: "Whether the wheel controls are disabled",
+    parent: {
+      control: false,
+      description: "Parent container ref for tooltip boundaries",
       table: {
-        type: { summary: "boolean" },
-        defaultValue: { summary: "false" },
+        type: { summary: "RefObject<HTMLDivElement>" },
+        defaultValue: { summary: "undefined" },
       },
     },
-    betAmount: {
-      control: "text",
-      description: "Bet amount in wei (for tooltip calculations)",
+    onSpinComplete: {
+      action: "onSpinComplete",
+      description: "Callback when spin animation completes",
       table: {
-        type: { summary: "bigint" },
-        defaultValue: { summary: "parseUnits('0.1', 18)" },
+        type: { summary: "() => void" },
+        defaultValue: { summary: "undefined" },
       },
     },
-    token: {
+    tooltipContent: {
       control: "object",
-      description: "Token information for tooltip display",
+      description: "Tooltip content for each multiplier",
       table: {
-        type: { summary: "TokenWithImage" },
-        defaultValue: { summary: "ETH token" },
-      },
-    },
-    houseEdge: {
-      control: "number",
-      description: "House edge in basis points (100 = 1%)",
-      table: {
-        type: { summary: "number" },
-        defaultValue: { summary: "100" },
+        type: { summary: "Record<number, { chance?: string; profit?: React.ReactNode }>" },
+        defaultValue: { summary: "undefined" },
       },
     },
   },
@@ -117,40 +105,59 @@ type Story = StoryObj<typeof meta>
 
 function InteractiveWheelGameControls({
   config = mockWheelConfig,
-  multiplier = 2.5,
-  isDisabled = false,
-  theme = "dark",
-  betAmount = mockBetAmount,
-  token = mockToken,
-  houseEdge = mockHouseEdge,
+  theme = "dark" as "light" | "dark",
+  tooltipContent,
 }: {
   config?: WeightedGameConfiguration
-  multiplier?: number
-  isDisabled?: boolean
-  theme?: Theme
-  betAmount?: bigint
-  token?: TokenWithImage
-  houseEdge?: number
+  theme?: "light" | "dark"
+  tooltipContent?: Record<number, { chance?: string; profit?: React.ReactNode }>
 }) {
   const [winningMultiplier, setWinningMultiplier] = useState<number | undefined>()
   const [isSpinning, setIsSpinning] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [spinMode, setSpinMode] = useState<"continuous" | "landing">("continuous")
+  const containerRef = useRef<HTMLDivElement>(null!)
 
   const possibleMultipliers = config.multipliers.map((m) => Number(m))
 
-  const handleSpin = () => {
+  const handleContinuousSpin = () => {
     if (isSpinning) return
-
+    setSpinMode("continuous")
     setIsSpinning(true)
     setWinningMultiplier(undefined)
+  }
 
-    const randomMultiplier =
-      possibleMultipliers[Math.floor(Math.random() * possibleMultipliers.length)]
-
-    setTimeout(() => {
+  const handleSpinWithResult = () => {
+    if (isSpinning && spinMode === "continuous") {
+      // If already spinning continuously, land on a random multiplier
+      const randomMultiplier =
+        possibleMultipliers[Math.floor(Math.random() * possibleMultipliers.length)]
       setWinningMultiplier(randomMultiplier)
+      setSpinMode("landing")
+    } else if (!isSpinning) {
+      // Start spinning and land on a result
+      setSpinMode("landing")
+      setIsSpinning(true)
+      setWinningMultiplier(undefined)
+
+      const randomMultiplier =
+        possibleMultipliers[Math.floor(Math.random() * possibleMultipliers.length)]
+
+      setTimeout(() => {
+        setWinningMultiplier(randomMultiplier)
+      }, 500)
+    }
+  }
+
+  const handleStop = () => {
+    setIsSpinning(false)
+    setWinningMultiplier(undefined)
+  }
+
+  const handleSpinComplete = () => {
+    console.log("Spin completed!")
+    setTimeout(() => {
       setIsSpinning(false)
-    }, 500)
+    }, 1000)
   }
 
   return (
@@ -162,21 +169,37 @@ function InteractiveWheelGameControls({
         >
           <WheelGameControls
             config={config}
+            isSpinning={isSpinning}
             winningMultiplier={winningMultiplier}
-            multiplier={multiplier}
-            isDisabled={isDisabled || isSpinning}
             theme={theme}
-            betAmount={betAmount}
-            token={token}
-            houseEdge={houseEdge}
             parent={containerRef}
+            onSpinComplete={handleSpinComplete}
+            tooltipContent={tooltipContent}
           />
         </div>
 
         <div className="flex space-x-2">
-          <Button onClick={handleSpin} disabled={isSpinning || isDisabled} size="sm">
-            {isSpinning ? "Spinning..." : "Spin Wheel"}
+          <Button onClick={handleContinuousSpin} disabled={isSpinning} size="sm">
+            Start Continuous Spin
           </Button>
+          <Button onClick={handleSpinWithResult} size="sm">
+            {isSpinning && spinMode === "continuous" ? "Land on Result" : "Spin & Land"}
+          </Button>
+          {isSpinning && (
+            <Button onClick={handleStop} variant="destructive" size="sm">
+              Stop
+            </Button>
+          )}
+        </div>
+        <div className="text-sm text-muted-foreground">
+          {isSpinning && spinMode === "continuous" && "Spinning continuously..."}
+          {isSpinning &&
+            spinMode === "landing" &&
+            winningMultiplier !== undefined &&
+            "Landing on result..."}
+          {!isSpinning &&
+            winningMultiplier !== undefined &&
+            `Landed on: ${(winningMultiplier / 10000).toFixed(2)}x`}
         </div>
       </div>
     </div>
@@ -185,7 +208,16 @@ function InteractiveWheelGameControls({
 
 export const LightThemeDefault: Story = {
   name: "Light Theme - Default",
-  render: () => <InteractiveWheelGameControls theme="light" />,
+  render: () => {
+    const tooltipContent = {
+      0: { chance: "50%", profit: "0" },
+      14580: { chance: "10%", profit: <span className="text-green-500">1.40</span> },
+      18760: { chance: "10%", profit: <span className="text-blue-500">1.80</span> },
+      20830: { chance: "10%", profit: <span className="text-purple-500">2.00</span> },
+      31250: { chance: "10%", profit: <span className="text-orange-500">3.00</span> },
+    }
+    return <InteractiveWheelGameControls theme="light" tooltipContent={tooltipContent} />
+  },
   args: {} as any,
   parameters: {
     backgrounds: { default: "light" },
@@ -199,35 +231,22 @@ export const LightThemeDefault: Story = {
 
 export const DarkThemeDefault: Story = {
   name: "Dark Theme - Default",
-  render: () => <InteractiveWheelGameControls theme="dark" />,
+  render: () => {
+    const tooltipContent = {
+      0: { chance: "50%", profit: "0" },
+      14580: { chance: "10%", profit: <span className="text-green-500">1.40</span> },
+      18760: { chance: "10%", profit: <span className="text-blue-500">1.80</span> },
+      20830: { chance: "10%", profit: <span className="text-purple-500">2.00</span> },
+      31250: { chance: "10%", profit: <span className="text-orange-500">3.00</span> },
+    }
+    return <InteractiveWheelGameControls theme="dark" tooltipContent={tooltipContent} />
+  },
   args: {} as any,
   parameters: {
     backgrounds: { default: "dark" },
     docs: {
       description: {
         story: "Dark theme wheel game controls. Click 'Spin Wheel' to see the animation.",
-      },
-    },
-  },
-}
-
-export const WithTooltips: Story = {
-  name: "With Tooltips - Interactive",
-  render: () => (
-    <InteractiveWheelGameControls
-      theme="dark"
-      betAmount={parseUnits("0.5", 18)}
-      token={mockToken}
-      houseEdge={150}
-    />
-  ),
-  args: {} as any,
-  parameters: {
-    backgrounds: { default: "dark" },
-    docs: {
-      description: {
-        story:
-          "Wheel game controls with custom tooltips showing win chance and target profit. Hover over multiplier badges to see tooltips with calculated data based on bet amount (0.5 ETH) and house edge (1.5%).",
       },
     },
   },

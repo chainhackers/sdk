@@ -362,6 +362,19 @@
     transition: transform 4s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
+  .wheel-continuous-spin {
+    animation: spin-continuous 2s linear infinite;
+  }
+
+  @keyframes spin-continuous {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   .wheel-multiplier-item {
     box-shadow: 0px 3px 0px 0px var(--wheel-color);
   }
