@@ -4,8 +4,9 @@ import wheelArrow from "../../assets/game/wheel-arrow.svg"
 import wheelDark from "../../assets/game/wheel-dark.svg"
 import wheelLight from "../../assets/game/wheel-light.svg"
 import { useWheelAnimation } from "../../hooks/useWheelAnimation"
-import { Theme } from "../../types/types"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
+import { Theme, TokenWithImage } from "../../types/types"
+import { TokenIcon } from "../ui/TokenIcon"
+import { Tooltip, TooltipPrimitive, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 import { GameMultiplierDisplay } from "./shared/GameMultiplierDisplay"
 
 export interface WheelSegment {
@@ -30,6 +31,7 @@ interface WheelGameControlsProps {
     {
       chance?: string
       profit?: React.ReactNode
+      token: TokenWithImage
     }
   >
 }
@@ -200,16 +202,24 @@ export function WheelGameControls({
     return (
       <Tooltip>
         <TooltipTrigger asChild>{multiplierContent}</TooltipTrigger>
-        <TooltipContent side="top" collisionBoundary={containerRef?.current} collisionPadding={19}>
-          <div className="flex flex-col gap-1">
-            {itemTooltipContent.chance && (
-              <div className="text-xs">Chance to draw: {itemTooltipContent.chance}</div>
-            )}
-            {itemTooltipContent.profit && (
-              <div className="text-xs">Target profit: {itemTooltipContent.profit}</div>
-            )}
+        <TooltipPrimitive.Content
+          side="top"
+          sideOffset={5}
+          collisionBoundary={containerRef?.current}
+          collisionPadding={19}
+          className="px-2 py-1 text-xs font-medium rounded-[2px] bg-wheel-multiplier-bg text-wheel-multiplier-text border-none shadow-none flex flex-col items-start gap-1 z-50"
+        >
+          <div className="flex items-center gap-1">
+            <span>Chance to draw: </span>
+            <span className="text-game-win font-bold">{20}%</span>
           </div>
-        </TooltipContent>
+          <div className="flex items-center gap-1">
+            <span>Target profit: </span>
+            <span className="font-bold">{1.4}</span>
+            <TokenIcon token={itemTooltipContent.token} size={15} />
+          </div>
+          <TooltipPrimitive.Arrow className="fill-wheel-multiplier-bg z-50" width={10} height={5} />
+        </TooltipPrimitive.Content>
       </Tooltip>
     )
   }

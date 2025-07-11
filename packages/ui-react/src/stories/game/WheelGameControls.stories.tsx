@@ -1,8 +1,10 @@
 import { CASINO_GAME_TYPE, WeightedGameConfiguration } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
 import { useRef, useState } from "react"
+import { Address } from "viem"
 import { WheelGameControls } from "../../components/game/WheelGameControls"
 import { Button } from "../../components/ui/button"
+import { TokenWithImage } from "../../types/types"
 
 const mockWheelConfig: WeightedGameConfiguration = {
   configId: 0,
@@ -22,6 +24,13 @@ const mockWheelConfig: WeightedGameConfiguration = {
     "#29384C",
     "#EC9E3C",
   ],
+}
+
+const DEGEN_TOKEN: TokenWithImage = {
+  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Address,
+  symbol: "DEGEN",
+  decimals: 18,
+  image: "https://www.betswirl.com/img/tokens/DEGEN.svg",
 }
 
 const meta = {
@@ -110,7 +119,10 @@ function InteractiveWheelGameControls({
 }: {
   config?: WeightedGameConfiguration
   theme?: "light" | "dark"
-  tooltipContent?: Record<number, { chance?: string; profit?: React.ReactNode }>
+  tooltipContent?: Record<
+    number,
+    { chance?: string; profit?: React.ReactNode; token: TokenWithImage }
+  >
 }) {
   const [winningMultiplier, setWinningMultiplier] = useState<number | undefined>()
   const [isSpinning, setIsSpinning] = useState(false)
@@ -210,11 +222,27 @@ export const LightThemeDefault: Story = {
   name: "Light Theme - Default",
   render: () => {
     const tooltipContent = {
-      0: { chance: "50%", profit: "0" },
-      14580: { chance: "10%", profit: <span className="text-green-500">1.40</span> },
-      18760: { chance: "10%", profit: <span className="text-blue-500">1.80</span> },
-      20830: { chance: "10%", profit: <span className="text-purple-500">2.00</span> },
-      31250: { chance: "10%", profit: <span className="text-orange-500">3.00</span> },
+      0: { chance: "50%", profit: "0", token: DEGEN_TOKEN },
+      14580: {
+        chance: "10%",
+        profit: <span className="text-green-500">1.40</span>,
+        token: DEGEN_TOKEN,
+      },
+      18760: {
+        chance: "10%",
+        profit: <span className="text-blue-500">1.80</span>,
+        token: DEGEN_TOKEN,
+      },
+      20830: {
+        chance: "10%",
+        profit: <span className="text-purple-500">2.00</span>,
+        token: DEGEN_TOKEN,
+      },
+      31250: {
+        chance: "10%",
+        profit: <span className="text-orange-500">3.00</span>,
+        token: DEGEN_TOKEN,
+      },
     }
     return <InteractiveWheelGameControls theme="light" tooltipContent={tooltipContent} />
   },
@@ -233,11 +261,27 @@ export const DarkThemeDefault: Story = {
   name: "Dark Theme - Default",
   render: () => {
     const tooltipContent = {
-      0: { chance: "50%", profit: "0" },
-      14580: { chance: "10%", profit: <span className="text-green-500">1.40</span> },
-      18760: { chance: "10%", profit: <span className="text-blue-500">1.80</span> },
-      20830: { chance: "10%", profit: <span className="text-purple-500">2.00</span> },
-      31250: { chance: "10%", profit: <span className="text-orange-500">3.00</span> },
+      0: { chance: "50%", profit: "0", token: DEGEN_TOKEN },
+      14580: {
+        chance: "10%",
+        profit: <span className="text-green-500">1.40</span>,
+        token: DEGEN_TOKEN,
+      },
+      18760: {
+        chance: "10%",
+        profit: <span className="text-blue-500">1.80</span>,
+        token: DEGEN_TOKEN,
+      },
+      20830: {
+        chance: "10%",
+        profit: <span className="text-purple-500">2.00</span>,
+        token: DEGEN_TOKEN,
+      },
+      31250: {
+        chance: "10%",
+        profit: <span className="text-orange-500">3.00</span>,
+        token: DEGEN_TOKEN,
+      },
     }
     return <InteractiveWheelGameControls theme="dark" tooltipContent={tooltipContent} />
   },
