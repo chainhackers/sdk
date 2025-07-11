@@ -34,6 +34,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build libs
+        working-directory: .
+        run: pnpm build:libs
+
+
       - name: Build Storybook
         run: pnpm build-storybook
 
