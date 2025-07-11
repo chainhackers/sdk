@@ -6,10 +6,11 @@ import { InfoSheetPanel } from "../../components/game/InfoSheetPanel"
 import { Button } from "../../components/ui/button"
 import { Sheet, SheetTrigger } from "../../components/ui/sheet"
 import { cn } from "../../lib/utils"
+import { Theme } from "../../types/types"
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
 }
 
 const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme = "system" }) => {
@@ -51,7 +52,7 @@ const InfoSheetWithWrapper = ({
   rngFee: string | number
   targetPayout: string
   gasPrice: string
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
 }) => {
   const [isOpen, setIsOpen] = useState(true)
 

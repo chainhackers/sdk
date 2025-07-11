@@ -18,7 +18,7 @@ import { useTokenContext } from "../../context/tokenContext"
 import { useTokens } from "../../hooks/useTokens"
 import { cn } from "../../lib/utils"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
-import type { TokenWithImage } from "../../types/types"
+import type { Theme, TokenWithImage } from "../../types/types"
 
 // Additional mock tokens for variety
 const USDC_TOKEN: TokenWithImage = {
@@ -30,7 +30,7 @@ const USDC_TOKEN: TokenWithImage = {
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
 }
 
 const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme = "system" }) => {
@@ -68,7 +68,7 @@ const ChainAndTokenSheetWithWrapper = ({
   selectedToken = STORYBOOK_TOKENS.ETH,
 }: {
   initialView?: "main" | "chain" | "token"
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
   selectedToken?: TokenWithImage
 }) => {
   const [isOpen, setIsOpen] = useState(true)

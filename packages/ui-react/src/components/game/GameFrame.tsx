@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import { zeroAddress } from "viem"
 
 import { cn } from "../../lib/utils"
-import { BetStatus, GameResult, HistoryEntry, TokenWithImage } from "../../types/types"
+import { BetStatus, GameResult, HistoryEntry, Theme, TokenWithImage } from "../../types/types"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Sheet, SheetTrigger } from "../ui/sheet"
@@ -16,7 +16,7 @@ import { getVariantConfig } from "./shared/gameVariants"
 import { GameVariant } from "./shared/types"
 
 interface ThemeSettings {
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
   customTheme?: {
     "--primary"?: string
     "--play-btn-font"?: string

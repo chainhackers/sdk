@@ -15,6 +15,7 @@ import {
   GameDefinition,
   GameResult,
   HistoryEntry,
+  Theme,
   TokenWithImage,
 } from "../types/types"
 import { useBetCalculations } from "./useBetCalculations"
@@ -57,7 +58,7 @@ interface UseGameLogicResult<T extends GameChoice = GameChoice> {
   isGamePaused: boolean
   nativeCurrencySymbol: string
   themeSettings: {
-    theme: "light" | "dark" | "system"
+    theme: Theme
     customTheme?: {
       "--primary"?: string
       "--play-btn-font"?: string

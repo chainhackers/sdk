@@ -13,6 +13,10 @@ import {
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
 
+export type Theme = "light" | "dark" | "system"
+
+export const THEME_OPTIONS: Theme[] = ["light", "dark", "system"]
+
 export type QueryParameter<
   queryFnData = unknown,
   error = DefaultError,

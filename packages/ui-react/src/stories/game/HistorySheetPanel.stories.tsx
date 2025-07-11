@@ -7,7 +7,7 @@ import { Sheet, SheetTrigger } from "../../components/ui/sheet"
 import { TokenIcon } from "../../components/ui/TokenIcon"
 import { cn } from "../../lib/utils"
 import type { TokenWithImage } from "../../types/types"
-import { HistoryEntry, HistoryEntryStatus } from "../../types/types"
+import { HistoryEntry, HistoryEntryStatus, Theme } from "../../types/types"
 
 // Mock token for stories
 const ETH_TOKEN: TokenWithImage = {
@@ -19,7 +19,7 @@ const ETH_TOKEN: TokenWithImage = {
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
 }
 
 const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme = "system" }) => {
@@ -86,7 +86,7 @@ const HistorySheetWithWrapper = ({
   theme = "light",
 }: {
   historyData: HistoryEntry[]
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
 }) => {
   const [isOpen, setIsOpen] = useState(true)
 
