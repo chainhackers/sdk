@@ -54,8 +54,8 @@
     "@betswirl/wagmi-provider": "workspace:*",
     "@coinbase/onchainkit": "^0.38.15",
     "@tanstack/react-query": "^5.81.5",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
     "wagmi": "^2.15.6",
     "viem": "catalog:"
   },
