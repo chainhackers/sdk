@@ -8,7 +8,7 @@ interface UseWheelAnimationParams {
   isSpinning: boolean
   winningMultiplier: number | null
   segments: WheelSegment[]
-  onSpinComplete: () => void
+  onSpinComplete?: () => void
 }
 
 interface UseWheelAnimationReturn {
@@ -62,11 +62,10 @@ export function useWheelAnimation({
   const [displayedMultiplier, setDisplayedMultiplier] = useState<number | undefined>()
   const [hasResult, setHasResult] = useState(false)
 
-  const animationFrameRef = useRef<number | null>(null)
   const spinStartTimeRef = useRef<number | null>(null)
   const lastKnownAngleRef = useRef<number>(0)
-  const spinCompleteTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const continuousSpinIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const spinCompleteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const continuousSpinIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const resetWheelState = useCallback(() => {
     setHasResult(false)
@@ -148,7 +147,7 @@ export function useWheelAnimation({
       spinCompleteTimeoutRef.current = setTimeout(() => {
         setDisplayedMultiplier(winningMultiplier)
         setHasResult(true)
-        onSpinComplete()
+        onSpinComplete?.()
       }, spinDuration)
     } else if (winningMultiplier === null) {
       resetWheelState()
@@ -174,9 +173,6 @@ export function useWheelAnimation({
       }
       if (continuousSpinIntervalRef.current) {
         clearInterval(continuousSpinIntervalRef.current)
-      }
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
       }
     }
   }, [])

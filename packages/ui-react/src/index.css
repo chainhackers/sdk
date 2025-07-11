@@ -360,10 +360,12 @@
 
   .wheel-spinning {
     transition: transform 4s cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: transform;
   }
 
   .wheel-continuous-spin {
     animation: spin-continuous 2s linear infinite;
+    will-change: transform;
   }
 
   @keyframes spin-continuous {

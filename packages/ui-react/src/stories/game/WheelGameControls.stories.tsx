@@ -127,7 +127,7 @@ function InteractiveWheelGameControls({
   const [winningMultiplier, setWinningMultiplier] = useState<number | undefined>()
   const [isSpinning, setIsSpinning] = useState(false)
   const [spinMode, setSpinMode] = useState<"continuous" | "landing">("continuous")
-  const containerRef = useRef<HTMLDivElement>(null!)
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   const possibleMultipliers = config.multipliers.map((m) => Number(m))
 
@@ -209,9 +209,6 @@ function InteractiveWheelGameControls({
             spinMode === "landing" &&
             winningMultiplier !== undefined &&
             "Landing on result..."}
-          {!isSpinning &&
-            winningMultiplier !== undefined &&
-            `Landed on: ${(winningMultiplier / 10000).toFixed(2)}x`}
         </div>
       </div>
     </div>

@@ -24,7 +24,7 @@ interface WheelGameControlsProps {
   isSpinning: boolean
   winningMultiplier?: number
   theme?: Theme
-  parent?: RefObject<HTMLDivElement>
+  parent?: RefObject<HTMLDivElement | null>
   onSpinComplete?: () => void
   tooltipContent?: Record<
     number,
@@ -71,14 +71,24 @@ function createWheelSegments(config: WeightedGameConfiguration): WheelSegment[] 
     const endAngle = (index + 1) * anglePerSegment
     const formattedMultiplier = formatMultiplier(multiplier)
 
+    const color = config.colors?.[index]
+    if (!color) {
+      throw new Error(`Color not defined for segment at index ${index}`)
+    }
+
+    const weight = config.weights?.[index]
+    if (weight === undefined) {
+      throw new Error(`Weight not defined for segment at index ${index}`)
+    }
+
     return {
       index,
       multiplier: Number(multiplier),
       formattedMultiplier,
-      color: config.colors?.[index] || "#29384C",
+      color,
       startAngle,
       endAngle,
-      weight: config.weights[index] || 1n,
+      weight,
     }
   })
 }
@@ -146,7 +156,7 @@ export function WheelGameControls({
     isSpinning,
     winningMultiplier: winningMultiplier ?? null,
     segments,
-    onSpinComplete: onSpinComplete ?? (() => {}),
+    onSpinComplete,
   })
 
   const isMultiplierWinning = (itemMultiplier: number): boolean => {
@@ -211,11 +221,11 @@ export function WheelGameControls({
         >
           <div className="flex items-center gap-1">
             <span>Chance to draw: </span>
-            <span className="text-game-win font-bold">{20}%</span>
+            <span className="text-game-win font-bold">{itemTooltipContent.chance}</span>
           </div>
           <div className="flex items-center gap-1">
             <span>Target profit: </span>
-            <span className="font-bold">{1.4}</span>
+            <span className="font-bold">{itemTooltipContent.profit}</span>
             <TokenIcon token={itemTooltipContent.token} size={15} />
           </div>
           <TooltipPrimitive.Arrow className="fill-wheel-multiplier-bg z-50" width={10} height={5} />
