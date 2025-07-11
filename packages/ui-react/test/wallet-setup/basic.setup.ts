@@ -57,7 +57,21 @@ const basicSetup = defineWalletSetup(PASSWORD, async (context, walletPage) => {
     console.log("Base network might already exist:", error)
   }
 
-  // Switch to Base network
+  // Add Polygon network
+  try {
+    await metamask.addNetwork({
+      name: "Polygon",
+      rpcUrl: "https://polygon-rpc.com",
+      chainId: 137,
+      symbol: "MATIC",
+      blockExplorerUrl: "https://polygonscan.com",
+    })
+    console.log("Polygon network added successfully")
+  } catch (error) {
+    console.log("Polygon network might already exist:", error)
+  }
+
+  // Switch to Base network as default
   try {
     await metamask.switchNetwork("Base")
     console.log("Switched to Base network")

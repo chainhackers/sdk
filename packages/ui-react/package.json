@@ -40,7 +40,8 @@
     "test:cointoss": "pnpm exec playwright test tests/coinToss.spec.ts --reporter=line",
     "test:dice": "pnpm exec playwright test tests/dice.spec.ts --reporter=line",
     "test:roulette": "pnpm exec playwright test tests/roulette.spec.ts --reporter=line",
-    "test:keno": "pnpm exec playwright test tests/keno.spec.ts --reporter=line"
+    "test:keno": "pnpm exec playwright test tests/keno.spec.ts --reporter=line",
+    "test:chain-switching": "pnpm exec playwright test tests/chainSwitching.spec.ts --reporter=line"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
