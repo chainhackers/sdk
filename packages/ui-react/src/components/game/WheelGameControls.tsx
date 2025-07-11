@@ -29,8 +29,8 @@ interface WheelGameControlsProps {
   tooltipContent?: Record<
     number,
     {
-      chance?: string
-      profit?: React.ReactNode
+      chance?: string | React.ReactNode
+      profit?: number
       token: TokenWithImage
     }
   >

@@ -121,7 +121,7 @@ function InteractiveWheelGameControls({
   theme?: "light" | "dark"
   tooltipContent?: Record<
     number,
-    { chance?: string; profit?: React.ReactNode; token: TokenWithImage }
+    { chance?: string | React.ReactNode; profit?: number; token: TokenWithImage }
   >
 }) {
   const [winningMultiplier, setWinningMultiplier] = useState<number | undefined>()
@@ -219,25 +219,25 @@ export const LightThemeDefault: Story = {
   name: "Light Theme - Default",
   render: () => {
     const tooltipContent = {
-      0: { chance: "50%", profit: "0", token: DEGEN_TOKEN },
+      0: { chance: "50%", profit: 0, token: DEGEN_TOKEN },
       14580: {
-        chance: "10%",
-        profit: <span className="text-green-500">1.40</span>,
+        chance: <span className="text-[#55DC36]">10%</span>,
+        profit: 1.4,
         token: DEGEN_TOKEN,
       },
       18760: {
-        chance: "10%",
-        profit: <span className="text-blue-500">1.80</span>,
+        chance: <span className="text-[#15A2D8]">10%</span>,
+        profit: 1.8,
         token: DEGEN_TOKEN,
       },
       20830: {
-        chance: "10%",
-        profit: <span className="text-purple-500">2.00</span>,
+        chance: <span className="text-[#7340F4]">10%</span>,
+        profit: 2.0,
         token: DEGEN_TOKEN,
       },
       31250: {
-        chance: "10%",
-        profit: <span className="text-orange-500">3.00</span>,
+        chance: <span className="text-[#EC9E3C]">10%</span>,
+        profit: 3.0,
         token: DEGEN_TOKEN,
       },
     }
@@ -258,25 +258,25 @@ export const DarkThemeDefault: Story = {
   name: "Dark Theme - Default",
   render: () => {
     const tooltipContent = {
-      0: { chance: "50%", profit: "0", token: DEGEN_TOKEN },
+      0: { chance: <span className="text-[#29384C]">50%</span>, profit: 0, token: DEGEN_TOKEN },
       14580: {
-        chance: "10%",
-        profit: <span className="text-green-500">1.40</span>,
+        chance: <span className="text-[#55DC36]">10%</span>,
+        profit: 1.4,
         token: DEGEN_TOKEN,
       },
       18760: {
-        chance: "10%",
-        profit: <span className="text-blue-500">1.80</span>,
+        chance: <span className="text-[#15A2D8]">10%</span>,
+        profit: 1.8,
         token: DEGEN_TOKEN,
       },
       20830: {
-        chance: "10%",
-        profit: <span className="text-purple-500">2.00</span>,
+        chance: <span className="text-[#7340F4]">10%</span>,
+        profit: 2.0,
         token: DEGEN_TOKEN,
       },
       31250: {
-        chance: "10%",
-        profit: <span className="text-orange-500">3.00</span>,
+        chance: <span className="text-[#EC9E3C]">10%</span>,
+        profit: 3.0,
         token: DEGEN_TOKEN,
       },
     }
