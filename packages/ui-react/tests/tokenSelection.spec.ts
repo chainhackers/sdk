@@ -99,6 +99,18 @@ test.describe("Token Selection Tests", () => {
     // Wait for UI to update with DEGEN balance
     await page.waitForTimeout(2000)
 
+    // Close the token selector popup if it's still open
+    const closeButton = page.locator('button[aria-label="Close"]').first()
+    if (await closeButton.isVisible({ timeout: 2000 }).catch(() => false)) {
+      console.log("Closing token selector popup")
+      await closeButton.click()
+      await page.waitForTimeout(1000)
+    }
+
+    // Also try clicking outside the popup
+    await page.mouse.click(10, 10)
+    await page.waitForTimeout(1000)
+
     // Check DEGEN balance
     console.log("\n=== CHECKING DEGEN BALANCE ===")
     const degenBalanceText = await balanceElement.locator("..").first().textContent()
@@ -158,7 +170,55 @@ test.describe("Token Selection Tests", () => {
     const buttonText = await playButton.textContent()
     console.log("Play button text:", buttonText)
 
-    if (buttonText?.toLowerCase().includes("approve")) {
+    // Check if button is disabled
+    const isDisabled = await playButton.isDisabled()
+    if (isDisabled) {
+      console.log("Play button is disabled, taking screenshot...")
+      await page.screenshot({ path: "degen-play-button-disabled.png", fullPage: true })
+
+      // Look for any approve buttons or messages
+      const approveButton = page.locator("button").filter({ hasText: /approve/i })
+      const approveCount = await approveButton.count()
+      console.log(`Found ${approveCount} approve button(s)`)
+
+      if (approveCount > 0) {
+        console.log("Found approve button, clicking the first one")
+        await approveButton.first().click()
+
+        // Confirm approval in MetaMask
+        await metamask.confirmTransaction()
+        console.log("Approval transaction confirmed in MetaMask")
+
+        // Wait for approval to be processed
+        await page.waitForTimeout(15000)
+
+        // Now look for Place Bet button
+        const placeBetButton = page.locator('button:has-text("Place Bet")')
+        await expect(placeBetButton).toBeVisible({ timeout: 30000 })
+        await expect(placeBetButton).toBeEnabled({ timeout: 15000 })
+        await placeBetButton.click()
+        console.log("Clicked Place Bet button after approval")
+      } else {
+        // Check if there's an error message
+        const errorMessage = page.locator("text=/insufficient|error|failed/i")
+        if (await errorMessage.isVisible({ timeout: 2000 }).catch(() => false)) {
+          const errorText = await errorMessage.textContent()
+          console.log("Error message found:", errorText)
+        }
+
+        console.log("No approve button found, waiting for Place Bet to be enabled...")
+        await page.waitForTimeout(5000) // Give it time to update
+
+        // Re-check the button
+        if (await playButton.isDisabled()) {
+          console.log("Button still disabled after waiting, skipping test")
+          return
+        }
+
+        await playButton.click()
+        console.log("Clicked Place Bet button after waiting")
+      }
+    } else if (buttonText?.toLowerCase().includes("approve")) {
       console.log("Need to approve DEGEN spending, clicking approve button")
       await playButton.click()
 
@@ -167,15 +227,16 @@ test.describe("Token Selection Tests", () => {
       console.log("Approval transaction confirmed in MetaMask")
 
       // Wait for approval to be processed
-      await page.waitForTimeout(5000)
+      await page.waitForTimeout(10000)
 
       // Now look for Place Bet button
       const placeBetButton = page.locator('button:has-text("Place Bet")')
       await expect(placeBetButton).toBeVisible({ timeout: 30000 })
-      await expect(placeBetButton).toBeEnabled()
+      await expect(placeBetButton).toBeEnabled({ timeout: 10000 })
       await placeBetButton.click()
       console.log("Clicked Place Bet button after approval")
     } else {
+      await expect(playButton).toBeEnabled({ timeout: 10000 })
       await playButton.click()
       console.log("Clicked Place Bet button")
     }

@@ -44,12 +44,23 @@ function storeTokenAddress(address: Address, chainId: number): void {
 }
 
 export function TokenProvider({ children }: TokenProviderProps) {
-  const { tokens, loading } = useTokens()
+  const { tokens, loading } = useTokens({
+    query: {
+      // Reduce refetching in the provider
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+    },
+  })
   const { appChainId } = useChain()
   const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage | undefined>()
 
   useEffect(() => {
     if (loading || tokens.length === 0) {
+      return
+    }
+
+    // Only update if we don't have a token or chain changed
+    if (selectedToken && selectedToken.chainId === appChainId) {
       return
     }
 
@@ -65,10 +76,11 @@ export function TokenProvider({ children }: TokenProviderProps) {
     // Default to native token of the current chain if no stored token
     const nativeToken = tokens.find((token) => token.address === zeroAddress)
     if (!nativeToken) {
-      throw new Error(`No native token found for chain ${appChainId}`)
+      console.warn(`No native token found for chain ${appChainId}`)
+      return
     }
     setSelectedTokenInternal(nativeToken)
-  }, [tokens, loading, appChainId])
+  }, [tokens, loading, appChainId, selectedToken])
 
   const setSelectedToken = (token: TokenWithImage) => {
     setSelectedTokenInternal(token)

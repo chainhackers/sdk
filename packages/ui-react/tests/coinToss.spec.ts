@@ -1,12 +1,12 @@
 import { testWithSynpress } from "@synthetixio/synpress"
 import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
-import basicSetup from "../test/wallet-setup/basic.setup"
 import {
-  extractBalance,
   closeAllDialogs,
+  extractBalance,
   verifyCanPlayAgain,
   waitForBettingStates,
 } from "../test/helpers/testHelpers"
+import basicSetup from "../test/wallet-setup/basic.setup"
 
 const test = testWithSynpress(metaMaskFixtures(basicSetup))
 const { expect } = test
@@ -232,12 +232,14 @@ test.describe("Coin Toss Game", () => {
     console.log("Starting balance:", startingBalance)
 
     // Check if wallet has sufficient balance for multiple games
-    const totalBetAmount = parseFloat(betAmount) * numberOfGames
+    const totalBetAmount = Number.parseFloat(betAmount) * numberOfGames
     if (startingBalance < totalBetAmount) {
       console.log("\n⚠️  WALLET NEEDS MORE FUNDING FOR MULTIPLE GAMES")
       console.log(`Please send at least ${totalBetAmount} ETH to ${address} on Base chain`)
       await page.screenshot({ path: "coinToss-multiple-needs-funding.png", fullPage: true })
-      throw new Error(`Test wallet needs at least ${totalBetAmount} ETH on Base chain for ${numberOfGames} games`)
+      throw new Error(
+        `Test wallet needs at least ${totalBetAmount} ETH on Base chain for ${numberOfGames} games`,
+      )
     }
 
     let currentBalance = startingBalance
@@ -261,16 +263,23 @@ test.describe("Coin Toss Game", () => {
 
       // Alternate between heads and tails for variety
       const selectHeads = gameNumber % 2 === 1
-      
+
       // Check if coin button is visible and enabled
       const isCoinButtonVisible = await coinButton.isVisible({ timeout: 5000 }).catch(() => false)
       if (isCoinButtonVisible) {
         const isCoinButtonEnabled = await coinButton.isEnabled()
-        console.log("Game " + gameNumber + " - Coin button visible: " + isCoinButtonVisible + ", enabled: " + isCoinButtonEnabled)
-        
+        console.log(
+          "Game " +
+            gameNumber +
+            " - Coin button visible: " +
+            isCoinButtonVisible +
+            ", enabled: " +
+            isCoinButtonEnabled,
+        )
+
         if (isCoinButtonEnabled) {
           const ariaLabel = await coinButton.getAttribute("aria-label")
-          
+
           if (selectHeads) {
             // Select heads
             if (ariaLabel?.includes("Select Heads")) {
@@ -299,11 +308,11 @@ test.describe("Coin Toss Game", () => {
       const playButton = page.locator('button:has-text("Place Bet"), button:has-text("Try again")')
       await expect(playButton).toBeVisible({ timeout: 10000 })
       await expect(playButton).toBeEnabled()
-      
+
       // Check which button text we have
       const buttonText = await playButton.textContent()
       console.log("Game " + gameNumber + " - Button text: '" + buttonText + "'")
-      
+
       await playButton.click()
       console.log("Game " + gameNumber + " - Clicked play button")
 
@@ -326,7 +335,7 @@ test.describe("Coin Toss Game", () => {
       if (hasResultModal) {
         const resultText = await resultModal.textContent()
         isWin = resultText?.toLowerCase().includes("won") || false
-        
+
         // Close result modal
         const resultCloseButton = resultModal.locator('button[aria-label="Close"]')
         if (await resultCloseButton.isVisible()) {
@@ -336,23 +345,23 @@ test.describe("Coin Toss Game", () => {
         // Determine result from balance
         const currentBalanceText = await balanceContainer.textContent()
         const newBalance = extractBalance(currentBalanceText)
-        isWin = newBalance > currentBalance - parseFloat(betAmount)
+        isWin = newBalance > currentBalance - Number.parseFloat(betAmount)
       }
 
       // Update current balance after the game
       const postGameBalanceText = await balanceContainer.textContent()
       const postGameBalance = extractBalance(postGameBalanceText)
-      
+
       gameResults.push({
         gameNumber,
         selection: selectHeads ? "Heads" : "Tails",
         result: isWin ? "Won" : "Lost",
-        balanceAfter: postGameBalance
+        balanceAfter: postGameBalance,
       })
 
       console.log("Game " + gameNumber + " - Result: " + (isWin ? "WON! 🎉" : "Lost 😢"))
       console.log("Game " + gameNumber + " - Balance after: " + postGameBalance + " ETH")
-      
+
       currentBalance = postGameBalance
 
       // Close any open dialogs
@@ -368,9 +377,19 @@ test.describe("Coin Toss Game", () => {
     console.log("\n=== GAME SUMMARY ===")
     let totalWins = 0
     let totalLosses = 0
-    
-    gameResults.forEach(game => {
-      console.log("Game " + game.gameNumber + ": " + game.selection + " - " + game.result + " (Balance: " + game.balanceAfter + " ETH)")
+
+    gameResults.forEach((game) => {
+      console.log(
+        "Game " +
+          game.gameNumber +
+          ": " +
+          game.selection +
+          " - " +
+          game.result +
+          " (Balance: " +
+          game.balanceAfter +
+          " ETH)",
+      )
       if (game.result === "Won") totalWins++
       else totalLosses++
     })
@@ -387,18 +406,18 @@ test.describe("Coin Toss Game", () => {
     // Verify balance changed (should have decreased by at least the gas fees) or stayed the same if wins balanced losses
     // In Base network, gas fees are very low so balance might stay the same if wins equal losses
     // We just verify that we tracked the balance correctly
-    const expectedBalanceChange = (totalWins - totalLosses) * parseFloat(betAmount)
+    const expectedBalanceChange = (totalWins - totalLosses) * Number.parseFloat(betAmount)
     const actualBalanceChange = currentBalance - startingBalance
     const tolerance = 0.001 // Allow for gas fees and floating point precision
-    
+
     console.log("Expected balance change: " + expectedBalanceChange + " ETH")
     console.log("Actual balance change: " + actualBalanceChange + " ETH")
     console.log("Tolerance for gas fees and precision: " + tolerance + " ETH")
-    
+
     // Round to avoid floating point precision issues
     const difference = Math.abs(actualBalanceChange - expectedBalanceChange)
     const roundedDifference = Math.round(difference * 10000) / 10000 // Round to 4 decimal places
-    
+
     expect(roundedDifference).toBeLessThanOrEqual(tolerance)
 
     // Verify we can still play another game
