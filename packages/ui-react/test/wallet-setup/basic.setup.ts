@@ -71,6 +71,20 @@ const basicSetup = defineWalletSetup(PASSWORD, async (context, walletPage) => {
     console.log("Polygon network might already exist:", error)
   }
 
+  // Add Avalanche network
+  try {
+    await metamask.addNetwork({
+      name: "Avalanche",
+      rpcUrl: "https://api.avax.network/ext/bc/C/rpc",
+      chainId: 43114,
+      symbol: "AVAX",
+      blockExplorerUrl: "https://snowtrace.io",
+    })
+    console.log("Avalanche network added successfully")
+  } catch (error) {
+    console.log("Avalanche network might already exist:", error)
+  }
+
   // Switch to Base network as default
   try {
     await metamask.switchNetwork("Base")

@@ -301,7 +301,7 @@ function TokenSelectionView({
       </div>
 
       <ScrollArea className="h-60 [&>[data-slot=scroll-area-scrollbar]]:w-[6px] [&>[data-slot=scroll-area-scrollbar]]:border-l-0 [&>[data-slot=scroll-area-scrollbar]]:z-10 [&>[data-slot=scroll-area-scrollbar]]:-translate-x-[1px] [&_[data-slot=scroll-area-thumb]]:bg-scrollbar-thumb ">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1" role="listbox" aria-label="Available tokens">
           {tokensLoading ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
               Loading tokens...
@@ -316,6 +316,8 @@ function TokenSelectionView({
                 variant="ghost"
                 key={token.address}
                 onClick={() => onTokenSelect(token)}
+                role="option"
+                aria-selected={token.address === selectedToken.address}
                 className={cn(
                   "flex items-center justify-between px-4 py-3 rounded-[8px] w-full text-left h-auto",
                   "hover:bg-surface-hover transition-colors",

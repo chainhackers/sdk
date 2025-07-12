@@ -53,3 +53,6 @@ tasks/
 # Allow test directories (override root .gitignore)
 !test/
 !tests/
+
+# Internal documentation
+docs/internal/
