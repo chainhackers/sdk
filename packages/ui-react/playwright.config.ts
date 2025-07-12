@@ -1,27 +1,23 @@
-import { defineConfig, devices } from "@playwright/test"
+import { defineConfig } from "@playwright/test"
 import { config } from "./app.config"
 
 export default defineConfig({
   testDir: "./tests",
+  timeout: 120000,
   fullyParallel: false,
   forbidOnly: false,
   retries: 2,
   workers: 1,
   reporter: "html",
-  timeout: 120 * 1000,
   expect: {
-    timeout: 7 * 1000,
+    timeout: 7000,
   },
   use: {
-    baseURL: config.baseUrl,
-    trace: "on-first-retry",
     headless: false,
+    chromiumChannel: "chromium",
+    baseURL: config.baseUrl,
+    actionTimeout: 60000,
+    trace: "on-first-retry",
+    video: "retain-on-failure",
   },
-  projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-    },
-  ],
-  // Additional Synpress-specific configuration can be added here
 })

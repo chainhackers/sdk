@@ -105,11 +105,25 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
   const tokensQuery = useQuery({
     queryKey: ["casino-tokens", appChainId, onlyActive],
     queryFn: async () => {
+      // Create a modified wallet that uses the app chain ID
       const wallet = new WagmiBetSwirlWallet(wagmiConfig)
-      return await getCasinoTokens(wallet, onlyActive)
+
+      // Store the original getChainId method
+      const originalGetChainId = wallet.getChainId.bind(wallet)
+
+      // Override getChainId to return the app chain
+      wallet.getChainId = () => appChainId
+
+      try {
+        return await getCasinoTokens(wallet, onlyActive)
+      } finally {
+        // Restore original method
+        wallet.getChainId = originalGetChainId
+      }
     },
     enabled: !!appChainId,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes cache
     ...query,
   })
 

@@ -4,7 +4,7 @@ import {
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { formatGwei, type Hex, zeroAddress } from "viem"
 import { useAccount, useBalance } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -133,6 +133,7 @@ export function useGameLogic<T extends GameChoice>({
   const { data: balance, refetch: refetchBalance } = useBalance({
     address,
     token: token.address === zeroAddress ? undefined : (token.address as Hex),
+    chainId: appChainId,
   })
   const { houseEdge } = useHouseEdge({
     game: gameType,
@@ -147,6 +148,12 @@ export function useGameLogic<T extends GameChoice>({
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
     usePlaceBet(gameType, token, refetchBalance, effectiveGameDefinition)
+
+  // Reset bet state when chain or token changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
+  useEffect(() => {
+    resetBetState()
+  }, [appChainId, token.address, resetBetState])
 
   const gameContractAddress = casinoChainById[appChainId]?.contracts.games[gameType]?.address
 

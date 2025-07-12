@@ -49,6 +49,7 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
     if (!address || !chainId) {
       setRawBets([])
       setIsLoading(false)
+      setError(null) // Clear error when wallet is disconnected
       return
     }
 
@@ -112,6 +113,7 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
     } else {
       setRawBets([])
       setIsLoading(false)
+      setError(null) // Clear error when wallet is disconnected
     }
   }, [fetchRawBets, address, chainId])
 

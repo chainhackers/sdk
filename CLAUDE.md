@@ -25,6 +25,17 @@ When working in `packages/ui-react/`:
 - `pnpm build` - Build for production
 - `pnpm storybook` - Run Storybook for component development
 
+### E2E Testing
+- `pnpm test:e2e` - Run end-to-end tests with Synpress and Playwright
+- `pnpm test:clear-cache` - Clear test cache (run after changing wallet setup)
+- `pnpm test:cointoss`, `pnpm test:dice`, `pnpm test:roulette`, `pnpm test:keno` - Run individual game tests
+- Test wallet address is read from `.secrets` file
+- Check wallet balances on block explorers before running tests:
+  - Base: https://basescan.org/address/{wallet_address}
+  - Polygon: https://polygonscan.com/address/{wallet_address}
+  - Avalanche: https://snowtrace.io/address/{wallet_address}
+- **Important**: Follow the E2E testing best practices documented in `packages/ui-react/test/best-practices.md`
+
 ## Memories
 - When working with ui-react, run pnpm commands in packages/ui-react, not project root
 - Avoid using the word "implement" in commit messages, use "add" and keep commit messages brief

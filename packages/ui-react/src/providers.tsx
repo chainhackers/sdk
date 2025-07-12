@@ -3,9 +3,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { type ReactNode } from "react"
 import { type Hex, http } from "viem"
 import { createConfig, WagmiProvider } from "wagmi"
-import { base } from "wagmi/chains"
-import { QUERY_DEFAULTS } from "./constants/queryDefaults"
+import { base, polygon } from "wagmi/chains"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
+import { QUERY_DEFAULTS } from "./constants/queryDefaults"
 import type { TokenWithImage } from "./types/types"
 
 const CHAIN = base
@@ -33,9 +33,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
   const rpcUrl = import.meta.env.VITE_RPC_URL
   const config = createConfig({
-    chains: [CHAIN],
+    chains: [CHAIN, polygon],
     transports: {
       [CHAIN.id]: http(rpcUrl),
+      [polygon.id]: http(),
     },
   })
 
