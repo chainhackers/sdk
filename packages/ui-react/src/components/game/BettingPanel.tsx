@@ -118,7 +118,7 @@ export function BettingPanel({
 
   const formattedBalance = formatRawAmount(balance, token.decimals)
 
-  const isBetSuccees = betStatus === "success"
+  const isBetSuccess = betStatus === "success"
   const isWaiting = betStatus === "loading" || betStatus === "pending" || betStatus === "rolling"
   const isError =
     betStatus === "error" ||
@@ -140,7 +140,7 @@ export function BettingPanel({
     hasValidSelection
 
   const isApprovingToken = isApprovePending || isApproveConfirming
-  const isInputDisabled = !isConnected || isWaiting || isBetSuccees || isApprovingToken
+  const isInputDisabled = !isConnected || isWaiting || isBetSuccess || isApprovingToken
 
   const isPlayButtonDisabled: boolean =
     isWaiting || (!canInitiateBet && !needsTokenApproval) || isApprovingToken
@@ -154,7 +154,7 @@ export function BettingPanel({
     playButtonText = "Approve Token"
   } else if (isError) {
     playButtonText = "Error, try again"
-  } else if (isBetSuccees) {
+  } else if (isBetSuccess) {
     playButtonText = "Try again"
   } else if (betStatus === "pending") {
     playButtonText = "Placing Bet..."
