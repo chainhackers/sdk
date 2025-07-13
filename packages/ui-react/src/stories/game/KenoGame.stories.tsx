@@ -25,8 +25,9 @@ const meta = {
         { name: "dark", value: "oklch(0.15 0 0)" },
       ],
     },
-    loki: {
-      skip: true,
+    chromatic: {
+      delay: 3000, // 3 second delay for all Keno stories
+      pauseAnimationAtEnd: true,
     },
   },
   decorators: [
