@@ -1,14 +1,7 @@
-import {
-  type CasinoChainId,
-  chainById,
-  chainNativeCurrencyToToken,
-  FORMAT_TYPE,
-  formatRawAmount,
-} from "@betswirl/sdk-core"
+import { type CasinoChainId, chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import { ChevronDown } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
-import { erc20Abi, type Hex, zeroAddress } from "viem"
-import { useAccount, useBalance, useReadContracts } from "wagmi"
+import { useEffect, useState } from "react"
+import { useBalances } from "../../context/BalanceContext"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useTokens } from "../../hooks/useTokens"
@@ -19,48 +12,6 @@ import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
-
-const TOKEN_BALANCE_CACHE_CONFIG = {
-  staleTime: 10_000, // 10 seconds fresh
-  gcTime: 5 * 60_000, // 5 minutes cache
-  refetchInterval: false, // No background refetch
-  refetchOnWindowFocus: true,
-} as const
-
-function combineTokensWithBalances(
-  tokens: TokenWithImage[],
-  nativeToken: TokenWithImage | undefined,
-  nativeBalance: bigint | undefined,
-  erc20Tokens: TokenWithImage[],
-  erc20Balances: readonly { result?: unknown }[] | undefined,
-): TokenWithBalance[] {
-  const result: TokenWithBalance[] = []
-
-  if (nativeToken) {
-    const balance = nativeBalance || 0n
-    result.push({
-      ...nativeToken,
-      balance,
-      formattedBalance: formatRawAmount(balance, nativeToken.decimals, FORMAT_TYPE.PRECISE),
-    })
-  }
-
-  erc20Tokens.forEach((token, index) => {
-    const balance = (erc20Balances?.[index]?.result as bigint) || 0n
-    result.push({
-      ...token,
-      balance,
-      formattedBalance: formatRawAmount(balance, token.decimals, FORMAT_TYPE.PRECISE),
-    })
-  })
-
-  const tokenIndexMap = new Map(tokens.map((token, index) => [token.address, index]))
-  return result.sort((a, b) => {
-    const aIndex = tokenIndexMap.get(a.address) ?? 0
-    const bIndex = tokenIndexMap.get(b.address) ?? 0
-    return aIndex - bIndex
-  })
-}
 
 interface ChainAndTokenSheetPanelProps {
   portalContainer: HTMLElement
@@ -74,7 +25,6 @@ export function ChainAndTokenSheetPanel({
   const { appChain, appChainId, switchAppChain } = useChain()
   const { selectedToken, setSelectedToken } = useTokenContext()
   const [currentView, setCurrentView] = useState<ChainTokenPanelView>(initialView)
-  const { address } = useAccount()
   const { tokens, loading: tokensLoading } = useTokens({
     onlyActive: true,
   })
@@ -169,8 +119,6 @@ export function ChainAndTokenSheetPanel({
             selectedToken={effectiveToken}
             onTokenSelect={handleTokenSelect}
             onBack={() => setCurrentView("main")}
-            userAddress={address}
-            appChainId={appChainId}
           />
         )}
       </SheetBottomPanelContent>
@@ -224,19 +172,12 @@ function ChainSelectionView({ currentChainId, onChainSelect, onBack }: ChainSele
   )
 }
 
-interface TokenWithBalance extends TokenWithImage {
-  balance: bigint
-  formattedBalance: string
-}
-
 interface TokenSelectionViewProps {
   tokens: TokenWithImage[]
   tokensLoading: boolean
   selectedToken: TokenWithImage
   onTokenSelect: (token: TokenWithImage) => void
   onBack: () => void
-  userAddress?: string
-  appChainId: CasinoChainId
 }
 
 function TokenSelectionView({
@@ -245,46 +186,15 @@ function TokenSelectionView({
   selectedToken,
   onTokenSelect,
   onBack,
-  userAddress,
-  appChainId,
 }: TokenSelectionViewProps) {
-  const nativeToken = tokens.find((token) => token.address === zeroAddress)
-  const erc20Tokens = tokens.filter((token) => token.address !== zeroAddress)
+  const { getBalance, getFormattedBalance } = useBalances()
 
-  const { data: erc20Balances } = useReadContracts({
-    contracts: erc20Tokens.map((token) => ({
-      address: token.address as Hex,
-      abi: erc20Abi,
-      functionName: "balanceOf",
-      args: [userAddress as Hex],
-      chainId: appChainId,
-    })),
-    query: {
-      ...TOKEN_BALANCE_CACHE_CONFIG,
-      enabled: !!userAddress && erc20Tokens.length > 0,
-    },
-  })
-
-  const { data: nativeBalance } = useBalance({
-    address: userAddress as Hex,
-    chainId: appChainId,
-    query: {
-      ...TOKEN_BALANCE_CACHE_CONFIG,
-      enabled: !!userAddress && !!nativeToken,
-    },
-  })
-
-  const tokensWithBalances = useMemo(
-    () =>
-      combineTokensWithBalances(
-        tokens,
-        nativeToken,
-        nativeBalance?.value,
-        erc20Tokens,
-        erc20Balances,
-      ),
-    [tokens, nativeToken, nativeBalance?.value, erc20Tokens, erc20Balances],
-  )
+  // No need for useMemo here - balances are already memoized in BalanceContext
+  const tokensWithBalances = tokens.map((token) => ({
+    ...token,
+    balance: getBalance(token.address) || 0n,
+    formattedBalance: getFormattedBalance(token.address, token.decimals),
+  }))
 
   return (
     <div className="flex flex-col">

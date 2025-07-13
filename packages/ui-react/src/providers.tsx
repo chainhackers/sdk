@@ -5,6 +5,7 @@ import { type Hex, http } from "viem"
 import { createConfig, WagmiProvider } from "wagmi"
 import { avalanche, base, polygon } from "wagmi/chains"
 import { QUERY_DEFAULTS } from "./constants/queryDefaults"
+import { BalanceProvider } from "./context/BalanceContext"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
 import type { TokenWithImage } from "./types/types"
 
@@ -64,7 +65,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
             bankrollToken={DEGEN_TOKEN}
             supportedChains={[base.id, polygon.id, avalanche.id]}
           >
-            {children}
+            <BalanceProvider>{children}</BalanceProvider>
           </BetSwirlSDKProvider>
         </OnchainKitProvider>
       </QueryClientProvider>

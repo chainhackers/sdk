@@ -59,8 +59,8 @@ export function TokenProvider({ children }: TokenProviderProps) {
       return
     }
 
-    // Only update if we don't have a token or chain changed
-    if (selectedToken && selectedToken.chainId === appChainId) {
+    // Only update if we don't have a token
+    if (selectedToken) {
       return
     }
 
