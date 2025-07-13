@@ -1,8 +1,9 @@
 // Import necessary Synpress modules
+
+import fs from "node:fs"
+import path from "node:path"
 import { defineWalletSetup } from "@synthetixio/synpress"
 import { MetaMask } from "@synthetixio/synpress/playwright"
-import fs from "fs"
-import path from "path"
 import { config } from "../../app.config"
 
 // Try to read from .secrets file first, fallback to config
@@ -22,7 +23,7 @@ function getCredentials() {
         }
       }
     }
-  } catch (error) {
+  } catch (_error) {
     // Ignore errors and use fallback
   }
 

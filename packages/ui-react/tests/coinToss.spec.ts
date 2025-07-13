@@ -248,7 +248,7 @@ test.describe("Coin Toss Game", () => {
 
     // Play multiple games
     for (let gameNumber = 1; gameNumber <= numberOfGames; gameNumber++) {
-      console.log("\n=== PLAYING GAME " + gameNumber + " OF " + numberOfGames + " ===")
+      console.log(`\n=== PLAYING GAME ${gameNumber} OF ${numberOfGames} ===`)
 
       // Enter bet amount (only if enabled - it's disabled when showing "Try again")
       await expect(betAmountInput).toBeVisible()
@@ -256,9 +256,9 @@ test.describe("Coin Toss Game", () => {
       if (isInputEnabled) {
         await betAmountInput.clear()
         await betAmountInput.fill(betAmount)
-        console.log("Game " + gameNumber + " - Bet amount: " + betAmount + " ETH")
+        console.log(`Game ${gameNumber} - Bet amount: ${betAmount} ETH`)
       } else {
-        console.log("Game " + gameNumber + " - Using previous bet amount (input disabled)")
+        console.log(`Game ${gameNumber} - Using previous bet amount (input disabled)`)
       }
 
       // Alternate between heads and tails for variety
@@ -284,24 +284,24 @@ test.describe("Coin Toss Game", () => {
             // Select heads
             if (ariaLabel?.includes("Select Heads")) {
               await coinButton.click()
-              console.log("Game " + gameNumber + " - Selected: Heads")
+              console.log(`Game ${gameNumber} - Selected: Heads`)
             } else {
-              console.log("Game " + gameNumber + " - Heads already selected")
+              console.log(`Game ${gameNumber} - Heads already selected`)
             }
           } else {
             // Select tails
             if (ariaLabel?.includes("Select Tails")) {
               await coinButton.click()
-              console.log("Game " + gameNumber + " - Selected: Tails")
+              console.log(`Game ${gameNumber} - Selected: Tails`)
             } else {
-              console.log("Game " + gameNumber + " - Tails already selected")
+              console.log(`Game ${gameNumber} - Tails already selected`)
             }
           }
         } else {
-          console.log("Game " + gameNumber + " - Coin button is disabled, skipping selection")
+          console.log(`Game ${gameNumber} - Coin button is disabled, skipping selection`)
         }
       } else {
-        console.log("Game " + gameNumber + " - Coin button not visible, skipping selection")
+        console.log(`Game ${gameNumber} - Coin button not visible, skipping selection`)
       }
 
       // Find and click play button
@@ -311,17 +311,17 @@ test.describe("Coin Toss Game", () => {
 
       // Check which button text we have
       const buttonText = await playButton.textContent()
-      console.log("Game " + gameNumber + " - Button text: '" + buttonText + "'")
+      console.log(`Game ${gameNumber} - Button text: '${buttonText}'`)
 
       await playButton.click()
-      console.log("Game " + gameNumber + " - Clicked play button")
+      console.log(`Game ${gameNumber} - Clicked play button`)
 
       // Only confirm transaction if it's a new bet (not "Try again")
       if (buttonText?.includes("Place Bet")) {
         await metamask.confirmTransaction()
-        console.log("Game " + gameNumber + " - Transaction confirmed")
+        console.log(`Game ${gameNumber} - Transaction confirmed`)
       } else {
-        console.log("Game " + gameNumber + " - No transaction to confirm (Try again button)")
+        console.log(`Game ${gameNumber} - No transaction to confirm (Try again button)`)
       }
 
       // Wait for bet to be processed
@@ -359,8 +359,8 @@ test.describe("Coin Toss Game", () => {
         balanceAfter: postGameBalance,
       })
 
-      console.log("Game " + gameNumber + " - Result: " + (isWin ? "WON! 🎉" : "Lost 😢"))
-      console.log("Game " + gameNumber + " - Balance after: " + postGameBalance + " ETH")
+      console.log(`Game ${gameNumber} - Result: ${isWin ? "WON! 🎉" : "Lost 😢"}`)
+      console.log(`Game ${gameNumber} - Balance after: ${postGameBalance} ETH`)
 
       currentBalance = postGameBalance
 
@@ -394,11 +394,11 @@ test.describe("Coin Toss Game", () => {
       else totalLosses++
     })
 
-    console.log("\nTotal games played: " + numberOfGames)
-    console.log("Wins: " + totalWins + ", Losses: " + totalLosses)
-    console.log("Starting balance: " + startingBalance + " ETH")
-    console.log("Final balance: " + currentBalance + " ETH")
-    console.log("Net change: " + (currentBalance - startingBalance).toFixed(4) + " ETH")
+    console.log(`\nTotal games played: ${numberOfGames}`)
+    console.log(`Wins: ${totalWins}, Losses: ${totalLosses}`)
+    console.log(`Starting balance: ${startingBalance} ETH`)
+    console.log(`Final balance: ${currentBalance} ETH`)
+    console.log(`Net change: ${(currentBalance - startingBalance).toFixed(4)} ETH`)
 
     // Verify we played all games
     expect(gameResults.length).toBe(numberOfGames)
@@ -410,9 +410,9 @@ test.describe("Coin Toss Game", () => {
     const actualBalanceChange = currentBalance - startingBalance
     const tolerance = 0.001 // Allow for gas fees and floating point precision
 
-    console.log("Expected balance change: " + expectedBalanceChange + " ETH")
-    console.log("Actual balance change: " + actualBalanceChange + " ETH")
-    console.log("Tolerance for gas fees and precision: " + tolerance + " ETH")
+    console.log(`Expected balance change: ${expectedBalanceChange} ETH`)
+    console.log(`Actual balance change: ${actualBalanceChange} ETH`)
+    console.log(`Tolerance for gas fees and precision: ${tolerance} ETH`)
 
     // Round to avoid floating point precision issues
     const difference = Math.abs(actualBalanceChange - expectedBalanceChange)

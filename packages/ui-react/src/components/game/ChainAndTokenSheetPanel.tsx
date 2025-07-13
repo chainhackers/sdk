@@ -301,6 +301,7 @@ function TokenSelectionView({
       </div>
 
       <ScrollArea className="h-60 [&>[data-slot=scroll-area-scrollbar]]:w-[6px] [&>[data-slot=scroll-area-scrollbar]]:border-l-0 [&>[data-slot=scroll-area-scrollbar]]:z-10 [&>[data-slot=scroll-area-scrollbar]]:-translate-x-[1px] [&_[data-slot=scroll-area-thumb]]:bg-scrollbar-thumb ">
+        {/* biome-ignore lint/a11y/useSemanticElements: Native <select> cannot display token icons, balances, and loading states. Custom listbox provides rich UI while maintaining accessibility through ARIA roles. */}
         <div className="flex flex-col gap-1" role="listbox" aria-label="Available tokens">
           {tokensLoading ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
@@ -312,6 +313,7 @@ function TokenSelectionView({
             </div>
           ) : (
             tokensWithBalances.map((token) => (
+              /* biome-ignore lint/a11y/useSemanticElements: Button with role="option" provides interactive token selection with icon, balance display, and custom styling that <option> cannot support */
               <Button
                 variant="ghost"
                 key={token.address}

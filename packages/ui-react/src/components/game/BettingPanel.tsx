@@ -111,7 +111,7 @@ export function BettingPanel({
 
     prevChainIdRef.current = appChainId
     prevTokenAddressRef.current = token.address
-  }, [appChainId, token.address]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [appChainId, token.address, onBetAmountChange]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync input value with betAmount when user is not typing
   // biome-ignore lint/correctness/useExhaustiveDependencies: inputValue is only used for logging, not logic
