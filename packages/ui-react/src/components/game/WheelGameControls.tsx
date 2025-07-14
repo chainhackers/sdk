@@ -201,7 +201,7 @@ export function WheelGameControls({
           } as React.CSSProperties
         }
       >
-        <span className="text-xs font-bold">{item.formattedMultiplier}</span>
+        <span className="text-xs font-medium">{item.formattedMultiplier}</span>
       </div>
     )
 
