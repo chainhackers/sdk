@@ -78,29 +78,96 @@ Example response from Base:
 Once you know which tokens are available, you can use them in your app:
 
 ```tsx
+import type { TokenWithImage } from '@betswirl/ui'
+import { base } from 'wagmi/chains'
+
 // Example token configuration
-const DEGEN_TOKEN = {
+const DEGEN_TOKEN: TokenWithImage = {
   address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
   symbol: "DEGEN",
   decimals: 18,
   image: "https://www.betswirl.com/img/tokens/DEGEN.svg"
 }
 
-// Native token (ETH/MATIC/AVAX etc)
-const NATIVE_TOKEN = {
+// Native token (ETH on Base)
+const ETH_TOKEN: TokenWithImage = {
   address: "0x0000000000000000000000000000000000000000",
-  symbol: "ETH", // or "MATIC", "AVAX" depending on chain
+  symbol: "ETH",
   decimals: 18,
   image: "https://www.betswirl.com/img/tokens/ETH.svg"
 }
 
+// USDC token
+const USDC_TOKEN: TokenWithImage = {
+  address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  symbol: "USDC",
+  decimals: 6,
+  image: "https://www.betswirl.com/img/tokens/USDC.svg"
+}
+
 // Use in BetSwirlSDKProvider
-<BetSwirlSDKProvider 
+<BetSwirlSDKProvider
   initialChainId={base.id}
   bankrollToken={DEGEN_TOKEN}
+  filteredTokens={[DEGEN_TOKEN.address, ETH_TOKEN.address]} // Optional: limit available tokens
 >
   <YourApp />
 </BetSwirlSDKProvider>
+```
+
+## Token Filtering
+
+The `filteredTokens` prop allows you to control which tokens are available for users to select in your application.
+
+### How Token Filtering Works
+
+1. **Without filtering** - All active tokens from the Bank contract are available
+2. **With filtering** - Only tokens whose addresses are in the `filteredTokens` array are available
+3. **Invalid addresses** - Tokens not found in the Bank contract are automatically excluded
+
+### Common Use Cases
+
+**Limit to specific tokens for your application:**
+```tsx
+// Example: Only allow ETH, USDC, and DEGEN
+const ALLOWED_TOKENS = [
+  "0x0000000000000000000000000000000000000000", // ETH
+  "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC
+  "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed", // DEGEN
+]
+
+<BetSwirlSDKProvider
+  initialChainId={base.id}
+  filteredTokens={ALLOWED_TOKENS}
+>
+  <App />
+</BetSwirlSDKProvider>
+```
+
+### Dynamic Token Filtering
+
+You can change the filtered tokens dynamically based on application state:
+
+```tsx
+const [filteredTokens, setFilteredTokens] = useState<string[]>([
+  "0x0000000000000000000000000000000000000000", // ETH
+  "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC
+])
+
+// Update filtering based on user action
+const showAllTokens = () => setFilteredTokens(undefined)
+const showStableOnly = () => setFilteredTokens([
+  "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC
+])
+
+return (
+  <BetSwirlSDKProvider
+    initialChainId={base.id}
+    filteredTokens={filteredTokens}
+  >
+    <App />
+  </BetSwirlSDKProvider>
+)
 ```
 
 ## Available Tokens by Network (as of July 2025)
@@ -115,9 +182,22 @@ const NATIVE_TOKEN = {
 ### Other Networks
 Check using the steps above as token availability may vary by network.
 
-## Notes
+## Important Notes
 
-- Token availability can change - always check the contract for the latest list
-- `allowed = true` and `paused = false` means the token is active
-- The native token always has address `0x0000000000000000000000000000000000000000`
-- Token images follow the pattern: `https://www.betswirl.com/img/tokens/{SYMBOL}.svg`
+### Token Configuration
+- **Token availability can change** - always check the Bank contract for the latest list
+- **Active tokens** require both `allowed = true` and `paused = false`
+- **Native token** always has address `0x0000000000000000000000000000000000000000`
+- **Token images** follow the pattern: `https://www.betswirl.com/img/tokens/{SYMBOL}.svg`
+
+### TypeScript Usage
+- Import `TokenWithImage` type from `@betswirl/ui` for proper type safety
+- Use `as const` for token addresses to ensure proper typing: `"0x..." as const`
+- The `bankrollToken` prop is **optional** - if not provided, users can select from all available tokens
+- The `filteredTokens` prop allows you to limit which tokens are available for selection
+
+### Best Practices
+- Always verify token addresses against the Bank contract before using them
+- Use the exact decimals returned by the contract (18 for most tokens, 6 for USDC)
+- Provide high-quality token images for better user experience
+- Consider using `filteredTokens` to limit options if your app only supports specific tokens
