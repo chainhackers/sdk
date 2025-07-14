@@ -48,7 +48,7 @@ function _extractEventData(
   decodedRollLog: DecodedEventLog,
   gameType: CASINO_GAME_TYPE,
 ): {
-  rolledData: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled
+  rolledData: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled | number
   payout: bigint
   totalBetAmount: bigint
   id: bigint
@@ -110,13 +110,27 @@ function _extractEventData(
         id: kenoRollArgs.id,
       }
     }
+    case CASINO_GAME_TYPE.WHEEL: {
+      const wheelRollArgs = decodedRollLog.args as unknown as {
+        id: bigint
+        payout: bigint
+        totalBetAmount: bigint
+        rolled: number[]
+      }
+      return {
+        rolledData: wheelRollArgs.rolled[0] || 0,
+        payout: wheelRollArgs.payout,
+        totalBetAmount: wheelRollArgs.totalBetAmount,
+        id: wheelRollArgs.id,
+      }
+    }
     default:
       throw new Error(`Unsupported game type for event extraction: ${gameType}`)
   }
 }
 
 function _decodeRolled(
-  rolled: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled,
+  rolled: boolean[] | DiceNumber | RouletteNumber | KenoEncodedRolled | number,
   game: CASINO_GAME_TYPE,
 ): GameRolledResult {
   switch (game) {
@@ -146,6 +160,11 @@ function _decodeRolled(
         game: CASINO_GAME_TYPE.KENO,
         rolled: Keno.decodeRolled(rolled as KenoEncodedRolled),
       }
+    case CASINO_GAME_TYPE.WHEEL:
+      return {
+        game: CASINO_GAME_TYPE.WHEEL,
+        rolled: rolled as number,
+      }
     default:
       logger.debug(`_decodeRolled: Unsupported game type: ${game}`)
       throw new Error(`Unsupported game type for decoding roll: ${game}`)
@@ -162,6 +181,8 @@ function formatRolledResult(rolled: GameRolledResult): string {
       return rolled.rolled.toString()
     case CASINO_GAME_TYPE.KENO:
       return rolled.rolled.join(", ")
+    case CASINO_GAME_TYPE.WHEEL:
+      return rolled.rolled.toString()
     default:
       return ""
   }
