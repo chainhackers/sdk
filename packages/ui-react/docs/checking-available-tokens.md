@@ -17,12 +17,6 @@ All mainnet networks use the same Bank contract address: `0x8FB3110015FBCAA469ee
 - **Avalanche** (43114): [0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA](https://snowtrace.io/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA#readContract)
 - **BSC** (56): [0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA](https://bscscan.com/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA#readContract)
 
-### Testnet Networks (Different Addresses)
-Each testnet has its own Bank contract:
-- **Base Sepolia** (84532): [0x637D401554875a330264e910A3778DAf549F2021](https://sepolia.basescan.org/address/0x637D401554875a330264e910A3778DAf549F2021#readContract)
-- **Arbitrum Sepolia** (421614): [0x3ca54e047aE5f9141b49c6817aa7994CDc589d19](https://sepolia.arbiscan.io/address/0x3ca54e047aE5f9141b49c6817aa7994CDc589d19#readContract)
-- **Avalanche Fuji** (43113): [0x25bED5A341218Df801a64951d02d3c968E84a6d4](https://testnet.snowtrace.io/address/0x25bED5A341218Df801a64951d02d3c968E84a6d4#readContract)
-- **Polygon Amoy** (80002): [0x89D47048152581633579450DC4888C931CD4c28C](https://amoy.polygonscan.com/address/0x89D47048152581633579450DC4888C931CD4c28C#readContract)
 
 ## Step-by-Step Guide to Check Tokens
 
