@@ -111,6 +111,50 @@ git commit -m "Add BetSwirl casino game"
 * Click "Import" → "Deploy"
 * Get public URL after ~2 minutes
 
+## Configuration
+
+### BetSwirlSDKProvider Props
+
+You can customize the SDK behavior with these optional props:
+
+```tsx
+<BetSwirlSDKProvider 
+  initialChainId={base.id}
+  affiliate="0x1234567890123456789012345678901234567890"  // Your affiliate address
+  bankrollToken={customToken}                            // Default betting token
+>
+  <App />
+</BetSwirlSDKProvider>
+```
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `affiliate` | `string` | Your wallet address to receive affiliate commissions. If not provided, you won't earn commissions |
+| `bankrollToken` | `object` | Default token for betting with address, symbol, decimals, and image. [See available tokens →](./checking-available-tokens.md) |
+
+### Environment Variables
+
+**You do NOT need any environment variables** when using this library. All configuration is done through React props.
+
+### Advanced Configuration (Optional)
+
+If you want to use a custom RPC endpoint for better performance, you can set:
+
+```env
+VITE_RPC_URL=https://your-custom-base-rpc.com
+```
+
+This library currently supports **Base network only**. The custom RPC URL will be used instead of the default Base RPC (`https://mainnet.base.org`).
+
+**When to use custom RPC:**
+- You have a premium RPC provider (Alchemy, Infura, etc.)
+- You want better reliability or speed
+- You're hitting rate limits on the default public RPC
+
+**When NOT needed:**
+- For most applications the default RPC works fine
+- If you're just testing or getting started
+
 ## Example Result
 
 * **GitHub Repository**: [github.com/chainhackers/betswirl-ui-react-demo](https://github.com/chainhackers/betswirl-ui-react-demo)
