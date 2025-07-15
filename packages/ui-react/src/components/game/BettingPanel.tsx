@@ -93,17 +93,7 @@ export function BettingPanel({
     const chainChanged = prevChainIdRef.current !== appChainId
     const tokenChanged = prevTokenAddressRef.current !== token.address
 
-    // console.log("[BettingPanel] Chain/Token effect:", {
-    //   chainChanged,
-    //   tokenChanged,
-    //   prevChain: prevChainIdRef.current,
-    //   newChain: appChainId,
-    //   prevToken: prevTokenAddressRef.current,
-    //   newToken: token.address,
-    // })
-
     if (chainChanged || tokenChanged) {
-      console.log("[BettingPanel] Clearing bet amount due to chain/token change")
       onBetAmountChange(undefined)
       setInputValue("")
       setIsValidInput(true)
@@ -117,19 +107,11 @@ export function BettingPanel({
   useEffect(() => {
     if (isUserTyping) return
 
-    // console.log("[BettingPanel] Bet amount sync effect:", {
-    //   betAmount,
-    //   isUserTyping,
-    //   currentInputValue: inputValue,
-    // })
-
     if (betAmount === undefined) {
-      // console.log("[BettingPanel] Clearing input value due to undefined betAmount")
       setInputValue("")
       setIsValidInput(true)
     } else {
       const formatted = formatRawAmount(betAmount, token.decimals, FORMAT_TYPE.PRECISE)
-      // console.log("[BettingPanel] Setting formatted value:", formatted)
       setInputValue(formatted)
       setIsValidInput(true)
     }
@@ -186,15 +168,6 @@ export function BettingPanel({
     isWaiting ||
     (!canInitiateBet && !needsTokenApproval && areChainsSynced) ||
     isApprovingToken
-
-  // console.log("[BettingPanel] Button state:", {
-  //   isApprovePending,
-  //   isApproveConfirming,
-  //   isRefetchingAllowance,
-  //   needsTokenApproval,
-  //   isInputDisabled,
-  //   isPlayButtonDisabled,
-  // })
 
   let playButtonText: string
   if (isApprovePending) {
@@ -288,13 +261,6 @@ export function BettingPanel({
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newInputValue = e.target.value
-    // console.log("[BettingPanel] Input change:", {
-    //   newInputValue,
-    //   currentInputValue: inputValue,
-    //   isUserTyping,
-    //   token: token.symbol,
-    //   tokenAddress: token.address,
-    // })
 
     setInputValue(newInputValue)
     setIsUserTyping(true)
@@ -304,7 +270,6 @@ export function BettingPanel({
     }
 
     typingTimeoutRef.current = setTimeout(() => {
-      console.log("[BettingPanel] User stopped typing")
       setIsUserTyping(false)
     }, 1000)
 
@@ -319,15 +284,12 @@ export function BettingPanel({
 
       try {
         const weiValue = parseUnits(newInputValue, token.decimals)
-        console.log("[BettingPanel] Parsed wei value:", weiValue.toString())
         onBetAmountChange(weiValue)
         setIsValidInput(true)
-      } catch (error) {
-        console.log("[BettingPanel] Parse error:", error)
+      } catch (_error) {
         setIsValidInput(false)
       }
-    } catch (error) {
-      console.log("[BettingPanel] Decimal validation error:", error)
+    } catch (_error) {
       setIsValidInput(false)
     }
   }
