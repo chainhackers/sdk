@@ -7,6 +7,10 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-oncha
 - [Tailwind CSS](https://tailwindcss.com)
 - [Next.js](https://nextjs.org/docs)
 
+## BetSwirl Integration
+
+For detailed instructions on integrating BetSwirl games into Farcaster frame, see [BetSwirl Farcaster Integration Guide](./betswirl-farcaster-guide.md).
+
 ## Getting Started
 
 1. Install dependencies:
