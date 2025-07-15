@@ -53,7 +53,7 @@ function combineTokensWithBalances(
 }
 
 export function BalanceProvider({ children }: BalanceProviderProps) {
-  const { appChainId, walletChainId, areChainsSynced } = useChain()
+  const { appChainId, walletChainId } = useChain()
   const { address } = useAccount()
   const queryClient = useQueryClient()
   const { tokens } = useTokens({ onlyActive: true })
@@ -107,6 +107,7 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
   })
 
   // Clear balances when wallet chain switches
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Need walletChainId to trigger when chain switches
   useEffect(() => {
     queryClient.removeQueries({ queryKey: ["balances"] })
     // Don't immediately refetch - let the query re-enable naturally when dependencies are ready

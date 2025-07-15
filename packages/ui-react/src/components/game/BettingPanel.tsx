@@ -114,7 +114,6 @@ export function BettingPanel({
   }, [appChainId, token.address, onBetAmountChange]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync input value with betAmount when user is not typing
-  // biome-ignore lint/correctness/useExhaustiveDependencies: inputValue is only used for logging, not logic
   useEffect(() => {
     if (isUserTyping) return
 

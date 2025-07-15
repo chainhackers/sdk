@@ -34,12 +34,16 @@ export function ChainAndTokenSheetPanel({
   }, [initialView])
 
   // Get native token from the tokens list to ensure we have the image
-  const nativeToken = tokens.find(token => token.address === chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency).address)
-  
-  const effectiveToken: TokenWithImage = selectedToken || nativeToken || {
-    ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
-    image: "",
-  }
+  const nativeToken = tokens.find(
+    (token) =>
+      token.address === chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency).address,
+  )
+
+  const effectiveToken: TokenWithImage = selectedToken ||
+    nativeToken || {
+      ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
+      image: "",
+    }
 
   const handleTokenSelect = (token: TokenWithImage) => {
     setSelectedToken(token)

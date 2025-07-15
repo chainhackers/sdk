@@ -126,24 +126,24 @@ export async function ensureWalletOnChain(
   expectedToken: string,
 ): Promise<boolean> {
   console.log(`\n=== ENSURING WALLET IS ON ${chainName.toUpperCase()} CHAIN ===`)
-  
+
   try {
     const currentNetwork = await metamask.getCurrentNetwork()
     console.log("Current wallet network:", currentNetwork)
-    
+
     if (currentNetwork !== chainName) {
       console.log(`Switching wallet to ${chainName} network...`)
       await metamask.switchNetwork(chainName)
       await page.waitForTimeout(3000)
-      
+
       // Reload page to ensure chain change is reflected
       await page.reload()
       await page.waitForLoadState("networkidle")
-      
+
       // Verify we're now on the correct chain
       const newNetwork = await metamask.getCurrentNetwork()
       console.log("Network after switch:", newNetwork)
-      
+
       if (newNetwork !== chainName) {
         console.log(`❌ Failed to switch to ${chainName} network. Current: ${newNetwork}`)
         return false
@@ -155,17 +155,17 @@ export async function ensureWalletOnChain(
     // Verify balance shows expected token
     const balanceElement = page.locator("text=/Balance:/").first()
     const isBalanceVisible = await balanceElement.isVisible({ timeout: 10000 }).catch(() => false)
-    
+
     if (isBalanceVisible) {
       const balanceContainer = await balanceElement.locator("..").first()
       const balanceText = await balanceContainer.textContent()
-      
+
       if (!balanceText?.includes(expectedToken)) {
         console.log(`❌ Balance shows wrong token for ${chainName} chain`)
         console.log(`Expected: ${expectedToken} balance, Got:`, balanceText)
         return false
       }
-      
+
       console.log(`✅ Confirmed ${expectedToken} balance on ${chainName} chain:`, balanceText)
     }
 

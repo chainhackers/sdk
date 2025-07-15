@@ -47,20 +47,20 @@ test.describe("Coin Toss Game", () => {
     console.log("\n=== ENSURING WALLET IS ON BASE CHAIN ===")
     const currentNetwork = await metamask.getCurrentNetwork()
     console.log("Current wallet network:", currentNetwork)
-    
+
     if (currentNetwork !== "Base") {
       console.log("Switching wallet to Base network...")
       await metamask.switchNetwork("Base")
       await page.waitForTimeout(3000)
-      
+
       // Reload page to ensure chain change is reflected
       await page.reload()
       await page.waitForLoadState("networkidle")
-      
+
       // Verify we're now on Base
       const newNetwork = await metamask.getCurrentNetwork()
       console.log("Network after switch:", newNetwork)
-      
+
       if (newNetwork !== "Base") {
         throw new Error(`Failed to switch to Base network. Current: ${newNetwork}`)
       }
@@ -259,20 +259,20 @@ test.describe("Coin Toss Game", () => {
     console.log("\n=== ENSURING WALLET IS ON BASE CHAIN ===")
     const currentNetwork = await metamask.getCurrentNetwork()
     console.log("Current wallet network:", currentNetwork)
-    
+
     if (currentNetwork !== "Base") {
       console.log("Switching wallet to Base network...")
       await metamask.switchNetwork("Base")
       await page.waitForTimeout(3000)
-      
+
       // Reload page to ensure chain change is reflected
       await page.reload()
       await page.waitForLoadState("networkidle")
-      
+
       // Verify we're now on Base
       const newNetwork = await metamask.getCurrentNetwork()
       console.log("Network after switch:", newNetwork)
-      
+
       if (newNetwork !== "Base") {
         throw new Error(`Failed to switch to Base network. Current: ${newNetwork}`)
       }
@@ -286,7 +286,7 @@ test.describe("Coin Toss Game", () => {
     await expect(balanceElement).toBeVisible({ timeout: 20000 })
     const balanceContainer = await balanceElement.locator("..").first()
     const initialBalanceText = await balanceContainer.textContent()
-    
+
     // Verify balance shows ETH (not POL or other tokens)
     if (!initialBalanceText?.includes("ETH")) {
       console.log("❌ Balance shows wrong token for Base chain")
@@ -294,7 +294,7 @@ test.describe("Coin Toss Game", () => {
       await page.screenshot({ path: "coinToss-multiple-wrong-token.png", fullPage: true })
       throw new Error(`Expected ETH balance on Base chain, but got: ${initialBalanceText}`)
     }
-    
+
     const startingBalance = extractBalance(initialBalanceText)
     console.log("Starting ETH balance:", startingBalance)
 

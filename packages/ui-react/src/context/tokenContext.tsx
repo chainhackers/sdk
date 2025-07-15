@@ -71,8 +71,7 @@ export function TokenProvider({ children }: TokenProviderProps) {
         // For ERC20 tokens, address comparison is sufficient
         return token.address === selectedToken.address
       })
-      
-      
+
       if (isTokenValidForChain) {
         // Token is valid for this chain, keep it
         return
