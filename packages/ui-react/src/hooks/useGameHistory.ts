@@ -2,19 +2,23 @@ import {
   Bet_OrderBy,
   CASINO_GAME_TYPE,
   CasinoBet,
+  CasinoBetFilterStatus,
   CasinoChainId,
   FORMAT_TYPE,
   fetchBets,
   formatAmount,
   formatRawAmount,
   OrderDirection,
+  Token,
 } from "@betswirl/sdk-core"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { type UseQueryResult, useQuery } from "@tanstack/react-query"
+import React from "react"
+import { Address } from "viem"
 import { useAccount } from "wagmi"
 import { TokenIcon } from "../components/ui/TokenIcon"
 import { createLogger } from "../lib/logger"
 import { toLowerCase } from "../lib/utils"
-import { HistoryEntryStatus, TokenWithImage } from "../types/types"
+import { HistoryEntryStatus, QueryParameter, TokenWithImage } from "../types/types"
 import { useTokens } from "./useTokens"
 
 const logger = createLogger("useGameHistory")
@@ -38,33 +42,72 @@ function formatRelativeTime(timestampSecs: number): string {
   return `~${diffInDays}d ago`
 }
 
-export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
-  const [rawBets, setRawBets] = useState<CasinoBet[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<Error | null>(null)
-  const { chainId, address } = useAccount()
-  const { tokens } = useTokens({ onlyActive: false }) // Get all tokens, not just active ones
+export type GameHistoryEntry = {
+  id: string
+  status: HistoryEntryStatus
+  multiplier: string
+  payoutAmount: string
+  payoutCurrencyIcon: React.ReactElement
+  timestamp: string
+}
 
-  const fetchRawBets = useCallback(async () => {
-    if (!address || !chainId) {
-      setRawBets([])
-      setIsLoading(false)
-      setError(null) // Clear error when wallet is disconnected
-      return
-    }
+export type UseGameHistoryProps = {
+  gameType: CASINO_GAME_TYPE
+  filter: {
+    userChainId?: CasinoChainId
+    userAddress?: Address
+    token?: Token
+    status?: CasinoBetFilterStatus
+  }
+  offset?: number
+  limit?: number
+  query?: QueryParameter<{
+    gameHistory: GameHistoryEntry[]
+    rawBets: CasinoBet[]
+  }>
+}
 
-    setIsLoading(true)
-    setError(null)
+export type UseGameHistory = (props: UseGameHistoryProps) => UseQueryResult<{
+  gameHistory: GameHistoryEntry[]
+  rawBets: CasinoBet[]
+}>
 
-    try {
+export const useGameHistory: UseGameHistory = ({ gameType, filter, offset, limit, query = {} }) => {
+  const { address: activeAddress, chainId: activeChainId } = useAccount()
+  // Get all tokens, not just the active ones
+  const { tokens } = useTokens({ onlyActive: false })
+  const address = filter.userAddress || activeAddress
+  const chainId = filter.userChainId || activeChainId
+  // I think affiliate should be accesible from a React context
+  //const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Address
+
+  return useQuery({
+    queryKey: [
+      "game-history",
+      gameType,
+      chainId,
+      address?.toLowerCase(),
+      filter.token,
+      filter.status,
+      offset,
+      limit,
+    ],
+    queryFn: async () => {
+      if (!address || !chainId) {
+        return { gameHistory: [], rawBets: [] }
+      }
+
       const result = await fetchBets(
         { chainId: chainId as CasinoChainId },
         {
           bettor: toLowerCase(address),
           game: gameType,
+          token: filter.token,
+          status: filter.status,
+          //affiliates: [affiliate], To uncomment when we have a way to get the affiliate address from the context
         },
-        undefined,
-        undefined,
+        offset,
+        limit,
         { key: Bet_OrderBy.BetTimestamp, order: OrderDirection.Desc },
       )
 
@@ -72,54 +115,35 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
         throw result.error
       }
 
-      setRawBets(result.bets)
       logger.info("Raw bets fetched", { count: result.bets.length })
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error("Failed to fetch game history"))
-    } finally {
-      setIsLoading(false)
-    }
-  }, [address, chainId, gameType])
 
-  const gameHistory = useMemo(() => {
-    return rawBets.map((bet: CasinoBet) => {
-      const matchingToken = tokens.find(
-        (token) => token.symbol === bet.token.symbol && token.address === bet.token.address,
-      )
+      const gameHistory = result.bets.map((bet: CasinoBet) => {
+        const matchingToken = tokens.find(
+          (token) => token.symbol === bet.token.symbol && token.address === bet.token.address,
+        )
 
-      const tokenWithImage: TokenWithImage = matchingToken || {
-        ...bet.token,
-        // Use BetSwirl's token image URL pattern as fallback
-        image: `https://www.betswirl.com/img/tokens/${bet.token.symbol.toUpperCase()}.svg`,
-      }
+        const tokenWithImage: TokenWithImage = matchingToken || {
+          ...bet.token,
+          // Use BetSwirl's token image URL pattern as fallback
+          image: `https://www.betswirl.com/img/tokens/${bet.token.symbol.toUpperCase()}.svg`,
+        }
 
-      return {
-        id: bet.id.toString(),
-        status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
-        multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
-        payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
-        payoutCurrencyIcon: React.createElement(TokenIcon, {
-          token: tokenWithImage,
-          size: 18,
-        }),
-        timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
-      }
-    })
-  }, [rawBets, tokens])
+        return {
+          id: bet.id.toString(),
+          status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
+          multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
+          payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
+          payoutCurrencyIcon: React.createElement(TokenIcon, {
+            token: tokenWithImage,
+            size: 18,
+          }),
+          timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
+        }
+      })
 
-  useEffect(() => {
-    if (address && chainId) {
-      fetchRawBets()
-    } else {
-      setRawBets([])
-      setIsLoading(false)
-      setError(null) // Clear error when wallet is disconnected
-    }
-  }, [fetchRawBets, address, chainId])
-
-  const refreshHistory = useCallback(async () => {
-    await fetchRawBets()
-  }, [fetchRawBets])
-
-  return { gameHistory, isLoading, error, refreshHistory }
+      return { gameHistory, rawBets: result.bets }
+    },
+    refetchOnWindowFocus: false,
+    ...query,
+  })
 }

@@ -1,7 +1,8 @@
 import React from "react"
+import { Theme } from "../../../types/types"
 
 export interface BaseGameProps extends React.HTMLAttributes<HTMLDivElement> {
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
   customTheme?: {
     "--primary"?: string
     "--play-btn-font"?: string

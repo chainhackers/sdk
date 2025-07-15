@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { CoinTossGame, type CoinTossGameProps } from "../../components/game/CoinTossGame"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
+import { THEME_OPTIONS } from "../../types/types"
 import gameBg1 from "../assets/game/game-background-1.jpg"
 import gameBg2 from "../assets/game/game-background-2.jpg"
 import gameBg3 from "../assets/game/game-background-3.jpg"
@@ -41,7 +42,7 @@ const meta = {
   argTypes: {
     theme: {
       control: "radio",
-      options: ["light", "dark", "system"],
+      options: THEME_OPTIONS,
     },
     token: {
       control: "radio",

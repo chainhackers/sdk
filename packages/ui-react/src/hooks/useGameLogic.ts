@@ -16,6 +16,7 @@ import {
   GameDefinition,
   GameResult,
   HistoryEntry,
+  Theme,
   TokenWithImage,
 } from "../types/types"
 import { useBetCalculations } from "./useBetCalculations"
@@ -58,7 +59,7 @@ interface UseGameLogicResult<T extends GameChoice = GameChoice> {
   isGamePaused: boolean
   nativeCurrencySymbol: string
   themeSettings: {
-    theme: "light" | "dark" | "system"
+    theme: Theme
     customTheme?: {
       "--primary"?: string
       "--play-btn-font"?: string
@@ -116,7 +117,10 @@ export function useGameLogic<T extends GameChoice>({
   const { gameType, defaultSelection } = effectiveGameDefinition
 
   const { isConnected: isWalletConnected, address } = useAccount()
-  const { gameHistory, refreshHistory } = useGameHistory(gameType)
+  const { data: gameHistoryData, refetch: refreshHistory } = useGameHistory({
+    gameType,
+    filter: {},
+  })
   const { areChainsSynced, appChainId } = useChain()
 
   const { selectedToken } = useTokenContext()
@@ -233,7 +237,7 @@ export function useGameLogic<T extends GameChoice>({
     balance,
     token,
     areChainsSynced,
-    gameHistory,
+    gameHistory: gameHistoryData?.gameHistory ?? [],
     refreshHistory,
     refetchBalance,
     betAmount,
