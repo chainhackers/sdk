@@ -173,6 +173,9 @@ If you deploy to a new project, the domain will be created from the project's na
 If you added environment variables for the manifest (e.g., NEXT_PUBLIC_URL) in Vercel project settings after deployment, you need to redeploy. Go to deployments, navigate to your project and click redeploy.   
 ![Redeploy](screenshots/redeploy.png)
 
+To update your production deployment from the command line, use `vercel --prod`. This will update your production domain. Without the `--prod` flag, Vercel creates a new preview deployment with an automatically generated URL intended for testing and not publicly accessible by default.
+
+[CLI Vercel Deploy](https://vercel.com/docs/cli/deploy)
 [Managing Deployments](https://vercel.com/docs/projects/project-dashboard#deployments)
 
 ## Publish and Test mini-app in Farcaster
