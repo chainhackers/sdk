@@ -1,6 +1,6 @@
 "use client";
 
-import { BetSwirlSDKProvider, type TokenWithImage } from "@betswirl/ui";
+import { BetSwirlSDKProvider, type TokenWithImage } from "@betswirl/ui-react";
 import { type AppConfig } from "@coinbase/onchainkit";
 import { MiniKitProvider } from "@coinbase/onchainkit/minikit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

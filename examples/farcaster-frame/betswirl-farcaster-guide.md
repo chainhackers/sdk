@@ -21,7 +21,7 @@ npx create-onchain --mini
 cd your-mini-project
 
 # Install BetSwirl UI
-npm install @betswirl/ui
+npm install @betswirl/ui-react
 ```
 
 **During installation:**
@@ -42,7 +42,7 @@ import { type ReactNode, useState } from "react";
 import { http, type Hex } from "viem";
 import { WagmiProvider, createConfig } from "wagmi";
 import { base } from "wagmi/chains";
-import { BetSwirlSDKProvider, type TokenWithImage } from "@betswirl/ui";
+import { BetSwirlSDKProvider, type TokenWithImage } from "@betswirl/ui-react";
 
 const DEGEN_TOKEN: TokenWithImage = {
   address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
@@ -91,8 +91,8 @@ export function Providers(props: { children: ReactNode }) {
 Add the game component in `app/page.tsx`:
 
 ```tsx
-import { DiceGame } from "@betswirl/ui";
-import "@betswirl/ui/styles.css";
+import { DiceGame } from "@betswirl/ui-react";
+import "@betswirl/ui-react/styles.css";
 
 // ... existing code ...
 

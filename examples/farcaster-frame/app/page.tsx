@@ -1,10 +1,10 @@
 "use client";
 
-import { DiceGame } from "@betswirl/ui";
+import { DiceGame } from "@betswirl/ui-react";
 import { useAddFrame, useMiniKit, useOpenUrl } from "@coinbase/onchainkit/minikit";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Icon } from "./components/DemoComponents";
-import "@betswirl/ui/styles.css";
+import "@betswirl/ui-react/styles.css";
 
 export default function App() {
   const { setFrameReady, isFrameReady, context } = useMiniKit();
