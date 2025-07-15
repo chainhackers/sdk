@@ -5,8 +5,6 @@ import { WheelSegment } from "../components/game/WheelGameControls"
 interface UseWheelAnimationParams {
   spinDuration: number
   continuousSpinDuration: number
-  isSpinning: boolean
-  winningMultiplier: number | null
   segments: WheelSegment[]
   onSpinComplete?: () => void
 }
@@ -15,6 +13,11 @@ interface UseWheelAnimationReturn {
   rotationAngle: number
   displayedMultiplier: number
   hasResult: boolean
+  isSpinning: boolean
+  winningSectorIndex: number | null
+  startEndlessSpin: () => void
+  spinWheelWithResult: (sectorIndex: number) => void
+  stopSpin: () => void
 }
 
 const ANGLE_VARIANCE = 32
@@ -23,17 +26,19 @@ const MIN_FULL_ROTATIONS = 5
 const MAX_FULL_ROTATIONS = 8
 
 /**
- * Calculates the target angle for a winning multiplier
+ * Calculates the target angle for a winning sector index
  * @param segments - Array of wheel segments
- * @param winningMultiplier - The winning multiplier value
+ * @param winningSectorIndex - The winning sector index (0-based)
  * @returns Target angle in degrees for the wheel to stop at
  */
-function getTargetAngleForMultiplier(segments: WheelSegment[], winningMultiplier: number): number {
-  const matchingSegments = segments.filter((s) => s.multiplier === winningMultiplier)
-  const segment = matchingSegments[Math.floor(Math.random() * matchingSegments.length)]
+function getTargetAngleForSectorIndex(
+  segments: WheelSegment[],
+  winningSectorIndex: number,
+): number {
+  const segment = segments[winningSectorIndex]
 
   if (!segment) {
-    console.warn(`Could not find segment for multiplier: ${winningMultiplier}`)
+    console.warn(`Could not find segment for sector index: ${winningSectorIndex}`)
     return 0
   }
 
@@ -53,14 +58,14 @@ function getTargetAngleForMultiplier(segments: WheelSegment[], winningMultiplier
 export function useWheelAnimation({
   spinDuration,
   continuousSpinDuration,
-  isSpinning,
-  winningMultiplier,
   segments,
   onSpinComplete,
 }: UseWheelAnimationParams): UseWheelAnimationReturn {
   const [rotationAngle, setRotationAngle] = useState(0)
   const [displayedMultiplier, setDisplayedMultiplier] = useState<number | undefined>()
   const [hasResult, setHasResult] = useState(false)
+  const [isSpinning, setIsSpinning] = useState(false)
+  const [winningSectorIndex, setWinningSectorIndex] = useState<number | null>(null)
 
   const spinStartTimeRef = useRef<number | null>(null)
   const lastKnownAngleRef = useRef<number>(0)
@@ -83,7 +88,7 @@ export function useWheelAnimation({
   }, [continuousSpinDuration])
 
   useEffect(() => {
-    if (isSpinning && winningMultiplier === null) {
+    if (isSpinning && winningSectorIndex === null) {
       spinStartTimeRef.current = Date.now()
 
       if (continuousSpinIntervalRef.current) {
@@ -96,7 +101,7 @@ export function useWheelAnimation({
       }
 
       continuousSpinIntervalRef.current = setInterval(updateRotation, FRAME_INTERVAL) // ~60fps
-    } else if (!isSpinning && winningMultiplier === null) {
+    } else if (!isSpinning && winningSectorIndex === null) {
       if (continuousSpinIntervalRef.current) {
         clearInterval(continuousSpinIntervalRef.current)
         continuousSpinIntervalRef.current = null
@@ -109,10 +114,10 @@ export function useWheelAnimation({
 
       spinStartTimeRef.current = null
     }
-  }, [isSpinning, winningMultiplier, getCurrentSpinAngle])
+  }, [isSpinning, winningSectorIndex, getCurrentSpinAngle])
 
   useEffect(() => {
-    if (winningMultiplier !== null && segments.length > 0 && isSpinning) {
+    if (winningSectorIndex !== null && segments.length > 0 && isSpinning) {
       resetWheelState()
 
       if (continuousSpinIntervalRef.current) {
@@ -124,7 +129,7 @@ export function useWheelAnimation({
 
       spinStartTimeRef.current = null
 
-      const targetAngle = getTargetAngleForMultiplier(segments, winningMultiplier)
+      const targetAngle = getTargetAngleForSectorIndex(segments, winningSectorIndex)
 
       const normalizedCurrent = currentAngle % 360
       const normalizedTarget = targetAngle % 360
@@ -145,11 +150,12 @@ export function useWheelAnimation({
       }
 
       spinCompleteTimeoutRef.current = setTimeout(() => {
-        setDisplayedMultiplier(winningMultiplier)
+        const winningSegment = segments[winningSectorIndex]
+        setDisplayedMultiplier(winningSegment.multiplier)
         setHasResult(true)
         onSpinComplete?.()
       }, spinDuration)
-    } else if (winningMultiplier === null) {
+    } else if (winningSectorIndex === null) {
       resetWheelState()
       if (spinCompleteTimeoutRef.current) {
         clearTimeout(spinCompleteTimeoutRef.current)
@@ -157,7 +163,7 @@ export function useWheelAnimation({
       }
     }
   }, [
-    winningMultiplier,
+    winningSectorIndex,
     segments,
     isSpinning,
     resetWheelState,
@@ -177,6 +183,46 @@ export function useWheelAnimation({
     }
   }, [])
 
+  const startEndlessSpin = useCallback(() => {
+    setIsSpinning(true)
+    setWinningSectorIndex(null)
+    resetWheelState()
+
+    lastKnownAngleRef.current = lastKnownAngleRef.current % 360
+  }, [resetWheelState])
+
+  const spinWheelWithResult = useCallback(
+    (sectorIndex: number) => {
+      setIsSpinning(true)
+      setWinningSectorIndex(null)
+      resetWheelState()
+
+      lastKnownAngleRef.current = lastKnownAngleRef.current % 360
+
+      setTimeout(() => {
+        setWinningSectorIndex(sectorIndex)
+      }, 100)
+    },
+    [resetWheelState],
+  )
+
+  const stopSpin = useCallback(() => {
+    if (spinCompleteTimeoutRef.current) {
+      clearTimeout(spinCompleteTimeoutRef.current)
+      spinCompleteTimeoutRef.current = null
+    }
+    if (continuousSpinIntervalRef.current) {
+      clearInterval(continuousSpinIntervalRef.current)
+      continuousSpinIntervalRef.current = null
+    }
+
+    setIsSpinning(false)
+    setWinningSectorIndex(null)
+    resetWheelState()
+
+    spinStartTimeRef.current = null
+  }, [resetWheelState])
+
   const numericDisplayedMultiplier =
     displayedMultiplier !== undefined ? displayedMultiplier / BP_VALUE : 0
 
@@ -184,5 +230,10 @@ export function useWheelAnimation({
     rotationAngle,
     displayedMultiplier: numericDisplayedMultiplier,
     hasResult,
+    isSpinning,
+    winningSectorIndex,
+    startEndlessSpin,
+    spinWheelWithResult,
+    stopSpin,
   }
 }

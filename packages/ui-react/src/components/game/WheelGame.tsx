@@ -5,17 +5,19 @@ import {
   WeightedGame,
   type WeightedGameConfiguration,
 } from "@betswirl/sdk-core"
-import { useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import wheelBackground from "../../assets/game/game-background.jpg"
+import { useDelayedGameResult } from "../../hooks/useDelayedGameResult"
 import { useWeightedGameLogic } from "../../hooks/useWeightedGameLogic"
 import { WeightedGameDefinition } from "../../types/types"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
 
-import { WheelGameControls } from "./WheelGameControls"
+import { WheelController, WheelGameControls } from "./WheelGameControls"
 
 const DEFAULT_CONFIG_ID = 0
+const RESULT_DISPLAY_DELAY = 2500
 
 const wheelGameDefinition: WeightedGameDefinition<{
   game: CASINO_GAME_TYPE.WHEEL
@@ -41,6 +43,8 @@ export function WheelGame({
   backgroundImage = wheelBackground,
   ...props
 }: WheelGameProps) {
+  const wheelControllerRef = useRef<WheelController>(null)
+
   const {
     isWalletConnected,
     balance,
@@ -76,8 +80,28 @@ export function WheelGame({
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
 
-  const isSpinning = betStatus === "rolling"
-  const winningMultiplier = gameResult?.rolled ? Number(gameResult.rolled) : undefined
+  const { delayedGameResult, handleSpinComplete } = useDelayedGameResult({
+    gameResult,
+    betStatus,
+    delay: RESULT_DISPLAY_DELAY,
+  })
+
+  // Handle game state changes with the imperative API
+  useEffect(() => {
+    if (!wheelControllerRef.current || !currentConfig) return
+
+    if (betStatus === "rolling" && !gameResult?.rolled) {
+      // Start endless spin when rolling starts
+      wheelControllerRef.current.startEndlessSpin()
+    } else if (betStatus === "success" && gameResult?.rolled) {
+      // gameResult.rolled.rolled is already a sector index
+      const sectorIndex = gameResult.rolled.rolled as number
+      wheelControllerRef.current.spinWheelWithResult(sectorIndex)
+    } else {
+      // Stop spinning when not rolling
+      wheelControllerRef.current.stopSpin()
+    }
+  }, [betStatus, gameResult, currentConfig])
 
   const tooltipContent = useMemo(() => {
     if (!currentConfig || !betAmount) return undefined
@@ -97,7 +121,6 @@ export function WheelGame({
     return content
   }, [currentConfig, betAmount, token])
 
-  console.log({ currentConfig })
   if (!currentConfig) {
     return (
       <GameFrame themeSettings={themeSettings} {...props} variant="wheel">
@@ -126,14 +149,14 @@ export function WheelGame({
         <GameFrame.HistoryButton historyData={gameHistory} onHistoryOpen={refreshHistory} />
         <GameFrame.GameControls>
           <WheelGameControls
+            ref={wheelControllerRef}
             config={currentConfig}
-            isSpinning={isSpinning}
-            winningMultiplier={winningMultiplier}
             theme={theme}
             tooltipContent={tooltipContent}
+            onSpinComplete={handleSpinComplete}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
+        <GameFrame.ResultWindow gameResult={delayedGameResult} currency={token.symbol} />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.WHEEL}

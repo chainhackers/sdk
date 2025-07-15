@@ -1,8 +1,8 @@
 import { CASINO_GAME_TYPE, WeightedGameConfiguration } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 import { Address } from "viem"
-import { WheelGameControls } from "../../components/game/WheelGameControls"
+import { WheelController, WheelGameControls } from "../../components/game/WheelGameControls"
 import { Button } from "../../components/ui/button"
 import { TokenWithImage } from "../../types/types"
 
@@ -33,6 +33,32 @@ const DEGEN_TOKEN: TokenWithImage = {
   image: "https://www.betswirl.com/img/tokens/DEGEN.svg",
 }
 
+function createMockTooltipContent(token: TokenWithImage) {
+  return {
+    0: { chance: "50%", profit: 0, token },
+    14580: {
+      chance: <span className="text-[#55DC36]">10%</span>,
+      profit: 1.4,
+      token,
+    },
+    18760: {
+      chance: <span className="text-[#15A2D8]">10%</span>,
+      profit: 1.8,
+      token,
+    },
+    20830: {
+      chance: <span className="text-[#7340F4]">10%</span>,
+      profit: 2.0,
+      token,
+    },
+    31250: {
+      chance: <span className="text-[#EC9E3C]">10%</span>,
+      profit: 3.0,
+      token,
+    },
+  }
+}
+
 const meta = {
   title: "Game/Controls/WheelGameControls",
   component: WheelGameControls,
@@ -55,22 +81,6 @@ const meta = {
       table: {
         type: { summary: "WeightedGameConfiguration" },
         defaultValue: { summary: "mockWheelConfig" },
-      },
-    },
-    isSpinning: {
-      control: "boolean",
-      description: "Controls whether the wheel is spinning",
-      table: {
-        type: { summary: "boolean" },
-        defaultValue: { summary: "false" },
-      },
-    },
-    winningMultiplier: {
-      control: { type: "number", min: 0, max: 31250, step: 1 },
-      description: "Winning multiplier to animate to (in BP)",
-      table: {
-        type: { summary: "number | undefined" },
-        defaultValue: { summary: "undefined" },
       },
     },
     theme: {
@@ -124,52 +134,26 @@ function InteractiveWheelGameControls({
     { chance?: string | React.ReactNode; profit?: number; token: TokenWithImage }
   >
 }) {
-  const [winningMultiplier, setWinningMultiplier] = useState<number | undefined>()
-  const [isSpinning, setIsSpinning] = useState(false)
-  const [spinMode, setSpinMode] = useState<"continuous" | "landing">("continuous")
+  const wheelControllerRef = useRef<WheelController>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
-  const possibleMultipliers = config.multipliers.map((m) => Number(m))
+  const totalSectors = config.multipliers.length
 
   const handleContinuousSpin = () => {
-    if (isSpinning) return
-    setSpinMode("continuous")
-    setIsSpinning(true)
-    setWinningMultiplier(undefined)
+    wheelControllerRef.current?.startEndlessSpin()
   }
 
   const handleSpinWithResult = () => {
-    if (isSpinning && spinMode === "continuous") {
-      // If already spinning continuously, land on a random multiplier
-      const randomMultiplier =
-        possibleMultipliers[Math.floor(Math.random() * possibleMultipliers.length)]
-      setWinningMultiplier(randomMultiplier)
-      setSpinMode("landing")
-    } else if (!isSpinning) {
-      // Start spinning and land on a result
-      setSpinMode("landing")
-      setIsSpinning(true)
-      setWinningMultiplier(undefined)
-
-      const randomMultiplier =
-        possibleMultipliers[Math.floor(Math.random() * possibleMultipliers.length)]
-
-      setTimeout(() => {
-        setWinningMultiplier(randomMultiplier)
-      }, 500)
-    }
+    const randomSectorIndex = Math.floor(Math.random() * totalSectors)
+    wheelControllerRef.current?.spinWheelWithResult(randomSectorIndex)
   }
 
   const handleStop = () => {
-    setIsSpinning(false)
-    setWinningMultiplier(undefined)
+    wheelControllerRef.current?.stopSpin()
   }
 
   const handleSpinComplete = () => {
     console.log("Spin completed!")
-    setTimeout(() => {
-      setIsSpinning(false)
-    }, 1000)
   }
 
   return (
@@ -180,9 +164,8 @@ function InteractiveWheelGameControls({
           className="relative w-[304px] h-[198px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden"
         >
           <WheelGameControls
+            ref={wheelControllerRef}
             config={config}
-            isSpinning={isSpinning}
-            winningMultiplier={winningMultiplier}
             theme={theme}
             parent={containerRef}
             onSpinComplete={handleSpinComplete}
@@ -191,24 +174,18 @@ function InteractiveWheelGameControls({
         </div>
 
         <div className="flex space-x-2">
-          <Button onClick={handleContinuousSpin} disabled={isSpinning} size="sm">
+          <Button onClick={handleContinuousSpin} size="sm">
             Start Continuous Spin
           </Button>
           <Button onClick={handleSpinWithResult} size="sm">
-            {isSpinning && spinMode === "continuous" ? "Land on Result" : "Spin & Land"}
+            Spin with Random Sector
           </Button>
-          {isSpinning && (
-            <Button onClick={handleStop} variant="destructive" size="sm">
-              Stop
-            </Button>
-          )}
+          <Button onClick={handleStop} variant="destructive" size="sm">
+            Stop
+          </Button>
         </div>
         <div className="text-sm text-muted-foreground">
-          {isSpinning && spinMode === "continuous" && "Spinning continuously..."}
-          {isSpinning &&
-            spinMode === "landing" &&
-            winningMultiplier !== undefined &&
-            "Landing on result..."}
+          Use the buttons above to control the wheel using sector indices (0-{totalSectors - 1})
         </div>
       </div>
     </div>
@@ -218,29 +195,7 @@ function InteractiveWheelGameControls({
 export const LightThemeDefault: Story = {
   name: "Light Theme - Default",
   render: () => {
-    const tooltipContent = {
-      0: { chance: "50%", profit: 0, token: DEGEN_TOKEN },
-      14580: {
-        chance: <span className="text-[#55DC36]">10%</span>,
-        profit: 1.4,
-        token: DEGEN_TOKEN,
-      },
-      18760: {
-        chance: <span className="text-[#15A2D8]">10%</span>,
-        profit: 1.8,
-        token: DEGEN_TOKEN,
-      },
-      20830: {
-        chance: <span className="text-[#7340F4]">10%</span>,
-        profit: 2.0,
-        token: DEGEN_TOKEN,
-      },
-      31250: {
-        chance: <span className="text-[#EC9E3C]">10%</span>,
-        profit: 3.0,
-        token: DEGEN_TOKEN,
-      },
-    }
+    const tooltipContent = createMockTooltipContent(DEGEN_TOKEN)
     return <InteractiveWheelGameControls theme="light" tooltipContent={tooltipContent} />
   },
   args: {} as any,
@@ -258,27 +213,8 @@ export const DarkThemeDefault: Story = {
   name: "Dark Theme - Default",
   render: () => {
     const tooltipContent = {
+      ...createMockTooltipContent(DEGEN_TOKEN),
       0: { chance: <span className="text-[#29384C]">50%</span>, profit: 0, token: DEGEN_TOKEN },
-      14580: {
-        chance: <span className="text-[#55DC36]">10%</span>,
-        profit: 1.4,
-        token: DEGEN_TOKEN,
-      },
-      18760: {
-        chance: <span className="text-[#15A2D8]">10%</span>,
-        profit: 1.8,
-        token: DEGEN_TOKEN,
-      },
-      20830: {
-        chance: <span className="text-[#7340F4]">10%</span>,
-        profit: 2.0,
-        token: DEGEN_TOKEN,
-      },
-      31250: {
-        chance: <span className="text-[#EC9E3C]">10%</span>,
-        profit: 3.0,
-        token: DEGEN_TOKEN,
-      },
     }
     return <InteractiveWheelGameControls theme="dark" tooltipContent={tooltipContent} />
   },
@@ -288,6 +224,88 @@ export const DarkThemeDefault: Story = {
     docs: {
       description: {
         story: "Dark theme wheel game controls. Click 'Spin Wheel' to see the animation.",
+      },
+    },
+  },
+}
+
+function ImperativeAPIDemo() {
+  const wheelControllerRef = useRef<WheelController>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+
+  const totalSectors = mockWheelConfig.multipliers.length
+
+  const handleStartEndlessSpin = () => {
+    wheelControllerRef.current?.startEndlessSpin()
+  }
+
+  const handleSpinWithResult = () => {
+    const randomSectorIndex = Math.floor(Math.random() * totalSectors)
+    wheelControllerRef.current?.spinWheelWithResult(randomSectorIndex)
+  }
+
+  const handleStop = () => {
+    wheelControllerRef.current?.stopSpin()
+  }
+
+  const tooltipContent = {
+    0: { chance: "50%", profit: 0, token: DEGEN_TOKEN },
+    14580: { chance: "10%", profit: 1.4, token: DEGEN_TOKEN },
+    18760: { chance: "10%", profit: 1.8, token: DEGEN_TOKEN },
+    20830: { chance: "10%", profit: 2.0, token: DEGEN_TOKEN },
+    31250: { chance: "10%", profit: 3.0, token: DEGEN_TOKEN },
+  }
+
+  return (
+    <div className="dark">
+      <div className="flex flex-col items-center space-y-4">
+        <div
+          ref={containerRef}
+          className="relative w-[304px] h-[198px] bg-gradient-to-b from-green-900 to-blue-900 rounded-lg overflow-hidden"
+        >
+          <WheelGameControls
+            ref={wheelControllerRef}
+            config={mockWheelConfig}
+            theme="dark"
+            parent={containerRef}
+            tooltipContent={tooltipContent}
+          />
+        </div>
+
+        <div className="flex space-x-2">
+          <Button onClick={handleStartEndlessSpin} size="sm">
+            Start Endless Spin
+          </Button>
+          <Button onClick={handleSpinWithResult} size="sm">
+            Spin with Random Sector
+          </Button>
+          <Button onClick={handleStop} variant="destructive" size="sm">
+            Stop
+          </Button>
+        </div>
+
+        <div className="text-sm text-muted-foreground max-w-md text-center">
+          <p className="font-semibold">Imperative API Demo</p>
+          <p>
+            This story demonstrates the imperative API using sector indices (0-{totalSectors - 1}).
+            Use the buttons to control the wheel directly.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export const ImperativeAPI: Story = {
+  name: "Imperative API Demo",
+  render: () => <ImperativeAPIDemo />,
+  args: {} as any,
+  parameters: {
+    backgrounds: { default: "dark" },
+    docs: {
+      description: {
+        story:
+          "Demonstrates the new imperative API for controlling the wheel game. Use the buttons to directly call methods on the wheel controller.",
       },
     },
   },
