@@ -52,7 +52,7 @@ interface WheelProps {
   multiplier: number
   hasCompletedSpin?: boolean
   theme?: Theme
-  winningSectorIndex?: number
+  isTransitionEnabled: boolean
 }
 
 const SPIN_DURATION = 3000
@@ -185,13 +185,10 @@ function Wheel({
   multiplier,
   hasCompletedSpin = false,
   theme = "light",
-  winningSectorIndex,
+  isTransitionEnabled,
 }: WheelProps) {
   const shouldShowMultiplier = hasCompletedSpin && !isSpinning
   const wheelSrc = theme === "dark" ? wheelDark : wheelLight
-
-  // Determine if we should use transition (only when decelerating to final position with a result)
-  const shouldUseTransition = isSpinning && winningSectorIndex !== undefined
 
   return (
     <>
@@ -200,7 +197,7 @@ function Wheel({
           className={"absolute inset-0 flex items-center justify-center top-[12px]"}
           style={{
             transform: `rotate(${rotationAngle}deg)`,
-            transition: shouldUseTransition
+            transition: isTransitionEnabled
               ? `transform ${SPIN_DURATION}ms cubic-bezier(0.25, 0.1, 0.25, 1)`
               : "none",
             transformOrigin: "center center",
@@ -229,6 +226,7 @@ export const WheelGameControls = forwardRef<WheelController, WheelGameControlsPr
       displayedMultiplier,
       hasResult,
       isSpinning: internalIsSpinning,
+      isTransitionEnabled,
       winningSectorIndex: internalWinningSectorIndex,
       startEndlessSpin,
       spinWheelWithResult,
@@ -268,7 +266,7 @@ export const WheelGameControls = forwardRef<WheelController, WheelGameControlsPr
             multiplier={displayedMultiplier}
             hasCompletedSpin={hasResult}
             theme={theme}
-            winningSectorIndex={internalWinningSectorIndex ?? undefined}
+            isTransitionEnabled={isTransitionEnabled}
           />
 
           <div className={"flex flex-wrap justify-center gap-[6px] w-full"}>

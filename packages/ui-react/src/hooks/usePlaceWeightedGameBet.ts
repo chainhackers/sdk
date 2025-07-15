@@ -11,7 +11,7 @@ import {
   WeightedGame,
   type WeightedGameConfiguration,
 } from "@betswirl/sdk-core"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { decodeEventLog, Hex } from "viem"
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -70,6 +70,8 @@ export function usePlaceWeightedGameBet(
   const [internalError, setInternalError] = useState<string | null>(null)
   const [isRolling, setIsRolling] = useState(false)
 
+  const spinStartedRef = useRef(false)
+
   const betStatus: BetStatus = useMemo(() => {
     if (internalError) return "internal-error"
     if (wagerWriteHook.isPending) return "pending"
@@ -117,6 +119,7 @@ export function usePlaceWeightedGameBet(
       refetchBalance()
     } else if (watcherStatus === "error") {
       setInternalError("watcher error")
+      setIsRolling(false)
       logger.debug("watcher: Bet resolved: ERROR from watcher")
     }
   }, [watcherStatus, watcherGameResult, refetchBalance])
@@ -129,6 +132,7 @@ export function usePlaceWeightedGameBet(
     setInternalError(null)
     setIsRolling(false)
     resetWatcher()
+    spinStartedRef.current = false
   }, [resetWatcher, wagerWriteHook.reset])
 
   const placeBet = useCallback(
@@ -205,7 +209,8 @@ export function usePlaceWeightedGameBet(
   }, [wagerWaitingHook.error])
 
   useEffect(() => {
-    if (wagerWaitingHook.isSuccess) {
+    if (wagerWaitingHook.isSuccess && !spinStartedRef.current) {
+      spinStartedRef.current = true
       setIsRolling(true)
       const handleBetResult = async () => {
         const betId = await _extractBetIdFromReceipt(

@@ -203,21 +203,19 @@ export function useWeightedGameLogic<
 
     if (betStatus === "error") {
       resetBetState()
-      if (isWalletConnected && betAmount && betAmount > 0n) {
-        if (needsTokenApproval) {
-          await approveToken()
-        } else {
-          placeBet(betAmount, currentConfig)
-        }
-      }
     } else if (isInGameResultState) {
       resetBetState()
-    } else if (isWalletConnected && betAmount && betAmount > 0n) {
-      if (needsTokenApproval) {
-        await approveToken()
-      } else {
-        placeBet(betAmount, currentConfig)
-      }
+      return
+    }
+
+    if (!isWalletConnected || !betAmount || betAmount <= 0n) {
+      return
+    }
+
+    if (needsTokenApproval) {
+      await approveToken()
+    } else {
+      placeBet(betAmount, currentConfig)
     }
   }
 

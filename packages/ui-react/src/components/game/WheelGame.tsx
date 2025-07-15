@@ -5,7 +5,7 @@ import {
   WeightedGame,
   type WeightedGameConfiguration,
 } from "@betswirl/sdk-core"
-import { useEffect, useMemo, useRef } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import wheelBackground from "../../assets/game/game-background.jpg"
 import { useDelayedGameResult } from "../../hooks/useDelayedGameResult"
 import { useWeightedGameLogic } from "../../hooks/useWeightedGameLogic"
@@ -86,22 +86,24 @@ export function WheelGame({
     delay: RESULT_DISPLAY_DELAY,
   })
 
-  // Handle game state changes with the imperative API
+  // Start endless spin when bet status becomes 'rolling'
   useEffect(() => {
-    if (!wheelControllerRef.current || !currentConfig) return
-
-    if (betStatus === "rolling" && !gameResult?.rolled) {
-      // Start endless spin when rolling starts
-      wheelControllerRef.current.startEndlessSpin()
-    } else if (betStatus === "success" && gameResult?.rolled) {
-      // gameResult.rolled.rolled is already a sector index
-      const sectorIndex = gameResult.rolled.rolled as number
-      wheelControllerRef.current.spinWheelWithResult(sectorIndex)
-    } else {
-      // Stop spinning when not rolling
-      wheelControllerRef.current.stopSpin()
+    if (betStatus === "rolling") {
+      wheelControllerRef.current?.startEndlessSpin()
     }
-  }, [betStatus, gameResult, currentConfig])
+  }, [betStatus])
+
+  // Stop spin with result when gameResult becomes available
+  useEffect(() => {
+    if (gameResult && gameResult.rolled.game === CASINO_GAME_TYPE.WHEEL) {
+      const winningSectorIndex = gameResult.rolled.rolled as number
+      wheelControllerRef.current?.spinWheelWithResult(winningSectorIndex)
+    }
+  }, [gameResult])
+
+  const handleAnimationAndResultTasks = useCallback(() => {
+    handleSpinComplete()
+  }, [handleSpinComplete])
 
   const tooltipContent = useMemo(() => {
     if (!currentConfig || !betAmount) return undefined
@@ -153,7 +155,7 @@ export function WheelGame({
             config={currentConfig}
             theme={theme}
             tooltipContent={tooltipContent}
-            onSpinComplete={handleSpinComplete}
+            onSpinComplete={handleAnimationAndResultTasks}
           />
         </GameFrame.GameControls>
         <GameFrame.ResultWindow gameResult={delayedGameResult} currency={token.symbol} />
