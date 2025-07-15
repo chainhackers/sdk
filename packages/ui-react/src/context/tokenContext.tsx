@@ -44,13 +44,7 @@ function storeTokenAddress(address: Address, chainId: number): void {
 }
 
 export function TokenProvider({ children }: TokenProviderProps) {
-  const { tokens, loading } = useTokens({
-    query: {
-      // Reduce refetching in the provider
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-    },
-  })
+  const { tokens, loading } = useTokens()
   const { appChainId } = useChain()
   const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage | undefined>()
 
