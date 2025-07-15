@@ -86,12 +86,35 @@ const basicSetup = defineWalletSetup(PASSWORD, async (context, walletPage) => {
     console.log("Avalanche network might already exist:", error)
   }
 
-  // Switch to Base network as default
-  try {
-    await metamask.switchNetwork("Base")
-    console.log("Switched to Base network")
-  } catch (error) {
-    console.log("Error switching to Base network:", error)
+  // Switch to Base network as default with retry logic
+  let baseNetworkSet = false
+  const maxRetries = 3
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Attempting to switch to Base network (attempt ${attempt}/${maxRetries})`)
+      await metamask.switchNetwork("Base")
+      
+      // Verify the switch was successful
+      const currentNetwork = await metamask.getCurrentNetwork()
+      if (currentNetwork === "Base") {
+        console.log("✅ Successfully switched to Base network")
+        baseNetworkSet = true
+        break
+      } else {
+        console.log(`❌ Switch appeared to succeed but current network is: ${currentNetwork}`)
+      }
+    } catch (error) {
+      console.log(`❌ Attempt ${attempt} failed to switch to Base network:`, error)
+      if (attempt < maxRetries) {
+        console.log("Retrying in 2 seconds...")
+        await new Promise(resolve => setTimeout(resolve, 2000))
+      }
+    }
+  }
+  
+  if (!baseNetworkSet) {
+    console.log("⚠️  Warning: Could not set Base as default network. Tests may need to switch manually.")
   }
 })
 

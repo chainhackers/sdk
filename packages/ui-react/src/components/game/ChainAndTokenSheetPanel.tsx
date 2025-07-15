@@ -33,7 +33,10 @@ export function ChainAndTokenSheetPanel({
     setCurrentView(initialView)
   }, [initialView])
 
-  const effectiveToken: TokenWithImage = selectedToken || {
+  // Get native token from the tokens list to ensure we have the image
+  const nativeToken = tokens.find(token => token.address === chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency).address)
+  
+  const effectiveToken: TokenWithImage = selectedToken || nativeToken || {
     ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
     image: "",
   }
@@ -44,13 +47,9 @@ export function ChainAndTokenSheetPanel({
   }
 
   const handleChainSelect = (chainId: CasinoChainId) => {
-    // Reset token to native token when switching chains
-    const newChainNativeToken: TokenWithImage = {
-      ...chainNativeCurrencyToToken(chainById[chainId].nativeCurrency),
-      image: "",
-    }
-    setSelectedToken(newChainNativeToken)
     switchAppChain(chainId)
+    // Let the token context handle resetting to native token with proper image
+    setSelectedToken(undefined)
     setCurrentView("main")
   }
 

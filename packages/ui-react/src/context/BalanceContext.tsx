@@ -53,7 +53,7 @@ function combineTokensWithBalances(
 }
 
 export function BalanceProvider({ children }: BalanceProviderProps) {
-  const { appChainId } = useChain()
+  const { appChainId, walletChainId, areChainsSynced } = useChain()
   const { address } = useAccount()
   const queryClient = useQueryClient()
   const { tokens } = useTokens({ onlyActive: true })
@@ -61,28 +61,28 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
   const nativeToken = tokens.find((token) => token.address === zeroAddress)
   const erc20Tokens = tokens.filter((token) => token.address !== zeroAddress)
 
-  // Fetch native token balance
+  // Fetch native token balance from wallet's current chain
   const { data: nativeBalance, isLoading: nativeLoading } = useBalance({
     address: address as Hex,
-    chainId: appChainId,
+    chainId: walletChainId,
     query: {
       ...BALANCE_CACHE_CONFIG,
-      enabled: !!address && !!nativeToken,
+      enabled: !!address && !!nativeToken && !!walletChainId,
     },
   })
 
-  // Batch fetch ERC20 balances
+  // Batch fetch ERC20 balances from wallet's current chain
   const { data: erc20Balances, isLoading: erc20Loading } = useReadContracts({
     contracts: erc20Tokens.map((token) => ({
       address: token.address as Hex,
       abi: erc20Abi,
       functionName: "balanceOf",
       args: [address as Hex],
-      chainId: appChainId,
+      chainId: walletChainId,
     })),
     query: {
       ...BALANCE_CACHE_CONFIG,
-      enabled: !!address && erc20Tokens.length > 0,
+      enabled: !!address && erc20Tokens.length > 0 && !!walletChainId,
     },
   })
 
@@ -93,7 +93,7 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["balances", appChainId, address, tokens.map((t) => t.address)],
+    queryKey: ["balances", walletChainId, appChainId, address, tokens.map((t) => t.address)],
     queryFn: () => {
       return combineTokensWithBalances(
         nativeToken,
@@ -103,18 +103,14 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
       )
     },
     ...BALANCE_CACHE_CONFIG,
-    enabled: !!address && tokens.length > 0 && !nativeLoading && !erc20Loading,
+    enabled: !!address && tokens.length > 0 && !nativeLoading && !erc20Loading && !!walletChainId,
   })
 
-  // Clear balances when chain switches
+  // Clear balances when wallet chain switches
   useEffect(() => {
     queryClient.removeQueries({ queryKey: ["balances"] })
-    // Refetch for new chain after a small delay
-    const timer = setTimeout(() => {
-      refetch()
-    }, 100)
-    return () => clearTimeout(timer)
-  }, [appChainId, queryClient, refetch])
+    // Don't immediately refetch - let the query re-enable naturally when dependencies are ready
+  }, [walletChainId, queryClient])
 
   // Refetch balances when wallet connects/disconnects
   useEffect(() => {
@@ -128,7 +124,7 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
   const contextValue = useMemo<BalanceContextValue>(
     () => ({
       balances,
-      chainId: appChainId,
+      chainId: walletChainId || appChainId, // Use wallet chain for display, fallback to app chain
       isLoading,
       error: error as Error | null,
       refetch,
@@ -139,7 +135,7 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
         return formatRawAmount(balance, decimals, FORMAT_TYPE.PRECISE)
       },
     }),
-    [balances, appChainId, isLoading, error, refetch],
+    [balances, walletChainId, appChainId, isLoading, error, refetch],
   )
 
   return <BalanceContext.Provider value={contextValue}>{children}</BalanceContext.Provider>

@@ -6,6 +6,7 @@ import { type Hex, http } from "viem"
 import { createConfig, WagmiProvider } from "wagmi"
 import { arbitrum, avalanche, base, polygon } from "wagmi/chains"
 import { BetSwirlSDKProvider } from "../context/BetSwirlSDKProvider"
+import { BalanceProvider } from "../context/BalanceContext"
 import type { TokenWithImage } from "../types/types"
 
 const CHAINS = [base, arbitrum, avalanche, polygon] as const
@@ -72,7 +73,9 @@ export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookPro
             bankrollToken={token}
             supportedChains={CHAINS.map((c) => c.id as CasinoChainId)}
           >
-            {children}
+            <BalanceProvider>
+              {children}
+            </BalanceProvider>
           </BetSwirlSDKProvider>
         </OnchainKitProvider>
       </QueryClientProvider>

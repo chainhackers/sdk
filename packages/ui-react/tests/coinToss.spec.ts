@@ -43,6 +43,31 @@ test.describe("Coin Toss Game", () => {
     const walletConnectedBtn = page.locator('[data-testid="ockConnectWallet_Connected"]')
     await expect(walletConnectedBtn).toBeVisible({ timeout: 10000 })
 
+    // Ensure wallet is on Base chain for ETH game
+    console.log("\n=== ENSURING WALLET IS ON BASE CHAIN ===")
+    const currentNetwork = await metamask.getCurrentNetwork()
+    console.log("Current wallet network:", currentNetwork)
+    
+    if (currentNetwork !== "Base") {
+      console.log("Switching wallet to Base network...")
+      await metamask.switchNetwork("Base")
+      await page.waitForTimeout(3000)
+      
+      // Reload page to ensure chain change is reflected
+      await page.reload()
+      await page.waitForLoadState("networkidle")
+      
+      // Verify we're now on Base
+      const newNetwork = await metamask.getCurrentNetwork()
+      console.log("Network after switch:", newNetwork)
+      
+      if (newNetwork !== "Base") {
+        throw new Error(`Failed to switch to Base network. Current: ${newNetwork}`)
+      }
+    } else {
+      console.log("Wallet already on Base network")
+    }
+
     // Check current balance
     console.log("\n=== CHECKING WALLET STATUS ===")
 
@@ -55,8 +80,16 @@ test.describe("Coin Toss Game", () => {
     const initialBalanceText = await balanceContainer.textContent()
     console.log("Initial balance text:", initialBalanceText)
 
+    // Verify balance shows ETH (not POL or other tokens)
+    if (!initialBalanceText?.includes("ETH")) {
+      console.log("❌ Balance shows wrong token for Base chain")
+      console.log("Expected: ETH balance, Got:", initialBalanceText)
+      await page.screenshot({ path: "coinToss-wrong-token.png", fullPage: true })
+      throw new Error(`Expected ETH balance on Base chain, but got: ${initialBalanceText}`)
+    }
+
     const initialBalance = extractBalance(initialBalanceText)
-    console.log("Initial balance amount:", initialBalance)
+    console.log("Initial ETH balance amount:", initialBalance)
 
     // Check if wallet has sufficient balance
     if (initialBalance === 0) {
@@ -222,14 +255,48 @@ test.describe("Coin Toss Game", () => {
     const walletConnectedBtn = page.locator('[data-testid="ockConnectWallet_Connected"]')
     await expect(walletConnectedBtn).toBeVisible({ timeout: 10000 })
 
+    // Ensure wallet is on Base chain for ETH game
+    console.log("\n=== ENSURING WALLET IS ON BASE CHAIN ===")
+    const currentNetwork = await metamask.getCurrentNetwork()
+    console.log("Current wallet network:", currentNetwork)
+    
+    if (currentNetwork !== "Base") {
+      console.log("Switching wallet to Base network...")
+      await metamask.switchNetwork("Base")
+      await page.waitForTimeout(3000)
+      
+      // Reload page to ensure chain change is reflected
+      await page.reload()
+      await page.waitForLoadState("networkidle")
+      
+      // Verify we're now on Base
+      const newNetwork = await metamask.getCurrentNetwork()
+      console.log("Network after switch:", newNetwork)
+      
+      if (newNetwork !== "Base") {
+        throw new Error(`Failed to switch to Base network. Current: ${newNetwork}`)
+      }
+    } else {
+      console.log("Wallet already on Base network")
+    }
+
     // Get initial balance
     console.log("\n=== CHECKING INITIAL BALANCE ===")
     const balanceElement = page.locator("text=/Balance:/").first()
     await expect(balanceElement).toBeVisible({ timeout: 20000 })
     const balanceContainer = await balanceElement.locator("..").first()
     const initialBalanceText = await balanceContainer.textContent()
+    
+    // Verify balance shows ETH (not POL or other tokens)
+    if (!initialBalanceText?.includes("ETH")) {
+      console.log("❌ Balance shows wrong token for Base chain")
+      console.log("Expected: ETH balance, Got:", initialBalanceText)
+      await page.screenshot({ path: "coinToss-multiple-wrong-token.png", fullPage: true })
+      throw new Error(`Expected ETH balance on Base chain, but got: ${initialBalanceText}`)
+    }
+    
     const startingBalance = extractBalance(initialBalanceText)
-    console.log("Starting balance:", startingBalance)
+    console.log("Starting ETH balance:", startingBalance)
 
     // Check if wallet has sufficient balance for multiple games
     const totalBetAmount = Number.parseFloat(betAmount) * numberOfGames

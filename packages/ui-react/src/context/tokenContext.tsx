@@ -8,7 +8,7 @@ const STORAGE_KEY = "betswirl-selected-token-address"
 
 interface TokenContextValue {
   selectedToken: TokenWithImage | undefined
-  setSelectedToken: (token: TokenWithImage) => void
+  setSelectedToken: (token: TokenWithImage | undefined) => void
 }
 
 const TokenContext = createContext<TokenContextValue | undefined>(undefined)
@@ -59,9 +59,25 @@ export function TokenProvider({ children }: TokenProviderProps) {
       return
     }
 
-    // Only update if we don't have a token
+    // Check if selected token is valid for current chain
     if (selectedToken) {
-      return
+      // For native tokens (zeroAddress), we must also check the symbol matches
+      // because all native tokens share the same address
+      const isTokenValidForChain = tokens.some((token) => {
+        if (token.address === zeroAddress && selectedToken.address === zeroAddress) {
+          // Both are native tokens - must have matching symbols
+          return token.symbol === selectedToken.symbol
+        }
+        // For ERC20 tokens, address comparison is sufficient
+        return token.address === selectedToken.address
+      })
+      
+      
+      if (isTokenValidForChain) {
+        // Token is valid for this chain, keep it
+        return
+      }
+      // Token is not valid for new chain, need to select a new one
     }
 
     const storedAddress = getStoredTokenAddress(appChainId)
@@ -82,9 +98,11 @@ export function TokenProvider({ children }: TokenProviderProps) {
     setSelectedTokenInternal(nativeToken)
   }, [tokens, loading, appChainId, selectedToken])
 
-  const setSelectedToken = (token: TokenWithImage) => {
+  const setSelectedToken = (token: TokenWithImage | undefined) => {
     setSelectedTokenInternal(token)
-    storeTokenAddress(token.address, appChainId)
+    if (token) {
+      storeTokenAddress(token.address, appChainId)
+    }
   }
 
   return (

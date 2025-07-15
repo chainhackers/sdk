@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test"
+import { MetaMask } from "@synthetixio/synpress/playwright"
 
 /**
  * Extract balance from text containing ETH amount
@@ -108,4 +109,69 @@ export async function waitForBettingStates(page: Page): Promise<void> {
   }
 
   console.log("Bet processing completed!")
+}
+
+/**
+ * Ensure wallet is on the specified chain, switch if necessary
+ * @param metamask - MetaMask instance
+ * @param page - Playwright page object
+ * @param chainName - Name of the chain (e.g., "Base", "Polygon")
+ * @param expectedToken - Expected token symbol for balance verification (e.g., "ETH", "POL")
+ * @returns True if chain switch was successful
+ */
+export async function ensureWalletOnChain(
+  metamask: MetaMask,
+  page: Page,
+  chainName: string,
+  expectedToken: string,
+): Promise<boolean> {
+  console.log(`\n=== ENSURING WALLET IS ON ${chainName.toUpperCase()} CHAIN ===`)
+  
+  try {
+    const currentNetwork = await metamask.getCurrentNetwork()
+    console.log("Current wallet network:", currentNetwork)
+    
+    if (currentNetwork !== chainName) {
+      console.log(`Switching wallet to ${chainName} network...`)
+      await metamask.switchNetwork(chainName)
+      await page.waitForTimeout(3000)
+      
+      // Reload page to ensure chain change is reflected
+      await page.reload()
+      await page.waitForLoadState("networkidle")
+      
+      // Verify we're now on the correct chain
+      const newNetwork = await metamask.getCurrentNetwork()
+      console.log("Network after switch:", newNetwork)
+      
+      if (newNetwork !== chainName) {
+        console.log(`❌ Failed to switch to ${chainName} network. Current: ${newNetwork}`)
+        return false
+      }
+    } else {
+      console.log(`Wallet already on ${chainName} network`)
+    }
+
+    // Verify balance shows expected token
+    const balanceElement = page.locator("text=/Balance:/").first()
+    const isBalanceVisible = await balanceElement.isVisible({ timeout: 10000 }).catch(() => false)
+    
+    if (isBalanceVisible) {
+      const balanceContainer = await balanceElement.locator("..").first()
+      const balanceText = await balanceContainer.textContent()
+      
+      if (!balanceText?.includes(expectedToken)) {
+        console.log(`❌ Balance shows wrong token for ${chainName} chain`)
+        console.log(`Expected: ${expectedToken} balance, Got:`, balanceText)
+        return false
+      }
+      
+      console.log(`✅ Confirmed ${expectedToken} balance on ${chainName} chain:`, balanceText)
+    }
+
+    return true
+  } catch (error) {
+    console.log(`❌ Error ensuring wallet on ${chainName} chain:`, error)
+    return false
+  }
 }
