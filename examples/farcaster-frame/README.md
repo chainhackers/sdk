@@ -9,7 +9,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-oncha
 
 ## BetSwirl Integration
 
-For detailed instructions on integrating BetSwirl games into Farcaster frame, see [BetSwirl Farcaster Integration Guide](./betswirl-farcaster-guide.md).
+For detailed instructions on integrating BetSwirl games into Farcaster frame, see [BetSwirl Farcaster Integration Guide](./docs/betswirl-farcaster-guide.md).
 
 ## Getting Started
 

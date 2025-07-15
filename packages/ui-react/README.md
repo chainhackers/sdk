@@ -18,7 +18,7 @@ This is a **game widget library** for BetSwirl protocol casino games built with 
 
 🪐 **Create a Farcaster Frame with BetSwirl game**
 
-* 📖 [Farcaster Integration Guide](../../examples/farcaster-frame/betswirl-farcaster-guide.md)
+* 📖 [Farcaster Integration Guide](../../examples/farcaster-frame/docs/betswirl-farcaster-guide.md)
 
 ## Development Setup
 
