@@ -8,8 +8,8 @@ import {
 import { useCallback, useEffect, useMemo, useRef } from "react"
 import wheelBackground from "../../assets/game/game-background.jpg"
 import { useDelayedGameResult } from "../../hooks/useDelayedGameResult"
-import { useWeightedGameLogic } from "../../hooks/useWeightedGameLogic"
-import { WeightedGameDefinition } from "../../types/types"
+import { useGameLogic } from "../../hooks/useGameLogic"
+import { GameDefinition } from "../../types/types"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
@@ -19,12 +19,34 @@ import { WheelController, WheelGameControls } from "./WheelGameControls"
 const DEFAULT_CONFIG_ID = 0
 const RESULT_DISPLAY_DELAY = 2500
 
-const wheelGameDefinition: WeightedGameDefinition<{
+// Создаем конфигурацию по умолчанию для Wheel
+const defaultWheelConfig: WeightedGameConfiguration = {
+  configId: DEFAULT_CONFIG_ID,
+  weights: [1n, 1n, 1n, 1n, 1n, 1n, 1n, 1n, 1n, 1n],
+  multipliers: [0n, 14580n, 0n, 18760n, 0n, 20830n, 0n, 14580n, 0n, 31250n],
+  colors: [
+    "#29384C",
+    "#55DC36",
+    "#29384C",
+    "#15A2D8",
+    "#29384C",
+    "#7340F4",
+    "#29384C",
+    "#55DC36",
+    "#29384C",
+    "#EC9E3C",
+  ],
+  label: "Normal",
+  game: CASINO_GAME_TYPE.WHEEL,
+  chainId: 137, // Будет переопределено при использовании
+}
+
+const wheelGameDefinition: GameDefinition<{
   game: CASINO_GAME_TYPE.WHEEL
   choice: WeightedGameConfiguration
 }> = {
   gameType: CASINO_GAME_TYPE.WHEEL,
-  defaultConfigId: DEFAULT_CONFIG_ID,
+  defaultSelection: { game: CASINO_GAME_TYPE.WHEEL, choice: defaultWheelConfig },
   getMultiplier: (config) => {
     const maxMultiplier = Math.max(...config.multipliers.map((m) => Number(m)))
     return maxMultiplier
@@ -53,16 +75,14 @@ export function WheelGame({
     gameHistory,
     refreshHistory,
     betAmount,
-    currentConfig,
+    selection,
     betStatus,
     gameResult,
     vrfFees,
     formattedVrfFees,
     gasPrice,
     targetPayoutAmount,
-
     grossMultiplier,
-
     isGamePaused,
     nativeCurrencySymbol,
     themeSettings: baseThemeSettings,
@@ -73,10 +93,13 @@ export function WheelGame({
     isApproveConfirming,
     isRefetchingAllowance,
     approveError,
-  } = useWeightedGameLogic({
+  } = useGameLogic({
     gameDefinition: wheelGameDefinition,
     backgroundImage,
   })
+
+  // Извлекаем текущую конфигурацию из selection
+  const currentConfig = selection.choice
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
 
@@ -141,7 +164,13 @@ export function WheelGame({
       <GameFrame.Header title="Wheel" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea variant="wheel">
         <GameFrame.InfoButton
-          winChance={wheelGameDefinition.getWinChancePercent?.(currentConfig)?.[0] || 0}
+          winChance={(() => {
+            const chances = wheelGameDefinition.getWinChancePercent?.(currentConfig)
+            if (Array.isArray(chances)) {
+              return Math.max(...chances)
+            }
+            return chances || 0
+          })()}
           rngFee={formattedVrfFees}
           targetPayout={formatRawAmount(targetPayoutAmount, token.decimals, FORMAT_TYPE.PRECISE)}
           gasPrice={gasPrice}

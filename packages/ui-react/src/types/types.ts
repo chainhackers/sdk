@@ -92,13 +92,5 @@ export interface GameDefinition<T extends GameChoice> {
   defaultSelection: T
   getMultiplier: (choice: T["choice"]) => number
   encodeInput: (choice: T["choice"]) => GameEncodedInput["encodedInput"]
-  getWinChancePercent?: (choice: T["choice"]) => number
-}
-
-export interface WeightedGameDefinition<T extends GameChoice> {
-  gameType: T["game"]
-  defaultConfigId: number
-  getMultiplier: (config: WeightedGameConfiguration) => number
-  encodeInput: (config: WeightedGameConfiguration) => GameEncodedInput["encodedInput"]
-  getWinChancePercent?: (config: WeightedGameConfiguration) => number[]
+  getWinChancePercent?: (choice: T["choice"]) => number | number[]
 }
