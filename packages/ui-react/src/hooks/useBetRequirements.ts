@@ -40,6 +40,8 @@ export function useBetRequirements(props: UseBetRequirementsProps) {
     return getBetRequirementsFunctionData(props.token.address, debouncedMultiplier, appChainId)
   }, [props.token.address, debouncedMultiplier, appChainId])
 
+  console.log({ functionData })
+
   const wagmiHook = useReadContract({
     abi: functionData.data.abi,
     address: functionData.data.to,
@@ -50,6 +52,9 @@ export function useBetRequirements(props: UseBetRequirementsProps) {
       refetchInterval: REFETCH_INTERVALS.BET_REQUIREMENTS,
     },
   })
+
+  console.log("data", wagmiHook.data)
+  console.log({ game: props.game })
 
   const isAllowed = Boolean(wagmiHook.data?.[0])
   const isLoading = wagmiHook.isLoading || wagmiHook.isFetching

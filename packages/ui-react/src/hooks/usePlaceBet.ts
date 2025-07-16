@@ -64,7 +64,7 @@ export function usePlaceBet<T extends GameChoice>(
   game: CASINO_GAME_TYPE,
   token: TokenWithImage,
   refetchBalance: () => void,
-  gameDefinition: GameDefinition<T>,
+  gameDefinition?: GameDefinition<T>,
 ): IUsePlaceBetReturn<T> {
   const { appChainId } = useChain()
   const { affiliate } = useBettingConfig()
@@ -157,6 +157,12 @@ export function usePlaceBet<T extends GameChoice>(
 
   const placeBet = useCallback(
     async (betAmount: bigint, choice: T) => {
+      if (!gameDefinition) {
+        logger.error("placeBet: Game definition is not loaded yet")
+        setInternalError("Game configuration is not loaded")
+        return
+      }
+
       resetBetState()
       setCurrentBetAmount(betAmount)
 

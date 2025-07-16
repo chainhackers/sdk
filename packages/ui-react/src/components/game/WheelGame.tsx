@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react"
 import wheelBackground from "../../assets/game/game-background.jpg"
 import { useDelayedGameResult } from "../../hooks/useDelayedGameResult"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { useWeightedGameConfiguration } from "../../hooks/useWeightedGameConfiguration"
 import { GameDefinition } from "../../types/types"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -18,44 +19,6 @@ import { WheelController, WheelGameControls } from "./WheelGameControls"
 
 const DEFAULT_CONFIG_ID = 0
 const RESULT_DISPLAY_DELAY = 2500
-
-// Создаем конфигурацию по умолчанию для Wheel
-const defaultWheelConfig: WeightedGameConfiguration = {
-  configId: DEFAULT_CONFIG_ID,
-  weights: [1n, 1n, 1n, 1n, 1n, 1n, 1n, 1n, 1n, 1n],
-  multipliers: [0n, 14580n, 0n, 18760n, 0n, 20830n, 0n, 14580n, 0n, 31250n],
-  colors: [
-    "#29384C",
-    "#55DC36",
-    "#29384C",
-    "#15A2D8",
-    "#29384C",
-    "#7340F4",
-    "#29384C",
-    "#55DC36",
-    "#29384C",
-    "#EC9E3C",
-  ],
-  label: "Normal",
-  game: CASINO_GAME_TYPE.WHEEL,
-  chainId: 137, // Будет переопределено при использовании
-}
-
-const wheelGameDefinition: GameDefinition<{
-  game: CASINO_GAME_TYPE.WHEEL
-  choice: WeightedGameConfiguration
-}> = {
-  gameType: CASINO_GAME_TYPE.WHEEL,
-  defaultSelection: { game: CASINO_GAME_TYPE.WHEEL, choice: defaultWheelConfig },
-  getMultiplier: (config) => {
-    const maxMultiplier = Math.max(...config.multipliers.map((m) => Number(m)))
-    return maxMultiplier
-  },
-  encodeInput: (config) => WeightedGame.encodeInput(config.configId),
-  getWinChancePercent: (config) => {
-    return config.multipliers.map((_, index) => WeightedGame.getWinChancePercent(config, index))
-  },
-}
 
 export interface WheelGameProps extends BaseGameProps {}
 
@@ -67,6 +30,39 @@ export function WheelGame({
 }: WheelGameProps) {
   const wheelControllerRef = useRef<WheelController>(null)
 
+  // Load wheel configuration from blockchain - hook auto-detects game type
+  const { config: wheelConfig } = useWeightedGameConfiguration({
+    configId: DEFAULT_CONFIG_ID,
+    query: { enabled: true }
+  })
+
+  // Create game definition dynamically based on loaded config
+  const wheelGameDefinition = useMemo(() => {
+    if (!wheelConfig) return undefined
+
+    return {
+      gameType: CASINO_GAME_TYPE.WHEEL,
+      defaultSelection: { game: CASINO_GAME_TYPE.WHEEL, choice: wheelConfig },
+      getMultiplier: (config: WeightedGameConfiguration) => {
+        if (!config?.multipliers) return 0
+        const maxMultiplier = Math.max(...config.multipliers.map((m) => Number(m)))
+        return maxMultiplier
+      },
+      encodeInput: (config: WeightedGameConfiguration) => {
+        if (!config) return 0
+        return WeightedGame.encodeInput(config.configId)
+      },
+      getWinChancePercent: (config: WeightedGameConfiguration) => {
+        if (!config?.multipliers) return []
+        return config.multipliers.map((_, index) => WeightedGame.getWinChancePercent(config, index))
+      },
+    } as GameDefinition<{
+      game: CASINO_GAME_TYPE.WHEEL
+      choice: WeightedGameConfiguration
+    }>
+  }, [wheelConfig])
+
+  // Always call useGameLogic - it now handles configuration loading internally
   const {
     isWalletConnected,
     balance,
@@ -75,7 +71,6 @@ export function WheelGame({
     gameHistory,
     refreshHistory,
     betAmount,
-    selection,
     betStatus,
     gameResult,
     vrfFees,
@@ -93,13 +88,11 @@ export function WheelGame({
     isApproveConfirming,
     isRefetchingAllowance,
     approveError,
+    isConfigurationLoading,
   } = useGameLogic({
     gameDefinition: wheelGameDefinition,
     backgroundImage,
   })
-
-  // Извлекаем текущую конфигурацию из selection
-  const currentConfig = selection.choice
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
 
@@ -129,9 +122,9 @@ export function WheelGame({
   }, [handleSpinComplete])
 
   const tooltipContent = useMemo(() => {
-    if (!currentConfig || !betAmount) return undefined
+    if (!wheelConfig || !betAmount) return undefined
 
-    const uniqueOutputs = WeightedGame.getUniqueOutputs(currentConfig, 0)
+    const uniqueOutputs = WeightedGame.getUniqueOutputs(wheelConfig, 0)
     const content: Record<number, { chance?: string; profit?: number; token: typeof token }> = {}
 
     uniqueOutputs.forEach((output) => {
@@ -144,20 +137,26 @@ export function WheelGame({
     })
 
     return content
-  }, [currentConfig, betAmount, token])
+  }, [wheelConfig, betAmount, token])
 
-  if (!currentConfig) {
+  // Show loading state while configuration is being fetched
+  if (isConfigurationLoading || !wheelConfig) {
     return (
       <GameFrame themeSettings={themeSettings} {...props} variant="wheel">
         <GameFrame.Header title="Wheel" connectWalletButton={<GameConnectWallet />} />
         <GameFrame.GameArea variant="wheel">
           <div className="flex items-center justify-center h-full">
-            <div className="text-center">Loading wheel configuration...</div>
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent mx-auto mb-4" />
+              <div>Loading wheel configuration...</div>
+            </div>
           </div>
         </GameFrame.GameArea>
       </GameFrame>
     )
   }
+
+  console.log({ wheelConfig })
 
   return (
     <GameFrame themeSettings={themeSettings} {...props} variant="wheel">
@@ -165,7 +164,7 @@ export function WheelGame({
       <GameFrame.GameArea variant="wheel">
         <GameFrame.InfoButton
           winChance={(() => {
-            const chances = wheelGameDefinition.getWinChancePercent?.(currentConfig)
+            const chances = wheelGameDefinition?.getWinChancePercent?.(wheelConfig)
             if (Array.isArray(chances)) {
               return Math.max(...chances)
             }
@@ -181,7 +180,7 @@ export function WheelGame({
         <GameFrame.GameControls>
           <WheelGameControls
             ref={wheelControllerRef}
-            config={currentConfig}
+            config={wheelConfig}
             theme={theme}
             tooltipContent={tooltipContent}
             onSpinComplete={handleAnimationAndResultTasks}
