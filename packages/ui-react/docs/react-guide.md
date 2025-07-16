@@ -103,11 +103,14 @@ createRoot(document.getElementById('root')!).render(
 In `src/App.tsx`:
 
 ```tsx
-import { CoinTossGame } from '@betswirl/ui'
+import { CoinTossGame, DiceGame, RouletteGame, KenoGame } from '@betswirl/ui'
 
-// Add component
+// Add component (choose one or multiple)
 <div style={{ margin: '2rem 0' }}>
   <CoinTossGame />
+  {/* <DiceGame /> */}
+  {/* <RouletteGame /> */}
+  {/* <KenoGame /> */}
 </div>
 ```
 

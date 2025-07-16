@@ -7,6 +7,7 @@ This is a **game widget library** for BetSwirl protocol casino games built with 
 * 🪙 **CoinToss** - Classic heads/tails game with animated coin flip
 * 🎲 **Dice** - Roll the dice with customizable win conditions
 * 🎰 **Roulette** - European roulette with single zero
+* 🎯 **Keno** - Pick your lucky numbers and win big
 
 ## Quick Start
 
@@ -43,30 +44,33 @@ pnpm format
 
 Configuration is in `biome.json` and extends the root workspace configuration.
 
-## Deploy
+## Development Setup
 
+1. Clone the repository and install dependencies from the **root directory**:
 ```shell
-setfacl -R -m u:dev-components:rwx /var/www/betswirl-sdk/
+git clone https://github.com/chainhackers/sdk.git
+cd sdk
+pnpm install
 ```
 
-1. Navigate to the ui-react folder:
+2. Build all packages:
+```shell
+pnpm build
+```
+
+3. Navigate to the ui-react package:
 ```shell
 cd packages/ui-react
 ```
 
-2. Install dependencies (ignore workspace):
-```shell
-pnpm install
-```
-
-Start Storybook:
-```shell
-pnpm storybook
-```
-
-Start development server:
+4. Start development server:
 ```bash
 pnpm dev
+```
+
+5. Or start Storybook:
+```shell
+pnpm storybook
 ```
 
 Open in browser:
