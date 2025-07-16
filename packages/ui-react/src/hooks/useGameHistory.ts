@@ -38,7 +38,7 @@ function formatRelativeTime(timestampSecs: number): string {
   return `~${diffInDays}d ago`
 }
 
-export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
+export const useGameHistory = (gameType?: CASINO_GAME_TYPE) => {
   const [rawBets, setRawBets] = useState<CasinoBet[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | null>(null)
@@ -46,7 +46,7 @@ export const useGameHistory = (gameType: CASINO_GAME_TYPE) => {
   const { tokens } = useTokens({ onlyActive: false }) // Get all tokens, not just active ones
 
   const fetchRawBets = useCallback(async () => {
-    if (!address || !chainId) {
+    if (!address || !chainId || !gameType) {
       setRawBets([])
       setIsLoading(false)
       return

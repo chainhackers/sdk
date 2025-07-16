@@ -1,5 +1,4 @@
 import {
-  CASINO_GAME_TYPE,
   casinoChainById,
   chainById,
   chainNativeCurrencyToToken,
@@ -32,6 +31,8 @@ interface UseGameLogicProps<T extends GameChoice> {
 }
 
 interface UseGameLogicResult<T extends GameChoice = GameChoice> {
+  isConfigurationLoading: boolean
+  gameDefinition: GameDefinition<T> | undefined
   isWalletConnected: boolean
   address: string | undefined
   balance: bigint
@@ -42,13 +43,12 @@ interface UseGameLogicResult<T extends GameChoice = GameChoice> {
   refetchBalance: () => void
   betAmount: bigint | undefined
   setBetAmount: (amount: bigint | undefined) => void
-  selection: T
+  selection: T | undefined
   setSelection: (selection: T) => void
   betStatus: BetStatus
   gameResult: GameResult | null
   resetBetState: () => void
   vrfFees: bigint
-  isConfigurationLoading: boolean
   formattedVrfFees: number | string
   gasPrice: string
   targetPayoutAmount: bigint
@@ -103,18 +103,12 @@ export function useGameLogic<T extends GameChoice>({
   gameDefinition,
   backgroundImage,
 }: UseGameLogicProps<T>): UseGameLogicResult<T> {
-  // Track configuration loading state
-  const isConfigurationLoading = !gameDefinition
-
   const { isConnected: isWalletConnected, address } = useAccount()
-
-  // Only fetch game history if we have a valid game definition
-  const { gameHistory, refreshHistory } = useGameHistory(
-    gameDefinition?.gameType || CASINO_GAME_TYPE.DICE
-  )
   const { areChainsSynced, appChainId } = useChain()
-
   const { selectedToken } = useTokenContext()
+
+  const isReady = !!gameDefinition
+  const isConfigurationLoading = !isReady
 
   // Determine the effective token to use - memoize to prevent unnecessary re-renders
   const token: TokenWithImage = useMemo(() => {
@@ -131,21 +125,24 @@ export function useGameLogic<T extends GameChoice>({
     token: token.address === zeroAddress ? undefined : (token.address as Hex),
   })
 
-  // Only fetch house edge if we have a valid game definition
+  const { gameHistory, refreshHistory } = useGameHistory(
+    gameDefinition?.gameType
+  )
+
   const { houseEdge } = useHouseEdge({
-    game: gameDefinition?.gameType || CASINO_GAME_TYPE.DICE,
+    game: gameDefinition?.gameType!,
     token,
+    query: { enabled: isReady },
   })
 
-  // Only check if game is paused if we have a valid game definition
   const { isPaused: isGamePaused } = useIsGamePaused({
-    game: gameDefinition?.gameType || CASINO_GAME_TYPE.DICE,
+    game: gameDefinition?.gameType!,
+    query: { enabled: isReady },
   })
 
   const [betAmount, setBetAmount] = useState<bigint | undefined>(undefined)
-  const [selection, setSelection] = useState<T>(() => {
-    // Only set default selection if we have a valid game definition
-    return gameDefinition?.defaultSelection as T
+  const [selection, setSelection] = useState<T | undefined>(() => {
+    return gameDefinition?.defaultSelection as T | undefined
   })
 
   // Update selection when gameDefinition changes
@@ -157,7 +154,7 @@ export function useGameLogic<T extends GameChoice>({
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
     usePlaceBet(
-      gameDefinition?.gameType || CASINO_GAME_TYPE.DICE,
+      gameDefinition?.gameType,
       token,
       refetchBalance,
       gameDefinition
@@ -181,14 +178,12 @@ export function useGameLogic<T extends GameChoice>({
     enabled: !!gameContractAddress && !!betAmount && betAmount > 0n,
   })
 
-  // Only perform bet calculations if we have a valid game definition
   const { netPayout, formattedNetMultiplier, grossMultiplier } = useBetCalculations({
-    selection,
+    selection: selection || ({} as T),
     houseEdge,
     betAmount,
-    betCount: 1, // TODO #64: Use the real bet count
+    betCount: 1,
     gameDefinition,
-    enabled: !isConfigurationLoading,
   })
 
   const isInGameResultState = !!gameResult
@@ -201,6 +196,9 @@ export function useGameLogic<T extends GameChoice>({
   }
 
   const handlePlayButtonClick = async () => {
+    // Don't allow play if we're in loading state or selection is not available
+    if (!gameDefinition || !selection) return
+
     // Reset approval error if there is one
     if (approveWriteWagmiHook.error) {
       resetApprovalState()
@@ -240,6 +238,8 @@ export function useGameLogic<T extends GameChoice>({
   }
 
   return {
+    isConfigurationLoading,
+    gameDefinition,
     isWalletConnected,
     address,
     balance: balance?.value ?? 0n,
@@ -250,8 +250,8 @@ export function useGameLogic<T extends GameChoice>({
     refetchBalance,
     betAmount,
     setBetAmount,
-    selection,
-    setSelection,
+    selection: selection || undefined,
+    setSelection: setSelection,
     betStatus,
     gameResult,
     resetBetState,
@@ -268,13 +268,12 @@ export function useGameLogic<T extends GameChoice>({
     themeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
-    placeBet,
+    placeBet: (betAmount: bigint, choice: T) => placeBet(betAmount, choice),
     needsTokenApproval,
     isApprovePending: approveWriteWagmiHook.isPending,
     isApproveConfirming: approveWaitingWagmiHook.isLoading,
     approveToken,
     isRefetchingAllowance: allowanceReadWagmiHook.isRefetching,
     approveError: approveWriteWagmiHook.error || approveWaitingWagmiHook.error,
-    isConfigurationLoading,
   }
 }
