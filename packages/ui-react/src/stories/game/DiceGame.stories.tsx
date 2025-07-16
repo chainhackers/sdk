@@ -93,6 +93,7 @@ export const DarkTheme: Story = {
   },
   parameters: {
     backgrounds: { default: "light" },
+    chromatic: { delay: 2000 }, // Wait 2 seconds for images to load
   },
 }
 
