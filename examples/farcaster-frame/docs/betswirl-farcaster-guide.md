@@ -175,7 +175,7 @@ If you added environment variables for the manifest (e.g., NEXT_PUBLIC_URL) in V
 
 To update your production deployment from the command line, use `vercel --prod`. This will update your production domain. Without the `--prod` flag, Vercel creates a new preview deployment with an automatically generated URL intended for testing and not publicly accessible by default.
 
-[CLI Vercel Deploy](https://vercel.com/docs/cli/deploy)
+[CLI Vercel Deploy](https://vercel.com/docs/cli/deploy)   
 [Managing Deployments](https://vercel.com/docs/projects/project-dashboard#deployments)
 
 ## Publish and Test mini-app in Farcaster
@@ -183,13 +183,12 @@ Detailed instructions can be found here - https://miniapps.farcaster.xyz/docs/gu
 
 After deployment, the manifest can be viewed at this URL - https://[your-app].vercel.app/.well-known/farcaster.json
 
-### Test mini-app:
-To test your mini-app in Farcaster, you don't need to publish the manifest.
-
+To test and configure your manifest:
 1. Go to https://farcaster.xyz/~/developers/mini-apps/manifest
 2. Paste your domain in the field without https and trailing slash (`[your-app].vercel.app`)
 
-After that, you'll be able to see your manifest and launch the mini-app in the Farcaster frame. 
+### Test mini-app:
+To test your mini-app in Farcaster, publishing the manifest is not required. Once you enter your domain, you'll be able to see your manifest and launch the mini-app in the Farcaster frame. 
 
 If the manifest is valid, you'll see - "Mini App configuration is valid."
 
@@ -201,10 +200,9 @@ If the manifest is not valid, you'll see - "[your-app].vercel.app does not have 
 
 ### Publish Manifest:
 
-1. Go to https://farcaster.xyz/~/developers/mini-apps/manifest
-2. Click the "Manage" button
+1. Click the "Manage" button
 ![Publishing Manifest](screenshots/manifestManage.png)
-3. Enter the domain address and fill in all necessary fields and click "Submit"
+2. Enter the domain address and fill in all necessary fields and click "Submit"
 ![Publishing Manifest](screenshots/createManifest.png)
 
 After that, you'll get a URL like - https://api.farcaster.xyz/miniapps/hosted-manifest/YOUR_MANIFEST_ID
@@ -220,6 +218,30 @@ You can find an example at `sdk/examples/farcaster-frame/next.config.mjs`.
 ### Post your mini-app
 
 Once you have a valid manifest, you can share your mini-app by posting its URL (https://[your-app].vercel.app) in a Farcaster cast. Users will be able to launch it directly from the cast. This will work even without publishing the manifest and generating Account association.
+
+### Account Association
+Account association links the domain to your account. After this, users will be able to add your application to their mini-app list. You can generate a signed account association object using the [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) in Warpcast. You need to have the Warpcast app installed on your phone.
+
+On the manifest page:
+1. Click the "Generate account association" button   
+![Account Association](screenshots/account-association.png)
+2. On your phone, scan the provided QR code or go to the link - https://farcaster.xyz/~/developers/register?domain=[your-app].vercel.app.
+You should be redirected to the "Account Association" page in the Warpcast app for message signing.
+3. In the app, click the "Sign as [your username]" button.   
+If everything went well, you'll see the message - "Signature sent, continue on desktop."
+4. Return to the manifest page on your desktop. A modal window should open with the accountAssociation object containing your signed message. If it doesn't open, try refreshing the page and clicking "Generate account association" again.
+5. Copy your accountAssociation message, go to your project and fill in the environment variables:
+```bash
+FARCASTER_HEADER=
+FARCASTER_PAYLOAD=
+FARCASTER_SIGNATURE=
+```
+6. Update your deployment
+7. Return to the manifest page [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) and refresh it, or click the "Refresh" button.   
+In the Account Association section, you should see "✓ Associated with your account" next to your domain. In the domain verification details 
+table, the Signature field should show "✓ Verified". This means the domain has been successfully associated with your account.
+
+[Verifying ownership](https://miniapps.farcaster.xyz/docs/guides/publishing#verifying-ownership)
 
 ## Documentation
 
