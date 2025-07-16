@@ -199,6 +199,7 @@ If the manifest is not valid, you'll see - "[your-app].vercel.app does not have 
 ![Testing mini-app](screenshots/notValidManifest.png)
 
 ### Publish Manifest:
+Farcaster hosted manifests simplify managing and updating your mini app manifest without redeploying your code.
 
 1. Click the "Manage" button
 ![Publishing Manifest](screenshots/manifestManage.png)
@@ -242,6 +243,12 @@ In the Account Association section, you should see "✓ Associated with your acc
 table, the Signature field should show "✓ Verified". This means the domain has been successfully associated with your account.
 
 [Verifying ownership](https://miniapps.farcaster.xyz/docs/guides/publishing#verifying-ownership)
+
+## Mini App search visibility
+
+For your app to appear in Farcaster’s mini-app search, Account Association must be configured. Without it, your app will not be included in search results.
+
+For more information, see: [App Discovery & Search](https://miniapps.farcaster.xyz/docs/guides/discovery) 
 
 ## Documentation
 
