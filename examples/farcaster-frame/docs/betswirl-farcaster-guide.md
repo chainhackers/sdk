@@ -25,12 +25,12 @@ npm install @betswirl/ui-react
 ```
 
 **During installation:**
-`Coinbase Developer Platform Client API Key` can be skipped (optional for basic functionality)
-If needed, add to .env: `NEXT_PUBLIC_ONCHAINKIT_API_KEY=your_api_key`
+`Coinbase Developer Platform Client API Key` - skip this (optional for mini-app)
+If needed later, add to .env: `NEXT_PUBLIC_ONCHAINKIT_API_KEY=your_api_key`
 
 ### Set up Providers
 
-Update `app/providers.tsx`:
+Replace the code in `app/providers.tsx` with:
 
 ```tsx
 "use client";
