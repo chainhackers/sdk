@@ -33,7 +33,7 @@ export function WheelGame({
   // Load wheel configuration from blockchain - hook auto-detects game type
   const { config: wheelConfig } = useWeightedGameConfiguration({
     configId: DEFAULT_CONFIG_ID,
-    query: { enabled: true }
+    query: { enabled: true },
   })
 
   // Create game definition dynamically based on loaded config
@@ -155,8 +155,6 @@ export function WheelGame({
       </GameFrame>
     )
   }
-
-  console.log({ wheelConfig })
 
   return (
     <GameFrame themeSettings={themeSettings} {...props} variant="wheel">

@@ -56,7 +56,6 @@ interface WheelProps {
 }
 
 const SPIN_DURATION = 3000
-const CONTINUOUS_SPIN_DURATION = 1000
 
 /**
  * Formats a multiplier value for display
@@ -111,22 +110,22 @@ function createWheelSegments(config: WeightedGameConfiguration): WheelSegment[] 
 function getUniqueMultipliers(
   segments: WheelSegment[],
 ): Array<{ multiplier: number; formattedMultiplier: string; color: string }> {
-  return segments
-    .reduce(
-      (acc, segment) => {
-        const existing = acc.find((item) => item.multiplier === segment.multiplier)
-        if (!existing) {
-          acc.push({
-            multiplier: segment.multiplier,
-            formattedMultiplier: segment.formattedMultiplier,
-            color: segment.color,
-          })
-        }
-        return acc
-      },
-      [] as Array<{ multiplier: number; formattedMultiplier: string; color: string }>,
-    )
-    .sort((a, b) => a.multiplier - b.multiplier)
+  const uniqueMultipliers = new Map<
+    number,
+    { multiplier: number; formattedMultiplier: string; color: string }
+  >()
+
+  for (const segment of segments) {
+    if (!uniqueMultipliers.has(segment.multiplier)) {
+      uniqueMultipliers.set(segment.multiplier, {
+        multiplier: segment.multiplier,
+        formattedMultiplier: segment.formattedMultiplier,
+        color: segment.color,
+      })
+    }
+  }
+
+  return Array.from(uniqueMultipliers.values()).sort((a, b) => a.multiplier - b.multiplier)
 }
 
 /**
@@ -233,7 +232,6 @@ export const WheelGameControls = forwardRef<WheelController, WheelGameControlsPr
       stopSpin,
     } = useWheelAnimation({
       spinDuration: SPIN_DURATION,
-      continuousSpinDuration: CONTINUOUS_SPIN_DURATION,
       segments,
       onSpinComplete,
     })

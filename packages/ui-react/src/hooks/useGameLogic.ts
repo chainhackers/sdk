@@ -1,4 +1,5 @@
 import {
+  CASINO_GAME_TYPE,
   casinoChainById,
   chainById,
   chainNativeCurrencyToToken,
@@ -125,18 +126,16 @@ export function useGameLogic<T extends GameChoice>({
     token: token.address === zeroAddress ? undefined : (token.address as Hex),
   })
 
-  const { gameHistory, refreshHistory } = useGameHistory(
-    gameDefinition?.gameType
-  )
+  const { gameHistory, refreshHistory } = useGameHistory(gameDefinition?.gameType)
 
   const { houseEdge } = useHouseEdge({
-    game: gameDefinition?.gameType!,
+    game: gameDefinition?.gameType as CASINO_GAME_TYPE,
     token,
     query: { enabled: isReady },
   })
 
   const { isPaused: isGamePaused } = useIsGamePaused({
-    game: gameDefinition?.gameType!,
+    game: gameDefinition?.gameType as CASINO_GAME_TYPE,
     query: { enabled: isReady },
   })
 
@@ -153,12 +152,7 @@ export function useGameLogic<T extends GameChoice>({
   }, [gameDefinition])
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
-    usePlaceBet(
-      gameDefinition?.gameType,
-      token,
-      refetchBalance,
-      gameDefinition
-    )
+    usePlaceBet(gameDefinition?.gameType, token, refetchBalance, gameDefinition)
 
   const gameContractAddress = gameDefinition
     ? casinoChainById[appChainId]?.contracts.games[gameDefinition.gameType]?.address

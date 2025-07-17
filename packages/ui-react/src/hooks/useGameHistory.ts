@@ -9,9 +9,8 @@ import {
   formatRawAmount,
   OrderDirection,
 } from "@betswirl/sdk-core"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useAccount } from "wagmi"
-import { TokenIcon } from "../components/ui/TokenIcon"
 import { createLogger } from "../lib/logger"
 import { toLowerCase } from "../lib/utils"
 import { HistoryEntryStatus, TokenWithImage } from "../types/types"
@@ -97,10 +96,7 @@ export const useGameHistory = (gameType?: CASINO_GAME_TYPE) => {
         status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
         multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
         payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
-        payoutCurrencyIcon: React.createElement(TokenIcon, {
-          token: tokenWithImage,
-          size: 18,
-        }),
+        payoutCurrencyToken: tokenWithImage,
         timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
       }
     })

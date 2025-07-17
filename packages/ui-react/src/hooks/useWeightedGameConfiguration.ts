@@ -1,9 +1,9 @@
 import {
+  CASINO_GAME_TYPE,
   getWeightedGameConfigurationFunctionData,
-  WeightedGameConfiguration,
   parseRawWeightedGameConfiguration,
   type RawWeightedGameConfiguration,
-  CASINO_GAME_TYPE,
+  WeightedGameConfiguration,
 } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { useReadContract } from "wagmi"
@@ -55,7 +55,9 @@ type UseWeightedGameConfigurationResult = {
  * }
  * ```
  */
-export function useWeightedGameConfiguration(props: UseWeightedGameConfigurationProps): UseWeightedGameConfigurationResult {
+export function useWeightedGameConfiguration(
+  props: UseWeightedGameConfigurationProps,
+): UseWeightedGameConfigurationResult {
   const { appChainId } = useChain()
   const { configId, query = {} } = props
 
@@ -83,10 +85,8 @@ export function useWeightedGameConfiguration(props: UseWeightedGameConfiguration
     const rawConfig = parseRawWeightedGameConfiguration(
       wagmiHook.data as RawWeightedGameConfiguration,
       configId,
-      appChainId
+      appChainId,
     )
-
-    console.log({ rawConfig })
 
     // Add game-specific enrichment based on rawConfig.game (Single Source of Truth)
     if (rawConfig.game === CASINO_GAME_TYPE.WHEEL) {
@@ -115,7 +115,7 @@ export function useWeightedGameConfiguration(props: UseWeightedGameConfiguration
       return {
         ...rawConfig,
         colors: wheelColors,
-        label: "Normal" // Could be enhanced to fetch from contract or cache
+        label: "Normal", // Could be enhanced to fetch from contract or cache
       }
     }
 

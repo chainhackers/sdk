@@ -81,7 +81,7 @@ export interface HistoryEntry {
   status: HistoryEntryStatus
   multiplier: number | string
   payoutAmount: number | string
-  payoutCurrencyIcon: React.ReactElement
+  payoutCurrencyToken: TokenWithImage
   timestamp: string
 }
 

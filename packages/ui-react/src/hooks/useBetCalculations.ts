@@ -49,7 +49,6 @@ export function useBetCalculations<T extends GameChoice>({
   betCount = 1,
   gameDefinition,
 }: UseBetCalculationsProps<T>): UseBetCalculationsResult {
-  console.log({ selection })
   const grossMultiplier = useMemo(() => {
     if (!gameDefinition || !selection) return 0
     return gameDefinition.getMultiplier(selection.choice)

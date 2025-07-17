@@ -21,7 +21,6 @@ type WheelAnimationAction =
 
 interface UseWheelAnimationParams {
   spinDuration: number
-  continuousSpinDuration: number
   segments: WheelSegment[]
   onSpinComplete?: () => void
 }
