@@ -18,15 +18,18 @@ pnpm install --ignore-workspace
 ```shell
 # Create new MiniKit project
 npx create-onchain --mini
+
+# ═════════════════════════════════════════════════════════════════════
+# ? Enter your Coinbase Developer Platform Client API Key: (optional) ›
+# ═════════════════════════════════════════════════════════════════════
+# > Skip this (press Enter) - optional for mini-app
+# If needed later, add to .env: `NEXT_PUBLIC_ONCHAINKIT_API_KEY=your_api_key`
+
 cd your-mini-project
 
 # Install BetSwirl UI
 npm install @betswirl/ui-react
 ```
-
-**During installation:**
-`Coinbase Developer Platform Client API Key` - skip this (optional for mini-app)
-If needed later, add to .env: `NEXT_PUBLIC_ONCHAINKIT_API_KEY=your_api_key`
 
 ### Set up Providers
 
@@ -88,17 +91,76 @@ export function Providers(props: { children: ReactNode }) {
 
 ### Add Game Component
 
-Add the game component in `app/page.tsx`:
+Add the game component in `app/page.tsx`.
+This code is enough:
 
 ```tsx
+"use client";
+
+import { useAddFrame, useMiniKit } from "@coinbase/onchainkit/minikit";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Button, Icon } from "./components/DemoComponents";
 import { DiceGame } from "@betswirl/ui-react";
 import "@betswirl/ui-react/styles.css";
 
-// ... existing code ...
+export default function App() {
+  const { setFrameReady, isFrameReady, context } = useMiniKit();
+  const [frameAdded, setFrameAdded] = useState(false);
 
-<main className="flex-1">
-  <DiceGame />
-</main>
+  const addFrame = useAddFrame();
+
+  useEffect(() => {
+    if (!isFrameReady) {
+      setFrameReady();
+    }
+  }, [setFrameReady, isFrameReady]);
+
+  const handleAddFrame = useCallback(async () => {
+    const frameAdded = await addFrame();
+    setFrameAdded(Boolean(frameAdded));
+  }, [addFrame]);
+
+  const saveFrameButton = useMemo(() => {
+    if (context && !context.client.added) {
+      return (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleAddFrame}
+          className="text-[var(--app-accent)] p-4"
+          icon={<Icon name="plus" size="sm" />}
+        >
+          Save Frame
+        </Button>
+      );
+    }
+
+    if (frameAdded) {
+      return (
+        <div className="flex items-center space-x-1 text-sm font-medium text-[#0052FF] animate-fade-out">
+          <Icon name="check" size="sm" className="text-[#0052FF]" />
+          <span>Saved</span>
+        </div>
+      );
+    }
+
+    return null;
+  }, [context, frameAdded, handleAddFrame]);
+
+  return (
+    <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme">
+      <div className="w-full max-w-md mx-auto px-4 py-3">
+        <header className="flex justify-between items-center mb-3 h-11">
+          <div>{saveFrameButton}</div>
+        </header>
+
+        <main className="flex justify-center">
+          <DiceGame />
+        </main>
+      </div>
+    </div>
+  );
+}
 ```
 
 ### Start dev server
@@ -111,14 +173,17 @@ Open in browser http://localhost:3000/
 
 ## Environment Variables
 
-`.env.example` 
+**If using existing template:**
+Create a .env file in the root directory and copy environment variables from `.env.example`.
 
-Configure the `.env` file in the root directory (included with the template), or you can set environment variables in your Vercel project settings.
+**If creating new project**, `.env` file is included with the template.
 
-**Security note**: The manifest file is publicly accessible at `/.well-known/farcaster.json`. Never store sensitive data in manifest environment variables. If you don't need certain environment variables, you can leave them empty.
+**Security note**: The manifest file is publicly accessible at `/.well-known/farcaster.json`. Never store sensitive data in manifest environment variables. Leave empty what you don't need.
 
 **How manifest generation works:**
-The manifest file is automatically generated during build through api route `app/.well-known/farcaster.json/route.ts`. This endpoint reads environment variables and returns JSON with your mini-app configuration that Farcaster uses.
+The manifest is generated during build through api route `app/.well-known/farcaster.json/route.ts`. This endpoint reads environment variables and returns JSON with your mini-app configuration for Farcaster.
+
+Configure the `.env` file:
 
 **Required variables for manifest:**
 ```bash
@@ -137,15 +202,17 @@ NEXT_PUBLIC_APP_PRIMARY_CATEGORY=games
 NEXT_PUBLIC_APP_HERO_IMAGE=$NEXT_PUBLIC_URL/hero.png
 ```
 
-These variables may not be filled in, but they must at least be present in the .env file with empty values, otherwise the manifest will be displayed as invalid.
+Must be present, even if empty:
 ```bash
 FARCASTER_HEADER=
 FARCASTER_PAYLOAD=
 FARCASTER_SIGNATURE=
 ```
 
-**Manifest properties:**
-Complete list of all available manifest properties with descriptions - [Define your application configuration](https://miniapps.farcaster.xyz/docs/guides/publishing#define-your-application-configuration). 
+Some variables use template images. Feel free to replace them, but keep the same format and dimensions.
+
+**Manifest properties:**   
+Complete list - [Define your application configuration](https://miniapps.farcaster.xyz/docs/guides/publishing#define-your-application-configuration). 
 
 All properties are configured through environment variables in the `app/.well-known/farcaster.json/route.ts` file.
 
@@ -158,8 +225,11 @@ Choose one of the following deployment methods:
 # Install Vercel CLI
 npm i -g vercel
 
+# Check for linting errors and fix if any
+npm run lint
+
 # Run deployment from root project
-vercel
+vercel --prod
 ```
 If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find your public domain in the project settings on Vercel.
 
@@ -173,52 +243,35 @@ If you deploy to a new project, the domain will be created from the project's na
 If you added environment variables for the manifest (e.g., NEXT_PUBLIC_URL) in Vercel project settings after deployment, you need to redeploy. Go to deployments, navigate to your project and click redeploy.   
 ![Redeploy](screenshots/redeploy.png)
 
-To update your production deployment from the command line, use `vercel --prod`. This will update your production domain. Without the `--prod` flag, Vercel creates a new preview deployment with an automatically generated URL intended for testing and not publicly accessible by default.
+**Additional Information:**  
+- [CLI Vercel Deploy](https://vercel.com/docs/cli/deploy)   
+- [Managing Deployments](https://vercel.com/docs/projects/project-dashboard#deployments)
 
-[CLI Vercel Deploy](https://vercel.com/docs/cli/deploy)   
-[Managing Deployments](https://vercel.com/docs/projects/project-dashboard#deployments)
-
-## Publish and Test mini-app in Farcaster
-Detailed instructions can be found here - https://miniapps.farcaster.xyz/docs/guides/publishing#steps
+## Test mini-app in Farcaster
 
 After deployment, the manifest can be viewed at this URL - https://[your-app].vercel.app/.well-known/farcaster.json
 
-To test and configure your manifest:
+To test your manifest:
 1. Go to https://farcaster.xyz/~/developers/mini-apps/manifest
 2. Paste your domain in the field without https and trailing slash (`[your-app].vercel.app`)
 
-### Test mini-app:
-To test your mini-app in Farcaster, publishing the manifest is not required. Once you enter your domain, you'll be able to see your manifest and launch the mini-app in the Farcaster frame. 
+After that, you'll be able to see your manifest and launch the mini-app in the Farcaster frame. 
 
 If the manifest is valid, you'll see - "Mini App configuration is valid."
 
 You can launch the application by clicking the Launch button.
 ![Testing mini-app](screenshots/launchMiniApp.png)
 
-If the manifest is not valid, you'll see - "[your-app].vercel.app does not have a valid manifest setup."
-![Testing mini-app](screenshots/notValidManifest.png)
+If the manifest is not valid, you'll see - "[your-app].vercel.app does not have a valid manifest setup."   
+![Testing mini-app](screenshots/notValidManifest.png)   
+Check if you have correctly filled all required environment variables and redeployed after making changes.
 
-### Publish Manifest:
-Farcaster hosted manifests simplify managing and updating your mini app manifest without redeploying your code.
-
-1. Click the "Manage" button
-![Publishing Manifest](screenshots/manifestManage.png)
-2. Enter the domain address and fill in all necessary fields and click "Submit"
-![Publishing Manifest](screenshots/createManifest.png)
-
-After that, you'll get a URL like - https://api.farcaster.xyz/miniapps/hosted-manifest/YOUR_MANIFEST_ID
-
-**If you're using our "farcaster-frame" template, you need to:**
-* Add the FARCASTER_MANIFEST_URL environment variable with this url to your .env file
-* Update deployment
-
-If you created the application from scratch, then you need to set up a redirect to your manifest in the next.config file.   
-[Next js redirects documentation](https://nextjs.org/docs/app/api-reference/config/next-config-js/redirects)   
-You can find an example at `sdk/examples/farcaster-frame/next.config.mjs`. 
+**Additional Information:**
+- [Hosted Manifest Guide](hosted-manifest-guide.md)
 
 ### Post your mini-app
 
-Once you have a valid manifest, you can share your mini-app by posting its URL (https://[your-app].vercel.app) in a Farcaster cast. Users will be able to launch it directly from the cast. This will work even without publishing the manifest and generating Account association.
+Once you have a valid manifest, you can share your mini-app by posting its URL (https://[your-app].vercel.app) in a Farcaster cast. Users will be able to launch it directly from the cast. This will work even without generating Account association.
 
 ### Account Association
 Account association links the domain to your account. After this, users will be able to add your application to their mini-app list. You can generate a signed account association object using the [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) in Warpcast. You need to have the Warpcast app installed on your phone.
@@ -238,11 +291,12 @@ FARCASTER_PAYLOAD=
 FARCASTER_SIGNATURE=
 ```
 6. Update your deployment
-7. Return to the manifest page [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) and refresh it, or click the "Refresh" button.   
-In the Account Association section, you should see "✓ Associated with your account" next to your domain. In the domain verification details 
-table, the Signature field should show "✓ Verified". This means the domain has been successfully associated with your account.
+7. Return to the manifest page [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) and refresh it, or click the "Refresh" button.      
+In the Account Association section, you should see "✓ Associated with your account" next to your domain.   
+In the domain verification details table, the Signature field should show "✓ Verified". This means the domain has been successfully associated with your account.
 
-[Verifying ownership](https://miniapps.farcaster.xyz/docs/guides/publishing#verifying-ownership)
+**Additional Information:**
+- [Verifying ownership](https://miniapps.farcaster.xyz/docs/guides/publishing#verifying-ownership)
 
 ## Mini App search visibility
 
@@ -253,5 +307,5 @@ For more information, see: [App Discovery & Search](https://miniapps.farcaster.x
 ## Documentation
 
 - [MiniKit Documentation](https://docs.base.org/wallet-app/build-with-minikit/quickstart)
-- [Farcaster Frame Publishing](https://miniapps.farcaster.xyz/docs/guides/publishing)
+- [Farcaster Mini Apps Publishing](https://miniapps.farcaster.xyz/docs/guides/publishing)
 - [Deploying to Vercel](https://vercel.com/docs/deployments)

@@ -1,9 +1,9 @@
 "use client";
 
-import { DiceGame } from "@betswirl/ui-react";
 import { useAddFrame, useMiniKit, useOpenUrl } from "@coinbase/onchainkit/minikit";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Icon } from "./components/DemoComponents";
+import { DiceGame } from "@betswirl/ui-react";
 import "@betswirl/ui-react/styles.css";
 
 export default function App() {
@@ -52,7 +52,7 @@ export default function App() {
   }, [context, frameAdded, handleAddFrame]);
 
   return (
-    <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme from-[var(--app-background)] to-[var(--app-gray)]">
+    <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme">
       <div className="w-full max-w-md mx-auto px-4 py-3">
         <header className="flex justify-between items-center mb-3 h-11">
           <div>{saveFrameButton}</div>
