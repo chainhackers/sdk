@@ -188,7 +188,11 @@ Configure the `.env` file:
 **Required variables for manifest:**
 ```bash
 NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME="YOUR_PROJECT_NAME"
+
+# Full public URL with your domain. 
+# If you don't have one, you can add it after deployment.
 NEXT_PUBLIC_URL="https://[your-app].vercel.app"
+
 NEXT_PUBLIC_APP_ICON=$NEXT_PUBLIC_URL/icon.png
 NEXT_PUBLIC_APP_SUBTITLE="Your App Subtitle"
 NEXT_PUBLIC_APP_DESCRIPTION="Your app description"
@@ -231,7 +235,6 @@ npm run lint
 # Run deployment from root project
 vercel --prod
 ```
-If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find your public domain in the project settings on Vercel.
 
 **Git Integration**
 * Sign in to [vercel.com](https://vercel.com) with GitHub
@@ -240,7 +243,25 @@ If you deploy to a new project, the domain will be created from the project's na
 * Click "Import" → "Deploy"
 * Get public URL after ~2 minutes
 
-If you added environment variables for the manifest (e.g., NEXT_PUBLIC_URL) in Vercel project settings after deployment, you need to redeploy. Go to deployments, navigate to your project and click redeploy.   
+### Domain
+If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find and change your public domain in the project settings on Vercel. 
+
+**Add a domain to your project:**
+[Add and configure domain](https://vercel.com/docs/domains/working-with-domains/add-a-domain)
+
+**Update an existing domain:**   
+1. Go to your project on Vercel   
+2. Open the **"Settings"** tab   
+![Settings](screenshots/settings.png)
+3. Go to the **"Domains"** section      
+![Domains](screenshots/domains.png)
+4. Click **"Edit"** next to your domain     
+![Edit domain](screenshots/edit-domain.png)
+5. Update your domain and click **"Save"**   
+
+**Redeploy:**   
+If you added environment variables for the manifest (e.g., NEXT_PUBLIC_URL) in Vercel project settings after deployment, you need to redeploy.   
+In your project dashboard, go to the “Deployments” tab, select the latest deployment, and click “Redeploy.”  
 ![Redeploy](screenshots/redeploy.png)
 
 **Additional Information:**  
@@ -269,11 +290,11 @@ Check if you have correctly filled all required environment variables and redepl
 **Additional Information:**
 - [Hosted Manifest Guide](hosted-manifest-guide.md)
 
-### Post your mini-app
+## Post your mini-app
 
 Once you have a valid manifest, you can share your mini-app by posting its URL (https://[your-app].vercel.app) in a Farcaster cast. Users will be able to launch it directly from the cast. This will work even without generating Account association.
 
-### Account Association
+## Account Association
 Account association links the domain to your account. After this, users will be able to add your application to their mini-app list. You can generate a signed account association object using the [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) in Warpcast. You need to have the Warpcast app installed on your phone.
 
 On the manifest page:
