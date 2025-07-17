@@ -7,6 +7,7 @@ import { avalanche, base, polygon } from "wagmi/chains"
 import { QUERY_DEFAULTS } from "./constants/queryDefaults"
 import { BalanceProvider } from "./context/BalanceContext"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
+import { TokenProvider } from "./context/tokenContext"
 
 const CHAIN = base
 
@@ -55,7 +56,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
             affiliate={affiliate}
             supportedChains={[base.id, polygon.id, avalanche.id]}
           >
-            <BalanceProvider>{children}</BalanceProvider>
+            <TokenProvider>
+              <BalanceProvider>{children}</BalanceProvider>
+            </TokenProvider>
           </BetSwirlSDKProvider>
         </OnchainKitProvider>
       </QueryClientProvider>

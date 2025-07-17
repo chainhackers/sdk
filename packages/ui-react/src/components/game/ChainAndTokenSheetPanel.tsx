@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useBalances } from "../../context/BalanceContext"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
-import { useTokens } from "../../hooks/useTokens"
 import { cn } from "../../lib/utils"
 import { type ChainTokenPanelView, type TokenWithImage } from "../../types/types"
 import { Button } from "../ui/button"
@@ -23,11 +22,13 @@ export function ChainAndTokenSheetPanel({
   initialView = "main",
 }: ChainAndTokenSheetPanelProps) {
   const { appChain, appChainId, switchAppChain } = useChain()
-  const { selectedToken, setSelectedToken } = useTokenContext()
+  const {
+    selectedToken,
+    setSelectedToken,
+    activeTokens: tokens,
+    loading: tokensLoading,
+  } = useTokenContext()
   const [currentView, setCurrentView] = useState<ChainTokenPanelView>(initialView)
-  const { tokens, loading: tokensLoading } = useTokens({
-    onlyActive: true,
-  })
 
   useEffect(() => {
     setCurrentView(initialView)

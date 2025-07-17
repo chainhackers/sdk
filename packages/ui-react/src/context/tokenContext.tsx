@@ -9,6 +9,10 @@ const STORAGE_KEY = "betswirl-selected-token-address"
 interface TokenContextValue {
   selectedToken: TokenWithImage | undefined
   setSelectedToken: (token: TokenWithImage | undefined) => void
+  activeTokens: TokenWithImage[]
+  allTokens: TokenWithImage[]
+  loading: boolean
+  error: Error | null
 }
 
 const TokenContext = createContext<TokenContextValue | undefined>(undefined)
@@ -44,12 +48,24 @@ function storeTokenAddress(address: Address, chainId: number): void {
 }
 
 export function TokenProvider({ children }: TokenProviderProps) {
-  const { tokens, loading } = useTokens()
   const { appChainId } = useChain()
   const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage | undefined>()
+  const {
+    tokens: activeTokens,
+    loading: activeLoading,
+    error: activeError,
+  } = useTokens({ onlyActive: true })
+  const {
+    tokens: allTokens,
+    loading: allLoading,
+    error: allError,
+  } = useTokens({ onlyActive: false })
+
+  const loading = activeLoading || allLoading
+  const error = activeError || allError
 
   useEffect(() => {
-    if (loading || tokens.length === 0) {
+    if (activeLoading || activeTokens.length === 0) {
       return
     }
 
@@ -57,7 +73,7 @@ export function TokenProvider({ children }: TokenProviderProps) {
     if (selectedToken) {
       // For native tokens (zeroAddress), we must also check the symbol matches
       // because all native tokens share the same address
-      const isTokenValidForChain = tokens.some((token) => {
+      const isTokenValidForChain = activeTokens.some((token) => {
         if (token.address === zeroAddress && selectedToken.address === zeroAddress) {
           // Both are native tokens - must have matching symbols
           return token.symbol === selectedToken.symbol
@@ -75,7 +91,7 @@ export function TokenProvider({ children }: TokenProviderProps) {
 
     const storedAddress = getStoredTokenAddress(appChainId)
     if (storedAddress) {
-      const foundToken = tokens.find((token) => token.address === storedAddress)
+      const foundToken = activeTokens.find((token) => token.address === storedAddress)
       if (foundToken) {
         setSelectedTokenInternal(foundToken)
         return
@@ -83,13 +99,13 @@ export function TokenProvider({ children }: TokenProviderProps) {
     }
 
     // Default to native token of the current chain if no stored token
-    const nativeToken = tokens.find((token) => token.address === zeroAddress)
+    const nativeToken = activeTokens.find((token) => token.address === zeroAddress)
     if (!nativeToken) {
       console.warn(`No native token found for chain ${appChainId}`)
       return
     }
     setSelectedTokenInternal(nativeToken)
-  }, [tokens, loading, appChainId, selectedToken])
+  }, [activeTokens, activeLoading, appChainId, selectedToken])
 
   const setSelectedToken = (token: TokenWithImage | undefined) => {
     setSelectedTokenInternal(token)
@@ -99,7 +115,9 @@ export function TokenProvider({ children }: TokenProviderProps) {
   }
 
   return (
-    <TokenContext.Provider value={{ selectedToken, setSelectedToken }}>
+    <TokenContext.Provider
+      value={{ selectedToken, setSelectedToken, activeTokens, allTokens, loading, error }}
+    >
       {children}
     </TokenContext.Provider>
   )

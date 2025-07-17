@@ -3,9 +3,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { createContext, type ReactNode, useContext, useEffect, useMemo } from "react"
 import { erc20Abi, type Hex, zeroAddress } from "viem"
 import { useAccount, useBalance, useReadContracts } from "wagmi"
-import { useTokens } from "../hooks/useTokens"
 import type { TokenWithImage } from "../types/types"
 import { useChain } from "./chainContext"
+import { useTokenContext } from "./tokenContext"
 
 interface BalanceContextValue {
   balances: Map<string, bigint>
@@ -56,7 +56,7 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
   const { appChainId, walletChainId } = useChain()
   const { address } = useAccount()
   const queryClient = useQueryClient()
-  const { tokens } = useTokens({ onlyActive: true })
+  const { activeTokens: tokens } = useTokenContext()
 
   const nativeToken = tokens.find((token) => token.address === zeroAddress)
   const erc20Tokens = tokens.filter((token) => token.address !== zeroAddress)

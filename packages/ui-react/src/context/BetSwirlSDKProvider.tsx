@@ -2,7 +2,6 @@ import { CasinoChainId } from "@betswirl/sdk-core"
 import React from "react"
 import { ChainProvider, ChainProviderProps } from "./chainContext"
 import { ConfigProvider, ConfigProviderProps } from "./configContext"
-import { TokenProvider } from "./tokenContext"
 
 type BetSwirlSDKProviderProps = ChainProviderProps &
   ConfigProviderProps & {
@@ -20,7 +19,7 @@ export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) =
         bankrollToken={bankrollToken}
         filteredTokens={filteredTokens}
       >
-        <TokenProvider initialToken={bankrollToken}>{children}</TokenProvider>
+        {children}
       </ConfigProvider>
     </ChainProvider>
   )
