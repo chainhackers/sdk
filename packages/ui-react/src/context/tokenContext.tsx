@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query"
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
 import { type Address, zeroAddress } from "viem"
 import { useTokens } from "../hooks/useTokens"
@@ -49,7 +50,19 @@ function storeTokenAddress(address: Address, chainId: number): void {
 
 export function TokenProvider({ children }: TokenProviderProps) {
   const { appChainId } = useChain()
+  const queryClient = useQueryClient()
   const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage | undefined>()
+  const [previousChainId, setPreviousChainId] = useState<number | undefined>(appChainId)
+  
+  // Invalidate token queries when chain changes
+  useEffect(() => {
+    if (previousChainId !== undefined && previousChainId !== appChainId) {
+      // Chain has changed, invalidate all token queries to force refetch
+      queryClient.invalidateQueries({ queryKey: ["casino-tokens"] })
+    }
+    setPreviousChainId(appChainId)
+  }, [appChainId, previousChainId, queryClient])
+  
   const {
     tokens: activeTokens,
     loading: activeLoading,
