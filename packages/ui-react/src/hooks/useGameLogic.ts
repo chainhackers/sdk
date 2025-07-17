@@ -105,6 +105,10 @@ export function useGameLogic<T extends GameChoice>({
   backgroundImage,
 }: UseGameLogicProps<T>): UseGameLogicResult<T> {
   const { isConnected: isWalletConnected, address } = useAccount()
+  const { data: gameHistoryData, refetch: refreshHistory } = useGameHistory({
+    gameType: gameDefinition?.gameType as CASINO_GAME_TYPE,
+    filter: {},
+  })
   const { areChainsSynced, appChainId } = useChain()
   const { selectedToken } = useTokenContext()
 
@@ -125,8 +129,6 @@ export function useGameLogic<T extends GameChoice>({
     address,
     token: token.address === zeroAddress ? undefined : (token.address as Hex),
   })
-
-  const { gameHistory, refreshHistory } = useGameHistory(gameDefinition?.gameType)
 
   const { houseEdge } = useHouseEdge({
     game: gameDefinition?.gameType as CASINO_GAME_TYPE,
@@ -259,7 +261,7 @@ export function useGameLogic<T extends GameChoice>({
     balance: balance?.value ?? 0n,
     token,
     areChainsSynced,
-    gameHistory,
+    gameHistory: gameHistoryData?.gameHistory ?? [],
     refreshHistory,
     refetchBalance,
     betAmount,
