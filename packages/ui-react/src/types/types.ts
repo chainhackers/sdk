@@ -93,4 +93,5 @@ export interface GameDefinition<T extends GameChoice> {
   getMultiplier: (choice: T["choice"]) => number
   encodeInput: (choice: T["choice"]) => GameEncodedInput["encodedInput"]
   getWinChancePercent?: (choice: T["choice"]) => number | number[]
+  formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
 }

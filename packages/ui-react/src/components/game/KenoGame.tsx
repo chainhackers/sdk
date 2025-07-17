@@ -51,6 +51,12 @@ function KenoGameContent({
         return Keno.getMultiplier(kenoConfig, choice.length, maxMultiplierHits)
       },
       encodeInput: (choice) => Keno.encodeInput(choice, kenoConfig),
+      formatDisplayResult: (rolledResult) => {
+        if (Array.isArray(rolledResult.rolled)) {
+          return rolledResult.rolled.join(", ")
+        }
+        return rolledResult.rolled.toString()
+      },
     }
   }, [kenoConfig])
 

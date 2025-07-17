@@ -57,6 +57,15 @@ export function WheelGame({
         if (!config?.multipliers) return []
         return config.multipliers.map((_, index) => WeightedGame.getWinChancePercent(config, index))
       },
+      formatDisplayResult: (rolledResult, config) => {
+        if (rolledResult.game !== CASINO_GAME_TYPE.WHEEL || !config?.multipliers) {
+          return ""
+        }
+        const winningIndex = rolledResult.rolled as number
+        const multiplier = config.multipliers[winningIndex]
+        const formattedMultiplier = (Number(multiplier) / 10000).toFixed(2)
+        return `${formattedMultiplier}x`
+      },
     } as GameDefinition<{
       game: CASINO_GAME_TYPE.WHEEL
       choice: WeightedGameConfiguration

@@ -151,8 +151,28 @@ export function useGameLogic<T extends GameChoice>({
     }
   }, [gameDefinition])
 
-  const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
-    usePlaceBet(gameDefinition?.gameType, token, refetchBalance, gameDefinition)
+  const {
+    placeBet,
+    betStatus,
+    gameResult: rawGameResult,
+    resetBetState,
+    vrfFees,
+    formattedVrfFees,
+    gasPrice,
+  } = usePlaceBet(gameDefinition?.gameType, token, refetchBalance, gameDefinition)
+
+  const gameResult = useMemo((): GameResult | null => {
+    if (!rawGameResult || !gameDefinition || !selection) {
+      return null
+    }
+
+    const displayResult = gameDefinition.formatDisplayResult(rawGameResult.rolled, selection.choice)
+
+    return {
+      ...rawGameResult,
+      formattedRolled: displayResult,
+    }
+  }, [rawGameResult, gameDefinition, selection])
 
   const gameContractAddress = gameDefinition
     ? casinoChainById[appChainId]?.contracts.games[gameDefinition.gameType]?.address

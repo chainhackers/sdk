@@ -171,23 +171,6 @@ function _decodeRolled(
   }
 }
 
-function formatRolledResult(rolled: GameRolledResult): string {
-  switch (rolled.game) {
-    case CASINO_GAME_TYPE.COINTOSS:
-      return rolled.rolled
-    case CASINO_GAME_TYPE.DICE:
-      return rolled.rolled.toString()
-    case CASINO_GAME_TYPE.ROULETTE:
-      return rolled.rolled.toString()
-    case CASINO_GAME_TYPE.KENO:
-      return rolled.rolled.join(", ")
-    case CASINO_GAME_TYPE.WHEEL:
-      return rolled.rolled.toString()
-    default:
-      return ""
-  }
-}
-
 /**
  * Watches for bet result events from casino contracts.
  * Uses primary event subscription with automatic fallback to polling if filters fail.
@@ -314,7 +297,7 @@ export function useBetResultWatcher({
         const result: GameResult = {
           ...casinoRolledBet,
           rolled: rolledResult,
-          formattedRolled: formatRolledResult(rolledResult),
+          formattedRolled: "", // It will be set later in game logic
         }
 
         logger.debug("processEventLogs: Bet event processed:", {
