@@ -8,6 +8,7 @@ This is a **game widget library** for BetSwirl protocol casino games built with 
 * 🎲 **Dice** - Roll the dice with customizable win conditions
 * 🎰 **Roulette** - European roulette with single zero
 * 🎱 **Keno** - Pick your lucky numbers and win big
+* 🎡 **Wheel** - Spin the wheel of fortune
 
 ## Quick Start
 
@@ -26,7 +27,7 @@ npm install @betswirl/ui-react
 
 ## Features
 
-- 🎯 **4 Casino Games** - CoinToss, Dice, Roulette, Keno
+- 🎯 **5 Casino Games** - CoinToss, Dice, Roulette, Keno, Wheel
 - ⚡ **Fast Integration** - Get started in minutes
 - 🎨 **Customizable** - Built with Tailwind CSS
 - 🔗 **Web3 Ready** - Works with any wallet provider
