@@ -210,7 +210,7 @@ export function WheelGame({
         onBetAmountChange={handleBetAmountChange}
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
-        isGamePaused={isGamePaused}
+        isGamePaused={isGamePaused || (!delayedGameResult && betStatus === "success")}
         needsTokenApproval={needsTokenApproval}
         isApprovePending={isApprovePending}
         isApproveConfirming={isApproveConfirming}
