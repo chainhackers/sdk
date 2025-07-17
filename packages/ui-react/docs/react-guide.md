@@ -23,10 +23,10 @@ npm run dev
 ### Install
 
 ```shell
-npm install @betswirl/ui
+npm install @betswirl/ui-react
 ```
 
-Package: [npmjs.com/package/@betswirl/ui](https://www.npmjs.com/package/@betswirl/ui)
+Package: [npmjs.com/package/@betswirl/ui-react](https://www.npmjs.com/package/@betswirl/ui-react)
 
 ### Update main.tsx
 
@@ -40,8 +40,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, type Hex } from 'viem'
 import { WagmiProvider, createConfig } from 'wagmi'
 import { base } from 'wagmi/chains'
-import { BetSwirlSDKProvider, type TokenWithImage } from '@betswirl/ui'
-import '@betswirl/ui/styles.css'
+import { BetSwirlSDKProvider, type TokenWithImage } from '@betswirl/ui-react'
+import '@betswirl/ui-react/styles.css'
 import './index.css'
 import App from './App.tsx'
 
@@ -103,7 +103,7 @@ createRoot(document.getElementById('root')!).render(
 In `src/App.tsx`:
 
 ```tsx
-import { CoinTossGame, DiceGame, RouletteGame, KenoGame } from '@betswirl/ui'
+import { CoinTossGame, DiceGame, RouletteGame, KenoGame } from '@betswirl/ui-react'
 
 // Add component (choose one or multiple)
 <div style={{ margin: '2rem 0' }}>
