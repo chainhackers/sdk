@@ -28,6 +28,7 @@ export function WheelGame({
   backgroundImage = wheelBackground,
   ...props
 }: WheelGameProps) {
+  const gameFrameRef = useRef<HTMLDivElement>(null)
   const wheelControllerRef = useRef<WheelController>(null)
 
   // Load wheel configuration from blockchain - hook auto-detects game type
@@ -142,7 +143,7 @@ export function WheelGame({
   // Show loading state while configuration is being fetched
   if (isConfigurationLoading || !wheelConfig) {
     return (
-      <GameFrame themeSettings={themeSettings} {...props} variant="wheel">
+      <GameFrame ref={gameFrameRef} themeSettings={themeSettings} {...props} variant="wheel">
         <GameFrame.Header title="Wheel" connectWalletButton={<GameConnectWallet />} />
         <GameFrame.GameArea variant="wheel">
           <div className="flex items-center justify-center h-full">
@@ -157,7 +158,7 @@ export function WheelGame({
   }
 
   return (
-    <GameFrame themeSettings={themeSettings} {...props} variant="wheel">
+    <GameFrame ref={gameFrameRef} themeSettings={themeSettings} {...props} variant="wheel">
       <GameFrame.Header title="Wheel" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea variant="wheel">
         <GameFrame.InfoButton
@@ -180,6 +181,7 @@ export function WheelGame({
             ref={wheelControllerRef}
             config={wheelConfig}
             theme={theme}
+            parent={gameFrameRef}
             tooltipContent={tooltipContent}
             onSpinComplete={handleAnimationAndResultTasks}
           />
