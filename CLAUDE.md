@@ -39,6 +39,7 @@ When working in `packages/ui-react/`:
 ## Memories
 - When working with ui-react, run pnpm commands in packages/ui-react, not project root
 - Avoid using the word "implement" in commit messages, use "add" and keep commit messages brief
+- Don't add attribution to commit messages, skip "Generated with Claude Code" and co-authored-by lines
 
 ## Architecture Overview
 
