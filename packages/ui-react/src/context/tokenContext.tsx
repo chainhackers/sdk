@@ -53,16 +53,19 @@ export function TokenProvider({ children }: TokenProviderProps) {
   const queryClient = useQueryClient()
   const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage | undefined>()
   const [previousChainId, setPreviousChainId] = useState<number | undefined>(appChainId)
-  
-  // Invalidate token queries when chain changes
+
+  // Cancel and remove token queries when chain changes
   useEffect(() => {
     if (previousChainId !== undefined && previousChainId !== appChainId) {
-      // Chain has changed, invalidate all token queries to force refetch
-      queryClient.invalidateQueries({ queryKey: ["casino-tokens"] })
+      // Chain has changed, cancel all in-flight queries and remove from cache
+      queryClient.cancelQueries({ queryKey: ["casino-tokens"] })
+      queryClient.removeQueries({ queryKey: ["casino-tokens"] })
+      // Clear selected token immediately to prevent showing old chain's token
+      setSelectedTokenInternal(undefined)
     }
     setPreviousChainId(appChainId)
   }, [appChainId, previousChainId, queryClient])
-  
+
   const {
     tokens: activeTokens,
     loading: activeLoading,
