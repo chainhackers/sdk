@@ -13,6 +13,7 @@ export interface WheelController {
   startEndlessSpin: () => void
   spinWheelWithResult: (sectorIndex: number) => void
   stopSpin: () => void
+  isSpinning: boolean
 }
 
 export interface WheelSegment {
@@ -35,7 +36,6 @@ interface WheelGameControlsProps {
   config: WeightedGameConfiguration
   theme?: Theme
   parent?: RefObject<HTMLDivElement | null>
-  onSpinComplete?: () => void
   tooltipContent?: Record<number, TooltipItemContent>
 }
 
@@ -217,7 +217,7 @@ function Wheel({
 }
 
 export const WheelGameControls = forwardRef<WheelController, WheelGameControlsProps>(
-  ({ config, theme = "light", parent: containerRef, onSpinComplete, tooltipContent }, ref) => {
+  ({ config, theme = "light", parent: containerRef, tooltipContent }, ref) => {
     const segments = useMemo(() => createWheelSegments(config), [config])
 
     const {
@@ -233,7 +233,6 @@ export const WheelGameControls = forwardRef<WheelController, WheelGameControlsPr
     } = useWheelAnimation({
       spinDuration: SPIN_DURATION,
       segments,
-      onSpinComplete,
     })
 
     // Expose the controller methods via ref
@@ -243,8 +242,9 @@ export const WheelGameControls = forwardRef<WheelController, WheelGameControlsPr
         startEndlessSpin,
         spinWheelWithResult,
         stopSpin,
+        isSpinning: internalIsSpinning,
       }),
-      [startEndlessSpin, spinWheelWithResult, stopSpin],
+      [startEndlessSpin, spinWheelWithResult, stopSpin, internalIsSpinning],
     )
 
     const isMultiplierWinning = (itemMultiplier: number): boolean => {

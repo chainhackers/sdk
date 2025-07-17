@@ -5,9 +5,8 @@ import {
   WeightedGame,
   type WeightedGameConfiguration,
 } from "@betswirl/sdk-core"
-import { useCallback, useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import wheelBackground from "../../assets/game/game-background.jpg"
-import { useDelayedGameResult } from "../../hooks/useDelayedGameResult"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { useWeightedGameConfiguration } from "../../hooks/useWeightedGameConfiguration"
 import { GameDefinition } from "../../types/types"
@@ -18,7 +17,6 @@ import { BaseGameProps } from "./shared/types"
 import { WheelController, WheelGameControls } from "./WheelGameControls"
 
 const DEFAULT_CONFIG_ID = 0
-const RESULT_DISPLAY_DELAY = 2500
 
 export interface WheelGameProps extends BaseGameProps {}
 
@@ -106,12 +104,6 @@ export function WheelGame({
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
 
-  const { delayedGameResult, handleSpinComplete } = useDelayedGameResult({
-    gameResult,
-    betStatus,
-    delay: RESULT_DISPLAY_DELAY,
-  })
-
   // Start endless spin when bet status becomes 'rolling'
   useEffect(() => {
     if (betStatus === "rolling") {
@@ -126,10 +118,6 @@ export function WheelGame({
       wheelControllerRef.current?.spinWheelWithResult(winningSectorIndex)
     }
   }, [gameResult])
-
-  const handleAnimationAndResultTasks = useCallback(() => {
-    handleSpinComplete()
-  }, [handleSpinComplete])
 
   const tooltipContent = useMemo(() => {
     if (!wheelConfig || !betAmount) return undefined
@@ -192,10 +180,12 @@ export function WheelGame({
             theme={theme}
             parent={gameFrameRef}
             tooltipContent={tooltipContent}
-            onSpinComplete={handleAnimationAndResultTasks}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow gameResult={delayedGameResult} currency={token.symbol} />
+        <GameFrame.ResultWindow
+          gameResult={wheelControllerRef.current?.isSpinning ? null : gameResult}
+          currency={token.symbol}
+        />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.WHEEL}
@@ -210,7 +200,7 @@ export function WheelGame({
         onBetAmountChange={handleBetAmountChange}
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
-        isGamePaused={isGamePaused || (!delayedGameResult && betStatus === "success")}
+        isGamePaused={isGamePaused || !!wheelControllerRef.current?.isSpinning}
         needsTokenApproval={needsTokenApproval}
         isApprovePending={isApprovePending}
         isApproveConfirming={isApproveConfirming}

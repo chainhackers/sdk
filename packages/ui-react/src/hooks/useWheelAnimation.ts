@@ -22,7 +22,6 @@ type WheelAnimationAction =
 interface UseWheelAnimationParams {
   spinDuration: number
   segments: WheelSegment[]
-  onSpinComplete?: () => void
 }
 
 interface UseWheelAnimationReturn {
@@ -130,7 +129,6 @@ function wheelAnimationReducer(
 export function useWheelAnimation({
   spinDuration,
   segments,
-  onSpinComplete,
 }: UseWheelAnimationParams): UseWheelAnimationReturn {
   const [state, dispatch] = useReducer(wheelAnimationReducer, initialState)
 
@@ -163,7 +161,6 @@ export function useWheelAnimation({
 
       spinCompleteTimeoutRef.current = setTimeout(() => {
         dispatch({ type: "FINISH_SPIN" })
-        onSpinComplete?.()
       }, spinDuration)
     }
 
@@ -172,14 +169,7 @@ export function useWheelAnimation({
     }
 
     return cleanupTimers
-  }, [
-    state.status,
-    state.winningSectorIndex,
-    segments,
-    spinDuration,
-    onSpinComplete,
-    cleanupTimers,
-  ])
+  }, [state.status, state.winningSectorIndex, segments, spinDuration, cleanupTimers])
 
   const startEndlessSpin = useCallback(() => {
     dispatch({ type: "START_SPIN" })
