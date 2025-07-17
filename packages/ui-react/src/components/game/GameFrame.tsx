@@ -1,6 +1,6 @@
 import { CASINO_GAME_TYPE } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
-import React, { createContext, useContext, useEffect, useRef, useState } from "react"
+import React, { createContext, forwardRef, useContext, useEffect, useRef, useState } from "react"
 import { zeroAddress } from "viem"
 
 import { cn } from "../../lib/utils"
@@ -51,51 +51,54 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: GameVariant
 }
 
-function GameFrameRoot({ themeSettings, children, variant = "default", ...props }: GameFrameProps) {
-  const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
-  const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
-  const cardRef = useRef<HTMLDivElement>(null)
-  const [isMounted, setIsMounted] = useState(false)
-  const { theme } = themeSettings
+const GameFrameRoot = forwardRef<HTMLDivElement, GameFrameProps>(
+  ({ themeSettings, children, variant = "default", ...props }, ref) => {
+    const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
+    const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
+    const cardRef = useRef<HTMLDivElement>(null)
+    const [isMounted, setIsMounted] = useState(false)
+    const { theme } = themeSettings
 
-  const themeClass = theme === "system" ? undefined : theme
-  const variantConfig = getVariantConfig(variant)
+    const themeClass = theme === "system" ? undefined : theme
+    const variantConfig = getVariantConfig(variant)
 
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    useEffect(() => {
+      setIsMounted(true)
+    }, [])
 
-  const contextValue: GameFrameContextValue = {
-    themeSettings,
-    portalContainer: cardRef.current,
-    isInfoSheetOpen,
-    setIsInfoSheetOpen,
-    isHistorySheetOpen,
-    setIsHistorySheetOpen,
-    isMounted,
-  }
+    const contextValue: GameFrameContextValue = {
+      themeSettings,
+      portalContainer: cardRef.current,
+      isInfoSheetOpen,
+      setIsInfoSheetOpen,
+      isHistorySheetOpen,
+      setIsHistorySheetOpen,
+      isMounted,
+    }
 
-  return (
-    <GameFrameContext.Provider value={contextValue}>
-      <div
-        className={cn("cointoss-game-wrapper game-global-styles", themeClass, props.className)}
-        style={themeSettings.customTheme as React.CSSProperties}
-        {...props}
-      >
-        <Card
-          ref={cardRef}
-          className={cn(
-            "relative overflow-hidden",
-            "bg-card text-card-foreground border",
-            variantConfig.card.height,
-          )}
+    return (
+      <GameFrameContext.Provider value={contextValue}>
+        <div
+          ref={ref}
+          className={cn("cointoss-game-wrapper game-global-styles", themeClass, props.className)}
+          style={themeSettings.customTheme as React.CSSProperties}
+          {...props}
         >
-          {children}
-        </Card>
-      </div>
-    </GameFrameContext.Provider>
-  )
-}
+          <Card
+            ref={cardRef}
+            className={cn(
+              "relative overflow-hidden",
+              "bg-card text-card-foreground border",
+              variantConfig.card.height,
+            )}
+          >
+            {children}
+          </Card>
+        </div>
+      </GameFrameContext.Provider>
+    )
+  },
+)
 
 interface HeaderProps {
   title: string

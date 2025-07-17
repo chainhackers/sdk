@@ -12,10 +12,8 @@ import {
   Token,
 } from "@betswirl/sdk-core"
 import { type UseQueryResult, useQuery } from "@tanstack/react-query"
-import React from "react"
 import { Address } from "viem"
 import { useAccount } from "wagmi"
-import { TokenIcon } from "../components/ui/TokenIcon"
 import { createLogger } from "../lib/logger"
 import { toLowerCase } from "../lib/utils"
 import { HistoryEntryStatus, QueryParameter, TokenWithImage } from "../types/types"
@@ -47,7 +45,7 @@ export type GameHistoryEntry = {
   status: HistoryEntryStatus
   multiplier: string
   payoutAmount: string
-  payoutCurrencyIcon: React.ReactElement
+  payoutCurrencyToken: TokenWithImage
   timestamp: string
 }
 
@@ -133,10 +131,7 @@ export const useGameHistory: UseGameHistory = ({ gameType, filter, offset, limit
           status: bet.isWin ? HistoryEntryStatus.WonBet : HistoryEntryStatus.Busted,
           multiplier: formatAmount(bet.formattedPayoutMultiplier, FORMAT_TYPE.MINIFY),
           payoutAmount: formatRawAmount(bet.payout, bet.token.decimals, FORMAT_TYPE.MINIFY),
-          payoutCurrencyIcon: React.createElement(TokenIcon, {
-            token: tokenWithImage,
-            size: 18,
-          }),
+          payoutCurrencyToken: tokenWithImage,
           timestamp: formatRelativeTime(Number(bet.rollTimestampSecs)),
         }
       })

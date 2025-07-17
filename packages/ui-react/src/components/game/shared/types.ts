@@ -16,7 +16,7 @@ export interface GameControlsProps {
   isDisabled: boolean
 }
 
-export type GameVariant = "default" | "roulette" | "keno"
+export type GameVariant = "default" | "roulette" | "keno" | "wheel"
 
 export interface VariantConfig {
   card: {

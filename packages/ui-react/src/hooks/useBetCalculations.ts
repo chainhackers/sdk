@@ -7,7 +7,7 @@ interface UseBetCalculationsProps<T extends GameChoice> {
   houseEdge: number
   betAmount: bigint | undefined
   betCount: number | undefined
-  gameDefinition: GameDefinition<T>
+  gameDefinition: GameDefinition<T> | undefined
 }
 
 interface UseBetCalculationsResult {
@@ -50,8 +50,10 @@ export function useBetCalculations<T extends GameChoice>({
   gameDefinition,
 }: UseBetCalculationsProps<T>): UseBetCalculationsResult {
   const grossMultiplier = useMemo(() => {
+    if (!gameDefinition || !selection) return 0
     return gameDefinition.getMultiplier(selection.choice)
   }, [selection, gameDefinition])
+
   const totalBetAmount = useMemo(
     () => (betAmount && betAmount > 0n ? betAmount * BigInt(betCount) : 0n),
     [betAmount, betCount],

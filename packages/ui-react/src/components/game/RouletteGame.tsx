@@ -28,6 +28,9 @@ const rouletteGameDefinition: GameDefinition<{
   getMultiplier: (choice) => Roulette.getMultiplier(choice),
   encodeInput: (choice) => Roulette.encodeInput(choice),
   getWinChancePercent: (choice) => Roulette.getWinChancePercent(choice),
+  formatDisplayResult: (rolledResult) => {
+    return rolledResult.rolled.toString()
+  },
 }
 
 export interface RouletteGameProps extends BaseGameProps {}
