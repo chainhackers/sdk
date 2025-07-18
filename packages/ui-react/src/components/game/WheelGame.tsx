@@ -159,13 +159,6 @@ export function WheelGame({
       <GameFrame.Header title="Wheel" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea variant="wheel">
         <GameFrame.InfoButton
-          winChance={(() => {
-            const chances = wheelGameDefinition?.getWinChancePercent?.(wheelConfig)
-            if (Array.isArray(chances)) {
-              return Math.max(...chances)
-            }
-            return chances || 0
-          })()}
           rngFee={formattedVrfFees}
           targetPayout={formatRawAmount(targetPayoutAmount, token.decimals, FORMAT_TYPE.PRECISE)}
           gasPrice={gasPrice}

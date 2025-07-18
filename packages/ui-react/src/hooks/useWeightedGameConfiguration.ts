@@ -26,6 +26,19 @@ type UseWeightedGameConfigurationResult = {
   error: Error | null
 }
 
+const WHEEL_COLORS = [
+  "var(--wheel-neutral)",
+  "var(--wheel-green)",
+  "var(--wheel-neutral)",
+  "var(--wheel-blue)",
+  "var(--wheel-neutral)",
+  "var(--wheel-purple)",
+  "var(--wheel-neutral)",
+  "var(--wheel-green)",
+  "var(--wheel-neutral)",
+  "var(--wheel-orange)",
+]
+
 /**
  * Fetches Weighted Game (Wheel, Plinko) configuration from the smart contract.
  * Configuration includes weights, multipliers, and game-specific data (colors, labels).
@@ -88,38 +101,13 @@ export function useWeightedGameConfiguration(
       appChainId,
     )
 
-    // Add game-specific enrichment based on rawConfig.game (Single Source of Truth)
     if (rawConfig.game === CASINO_GAME_TYPE.WHEEL) {
-      // For wheel, we need colors - use cached configuration colors if available
-      const baseWheelColors = [
-        "#29384C",
-        "#55DC36",
-        "#29384C",
-        "#15A2D8",
-        "#29384C",
-        "#7340F4",
-        "#29384C",
-        "#55DC36",
-        "#29384C",
-        "#EC9E3C",
-      ]
-
-      // Ensure we have enough colors for all segments by repeating the pattern if needed
-      const wheelColors: string[] = []
-      for (let i = 0; i < rawConfig.multipliers.length; i++) {
-        wheelColors.push(baseWheelColors[i % baseWheelColors.length])
-      }
-
-      console.log({ wheelColors })
-
       return {
         ...rawConfig,
-        colors: wheelColors,
-        label: "Normal", // Could be enhanced to fetch from contract or cache
+        colors: WHEEL_COLORS,
       }
     }
 
-    // For other game types, return rawConfig as-is
     return rawConfig
   }, [wagmiHook.data, configId, appChainId])
 
