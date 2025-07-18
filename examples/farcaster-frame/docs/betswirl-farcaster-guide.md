@@ -232,9 +232,14 @@ npm i -g vercel
 # Check for linting errors and fix if any
 npm run lint
 
+# Log in to Vercel
+vercel login
+
 # Run deployment from root project
 vercel --prod
 ```
+
+![Vercel deploy](screenshots/vercel-deploy.png)
 
 **Git Integration**
 * Sign in to [vercel.com](https://vercel.com) with GitHub
@@ -243,13 +248,15 @@ vercel --prod
 * Click "Import" → "Deploy"
 * Get public URL after ~2 minutes
 
+**Important:** After deployment, update the NEXT_PUBLIC_URL variable with your actual domain, unless you’ve already set it, and redeploy using `vercel --prod`. To find or update your domain, see the [Domain](#domain) section below.
+
 ### Domain
 If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find and change your public domain in the project settings on Vercel. 
 
 **Add a domain to your project:**
 [Add and configure domain](https://vercel.com/docs/domains/working-with-domains/add-a-domain)
 
-**Update an existing domain:**   
+**Find or edit an existing domain:**   
 1. Go to your project on Vercel   
 2. Open the **"Settings"** tab   
 ![Settings](screenshots/settings.png)
