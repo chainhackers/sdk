@@ -169,12 +169,12 @@ export default function App() {
 npm run dev
 ```
 
-Open in browser http://localhost:3000/
+Open in browser `http://localhost:3000/`
 
 ## Environment Variables
 
 **If using existing template:**
-Create a .env file in the root directory and copy environment variables from `.env.example`.
+Create a `.env` file in the root directory and copy environment variables from `.env.example`.
 
 **If creating new project**, `.env` file is included with the template.
 
@@ -248,7 +248,7 @@ vercel --prod
 * Click "Import" → "Deploy"
 * Get public URL after ~2 minutes
 
-**Important:** After deployment, update the NEXT_PUBLIC_URL variable with your actual domain, unless you’ve already set it, and redeploy using `vercel --prod`. To find or update your domain, see the [Domain](#domain) section below.
+**Important:** After deployment, update the `NEXT_PUBLIC_URL` variable with your actual domain, unless you’ve already set it, and redeploy using `vercel --prod`. To find or update your domain, see the [Domain](#domain) section below.
 
 ### Domain
 If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find and change your public domain in the project settings on Vercel. 
@@ -270,8 +270,8 @@ If you deploy to a new project, the domain will be created from the project's na
 5. Update your domain and click **"Save"**   
 
 **Redeploy:**   
-If you added environment variables for the manifest (e.g., NEXT_PUBLIC_URL) in Vercel project settings after deployment, you need to redeploy.   
-In your project dashboard, go to the “Deployments” tab, select the latest deployment, and click “Redeploy.”  
+If you added environment variables for the manifest (e.g., `NEXT_PUBLIC_URL`) in Vercel project settings after deployment, you need to redeploy.   
+In your project dashboard, go to the **"Deployments"** tab, select the latest deployment, and click **"Redeploy."**  
 ![Redeploy](screenshots/redeploy.png)
 
 **Additional Information:**  
@@ -280,21 +280,21 @@ In your project dashboard, go to the “Deployments” tab, select the latest de
 
 ## Test mini-app in Farcaster
 
-After deployment, the manifest can be viewed at this URL - https://[your-app].vercel.app/.well-known/farcaster.json
+After deployment, the manifest can be viewed at this URL - `https://[your-app].vercel.app/.well-known/farcaster.json`
 
 To test your manifest:
-1. Go to https://farcaster.xyz/~/developers/mini-apps/manifest
+1. Go to `https://farcaster.xyz/~/developers/mini-apps/manifest`
 2. Paste your domain in the field without https and trailing slash (`[your-app].vercel.app`)
 
 After that, you'll be able to see your manifest and launch the mini-app in the Farcaster frame. 
 
-If the manifest is valid, you'll see - "Mini App configuration is valid."
+If the manifest is valid, you'll see - `"Mini App configuration is valid."`
 
-You can launch the application by clicking the Launch button.
+You can launch the application by clicking the **Launch** button.
 
 ![Testing mini-app](screenshots/launchMiniApp.png)
 
-If the manifest is not valid, you'll see - "[your-app].vercel.app does not have a valid manifest setup."   
+If the manifest is not valid, you'll see - `"[your-app].vercel.app does not have a valid manifest setup."`   
 ![Testing mini-app](screenshots/notValidManifest.png)   
 Check if you have correctly filled all required environment variables and redeployed after making changes.
 
@@ -303,38 +303,38 @@ Check if you have correctly filled all required environment variables and redepl
 
 ## Post your mini-app
 
-Once you have a valid manifest, you can share your mini-app by posting its URL (https://[your-app].vercel.app) in a Farcaster cast. Users will be able to launch it directly from the cast. This will work even without generating Account association.
+Once you have a valid manifest, you can share your mini-app by posting its URL (`https://[your-app].vercel.app`) in a Farcaster cast. Users will be able to launch it directly from the cast. This will work even without generating Account association.
 
 ## Account Association
 Account association links the domain to your account. After this, users will be able to add your application to their mini-app list. You can generate a signed account association object using the [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) in Warpcast. You need to have the Warpcast app installed on your phone.
 
 On the manifest page:
-1. Click the "Generate account association" button   
+1. Click the **"Generate account association"** button   
 
 ![Account Association](screenshots/account-association.png)   
 
-2. On your phone, scan the provided QR code or go to the link - https://farcaster.xyz/~/developers/register?domain=[your-app].vercel.app.
-You should be redirected to the "Account Association" page in the Warpcast app for message signing.
-3. In the app, click the "Sign as [your username]" button.   
-If everything went well, you'll see the message - "Signature sent, continue on desktop."
-4. Return to the manifest page on your desktop. A modal window should open with the accountAssociation object containing your signed message. If it doesn't open, try refreshing the page and clicking "Generate account association" again.
-5. Copy your accountAssociation message, go to your project and fill in the environment variables:
+2. On your phone, scan the provided QR code or go to the link - `https://farcaster.xyz/~/developers/register?domain=[your-app].vercel.app`.
+You should be redirected to the **"Account Association"** page in the Warpcast app for message signing.
+3. In the app, click the **"Sign as [your username]"** button.   
+If everything went well, you'll see the message - `"Signature sent, continue on desktop."`
+4. Return to the manifest page on your desktop. A modal window should open with the `accountAssociation` object containing your signed message. If it doesn't open, try refreshing the page and clicking **"Generate account association"** again.
+5. Copy your `accountAssociation` message, go to your project and fill in the environment variables:
 ```bash
 FARCASTER_HEADER=
 FARCASTER_PAYLOAD=
 FARCASTER_SIGNATURE=
 ```
 6. Update your deployment
-7. Return to the manifest page [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) and refresh it, or click the "Refresh" button.      
-In the Account Association section, you should see "✓ Associated with your account" next to your domain.   
-In the domain verification details table, the Signature field should show "✓ Verified". This means the domain has been successfully associated with your account.
+7. Return to the manifest page [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) and refresh it, or click the **"Refresh"** button.      
+In the **Account Association** section, you should see `"✓ Associated with your account"` next to your domain.   
+In the domain verification details table, the **Signature** field should show `"✓ Verified"`. This means the domain has been successfully associated with your account.
 
 **Additional Information:**
 - [Verifying ownership](https://miniapps.farcaster.xyz/docs/guides/publishing#verifying-ownership)
 
 ## Mini App search visibility
 
-For your app to appear in Farcaster’s mini-app search, Account Association must be configured. Without it, your app will not be included in search results.
+For your app to appear in Farcaster's mini-app search, **Account Association** must be configured. Without it, your app will not be included in search results.
 
 For more information, see: [App Discovery & Search](https://miniapps.farcaster.xyz/docs/guides/discovery) 
 
