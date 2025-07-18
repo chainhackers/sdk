@@ -272,6 +272,7 @@ export function BettingPanel({
           <Button
             variant="ghost"
             onClick={handleBalanceClick}
+            disabled={isInputDisabled}
             className={cn(
               "text-sm font-medium flex items-center w-fit h-auto p-0",
               "bg-secondary rounded-[8px] px-2 py-1",
