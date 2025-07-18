@@ -1,0 +1,66 @@
+name: Deploy Storybook
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install pnpm
+        run: corepack use pnpm@latest-10
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build libs
+        run: pnpm build:libs
+
+      - name: Build Storybook
+        working-directory: packages/ui-react
+        env:
+          VITE_BASE_RPC_URL: ${{ secrets.VITE_BASE_RPC_URL }}
+          VITE_POLYGON_RPC_URL: ${{ secrets.VITE_POLYGON_RPC_URL }}
+          VITE_AVALANCHE_RPC_URL: ${{ secrets.VITE_AVALANCHE_RPC_URL }}
+          VITE_ARBITRUM_RPC_URL: ${{ secrets.VITE_ARBITRUM_RPC_URL }}
+          VITE_AFFILIATE_ADDRESS: ${{ vars.VITE_AFFILIATE_ADDRESS }}
+        run: pnpm build-storybook
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: packages/ui-react/storybook-static/
+          retention-days: 30
+
+      - name: Run Ansible playbook
+        uses: dawidd6/action-ansible-playbook@v4
+        with:
+          playbook: .github/ansible/deploy.yml
+          configuration: |
+            [defaults]
+            callbacks_enabled = ansible.posix.profile_tasks, ansible.posix.timer
+            stdout_callback = yaml
+            host_key_checking = False
+          key: ${{ secrets.SSH_DEPLOY_KEY }}
+          inventory: |
+            [webservers]
+            ${{ vars.DEPLOY_HOST }}
+          known_hosts: ${{ vars.KNOWN_HOSTS }}
+          options: |
+            -u ${{ vars.DEPLOY_USER }}
+            -v

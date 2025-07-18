@@ -1,0 +1,38 @@
+{
+  "root": false,
+  "extends": "//",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": [
+      "src/**/*.js",
+      "src/**/*.jsx",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "test/**/*.ts",
+      "test/**/*.tsx",
+      "tests/**/*.ts",
+      "tests/**/*.tsx",
+      "*.json",
+      "*.js",
+      "*.ts",
+      "!.cache-synpress/**",
+      "!node_modules/**",
+      "!dist/**",
+      "!test-results/**",
+      "!playwright-report/**",
+      "!coverage/**",
+      "!.turbo/**",
+      "!build/**"
+    ],
+    "ignoreUnknown": true
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded"
+    }
+  }
+}

@@ -20,6 +20,7 @@ import {
   formatRawAmount,
   formatTxnUrl,
   GAS_PRICE_TYPE,
+  GAS_TOKEN_ADDRESS,
   getBetSwirlBetUrl,
   Keno,
   type KenoChoiceInput,
@@ -40,7 +41,7 @@ import { initWagmiBetSwirlClient, WagmiBetSwirlClient } from "@betswirl/wagmi-pr
 import { checkbox, input, select } from "@inquirer/prompts";
 import { getBalance } from "@wagmi/core";
 import chalk from "chalk";
-import { type Hash, type Hex, parseUnits, type TransactionReceipt, zeroAddress } from "viem";
+import { type Hash, type Hex, parseUnits, type TransactionReceipt } from "viem";
 import { getWagmiConfigForAllChains, getWagmiConfigFromCasinoChain } from "../../utils";
 
 let wagmiBetSwirlClient: WagmiBetSwirlClient;
@@ -97,7 +98,7 @@ export async function _getTokenInfo(
     chainId: tokenInfo.chainId,
   });
   let userTokenBalance = 0n;
-  if (token.address === zeroAddress) {
+  if (token.address === GAS_TOKEN_ADDRESS) {
     userTokenBalance = userGasBalanceData.value;
   } else {
     userTokenBalance = (
@@ -378,7 +379,7 @@ export async function _selectBetAmount(
   }
   // If token is gas balance, substract the fees
   const availableTokenBalance =
-    casinoGameToken.address === zeroAddress ? gasBalanceRemainingAfterFees : userTokenBalance;
+    casinoGameToken.address === GAS_TOKEN_ADDRESS ? gasBalanceRemainingAfterFees : userTokenBalance;
   // Take into consideration the max bet amount for the balance user but also max bet amount of the bet
   const maxAmountPerBetFormatted = Math.min(
     Number(
