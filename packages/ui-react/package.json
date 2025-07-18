@@ -2,10 +2,10 @@
   "name": "@betswirl/ui-react",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chainhackers/sdk.git",
+    "url": "https://github.com/betswirl/sdk.git",
     "directory": "packages/ui-react"
   },
-  "version": "0.1.6",
+  "version": "0.1.7",
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
