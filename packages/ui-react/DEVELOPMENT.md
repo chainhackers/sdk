@@ -2,6 +2,16 @@
 
 This document is for developers working on the BetSwirl UI React library itself, not for users of the library.
 
+## Architecture
+
+The project uses:
+- **React 19** + **TypeScript** for component development
+- **Vite** for fast development and building
+- **Biome** for linting and code formatting (replaces ESLint)
+- **Storybook** for component development and testing
+- **Tailwind CSS 4** for styling
+
+
 ## Development Setup
 
 ### Prerequisites
@@ -89,6 +99,28 @@ pnpm test:e2e
 
 On the first run, installing Chromium and MetaMask wallet setup may take some time.
 
+### Testing Best Practices
+
+#### ARIA Roles for E2E Testing
+
+We use ARIA roles (`role="listbox"` and `role="option"`) on our custom token selector components primarily to make E2E tests more reliable and maintainable:
+
+- **Stable selectors**: ARIA roles provide semantic selectors that won't break when CSS classes change
+- **Easy token detection**: Tests can reliably find and interact with token options using `[role="option"]`
+- **Better than class names**: More resilient than `.token-option` or other implementation-specific selectors
+
+Example in tests:
+```typescript
+// Find all available tokens
+const tokens = await page.locator('[role="option"]').allTextContents()
+
+// Select a specific token
+await page.locator('[role="option"][aria-selected="false"]').first().click()
+```
+
+**Note on linter warnings**: Biome suggests using native `<select>` elements, but our custom components need features that native elements can't provide (token icons, balance displays, custom styling). The biome-ignore comments are intentional.
+
+
 ## Building and Publishing
 
 ### Build Library
@@ -171,12 +203,5 @@ pnpm storybook:build
 
 **Note**: This process should be automated via CI/CD. The manual steps are for emergency deployments only.
 
-## Architecture
 
-The project uses:
-- **React 19** + **TypeScript** for component development
-- **Vite** for fast development and building
-- **Biome** for linting and code formatting (replaces ESLint)
-- **Storybook** for component development and testing
-- **Tailwind CSS 4** for styling
 

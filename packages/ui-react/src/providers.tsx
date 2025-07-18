@@ -3,10 +3,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { type ReactNode } from "react"
 import { type Hex, http } from "viem"
 import { createConfig, WagmiProvider } from "wagmi"
-import { base } from "wagmi/chains"
+import { avalanche, base, polygon } from "wagmi/chains"
 import { QUERY_DEFAULTS } from "./constants/queryDefaults"
+import { BalanceProvider } from "./context/BalanceContext"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
-import type { TokenWithImage } from "./types/types"
+import { TokenProvider } from "./context/tokenContext"
 
 const CHAIN = base
 
@@ -21,21 +22,21 @@ const queryClient = new QueryClient({
   },
 })
 
-// Define tokens with images
-const DEGEN_TOKEN: TokenWithImage = {
-  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
-  symbol: "DEGEN",
-  decimals: 18,
-  image: "https://www.betswirl.com/img/tokens/DEGEN.svg",
-}
-
 export function AppProviders({ children }: { children: ReactNode }) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
-  const rpcUrl = import.meta.env.VITE_RPC_URL
+
+  // Get RPC URLs for each chain, fallback to public RPCs if not configured
+  const baseRpcUrl = import.meta.env.VITE_BASE_RPC_URL || "https://mainnet.base.org"
+  const polygonRpcUrl = import.meta.env.VITE_POLYGON_RPC_URL || "https://polygon-rpc.com"
+  const avalancheRpcUrl =
+    import.meta.env.VITE_AVALANCHE_RPC_URL || "https://api.avax.network/ext/bc/C/rpc"
+
   const config = createConfig({
-    chains: [CHAIN],
+    chains: [CHAIN, polygon, avalanche],
     transports: {
-      [CHAIN.id]: http(rpcUrl),
+      [CHAIN.id]: http(baseRpcUrl),
+      [polygon.id]: http(polygonRpcUrl),
+      [avalanche.id]: http(avalancheRpcUrl),
     },
   })
 
@@ -59,9 +60,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
           <BetSwirlSDKProvider
             initialChainId={CHAIN.id}
             affiliate={affiliate}
-            bankrollToken={DEGEN_TOKEN}
+            supportedChains={[base.id, polygon.id, avalanche.id]}
           >
-            {children}
+            <TokenProvider>
+              <BalanceProvider>{children}</BalanceProvider>
+            </TokenProvider>
           </BetSwirlSDKProvider>
         </OnchainKitProvider>
       </QueryClientProvider>

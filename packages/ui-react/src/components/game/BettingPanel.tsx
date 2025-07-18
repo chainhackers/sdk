@@ -16,6 +16,7 @@ import { ChainIcon } from "../ui/ChainIcon"
 import { Label } from "../ui/label"
 import { Sheet } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 import { ChainAndTokenSheetPanel } from "./ChainAndTokenSheetPanel"
 
 interface BettingPanelProps {
@@ -67,7 +68,7 @@ export function BettingPanel({
   portalContainer,
   isMounted,
 }: BettingPanelProps) {
-  const { appChainId } = useChain()
+  const { appChainId, switchWalletChain } = useChain()
   const [inputValue, setInputValue] = useState<string>("")
   const [isValidInput, setIsValidInput] = useState<boolean>(true)
   const [isUserTyping, setIsUserTyping] = useState<boolean>(false)
@@ -83,6 +84,26 @@ export function BettingPanel({
     }
   }, [])
 
+  // Track previous values to detect actual changes
+  const prevChainIdRef = useRef(appChainId)
+  const prevTokenAddressRef = useRef(token.address)
+
+  // Clear bet amount when chain or token actually changes
+  useEffect(() => {
+    const chainChanged = prevChainIdRef.current !== appChainId
+    const tokenChanged = prevTokenAddressRef.current !== token.address
+
+    if (chainChanged || tokenChanged) {
+      onBetAmountChange(undefined)
+      setInputValue("")
+      setIsValidInput(true)
+    }
+
+    prevChainIdRef.current = appChainId
+    prevTokenAddressRef.current = token.address
+  }, [appChainId, token.address, onBetAmountChange]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync input value with betAmount when user is not typing
   useEffect(() => {
     if (isUserTyping) return
 
@@ -143,7 +164,10 @@ export function BettingPanel({
   const isInputDisabled = !isConnected || isWaiting || isBetSuccess || isApprovingToken
 
   const isPlayButtonDisabled: boolean =
-    isWaiting || (!canInitiateBet && !needsTokenApproval) || isApprovingToken
+    !isConnected ||
+    isWaiting ||
+    (!canInitiateBet && !needsTokenApproval && areChainsSynced) ||
+    isApprovingToken
 
   let playButtonText: string
   if (isApprovePending) {
@@ -185,6 +209,11 @@ export function BettingPanel({
   }
 
   const handlePlayBtnClick = () => {
+    // Handle chain switching when chains are not synced
+    if (!areChainsSynced && isConnected) {
+      switchWalletChain(appChainId)
+      return
+    }
     onPlayBtnClick()
   }
 
@@ -232,6 +261,7 @@ export function BettingPanel({
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newInputValue = e.target.value
+
     setInputValue(newInputValue)
     setIsUserTyping(true)
 
@@ -256,132 +286,171 @@ export function BettingPanel({
         const weiValue = parseUnits(newInputValue, token.decimals)
         onBetAmountChange(weiValue)
         setIsValidInput(true)
-      } catch {
+      } catch (_error) {
         setIsValidInput(false)
       }
-    } catch {
+    } catch (_error) {
       setIsValidInput(false)
     }
   }
 
   return (
-    <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
-      <div className="flex flex-col gap-3">
-        <div className="text-sm font-medium flex items-center">
-          <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
-          <Button
-            variant="ghost"
-            onClick={handleBalanceClick}
-            className={cn(
-              "text-sm font-medium flex items-center w-fit h-auto p-0",
-              "bg-secondary rounded-[8px] px-2 py-1",
-              "hover:opacity-80 hover:bg-secondary transition-opacity",
-            )}
+    <TooltipProvider>
+      <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
+          <div className="text-sm font-medium flex items-center">
+            <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
+            <Button
+              variant="ghost"
+              onClick={handleBalanceClick}
+              className={cn(
+                "text-sm font-medium flex items-center w-fit h-auto p-0",
+                "bg-secondary rounded-[8px] px-2 py-1",
+                "hover:opacity-80 hover:bg-secondary transition-opacity",
+              )}
+            >
+              <span className="font-semibold">{formattedBalance}</span>
+              <div className="flex items-center ml-1">
+                <ChainIcon
+                  chainId={appChainId}
+                  size={18}
+                  className="-mr-[4px] mask-overlap-cutout"
+                />
+                <TokenIcon token={token} size={18} />
+              </div>
+            </Button>
+          </div>
+
+          <Label
+            htmlFor="betAmount"
+            className="text-sm font-medium -mb-1 text-text-on-surface-variant"
           >
-            <span className="font-semibold">{formattedBalance}</span>
-            <div className="flex items-center ml-1">
-              <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
+            Bet amount
+          </Label>
+          <div className="relative flex h-12 w-full items-center text-sm">
+            <input
+              id="betAmount"
+              type="number"
+              placeholder="0"
+              min={0}
+              max={Number.parseFloat(formattedBalance)}
+              step={BET_AMOUNT_INPUT_STEP}
+              value={inputValue}
+              onChange={handleInputChange}
+              disabled={isInputDisabled}
+              className={cn(
+                "flex h-full w-full rounded-[12px] border-0",
+                "bg-neutral-background text-foreground font-semibold",
+                "px-4 py-2 pr-16",
+                "text-base placeholder:text-muted-foreground",
+                "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0",
+                "disabled:cursor-not-allowed disabled:opacity-50",
+                !isValidInput && "text-muted-foreground",
+              )}
+            />
+            <Button
+              variant="ghost"
+              onClick={handleTokenClick}
+              className={cn(
+                "absolute right-[12px] top-1/2 -translate-y-1/2 transform",
+                "flex items-center text-foreground font-medium gap-1",
+                "h-auto w-fit p-0 bg-transparent hover:bg-transparent hover:opacity-80 transition-opacity",
+                "border-0 shadow-none outline-none focus:outline-none focus-visible:ring-0",
+              )}
+              disabled={isInputDisabled}
+            >
               <TokenIcon token={token} size={18} />
-            </div>
-          </Button>
+              <span>{token.symbol}</span>
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              variant="secondary"
+              onClick={handleHalfBet}
+              className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
+              disabled={isInputDisabled || !isBetAmountValid}
+            >
+              1/2
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleDoubleBet}
+              className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
+              disabled={isInputDisabled || !isBetAmountValid}
+            >
+              2x
+            </Button>
+            <Button
+              variant="secondary"
+              className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
+              onClick={handleMaxBet}
+              disabled={isInputDisabled || !isBetAmountValid}
+            >
+              Max
+            </Button>
+          </div>
         </div>
 
-        <Label
-          htmlFor="betAmount"
-          className="text-sm font-medium -mb-1 text-text-on-surface-variant"
-        >
-          Bet amount
-        </Label>
-        <div className="relative flex h-12 w-full items-center text-sm">
-          <input
-            id="betAmount"
-            type="number"
-            placeholder="0"
-            min={0}
-            max={Number.parseFloat(formattedBalance)}
-            step={BET_AMOUNT_INPUT_STEP}
-            value={inputValue}
-            onChange={handleInputChange}
-            disabled={isInputDisabled}
+        {!isConnected ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="w-full">
+                <Button
+                  size="lg"
+                  className={cn(
+                    "w-full",
+                    "border-0",
+                    "font-bold",
+                    "rounded-[16px]",
+                    "text-play-btn-font",
+                  )}
+                  variant={isError ? "destructive" : "default"}
+                  onClick={handlePlayBtnClick}
+                  disabled={isPlayButtonDisabled}
+                >
+                  {playButtonText}
+                </Button>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Use the Connect button in the top right to connect your wallet</p>
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <Button
+            size="lg"
             className={cn(
-              "flex h-full w-full rounded-[12px] border-0",
-              "bg-neutral-background text-foreground font-semibold",
-              "px-4 py-2 pr-16",
-              "text-base placeholder:text-muted-foreground",
-              "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              !isValidInput && "text-muted-foreground",
+              "w-full",
+              "border-0",
+              "font-bold",
+              "rounded-[16px]",
+              "text-play-btn-font",
             )}
-          />
-          <Button
-            variant="ghost"
-            onClick={handleTokenClick}
-            className={cn(
-              "absolute right-[12px] top-1/2 -translate-y-1/2 transform",
-              "flex items-center text-foreground font-medium gap-1",
-              "h-auto w-fit p-0 bg-transparent hover:bg-transparent hover:opacity-80 transition-opacity",
-              "border-0 shadow-none outline-none focus:outline-none focus-visible:ring-0",
-            )}
-            disabled={isInputDisabled}
+            variant={isError ? "destructive" : "default"}
+            onClick={handlePlayBtnClick}
+            disabled={isPlayButtonDisabled}
           >
-            <TokenIcon token={token} size={18} />
-            <span>{token.symbol}</span>
+            {playButtonText}
           </Button>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2">
-          <Button
-            variant="secondary"
-            onClick={handleHalfBet}
-            className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-            disabled={isInputDisabled || !isBetAmountValid}
-          >
-            1/2
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={handleDoubleBet}
-            className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-            disabled={isInputDisabled || !isBetAmountValid}
-          >
-            2x
-          </Button>
-          <Button
-            variant="secondary"
-            className="border border-border-stroke rounded-[8px] h-[30px] w-[85.33px] text-text-on-surface"
-            onClick={handleMaxBet}
-            disabled={isInputDisabled || !isBetAmountValid}
-          >
-            Max
-          </Button>
-        </div>
-      </div>
-
-      <Button
-        size="lg"
-        className={cn("w-full", "border-0", "font-bold", "rounded-[16px]", "text-play-btn-font")}
-        variant={isError ? "destructive" : "default"}
-        onClick={handlePlayBtnClick}
-        disabled={isPlayButtonDisabled}
-      >
-        {playButtonText}
-      </Button>
-
-      <Sheet
-        open={isChainTokenSheetOpen}
-        onOpenChange={(open) => {
-          if (!open) {
-            handleSheetClose()
-          }
-        }}
-      >
-        {isMounted && portalContainer && (
-          <ChainAndTokenSheetPanel
-            portalContainer={portalContainer}
-            initialView={panelInitialView}
-          />
         )}
-      </Sheet>
-    </div>
+
+        <Sheet
+          open={isChainTokenSheetOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              handleSheetClose()
+            }
+          }}
+        >
+          {isMounted && portalContainer && (
+            <ChainAndTokenSheetPanel
+              portalContainer={portalContainer}
+              initialView={panelInitialView}
+            />
+          )}
+        </Sheet>
+      </div>
+    </TooltipProvider>
   )
 }

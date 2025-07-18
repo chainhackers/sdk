@@ -139,6 +139,7 @@ const SheetBottomPanelContent = React.forwardRef<
     </SheetPrimitive.Description>
     {children}
     <SheetPrimitive.Close
+      aria-label="Close"
       className={cn(
         "ring-offset-background focus:ring-ring data-[state=open]:bg-secondary",
         "absolute right-3 sm:right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100",

@@ -32,6 +32,12 @@ jobs:
 
       - name: Build Storybook
         working-directory: packages/ui-react
+        env:
+          VITE_BASE_RPC_URL: ${{ secrets.VITE_BASE_RPC_URL }}
+          VITE_POLYGON_RPC_URL: ${{ secrets.VITE_POLYGON_RPC_URL }}
+          VITE_AVALANCHE_RPC_URL: ${{ secrets.VITE_AVALANCHE_RPC_URL }}
+          VITE_ARBITRUM_RPC_URL: ${{ secrets.VITE_ARBITRUM_RPC_URL }}
+          VITE_AFFILIATE_ADDRESS: ${{ vars.VITE_AFFILIATE_ADDRESS }}
         run: pnpm build-storybook
 
       - name: Upload build artifacts

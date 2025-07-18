@@ -42,6 +42,17 @@ tasks/
 # Synpress cache
 .cache-synpress/
 
+# Test screenshots
+*.png
+*.jpg
+*.jpeg
+
+# Local secrets
+.secrets
+
 # Allow test directories (override root .gitignore)
 !test/
 !tests/
+
+# Internal documentation
+docs/internal/
