@@ -253,10 +253,13 @@ If you deploy to a new project, the domain will be created from the project's na
 1. Go to your project on Vercel   
 2. Open the **"Settings"** tab   
 ![Settings](screenshots/settings.png)
+
 3. Go to the **"Domains"** section      
 ![Domains](screenshots/domains.png)
+
 4. Click **"Edit"** next to your domain     
 ![Edit domain](screenshots/edit-domain.png)
+
 5. Update your domain and click **"Save"**   
 
 **Redeploy:**   
@@ -281,6 +284,7 @@ After that, you'll be able to see your manifest and launch the mini-app in the F
 If the manifest is valid, you'll see - "Mini App configuration is valid."
 
 You can launch the application by clicking the Launch button.
+
 ![Testing mini-app](screenshots/launchMiniApp.png)
 
 If the manifest is not valid, you'll see - "[your-app].vercel.app does not have a valid manifest setup."   
@@ -299,7 +303,9 @@ Account association links the domain to your account. After this, users will be 
 
 On the manifest page:
 1. Click the "Generate account association" button   
-![Account Association](screenshots/account-association.png)
+
+![Account Association](screenshots/account-association.png)   
+
 2. On your phone, scan the provided QR code or go to the link - https://farcaster.xyz/~/developers/register?domain=[your-app].vercel.app.
 You should be redirected to the "Account Association" page in the Warpcast app for message signing.
 3. In the app, click the "Sign as [your username]" button.   
