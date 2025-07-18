@@ -1,17 +1,17 @@
-import { getPayoutDetails } from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, getPayoutDetails } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { GameChoice, GameDefinition } from "../types/types"
+import { useTokenContext } from "../context/tokenContext"
+import { useHouseEdge } from "./useHouseEdge"
 
 interface UseBetCalculationsProps<T extends GameChoice> {
   selection: T
-  houseEdge: number
   betAmount: bigint | undefined
   betCount: number | undefined
   gameDefinition: GameDefinition<T> | undefined
 }
 
 interface UseBetCalculationsResult {
-  houseEdge: number
   totalBetAmount: bigint
   grossMultiplier: number
   netMultiplier: number
@@ -44,11 +44,16 @@ interface UseBetCalculationsResult {
  */
 export function useBetCalculations<T extends GameChoice>({
   selection,
-  houseEdge,
   betAmount,
   betCount = 1,
   gameDefinition,
 }: UseBetCalculationsProps<T>): UseBetCalculationsResult {
+  const { selectedToken: token } = useTokenContext()
+  const { houseEdge } = useHouseEdge({
+    game: gameDefinition?.gameType as CASINO_GAME_TYPE,
+    token,
+  })
+
   const grossMultiplier = useMemo(() => {
     if (!gameDefinition || !selection) return 0
     return gameDefinition.getMultiplier(selection.choice)
@@ -63,7 +68,6 @@ export function useBetCalculations<T extends GameChoice>({
     getPayoutDetails(betAmount ?? 0n, betCount, grossMultiplier, houseEdge)
 
   return {
-    houseEdge,
     totalBetAmount,
     grossMultiplier,
     netMultiplier,

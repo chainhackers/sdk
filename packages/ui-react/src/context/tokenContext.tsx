@@ -2,11 +2,13 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 import { type Address } from "viem"
 import { useTokens } from "../hooks/useTokens"
 import { TokenWithImage } from "../types/types"
+import { chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
+import { useChain } from "./chainContext"
 
 const STORAGE_KEY = "betswirl-selected-token-address"
 
 interface TokenContextValue {
-  selectedToken: TokenWithImage | undefined
+  selectedToken: TokenWithImage
   setSelectedToken: (token: TokenWithImage) => void
 }
 
@@ -44,7 +46,10 @@ function storeTokenAddress(address: Address): void {
 
 export function TokenProvider({ children, initialToken }: TokenProviderProps) {
   const { tokens, loading } = useTokens()
-  const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage | undefined>()
+  const { appChainId } = useChain()
+  const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage>(
+    chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency) as TokenWithImage
+  )
 
   useEffect(() => {
     if (loading || tokens.length === 0) {
@@ -60,7 +65,7 @@ export function TokenProvider({ children, initialToken }: TokenProviderProps) {
       }
     }
 
-    setSelectedTokenInternal(initialToken)
+    setSelectedTokenInternal(initialToken ?? selectedToken)
   }, [tokens, loading, initialToken])
 
   const setSelectedToken = (token: TokenWithImage) => {

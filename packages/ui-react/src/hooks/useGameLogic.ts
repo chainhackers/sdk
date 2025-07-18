@@ -20,7 +20,6 @@ import {
 } from "../types/types"
 import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
-import { useHouseEdge } from "./useHouseEdge"
 import { useIsGamePaused } from "./useIsGamePaused"
 
 import { usePlaceBet } from "./usePlaceBet"
@@ -55,7 +54,6 @@ interface UseGameLogicResult<T extends GameChoice = GameChoice> {
   targetPayoutAmount: bigint
   formattedNetMultiplier: number
   grossMultiplier: number // BP
-  houseEdge: number // BP
   isInGameResultState: boolean
   isGamePaused: boolean
   nativeCurrencySymbol: string
@@ -130,12 +128,6 @@ export function useGameLogic<T extends GameChoice>({
     token: token.address === zeroAddress ? undefined : (token.address as Hex),
   })
 
-  const { houseEdge } = useHouseEdge({
-    game: gameDefinition?.gameType as CASINO_GAME_TYPE,
-    token,
-    query: { enabled: isReady },
-  })
-
   const { isPaused: isGamePaused } = useIsGamePaused({
     game: gameDefinition?.gameType as CASINO_GAME_TYPE,
     query: { enabled: isReady },
@@ -196,7 +188,6 @@ export function useGameLogic<T extends GameChoice>({
 
   const { netPayout, formattedNetMultiplier, grossMultiplier } = useBetCalculations({
     selection: selection || ({} as T),
-    houseEdge,
     betAmount,
     betCount: 1,
     gameDefinition,
@@ -277,7 +268,6 @@ export function useGameLogic<T extends GameChoice>({
     targetPayoutAmount: netPayout,
     formattedNetMultiplier: formattedNetMultiplier,
     grossMultiplier,
-    houseEdge,
     isInGameResultState,
     isGamePaused,
     nativeCurrencySymbol,

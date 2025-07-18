@@ -7,16 +7,16 @@ import {
 } from "@betswirl/sdk-core"
 import { useEffect, useMemo, useRef } from "react"
 import wheelBackground from "../../assets/game/game-background.jpg"
+import { useChain } from "../../context/chainContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
-import { useWeightedGameConfiguration } from "../../hooks/useWeightedGameConfiguration"
-import { GameDefinition } from "../../types/types"
+import { GameDefinition, TokenWithImage } from "../../types/types"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
 
 import { WheelController, WheelGameControls } from "./WheelGameControls"
-
-const DEFAULT_CONFIG_ID = 0
+import { useHouseEdge } from "../../hooks/useHouseEdge"
+import { useTokenContext } from "../../context/tokenContext"
 
 export interface WheelGameProps extends BaseGameProps {}
 
@@ -29,14 +29,21 @@ export function WheelGame({
   const gameFrameRef = useRef<HTMLDivElement>(null)
   const wheelControllerRef = useRef<WheelController>(null)
 
-  // Load wheel configuration from blockchain - hook auto-detects game type
-  const { config: wheelConfig } = useWeightedGameConfiguration({
-    configId: DEFAULT_CONFIG_ID,
-    query: { enabled: true },
+  const { selectedToken: token } = useTokenContext()
+  const { appChainId } = useChain()
+  const { houseEdge } = useHouseEdge({
+    game: CASINO_GAME_TYPE.WHEEL,
+    token,
   })
 
   // Create game definition dynamically based on loaded config
   const wheelGameDefinition = useMemo(() => {
+    const choiceInputs = WeightedGame.getChoiceInputs(appChainId, CASINO_GAME_TYPE.WHEEL, houseEdge)
+    console.log({ choiceInputs, houseEdge })
+
+    if (!choiceInputs || choiceInputs.length === 0) return undefined
+
+    const wheelConfig = choiceInputs[0]?.config
     if (!wheelConfig) return undefined
 
     return {
@@ -68,13 +75,12 @@ export function WheelGame({
       game: CASINO_GAME_TYPE.WHEEL
       choice: WeightedGameConfiguration
     }>
-  }, [wheelConfig])
+  }, [appChainId, houseEdge])
 
   // Always call useGameLogic - it now handles configuration loading internally
   const {
     isWalletConnected,
     balance,
-    token,
     areChainsSynced,
     gameHistory,
     refreshHistory,
@@ -119,26 +125,28 @@ export function WheelGame({
     }
   }, [gameResult])
 
-  const tooltipContent = useMemo(() => {
-    if (!wheelConfig || !betAmount) return undefined
+  const wheelConfig = wheelGameDefinition?.defaultSelection.choice
 
-    const uniqueOutputs = WeightedGame.getUniqueOutputs(wheelConfig, 0)
-    const content: Record<number, { chance?: string; profit?: number; token: typeof token }> = {}
+  const tooltipContent = useMemo(() => {
+    if (!wheelConfig || !betAmount || houseEdge === undefined) return undefined
+
+    const uniqueOutputs = WeightedGame.getUniqueOutputs(wheelConfig, houseEdge)
+    const content: Record<number, { chance?: string; profit?: number; token: TokenWithImage }> = {}
 
     uniqueOutputs.forEach((output) => {
       const profit = (Number(betAmount) * output.formattedNetMultiplier) / 10 ** token.decimals
       content[output.multiplier] = {
         chance: `${output.chanceToWin}%`,
         profit: profit,
-        token: token,
+        token,
       }
     })
 
     return content
-  }, [wheelConfig, betAmount, token])
+  }, [wheelConfig, betAmount, token, houseEdge])
 
   // Show loading state while configuration is being fetched
-  if (isConfigurationLoading || !wheelConfig) {
+  if (isConfigurationLoading || !wheelGameDefinition || !wheelConfig) {
     return (
       <GameFrame ref={gameFrameRef} themeSettings={themeSettings} {...props} variant="wheel">
         <GameFrame.Header title="Wheel" connectWalletButton={<GameConnectWallet />} />
