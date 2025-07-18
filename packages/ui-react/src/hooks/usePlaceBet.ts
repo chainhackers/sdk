@@ -142,6 +142,10 @@ export function usePlaceBet<T extends GameChoice>(
     } else if (watcherStatus === "error") {
       setInternalError("watcher error")
       logger.debug("watcher: Bet resolved: ERROR from watcher")
+    } else if (watcherStatus === "timeout") {
+      setIsRolling(false)
+      setInternalError("Result timeout - please check transaction history")
+      logger.debug("watcher: Bet resolved: TIMEOUT - exceeded maximum wait time")
     }
   }, [watcherStatus, watcherGameResult, refetchBalance])
 
@@ -267,6 +271,7 @@ export function usePlaceBet<T extends GameChoice>(
           eventArgs: rollEventData.args,
           betAmount: currentBetAmount!,
           placedBet,
+          transactionBlockNumber: wagerWaitingHook.data!.blockNumber,
         })
 
         refetchBalance()

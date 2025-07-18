@@ -1,13 +1,19 @@
+import { useQueryClient } from "@tanstack/react-query"
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
-import { type Address } from "viem"
+import { type Address, zeroAddress } from "viem"
 import { useTokens } from "../hooks/useTokens"
 import { TokenWithImage } from "../types/types"
+import { useChain } from "./chainContext"
 
 const STORAGE_KEY = "betswirl-selected-token-address"
 
 interface TokenContextValue {
   selectedToken: TokenWithImage | undefined
-  setSelectedToken: (token: TokenWithImage) => void
+  setSelectedToken: (token: TokenWithImage | undefined) => void
+  activeTokens: TokenWithImage[]
+  allTokens: TokenWithImage[]
+  loading: boolean
+  error: Error | null
 }
 
 const TokenContext = createContext<TokenContextValue | undefined>(undefined)
@@ -17,59 +23,117 @@ interface TokenProviderProps {
   initialToken?: TokenWithImage
 }
 
-function getStoredTokenAddress(): Address | null {
+function getStoredTokenAddress(chainId: number): Address | null {
   if (typeof window === "undefined") {
     return null
   }
 
   try {
-    const stored = sessionStorage.getItem(STORAGE_KEY)
+    const stored = sessionStorage.getItem(`${STORAGE_KEY}-${chainId}`)
     return stored as Address | null
   } catch {
     return null
   }
 }
 
-function storeTokenAddress(address: Address): void {
+function storeTokenAddress(address: Address, chainId: number): void {
   if (typeof window === "undefined") {
     return
   }
 
   try {
-    sessionStorage.setItem(STORAGE_KEY, address)
+    sessionStorage.setItem(`${STORAGE_KEY}-${chainId}`, address)
   } catch {
     // Ignore storage errors
   }
 }
 
-export function TokenProvider({ children, initialToken }: TokenProviderProps) {
-  const { tokens, loading } = useTokens()
+export function TokenProvider({ children }: TokenProviderProps) {
+  const { appChainId } = useChain()
+  const queryClient = useQueryClient()
   const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage | undefined>()
+  const [previousChainId, setPreviousChainId] = useState<number | undefined>(appChainId)
+
+  // Cancel and remove token queries when chain changes
+  useEffect(() => {
+    if (previousChainId !== undefined && previousChainId !== appChainId) {
+      // Chain has changed, cancel all in-flight queries and remove from cache
+      queryClient.cancelQueries({ queryKey: ["casino-tokens"] })
+      queryClient.removeQueries({ queryKey: ["casino-tokens"] })
+      // Clear selected token immediately to prevent showing old chain's token
+      setSelectedTokenInternal(undefined)
+    }
+    setPreviousChainId(appChainId)
+  }, [appChainId, previousChainId, queryClient])
+
+  const {
+    tokens: activeTokens,
+    loading: activeLoading,
+    error: activeError,
+  } = useTokens({ onlyActive: true })
+  const {
+    tokens: allTokens,
+    loading: allLoading,
+    error: allError,
+  } = useTokens({ onlyActive: false })
+
+  const loading = activeLoading || allLoading
+  const error = activeError || allError
 
   useEffect(() => {
-    if (loading || tokens.length === 0) {
+    if (activeLoading || activeTokens.length === 0) {
       return
     }
 
-    const storedAddress = getStoredTokenAddress()
+    // Check if selected token is valid for current chain
+    if (selectedToken) {
+      // For native tokens (zeroAddress), we must also check the symbol matches
+      // because all native tokens share the same address
+      const isTokenValidForChain = activeTokens.some((token) => {
+        if (token.address === zeroAddress && selectedToken.address === zeroAddress) {
+          // Both are native tokens - must have matching symbols
+          return token.symbol === selectedToken.symbol
+        }
+        // For ERC20 tokens, address comparison is sufficient
+        return token.address === selectedToken.address
+      })
+
+      if (isTokenValidForChain) {
+        // Token is valid for this chain, keep it
+        return
+      }
+      // Token is not valid for new chain, need to select a new one
+    }
+
+    const storedAddress = getStoredTokenAddress(appChainId)
     if (storedAddress) {
-      const foundToken = tokens.find((token) => token.address === storedAddress)
+      const foundToken = activeTokens.find((token) => token.address === storedAddress)
       if (foundToken) {
         setSelectedTokenInternal(foundToken)
         return
       }
     }
 
-    setSelectedTokenInternal(initialToken)
-  }, [tokens, loading, initialToken])
+    // Default to native token of the current chain if no stored token
+    const nativeToken = activeTokens.find((token) => token.address === zeroAddress)
+    if (!nativeToken) {
+      console.warn(`No native token found for chain ${appChainId}`)
+      return
+    }
+    setSelectedTokenInternal(nativeToken)
+  }, [activeTokens, activeLoading, appChainId, selectedToken])
 
-  const setSelectedToken = (token: TokenWithImage) => {
+  const setSelectedToken = (token: TokenWithImage | undefined) => {
     setSelectedTokenInternal(token)
-    storeTokenAddress(token.address)
+    if (token) {
+      storeTokenAddress(token.address, appChainId)
+    }
   }
 
   return (
-    <TokenContext.Provider value={{ selectedToken, setSelectedToken }}>
+    <TokenContext.Provider
+      value={{ selectedToken, setSelectedToken, activeTokens, allTokens, loading, error }}
+    >
       {children}
     </TokenContext.Provider>
   )

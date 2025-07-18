@@ -1,6 +1,6 @@
 # React Integration Guide
 
-## Create Demo Project
+bwonс## Create Demo Project
 
 ```shell
 # node --version
@@ -149,6 +149,7 @@ You can customize the SDK behavior with these optional props:
   affiliate="0x1234567890123456789012345678901234567890"  // Your affiliate address
   bankrollToken={customToken}                            // Default betting token
   filteredTokens={["0x...", "0x..."]}                   // Limit available tokens
+  supportedChains={[base.id, arbitrum.id, polygon.id]}  // Enable multi-chain support
 >
   <App />
 </BetSwirlSDKProvider>
@@ -156,10 +157,18 @@ You can customize the SDK behavior with these optional props:
 
 | Prop | Type | Description |
 |------|------|-------------|
-| `initialChainId` | `number` | **Required.** Chain ID to initialize the SDK with (currently only Base: 8453) |
+| `initialChainId` | `number` | **Required.** Chain ID to initialize the SDK with |
 | `affiliate` | `string` | Optional. Your wallet address to receive affiliate commissions. If not provided, default affiliate will be used |
 | `bankrollToken` | `TokenWithImage` | Optional. Default token for betting. Must include `address`, `symbol`, `decimals`, and `image` properties. [See available tokens →](./checking-available-tokens.md) |
 | `filteredTokens` | `string[]` | Optional. Array of token addresses to limit which tokens are available for selection. If not provided, all supported tokens will be available. [Learn more about token filtering →](./checking-available-tokens.md#token-filtering) |
+| `supportedChains` | `number[]` | Optional. Array of chain IDs to enable multi-chain support. If not specified, all BetSwirl-supported chains are available |
+
+### Multi-Chain Support
+
+When multiple chains are configured:
+- Players can switch between chains using the chain selector in the betting panel
+- Chain preferences are persisted per wallet address
+- Token balances update automatically when switching chains
 
 #### TokenWithImage Interface
 

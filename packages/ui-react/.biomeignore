@@ -1,0 +1,38 @@
+# Biome ignore file
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.turbo/
+.next/
+
+# Test artifacts
+test-results/
+.cache-synpress/
+playwright-report/
+coverage/
+.nyc_output/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Environment files
+.env.local
+.env.*.local
+
+# Generated files
+*.generated.ts
+*.generated.js

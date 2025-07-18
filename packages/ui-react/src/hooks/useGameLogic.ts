@@ -4,9 +4,10 @@ import {
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
-import React, { useMemo, useState } from "react"
-import { formatGwei, type Hex, zeroAddress } from "viem"
-import { useAccount, useBalance } from "wagmi"
+import React, { useEffect, useMemo, useState } from "react"
+import { formatGwei, zeroAddress } from "viem"
+import { useAccount } from "wagmi"
+import { useBalanceRefresh, useBalances } from "../context/BalanceContext"
 import { useChain } from "../context/chainContext"
 import { useTokenContext } from "../context/tokenContext"
 import {
@@ -123,6 +124,8 @@ export function useGameLogic<T extends GameChoice>({
   const { areChainsSynced, appChainId } = useChain()
 
   const { selectedToken } = useTokenContext()
+  const { getBalance, refetch: refetchBalance } = useBalances()
+  const triggerBalanceRefresh = useBalanceRefresh()
 
   // Determine the effective token to use - memoize to prevent unnecessary re-renders
   const token: TokenWithImage = useMemo(() => {
@@ -134,10 +137,8 @@ export function useGameLogic<T extends GameChoice>({
     )
   }, [selectedToken, appChainId])
 
-  const { data: balance, refetch: refetchBalance } = useBalance({
-    address,
-    token: token.address === zeroAddress ? undefined : (token.address as Hex),
-  })
+  // Get balance from BalanceContext
+  const balance = getBalance(token.address) || 0n
   const { houseEdge } = useHouseEdge({
     game: gameType,
     token,
@@ -150,7 +151,13 @@ export function useGameLogic<T extends GameChoice>({
   const [selection, setSelection] = useState<T>(defaultSelection as T)
 
   const { placeBet, betStatus, gameResult, resetBetState, vrfFees, formattedVrfFees, gasPrice } =
-    usePlaceBet(gameType, token, refetchBalance, effectiveGameDefinition)
+    usePlaceBet(gameType, token, triggerBalanceRefresh, effectiveGameDefinition)
+
+  // Reset bet state when chain or token changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
+  useEffect(() => {
+    resetBetState()
+  }, [appChainId, token.address, resetBetState])
 
   const gameContractAddress = casinoChainById[appChainId]?.contracts.games[gameType]?.address
 
@@ -227,7 +234,7 @@ export function useGameLogic<T extends GameChoice>({
   return {
     isWalletConnected,
     address,
-    balance: balance?.value ?? 0n,
+    balance,
     token,
     areChainsSynced,
     gameHistory: gameHistoryData?.gameHistory ?? [],

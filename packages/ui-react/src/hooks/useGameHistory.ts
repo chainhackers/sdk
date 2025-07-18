@@ -16,10 +16,10 @@ import React from "react"
 import { Address } from "viem"
 import { useAccount } from "wagmi"
 import { TokenIcon } from "../components/ui/TokenIcon"
+import { useTokenContext } from "../context/tokenContext"
 import { createLogger } from "../lib/logger"
 import { toLowerCase } from "../lib/utils"
 import { HistoryEntryStatus, QueryParameter, TokenWithImage } from "../types/types"
-import { useTokens } from "./useTokens"
 
 const logger = createLogger("useGameHistory")
 
@@ -75,7 +75,7 @@ export type UseGameHistory = (props: UseGameHistoryProps) => UseQueryResult<{
 export const useGameHistory: UseGameHistory = ({ gameType, filter, offset, limit, query = {} }) => {
   const { address: activeAddress, chainId: activeChainId } = useAccount()
   // Get all tokens, not just the active ones
-  const { tokens } = useTokens({ onlyActive: false })
+  const { allTokens: tokens } = useTokenContext()
   const address = filter.userAddress || activeAddress
   const chainId = filter.userChainId || activeChainId
   // I think affiliate should be accesible from a React context

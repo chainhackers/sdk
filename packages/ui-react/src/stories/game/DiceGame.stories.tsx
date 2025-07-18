@@ -82,6 +82,9 @@ export const LightTheme: Story = {
     theme: "light",
     token: "ETH",
   },
+  parameters: {
+    chromatic: { delay: 2000 }, // Wait 2 seconds for ETH icon loading and multiplier stabilization
+  },
 }
 
 export const DarkTheme: Story = {
@@ -93,6 +96,7 @@ export const DarkTheme: Story = {
   },
   parameters: {
     backgrounds: { default: "light" },
+    chromatic: { delay: 2000 }, // Wait 2 seconds for images to load
   },
 }
 
