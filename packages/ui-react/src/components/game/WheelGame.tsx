@@ -154,25 +154,15 @@ export function WheelGame({
   }, [wheelConfig, betAmount, token, houseEdge, appChainId])
 
   // Show loading state while configuration is being fetched
-  if (isConfigurationLoading || !wheelGameDefinition || !wheelConfig) {
-    return (
-      <GameFrame ref={gameFrameRef} themeSettings={themeSettings} {...props} variant="wheel">
-        <GameFrame.Header title="Wheel" connectWalletButton={<GameConnectWallet />} />
+  const gameArea = isConfigurationLoading || !wheelGameDefinition || !wheelConfig ? (
         <GameFrame.GameArea variant="wheel">
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent mx-auto mb-4" />
-              <div>Loading wheel configuration...</div>
             </div>
           </div>
         </GameFrame.GameArea>
-      </GameFrame>
-    )
-  }
-
-  return (
-    <GameFrame ref={gameFrameRef} themeSettings={themeSettings} {...props} variant="wheel">
-      <GameFrame.Header title="Wheel" connectWalletButton={<GameConnectWallet />} />
+  ) : (
       <GameFrame.GameArea variant="wheel">
         <GameFrame.InfoButton
           rngFee={formattedVrfFees}
@@ -196,6 +186,12 @@ export function WheelGame({
           currency={token.symbol}
         />
       </GameFrame.GameArea>
+  )
+
+  return (
+    <GameFrame ref={gameFrameRef} themeSettings={themeSettings} {...props} variant="wheel">
+      <GameFrame.Header title="Wheel" connectWalletButton={<GameConnectWallet />} />
+      {gameArea}
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.WHEEL}
         betCount={1}
