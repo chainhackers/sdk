@@ -2,7 +2,7 @@
 Farcaster hosted manifests simplify updating your mini app manifest without redeploying your code.
 
 1. Go to https://farcaster.xyz/~/developers/mini-apps/manifest
-2. Click the "Manage" button
+2. Click the "Manage" button   
 ![Publishing Manifest](screenshots/manifestManage.png)
 3. Enter the domain address and fill in all necessary fields and click "Submit"
 ![Publishing Manifest](screenshots/createManifest.png)

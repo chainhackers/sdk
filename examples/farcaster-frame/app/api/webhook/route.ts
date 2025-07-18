@@ -107,6 +107,10 @@ export async function POST(request: Request) {
 
       break;
     }
+    default: {
+      console.warn(`Unknown Farcaster frame event type: ${event.event}`);
+      break;
+    }
   }
 
   return Response.json({ success: true });
