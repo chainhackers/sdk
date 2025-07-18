@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { KenoGame, type KenoGameProps } from "../../components/game/KenoGame"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
+import { THEME_OPTIONS } from "../../types/types"
 import gameBg1 from "../assets/game/game-background-1.jpg"
 import gameBg2 from "../assets/game/game-background-2.jpg"
 import gameBg3 from "../assets/game/game-background-3.jpg"
@@ -25,8 +26,9 @@ const meta = {
         { name: "dark", value: "oklch(0.15 0 0)" },
       ],
     },
-    loki: {
-      skip: true,
+    chromatic: {
+      delay: 3000, // 3 second delay for all Keno stories
+      pauseAnimationAtEnd: true,
     },
   },
   decorators: [
@@ -43,7 +45,7 @@ const meta = {
   argTypes: {
     theme: {
       control: "radio",
-      options: ["light", "dark", "system"],
+      options: THEME_OPTIONS,
     },
     token: {
       control: "radio",

@@ -13,6 +13,10 @@ import {
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
 
+export type Theme = "light" | "dark" | "system"
+
+export const THEME_OPTIONS: Theme[] = ["light", "dark", "system"]
+
 export type QueryParameter<
   queryFnData = unknown,
   error = DefaultError,
@@ -77,3 +81,11 @@ export interface HistoryEntry {
 }
 
 export type ChainTokenPanelView = "main" | "chain" | "token"
+
+export interface GameDefinition<T extends GameChoice> {
+  gameType: T["game"]
+  defaultSelection: T
+  getMultiplier: (choice: T["choice"]) => number
+  encodeInput: (choice: T["choice"]) => GameEncodedInput["encodedInput"]
+  getWinChancePercent?: (choice: T["choice"]) => number
+}

@@ -15,7 +15,7 @@ export function GameMultiplierDisplay({ multiplier, className }: GameMultiplierD
         className,
       )}
     >
-      {displayValue} x
+      {displayValue}x
     </div>
   )
 }

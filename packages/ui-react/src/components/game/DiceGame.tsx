@@ -7,6 +7,7 @@ import {
 } from "@betswirl/sdk-core"
 import diceBackground from "../../assets/game/game-background.jpg"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { GameDefinition } from "../../types/types"
 import { DiceGameControls } from "./DiceGameControls"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -14,6 +15,17 @@ import { BaseGameProps } from "./shared/types"
 import { useGameControls } from "./shared/useGameControls"
 
 const DEFAULT_DICE_NUMBER = 20 as DiceNumber
+
+const diceGameDefinition: GameDefinition<{ game: CASINO_GAME_TYPE.DICE; choice: DiceNumber }> = {
+  gameType: CASINO_GAME_TYPE.DICE,
+  defaultSelection: {
+    game: CASINO_GAME_TYPE.DICE,
+    choice: DEFAULT_DICE_NUMBER,
+  },
+  getMultiplier: (choice) => Dice.getMultiplier(choice),
+  encodeInput: (choice) => Dice.encodeInput(choice),
+  getWinChancePercent: (choice) => Dice.getWinChancePercent(choice),
+}
 
 export interface DiceGameProps extends BaseGameProps {}
 
@@ -53,11 +65,7 @@ export function DiceGame({
     isRefetchingAllowance,
     approveError,
   } = useGameLogic({
-    gameType: CASINO_GAME_TYPE.DICE,
-    defaultSelection: {
-      game: CASINO_GAME_TYPE.DICE,
-      choice: DEFAULT_DICE_NUMBER,
-    },
+    gameDefinition: diceGameDefinition,
     backgroundImage,
   })
 

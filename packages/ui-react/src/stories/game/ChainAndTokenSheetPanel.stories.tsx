@@ -18,7 +18,7 @@ import { useTokenContext } from "../../context/tokenContext"
 import { useTokens } from "../../hooks/useTokens"
 import { cn } from "../../lib/utils"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
-import type { TokenWithImage } from "../../types/types"
+import type { Theme, TokenWithImage } from "../../types/types"
 
 // Additional mock tokens for variety
 const USDC_TOKEN: TokenWithImage = {
@@ -30,7 +30,7 @@ const USDC_TOKEN: TokenWithImage = {
 
 interface PanelStoryWrapperProps {
   children: (container: HTMLDivElement) => React.ReactNode
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
 }
 
 const PanelStoryWrapper: React.FC<PanelStoryWrapperProps> = ({ children, theme = "system" }) => {
@@ -68,7 +68,7 @@ const ChainAndTokenSheetWithWrapper = ({
   selectedToken = STORYBOOK_TOKENS.ETH,
 }: {
   initialView?: "main" | "chain" | "token"
-  theme?: "light" | "dark" | "system"
+  theme?: Theme
   selectedToken?: TokenWithImage
 }) => {
   const [isOpen, setIsOpen] = useState(true)
@@ -330,38 +330,45 @@ const ChainSelectionViewContent: React.FC<ChainSelectionViewContentProps> = ({
   currentChainId,
   onChainSelect,
   onBack,
-}) => (
-  <div className="flex flex-col">
-    <div className="flex items-center gap-3 mb-6">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onBack}
-        className="flex items-center justify-center w-8 h-8 rounded-[8px] hover:bg-surface-hover transition-colors p-0"
-      >
-        <ChevronDown className="h-4 w-4 !rotate-90" />
-      </Button>
-      <h2 className="text-lg font-semibold">Select Chain</h2>
-    </div>
+}) => {
+  const { availableChains } = useChain()
 
-    <div className="flex flex-col gap-2">
-      <Button
-        variant="ghost"
-        onClick={() => onChainSelect(currentChainId)}
-        className={cn(
-          "flex items-center gap-3 p-3 rounded-[8px] w-full text-left h-auto justify-start",
-          "bg-surface-selected hover:bg-surface-hover transition-colors",
-        )}
-      >
-        <ChainIcon chainId={currentChainId} size={24} />
-        <div className="flex flex-col">
-          <span className="font-medium text-foreground">Current Chain</span>
-          <span className="text-sm text-muted-foreground">Only current chain is available</span>
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center gap-3 mb-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onBack}
+          className="flex items-center justify-center w-8 h-8 rounded-[8px] hover:bg-surface-hover transition-colors p-0"
+        >
+          <ChevronDown className="h-4 w-4 !rotate-90" />
+        </Button>
+        <h2 className="text-lg font-semibold">Select Chain</h2>
+      </div>
+
+      <ScrollArea className="h-60">
+        <div className="flex flex-col gap-2">
+          {availableChains.map((chain) => (
+            <Button
+              key={chain.viemChain.id}
+              variant="ghost"
+              onClick={() => onChainSelect(chain.viemChain.id as CasinoChainId)}
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-[8px] w-full text-left h-auto justify-start",
+                "hover:bg-surface-hover transition-colors",
+                chain.viemChain.id === currentChainId && "bg-surface-selected",
+              )}
+            >
+              <ChainIcon chainId={chain.viemChain.id as CasinoChainId} size={24} />
+              <span className="font-medium text-foreground">{chain.viemChain.name}</span>
+            </Button>
+          ))}
         </div>
-      </Button>
+      </ScrollArea>
     </div>
-  </div>
-)
+  )
+}
 
 interface TokenSelectionViewContentProps {
   tokens: TokenWithImage[]

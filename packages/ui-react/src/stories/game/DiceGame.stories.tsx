@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { DiceGame, type DiceGameProps } from "../../components/game/DiceGame"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
+import { THEME_OPTIONS } from "../../types/types"
 import gameBg1 from "../assets/game/game-background-9.png"
 import gameBg4 from "../assets/game/game-background-10.png"
 import gameBg2 from "../assets/game/game-background-11.webp"
@@ -39,7 +40,7 @@ const meta = {
   argTypes: {
     theme: {
       control: "radio",
-      options: ["light", "dark", "system"],
+      options: THEME_OPTIONS,
     },
     token: {
       control: "radio",
@@ -81,6 +82,9 @@ export const LightTheme: Story = {
     theme: "light",
     token: "ETH",
   },
+  parameters: {
+    chromatic: { delay: 2000 }, // Wait 2 seconds for ETH icon loading and multiplier stabilization
+  },
 }
 
 export const DarkTheme: Story = {
@@ -92,6 +96,7 @@ export const DarkTheme: Story = {
   },
   parameters: {
     backgrounds: { default: "light" },
+    chromatic: { delay: 2000 }, // Wait 2 seconds for images to load
   },
 }
 

@@ -94,6 +94,27 @@ pnpm test:e2e
 
 On the first run, installing Chromium and MetaMask wallet setup may take some time.
 
+### Testing Best Practices
+
+#### ARIA Roles for E2E Testing
+
+We use ARIA roles (`role="listbox"` and `role="option"`) on our custom token selector components primarily to make E2E tests more reliable and maintainable:
+
+- **Stable selectors**: ARIA roles provide semantic selectors that won't break when CSS classes change
+- **Easy token detection**: Tests can reliably find and interact with token options using `[role="option"]`
+- **Better than class names**: More resilient than `.token-option` or other implementation-specific selectors
+
+Example in tests:
+```typescript
+// Find all available tokens
+const tokens = await page.locator('[role="option"]').allTextContents()
+
+// Select a specific token
+await page.locator('[role="option"][aria-selected="false"]').first().click()
+```
+
+**Note on linter warnings**: Biome suggests using native `<select>` elements, but our custom components need features that native elements can't provide (token icons, balance displays, custom styling). The biome-ignore comments are intentional.
+
 ### Building and Publishing
 - `pnpm build` - Build library for production
 - `pnpm prepublishOnly` - Automatically runs build before publishing

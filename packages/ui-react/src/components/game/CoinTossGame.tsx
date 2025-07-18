@@ -7,11 +7,26 @@ import {
 } from "@betswirl/sdk-core"
 import coinTossBackground from "../../assets/game/game-background.jpg"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { GameDefinition } from "../../types/types"
 import { CoinTossGameControls } from "./CoinTossGameControls"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
 import { useGameControls } from "./shared/useGameControls"
+
+const coinTossGameDefinition: GameDefinition<{
+  game: CASINO_GAME_TYPE.COINTOSS
+  choice: COINTOSS_FACE
+}> = {
+  gameType: CASINO_GAME_TYPE.COINTOSS,
+  defaultSelection: {
+    game: CASINO_GAME_TYPE.COINTOSS,
+    choice: COINTOSS_FACE.HEADS,
+  },
+  getMultiplier: (choice) => CoinToss.getMultiplier(choice),
+  encodeInput: (choice) => CoinToss.encodeInput(choice),
+  getWinChancePercent: (choice) => CoinToss.getWinChancePercent(choice),
+}
 
 export interface CoinTossGameProps extends BaseGameProps {}
 
@@ -51,11 +66,7 @@ export function CoinTossGame({
     isRefetchingAllowance,
     approveError,
   } = useGameLogic({
-    gameType: CASINO_GAME_TYPE.COINTOSS,
-    defaultSelection: {
-      game: CASINO_GAME_TYPE.COINTOSS,
-      choice: COINTOSS_FACE.HEADS,
-    },
+    gameDefinition: coinTossGameDefinition,
     backgroundImage,
   })
 

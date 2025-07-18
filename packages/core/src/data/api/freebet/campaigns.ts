@@ -8,6 +8,14 @@ export enum FREEBET_CAMPAIGN_STATUS {
   EXPIRED = "expired",
 }
 
+export type RawLightFreebet = {
+  id: number;
+  is_wagered: boolean;
+  amount: string; // raw
+  player_address: Address;
+  from_code?: string;
+};
+
 export type RawAggregatedFreebetCampaign = {
   affiliate_address: Address;
   chain_id: CasinoChainId;
@@ -19,12 +27,7 @@ export type RawAggregatedFreebetCampaign = {
   signer_address: Address;
   status: FREEBET_CAMPAIGN_STATUS;
   token: Token;
-  freebets: {
-    id: number;
-    is_wagered: boolean;
-    amount: string; // raw
-    player_address: Address;
-  }[];
+  freebets: RawLightFreebet[];
   total_count: number;
   total_wagered_count: number;
   total_amount: string; // raw
@@ -48,6 +51,7 @@ export type FreebetCampaign = {
     amount: bigint;
     formattedAmount: string;
     playerAddress: Address;
+    fromCode?: string;
   }[];
   totalCount: number;
   totalWageredCount: number;
@@ -169,6 +173,7 @@ export const formatRawFreebetCampaign = (
     amount: BigInt(freebet.amount),
     formattedAmount: formatUnits(BigInt(freebet.amount), campaign.token.decimals),
     playerAddress: freebet.player_address,
+    fromCode: freebet.from_code,
   })),
   totalCount: campaign.total_count,
   totalWageredCount: campaign.total_wagered_count,
