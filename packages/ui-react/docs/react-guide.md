@@ -263,6 +263,6 @@ Use `filteredTokens` to limit available options:
 
 ## Example Result
 
-* **GitHub Repository**: [github.com/chainhackers/betswirl-ui-react-demo](https://github.com/chainhackers/betswirl-ui-react-demo)
+* **GitHub Repository**: [github.com/BetSwirl/betswirl-ui-react-demo](https://github.com/BetSwirl/betswirl-ui-react-demo)
 * **Live Demo**: [betswirl-ui-react-demo.vercel.app](https://betswirl-ui-react-demo.vercel.app)
 

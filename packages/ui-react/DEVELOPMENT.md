@@ -8,7 +8,7 @@ This document is for developers working on the BetSwirl UI React library itself,
 
 1. Clone the repository and install dependencies from the **root directory**:
 ```shell
-git clone https://github.com/chainhackers/sdk.git
+git clone https://github.com/BetSwirl/sdk.git
 cd sdk
 pnpm install
 ```
@@ -96,10 +96,43 @@ On the first run, installing Chromium and MetaMask wallet setup may take some ti
 pnpm build
 ```
 
-### Publishing
+### Release Process
+
+When ready to publish a new version to npm:
+
+**1. Create changeset:**
 ```bash
-pnpm prepublishOnly  # Automatically runs build before publishing
+pnpm change:add
 ```
+- Select `@betswirl/ui-react` (use spacebar)
+- Choose version bump type:
+  - `patch` (0.1.6 → 0.1.7) - bug fixes
+  - `minor` (0.1.6 → 0.2.0) - new features  
+  - `major` (0.1.6 → 1.0.0) - breaking changes
+- Write description of changes
+
+**2. Update version:**
+```bash
+pnpm change:version
+```
+
+**3. Commit version changes:**
+```bash
+git add .
+git commit -m "chore: release @betswirl/ui-react@X.X.X"
+```
+
+**4. Publish to npm:**
+```bash
+pnpm change:publish
+```
+
+**5. Push commit:**
+```bash
+git push
+```
+
+**Result:** Package is published to npm registry and users can install: `npm install @betswirl/ui-react@X.X.X`
 
 ## Deployment
 
