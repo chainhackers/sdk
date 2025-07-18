@@ -43,8 +43,23 @@ export function WheelGame({
 
     if (!choiceInputs || choiceInputs.length === 0) return undefined
 
-    const wheelConfig = choiceInputs[0]?.config
-    if (!wheelConfig) return undefined
+    const wheelChoiceInput = choiceInputs[0]
+    if (!wheelChoiceInput || !wheelChoiceInput.config || !wheelChoiceInput.netMultiplier) return undefined
+
+    // Use the enriched config from choiceInputs which includes colors and net multipliers
+    const wheelConfig = {
+      ...wheelChoiceInput.config,
+      // Override multipliers with net multipliers from choiceInputs
+      multipliers: (wheelChoiceInput.netMultiplier as number[]).map(m => BigInt(Math.round(m))),
+    }
+    console.log('Using wheelConfig from choiceInputs:', {
+      colors: wheelConfig.colors,
+      originalMultipliers: wheelChoiceInput.config.multipliers,
+      netMultipliers: wheelChoiceInput.netMultiplier,
+      formattedNetMultipliers: wheelChoiceInput.formattedNetMultiplier,
+      weights: wheelConfig.weights,
+      configId: wheelConfig.configId,
+    })
 
     return {
       gameType: CASINO_GAME_TYPE.WHEEL,
@@ -67,6 +82,17 @@ export function WheelGame({
           return ""
         }
         const winningIndex = rolledResult.rolled as number
+
+        // Get choiceInputs to show net multiplier
+        const choiceInputs = WeightedGame.getChoiceInputs(appChainId, CASINO_GAME_TYPE.WHEEL, houseEdge)
+        if (choiceInputs && choiceInputs.length > 0 && choiceInputs[0] && choiceInputs[0].formattedNetMultiplier) {
+          const formattedNetMultipliers = choiceInputs[0].formattedNetMultiplier as number[]
+          if (formattedNetMultipliers && formattedNetMultipliers[winningIndex] !== undefined) {
+            return `${formattedNetMultipliers[winningIndex].toFixed(3)}x`
+          }
+        }
+
+        // Fallback to original logic
         const multiplier = config.multipliers[winningIndex]
         const formattedMultiplier = (Number(multiplier) / 10000).toFixed(2)
         return `${formattedMultiplier}x`
@@ -130,20 +156,54 @@ export function WheelGame({
   const tooltipContent = useMemo(() => {
     if (!wheelConfig || !betAmount || houseEdge === undefined) return undefined
 
-    const uniqueOutputs = WeightedGame.getUniqueOutputs(wheelConfig, houseEdge)
+    // Get choiceInputs to use net multipliers directly
+    const choiceInputs = WeightedGame.getChoiceInputs(appChainId, CASINO_GAME_TYPE.WHEEL, houseEdge)
+    if (!choiceInputs || choiceInputs.length === 0) return undefined
+
+    const wheelChoiceInput = choiceInputs[0]
+    if (!wheelChoiceInput || !wheelChoiceInput.netMultiplier || !wheelChoiceInput.formattedNetMultiplier || !wheelChoiceInput.winChancePercent) return undefined
+
     const content: Record<number, { chance?: string; profit?: number; token: TokenWithImage }> = {}
 
-    uniqueOutputs.forEach((output) => {
-      const profit = (Number(betAmount) * output.formattedNetMultiplier) / 10 ** token.decimals
-      content[output.multiplier] = {
-        chance: `${output.chanceToWin}%`,
+    // Use net multipliers and win chances from choiceInputs
+    const netMultipliers = wheelChoiceInput.netMultiplier as number[]
+    const formattedNetMultipliers = wheelChoiceInput.formattedNetMultiplier as number[]
+    const winChances = wheelChoiceInput.winChancePercent as number[]
+
+    // Group by net multiplier and sum chances
+    const multiplierGroups: Record<number, { totalChance: number; formattedMultiplier: number }> = {}
+
+    netMultipliers.forEach((netMultiplier, index) => {
+      // Process all multipliers including 0 (losing segments)
+      const roundedMultiplier = Math.round(netMultiplier)
+
+      if (!multiplierGroups[roundedMultiplier]) {
+        multiplierGroups[roundedMultiplier] = {
+          totalChance: 0,
+          formattedMultiplier: formattedNetMultipliers[index],
+        }
+      }
+
+      multiplierGroups[roundedMultiplier].totalChance += winChances[index]
+    })
+
+    // Create content with grouped chances
+    Object.entries(multiplierGroups).forEach(([multiplier, group]) => {
+      const profit = (Number(betAmount) * group.formattedMultiplier) / 10 ** token.decimals
+      content[Number(multiplier)] = {
+        chance: `${group.totalChance}%`,
         profit: profit,
         token,
       }
     })
 
+    console.log('Tooltip content with grouped multipliers:', {
+      multiplierGroups,
+      content,
+    })
+
     return content
-  }, [wheelConfig, betAmount, token, houseEdge])
+  }, [wheelConfig, betAmount, token, houseEdge, appChainId])
 
   // Show loading state while configuration is being fetched
   if (isConfigurationLoading || !wheelGameDefinition || !wheelConfig) {
