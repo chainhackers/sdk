@@ -173,27 +173,31 @@ Open in browser `http://localhost:3000/`
 
 ## Environment Variables
 
-**If using existing template:**
-Create a `.env` file in the root directory and copy environment variables from `.env.example`.
+- **If you already have a project on Vercel**, you can add the environment variables in the project settings before deploying - see [Add environment variables on Vercel](#add-environment-variables-on-vercel).
 
-**If creating new project**, `.env` file is included with the template.
+- **If you are creating a new project**, you can add the environment variables after the initial deployment. Go to the deployment step - [Deploy to Vercel](#deploy-to-vercel).
 
-**Security note**: The manifest file is publicly accessible at `/.well-known/farcaster.json`. Never store sensitive data in manifest environment variables. Leave empty what you don't need.
+>⚠️ **Security note**: The manifest file is publicly accessible at `/.well-known/farcaster.json`. Never store sensitive data in manifest environment variables.
 
-**How manifest generation works:**
-The manifest is generated during build through api route `app/.well-known/farcaster.json/route.ts`. This endpoint reads environment variables and returns JSON with your mini-app configuration for Farcaster.
+>**How manifest generation works:**
+>The manifest is generated during build through api route `app/.well-known/farcaster.json/route.ts`. This endpoint reads environment variables and returns JSON with your mini-app configuration for Farcaster.
 
-Configure the `.env` file:
+You can find a template with the environment variables in `.env.example`, or in `.env` if you set up the project from scratch.
 
 **Required variables for manifest:**
 ```bash
-NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME="YOUR_PROJECT_NAME"
-
 # Full public URL with your domain. 
 # If you don't have one, you can add it after deployment.
 NEXT_PUBLIC_URL="https://[your-app].vercel.app"
-
+NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME="YOUR_PROJECT_NAME"
 NEXT_PUBLIC_APP_ICON=$NEXT_PUBLIC_URL/icon.png
+NEXT_PUBLIC_APP_HERO_IMAGE=$NEXT_PUBLIC_URL/hero.png # For app preview
+
+# Required to:
+# - add your mini app to the user's list of mini apps
+# - enable search visibility
+# Can be filled in later,
+# after registering your manifest (see the "Account Association" section)
 NEXT_PUBLIC_APP_SUBTITLE="Your App Subtitle"
 NEXT_PUBLIC_APP_DESCRIPTION="Your app description"
 NEXT_PUBLIC_APP_SPLASH_IMAGE=$NEXT_PUBLIC_URL/splash.png
@@ -201,30 +205,40 @@ NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR="#your-color-in-hex"
 NEXT_PUBLIC_APP_PRIMARY_CATEGORY=games
 ```
 
+**Optional variables:**
 ```bash
-# For app preview
-NEXT_PUBLIC_APP_HERO_IMAGE=$NEXT_PUBLIC_URL/hero.png
+# Shared/OnchainKit variables
+NEXT_PUBLIC_ICON_URL=$NEXT_PUBLIC_URL/logo.png
+NEXT_PUBLIC_ONCHAINKIT_API_KEY=
+
+# Optional Frame metadata items below
+NEXT_PUBLIC_APP_TAGLINE=
+NEXT_PUBLIC_APP_OG_TITLE=farcaster-frame
+NEXT_PUBLIC_APP_OG_DESCRIPTION=
+NEXT_PUBLIC_APP_OG_IMAGE=$NEXT_PUBLIC_URL/hero.png
 ```
 
-Must be present, even if empty:
-```bash
-FARCASTER_HEADER=
-FARCASTER_PAYLOAD=
-FARCASTER_SIGNATURE=
-```
+Some variables use template images. Feel free to replace them, but keep the same format and dimensions.   
 
-Some variables use template images. Feel free to replace them, but keep the same format and dimensions.
+**Additional Information:**    
+- All properties are configured through environment variables in the `app/.well-known/farcaster.json/route.ts` file.
+- [Complete list Manifest properties](https://miniapps.farcaster.xyz/docs/guides/publishing#define-your-application-configuration).   
 
-**Manifest properties:**   
-Complete list - [Define your application configuration](https://miniapps.farcaster.xyz/docs/guides/publishing#define-your-application-configuration). 
-
-All properties are configured through environment variables in the `app/.well-known/farcaster.json/route.ts` file.
 
 ## Deploy to Vercel
 
-Choose one of the following deployment methods:
+Choose one of the following deployment methods: **Vercel CLI** or **Git Integration**.
 
-**Vercel CLI**
+### Vercel CLI
+>⚠️ **Important:** If you set up the project from scratch, create a `.vercelignore` file in the root directory and add `.env` and any other files or folders you want to exclude from deployment.
+
+`.vercelignore`
+```bash
+.env
+# Exclude others
+...
+```
+
 ```shell
 # Install Vercel CLI
 npm i -g vercel
@@ -241,22 +255,21 @@ vercel --prod
 
 ![Vercel deploy](screenshots/vercel-deploy.png)
 
-**Git Integration**
+### Git Integration
 * Sign in to [vercel.com](https://vercel.com) with GitHub
 * Click "Add New..." → "Project"
 * Select your repository
 * Click "Import" → "Deploy"
 * Get public URL after ~2 minutes
 
-**Important:** After deployment, add the `NEXT_PUBLIC_URL` variable with your domain if it’s not set, and redeploy using `vercel --prod`. To find or update your domain, see the [Domain](#domain) section below.
-
-### Domain
+## Check Domain Settings
 If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find and change your public domain in the project settings on Vercel. 
 
-**Add a domain to your project:**
+**Add a new domain:**
 [Add and configure domain](https://vercel.com/docs/domains/working-with-domains/add-a-domain)
 
 **Find or edit an existing domain:**   
+
 1. Go to your project on Vercel   
 2. Open the **"Settings"** tab   
 ![Settings](screenshots/settings.png)
@@ -269,9 +282,34 @@ If you deploy to a new project, the domain will be created from the project's na
 
 5. Update your domain and click **"Save"**   
 
-**Redeploy:**   
-If you added environment variables for the manifest (e.g., `NEXT_PUBLIC_URL`) in Vercel project settings after deployment, you need to redeploy.   
-In your project dashboard, go to the **"Deployments"** tab, select the latest deployment, and click **"Redeploy."**  
+## Add Environment Variables on Vercel
+
+Follow these steps to add [Environment Variables](#environment-variables) on Vercel:
+1. Go to your project on Vercel
+2. Open the **"Settings"** tab   
+![Settings](screenshots/settings.png)
+
+3. Go to the **"Environments"** section      
+![Environments section](screenshots/environments.png)
+
+4. Select the **"Production"** domain   
+![Production domain](screenshots/env-production.png)
+
+5. Click **"Add Environment Variables"**   
+![Environment Variables](screenshots/add-env-vars.png)
+
+6. Add all [Environment variables](#environment-variables) at once by pasting them into the input field or importing your .env file to avoid adding them one by one.   
+![Input environment variables](screenshots/input-env-vars.png)
+
+7. Click **"Save"**
+
+## Redeploy  
+If you added environment variables for the manifest in Vercel project settings after deployment, you need to redeploy. 
+ 
+1. Go to your project dashboard in Vercel
+2. Click on the **"Deployments"** tab
+3. Select the latest deployment
+4. Click the **"Redeploy"**       
 ![Redeploy](screenshots/redeploy.png)
 
 **Additional Information:**  
@@ -318,13 +356,15 @@ You should be redirected to the **"Account Association"** page in the Warpcast a
 3. In the app, click the **"Sign as [your username]"** button.   
 If everything went well, you'll see the message - `"Signature sent, continue on desktop."`
 4. Return to the manifest page on your desktop. A modal window should open with the `accountAssociation` object containing your signed message. If it doesn't open, try refreshing the page and clicking **"Generate account association"** again.
-5. Copy your `accountAssociation` message, go to your project and fill in the environment variables:
+5. Copy your `accountAssociation` message and add these variables to your Vercel project:   
+[How add environment variables on Vercel](#add-environment-variables-on-vercel)    
 ```bash
 FARCASTER_HEADER=
 FARCASTER_PAYLOAD=
 FARCASTER_SIGNATURE=
 ```
-6. Update your deployment
+
+6. [Update your deployment](#redeploy)
 7. Return to the manifest page [Mini App Manifest Tool](https://farcaster.xyz/~/developers/mini-apps/manifest) and refresh it, or click the **"Refresh"** button.      
 In the **Account Association** section, you should see `"✓ Associated with your account"` next to your domain.   
 In the domain verification details table, the **Signature** field should show `"✓ Verified"`. This means the domain has been successfully associated with your account.
