@@ -193,13 +193,14 @@ NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME="YOUR_PROJECT_NAME"
 NEXT_PUBLIC_APP_ICON=$NEXT_PUBLIC_URL/icon.png
 NEXT_PUBLIC_APP_HERO_IMAGE=$NEXT_PUBLIC_URL/hero.png # For app preview
 
-# Required to:
-# - add your mini app to the user's list of mini apps
-# - enable search visibility
-# Can be filled in later,
-# after registering your manifest (see the "Account Association" section)
-NEXT_PUBLIC_APP_SUBTITLE="Your App Subtitle"
+# ════════════════════════════════════════════════════════════════════
+# > Can be set after app registration (see "Account Association"):
+# ════════════════════════════════════════════════════════════════════
+# Required for search indexing
 NEXT_PUBLIC_APP_DESCRIPTION="Your app description"
+
+# Recommended to set. May be required for search indexing in Warpcast
+NEXT_PUBLIC_APP_SUBTITLE="Your App Subtitle"
 NEXT_PUBLIC_APP_SPLASH_IMAGE=$NEXT_PUBLIC_URL/splash.png
 NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR="#your-color-in-hex"
 NEXT_PUBLIC_APP_PRIMARY_CATEGORY=games
@@ -262,6 +263,9 @@ vercel --prod
 * Click "Import" → "Deploy"
 * Get public URL after ~2 minutes
 
+**Additional Information:**  
+- [CLI Vercel Deploy](https://vercel.com/docs/cli/deploy)   
+
 ## Check Domain Settings
 If you deploy to a new project, the domain will be created from the project's name. If such a domain already exists, Vercel will generate a new one based on the project's name. You can find and change your public domain in the project settings on Vercel. 
 
@@ -298,7 +302,8 @@ Follow these steps to add [Environment Variables](#environment-variables) on Ver
 5. Click **"Add Environment Variables"**   
 ![Environment Variables](screenshots/add-env-vars.png)
 
-6. Add all [Environment variables](#environment-variables) at once by pasting them into the input field or importing your .env file to avoid adding them one by one.   
+6. Add all [Environment variables](#environment-variables) at once by pasting them into the input field or importing your `.env` file to avoid adding them one by one. 
+Replace `$NEXT_PUBLIC_URL` with your public URL in all variables where it is used.
 ![Input environment variables](screenshots/input-env-vars.png)
 
 7. Click **"Save"**
@@ -312,10 +317,6 @@ If you added environment variables for the manifest in Vercel project settings a
 4. Click the **"Redeploy"**       
 ![Redeploy](screenshots/redeploy.png)
 
-**Additional Information:**  
-- [CLI Vercel Deploy](https://vercel.com/docs/cli/deploy)   
-- [Managing Deployments](https://vercel.com/docs/projects/project-dashboard#deployments)
-
 ## Test mini-app in Farcaster
 
 After deployment, the manifest can be viewed at this URL - `https://[your-app].vercel.app/.well-known/farcaster.json`
@@ -326,15 +327,16 @@ To test your manifest:
 
 After that, you'll be able to see your manifest and launch the mini-app in the Farcaster frame. 
 
-If the manifest is valid, you'll see - `"Mini App configuration is valid."`
+If the manifest is valid, you'll see - `"Mini App configuration is valid."` in the **"Mini App Configuration"** section.
 
 You can launch the application by clicking the **Launch** button.
 
 ![Testing mini-app](screenshots/launchMiniApp.png)
 
-If the manifest is not valid, you'll see - `"[your-app].vercel.app does not have a valid manifest setup."`   
+If the manifest is not valid, check if you have correctly filled all required environment variables and redeployed after making changes.
+
+This message  - `"[your-app].vercel.app does not have a valid manifest setup."` appears if the domain is not associated with your account. It's not required for mini app rendering or testing.   
 ![Testing mini-app](screenshots/notValidManifest.png)   
-Check if you have correctly filled all required environment variables and redeployed after making changes.
 
 **Additional Information:**
 - [Hosted Manifest Guide](hosted-manifest-guide.md)
@@ -375,6 +377,21 @@ In the domain verification details table, the **Signature** field should show `"
 ## Mini App search visibility
 
 For your app to appear in Farcaster's mini-app search, **Account Association** must be configured. Without it, your app will not be included in search results.
+
+Set these variables if they are not already set:   
+
+1. [Add environment variables on Vercel](#add-environment-variables-on-vercel)
+```bash
+# Required for search indexing
+NEXT_PUBLIC_APP_DESCRIPTION="Your app description"
+
+# Recommended to set. May be required for search indexing in Warpcast
+NEXT_PUBLIC_APP_SUBTITLE="Your App Subtitle"
+NEXT_PUBLIC_APP_SPLASH_IMAGE=$NEXT_PUBLIC_URL/splash.png
+NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR="#your-color-in-hex"
+NEXT_PUBLIC_APP_PRIMARY_CATEGORY=games
+```
+2. [Update your deployment](#redeploy)
 
 For more information, see: [App Discovery & Search](https://miniapps.farcaster.xyz/docs/guides/discovery) 
 
