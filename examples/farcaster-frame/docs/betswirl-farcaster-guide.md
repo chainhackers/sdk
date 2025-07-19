@@ -186,8 +186,7 @@ You can find a template with the environment variables in `.env.example`, or in 
 
 **Required variables for manifest:**
 ```bash
-# Full public URL with your domain. 
-# If you don't have one, you can add it after deployment.
+# Full public URL with your domain.   
 NEXT_PUBLIC_URL="https://[your-app].vercel.app"
 NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME="YOUR_PROJECT_NAME"
 NEXT_PUBLIC_APP_ICON=$NEXT_PUBLIC_URL/icon.png
@@ -303,7 +302,7 @@ Follow these steps to add [Environment Variables](#environment-variables) on Ver
 ![Environment Variables](screenshots/add-env-vars.png)
 
 6. Add all [Environment variables](#environment-variables) at once by pasting them into the input field or importing your `.env` file to avoid adding them one by one. 
-Replace `$NEXT_PUBLIC_URL` with your public URL in all variables where it is used.
+Replace `$NEXT_PUBLIC_URL` with your public URL in all variables where it is used.   
 ![Input environment variables](screenshots/input-env-vars.png)
 
 7. Click **"Save"**
