@@ -14,7 +14,8 @@
       "!**/.turbo/**/*",
       "!**/tsconfig*.json",
       "!**/documents/**/*.ts",
-      "!**/packages/ui-react/**/*"
+      "!**/packages/ui-react/**/*",
+      "!**/examples/farcaster-frame/**/*"
     ]
   },
   "formatter": {
