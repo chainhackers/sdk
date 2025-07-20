@@ -16,69 +16,37 @@ The project uses:
 
 ### Prerequisites
 
-1. Clone the repository and install dependencies from the **root directory**:
 ```shell
+# Clone and setup from the SDK project root directory
 git clone https://github.com/BetSwirl/sdk.git
 cd sdk
 pnpm install
-```
-
-2. Build all packages:
-```shell
-pnpm build
-```
-
-3. Navigate to the ui-react package:
-```shell
-cd packages/ui-react
+pnpm build:libs         # Build all library packages
+cd packages/ui-react    # Navigate to ui-react
 ```
 
 ### Development Commands
 
-#### Start Development Server
 ```bash
-pnpm dev
+# From packages/ui-react directory:
+pnpm dev         # Start development server (http://localhost:5173/)
+pnpm storybook   # Start Storybook (http://localhost:6006/)
 ```
-Opens: http://localhost:5173/
-
-#### Start Storybook
-```shell
-pnpm storybook
-```
-Opens: http://localhost:6006/
 
 #### Code Quality
 ```bash
-# Check code quality
-pnpm lint
-
-# Auto-fix issues
-pnpm lint:fix
-
-# Format code
-pnpm format
+pnpm lint        # Check code quality
+pnpm lint:fix    # Auto-fix issues  
+pnpm format      # Format code
 ```
 
-Configuration is in root `biome.json` and applies to the entire monorepo.
+Configuration uses two files:
+- Root [`biome.json`](../../../biome.json) - base configuration for entire monorepo
+- Package [`biome.json`](../biome.json) - extends root config with ui-react specific settings
 
 #### Biome Configuration
 
-This project uses **Biome** for code formatting and linting instead of ESLint/Prettier:
-
-**Why Biome?**
-- **Faster**: Written in Rust, 20x faster than ESLint
-- **All-in-one**: Combines linting, formatting, and import sorting
-- **Zero config**: Works out of the box with sensible defaults
-
-**Configuration structure:**
-```
-├── biome.json (root workspace config for entire monorepo)
-```
-
-**Key settings:**
-- **Formatting**: 2 spaces, 100 char line width, double quotes
-- **Linting**: Recommended rules + custom project rules
-- **Exclusions**: Ignores build artifacts (`dist/`, `.cache-synpress/`, `playwright-report/`, `node_modules/`, `.turbo/`)
+This project uses **Biome** for code formatting and linting.
 
 **Common issues:**
 - If Biome hangs: Check if you have large generated files not excluded in root biome.json
@@ -87,14 +55,9 @@ This project uses **Biome** for code formatting and linting instead of ESLint/Pr
 ## Testing
 
 ### E2E Tests
-Start development server (if not already running):
 ```bash
-pnpm dev
-```
-
-Run tests:
-```bash
-pnpm test:e2e
+pnpm dev         # Start development server if not running
+pnpm test:e2e    # Run tests
 ```
 
 On the first run, installing Chromium and MetaMask wallet setup may take some time.
@@ -107,7 +70,7 @@ We use ARIA roles (`role="listbox"` and `role="option"`) on our custom token sel
 
 - **Stable selectors**: ARIA roles provide semantic selectors that won't break when CSS classes change
 - **Easy token detection**: Tests can reliably find and interact with token options using `[role="option"]`
-- **Better than class names**: More resilient than `.token-option` or other implementation-specific selectors
+- **Stable selectors**: Won't break when CSS classes or implementation details change
 
 Example in tests:
 ```typescript
@@ -125,16 +88,15 @@ await page.locator('[role="option"][aria-selected="false"]').first().click()
 
 ### Build Library
 ```bash
-pnpm build
+pnpm build       # Build the library
 ```
 
 ### Release Process
 
 When ready to publish a new version to npm:
 
-**1. Create changeset:**
 ```bash
-pnpm change:add
+pnpm change:add  # Create changeset
 ```
 - Select `@betswirl/ui-react` (use spacebar)
 - Choose version bump type:
@@ -143,24 +105,11 @@ pnpm change:add
   - `major` (0.1.6 → 1.0.0) - breaking changes
 - Write description of changes
 
-**2. Update version:**
 ```bash
-pnpm change:version
-```
-
-**3. Commit version changes:**
-```bash
+pnpm change:version      # Update version
 git add .
 git commit -m "chore: release @betswirl/ui-react@X.X.X"
-```
-
-**4. Publish to npm:**
-```bash
-pnpm change:publish
-```
-
-**5. Push commit:**
-```bash
+pnpm change:publish      # Publish to npm
 git push
 ```
 
@@ -185,23 +134,12 @@ This command:
 - Applies to `/var/www/betswirl-sdk/` directory recursively
 
 #### Manual Deployment Process
-1. Navigate to the ui-react folder:
 ```shell
 cd packages/ui-react
-```
-
-2. Install dependencies (ignore workspace):
-```shell
-pnpm install
-```
-
-3. Build and deploy Storybook:
-```shell
+pnpm install             # Install dependencies (ignore workspace)
 pnpm storybook:build
 # Copy build output to server
 ```
 
 **Note**: This process should be automated via CI/CD. The manual steps are for emergency deployments only.
-
-
 
