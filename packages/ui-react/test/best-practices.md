@@ -1,6 +1,6 @@
 # E2E Testing Best Practices for BetSwirl SDK
 
-This document outlines best practices for writing E2E tests with Playwright and Synpress for the BetSwirl SDK UI components.
+Best practices for writing E2E tests with Playwright and Synpress for the BetSwirl SDK UI components.
 
 ## General Playwright Best Practices
 
@@ -31,7 +31,7 @@ Priority order for locators:
 3. `getByPlaceholder()` - input placeholders
 4. `getByText()` - visible text content
 5. `getByTestId()` - explicit test IDs
-6. CSS/XPath selectors - last resort
+6. CSS/XPath selectors
 
 ### 4. Avoid Hard-Coded Waits
 ```typescript
