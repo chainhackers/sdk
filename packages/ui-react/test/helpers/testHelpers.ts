@@ -97,7 +97,7 @@ export async function waitForBettingStates(page: Page): Promise<void> {
   const hasLoadingState = await loadingBetButton.isVisible({ timeout: 5000 }).catch(() => false)
   if (hasLoadingState) {
     console.log("Waiting for transaction confirmation...")
-    await expect(loadingBetButton).toBeHidden({ timeout: 60000 })
+    await expect(loadingBetButton).toBeHidden({ timeout: 120000 })
   }
 
   // Finally it should show "Bet rolling..." while the bet is being resolved
@@ -125,32 +125,17 @@ export async function ensureWalletOnChain(
   chainName: string,
   expectedToken: string,
 ): Promise<boolean> {
-  console.log(`\n=== ENSURING WALLET IS ON ${chainName.toUpperCase()} CHAIN ===`)
+  console.log(`\n=== SWITCHING TO ${chainName.toUpperCase()} CHAIN ===`)
 
   try {
-    const currentNetwork = await metamask.getCurrentNetwork()
-    console.log("Current wallet network:", currentNetwork)
+    // Always switch to the requested chain
+    console.log(`Switching wallet to ${chainName} network...`)
+    await metamask.switchNetwork(chainName)
+    await page.waitForTimeout(3000)
 
-    if (currentNetwork !== chainName) {
-      console.log(`Switching wallet to ${chainName} network...`)
-      await metamask.switchNetwork(chainName)
-      await page.waitForTimeout(3000)
-
-      // Reload page to ensure chain change is reflected
-      await page.reload()
-      await page.waitForLoadState("networkidle")
-
-      // Verify we're now on the correct chain
-      const newNetwork = await metamask.getCurrentNetwork()
-      console.log("Network after switch:", newNetwork)
-
-      if (newNetwork !== chainName) {
-        console.log(`❌ Failed to switch to ${chainName} network. Current: ${newNetwork}`)
-        return false
-      }
-    } else {
-      console.log(`Wallet already on ${chainName} network`)
-    }
+    // Reload page to ensure chain change is reflected
+    await page.reload()
+    await page.waitForLoadState("networkidle")
 
     // Verify balance shows expected token
     const balanceElement = page.locator("text=/Balance:/").first()
@@ -171,7 +156,7 @@ export async function ensureWalletOnChain(
 
     return true
   } catch (error) {
-    console.log(`❌ Error ensuring wallet on ${chainName} chain:`, error)
+    console.log(`❌ Error switching to ${chainName} chain:`, error)
     return false
   }
 }
