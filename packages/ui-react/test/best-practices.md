@@ -185,11 +185,8 @@ class CoinTossPage {
 
 1. **Create test wallet configuration**:
    ```bash
-   # Navigate to SDK root directory
-   cd ../.. # (from packages/ui-react)
-   
-   # Create .secrets file
-   nano .secrets
+   cd ../..         # Navigate to SDK root directory (from packages/ui-react)
+   nano .secrets    # Create .secrets file
    ```
    
    Add your test wallet credentials:
@@ -200,8 +197,7 @@ class CoinTossPage {
    
    **To generate a new test wallet seed phrase** (if you don't have one):
    ```bash
-   # Using Python with mnemonic library (pre-installed on this system)
-   python3 -c "from mnemonic import Mnemonic; m = Mnemonic('english'); print('Generated seed phrase:', m.generate(strength=128))"
+   python3 -c "from mnemonic import Mnemonic; m = Mnemonic('english'); print('Generated seed phrase:', m.generate(strength=128))"  # Generate new seed phrase
    ```
    
    ⚠️ **CRITICAL**: 
@@ -213,28 +209,21 @@ class CoinTossPage {
 
 2. **Build SDK packages**:
    ```bash
-   # From SDK root directory
-   pnpm build
+   pnpm build    # From SDK root directory
    ```
 
 3. **Install Playwright browsers**:
    ```bash
-   # Return to ui-react directory
-   cd packages/ui-react
-   pnpm exec playwright install
+   cd packages/ui-react           # Return to ui-react directory
+   pnpm exec playwright install   # Install browsers
    ```
 
 ### Development
 
 ```bash
-# 1. Start dev server (keep running in separate terminal)
-pnpm dev
-
-# 2. Setup MetaMask wallet cache (first time only)
-pnpm test:e2e-setup
-
-# 3. Run all tests
-pnpm test:e2e
+pnpm dev                   # 1. Start dev server (keep running in separate terminal)
+pnpm test:e2e-setup        # 2. Setup MetaMask wallet cache (first time only)
+pnpm test:e2e              # 3. Run all tests
 
 # Or run specific game tests
 pnpm test:cointoss
@@ -242,20 +231,14 @@ pnpm test:dice
 pnpm test:roulette
 pnpm test:keno
 
-# Run with slow motion (for debugging/screenshots)
-SLOW_MO=2000 pnpm test:cointoss
-
-# Clear cache if wallet setup changed
-pnpm test:clear-cache
+SLOW_MO=2000 pnpm test:cointoss    # Run with slow motion (for debugging/screenshots)
+pnpm test:clear-cache               # Clear cache if wallet setup changed
 ```
 
 ### CI/CD
 ```bash
-# Run all tests in headless mode
-HEADLESS=true pnpm test:e2e
-
-# Run with detailed reporter
-pnpm test:e2e --reporter=list,html
+HEADLESS=true pnpm test:e2e         # Run all tests in headless mode
+pnpm test:e2e --reporter=list,html  # Run with detailed reporter
 ```
 
 ## Debugging
@@ -276,8 +259,7 @@ test.afterEach(async ({ page }, testInfo) => {
 
 ### 3. Use Trace Viewer
 ```bash
-# Show trace for failed tests
-pnpm exec playwright show-trace test-results/*/trace.zip
+pnpm exec playwright show-trace test-results/*/trace.zip  # Show trace for failed tests
 ```
 
 ## Common Pitfalls to Avoid
