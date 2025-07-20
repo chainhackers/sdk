@@ -1,14 +1,14 @@
 # BetSwirl UI React - Development Guide
 
-This document is for developers working on the BetSwirl UI React library itself, not for users of the library.
+This document is for developers working on the BetSwirl UI React library.
 
 ## Architecture
 
 The project uses:
-- **React 19** + **TypeScript** for component development
-- **Vite** for fast development and building
-- **Biome** for linting and code formatting (replaces ESLint)
-- **Storybook** for component development and testing
+- **React 19** + **TypeScript**
+- **Vite** for development and building
+- **Biome** for linting and code formatting
+- **Storybook** for testing
 - **Tailwind CSS 4** for styling
 
 
@@ -46,7 +46,7 @@ Configuration uses two files:
 
 #### Biome Configuration
 
-This project uses **Biome** for code formatting and linting.
+**Biome** for code formatting and linting.
 
 **Common issues:**
 - If Biome hangs: Check if you have large generated files not excluded in root biome.json
@@ -60,17 +60,16 @@ pnpm dev         # Start development server if not running
 pnpm test:e2e    # Run tests
 ```
 
-On the first run, installing Chromium and MetaMask wallet setup may take some time.
+Installing Chromium and MetaMask wallet setup may take some time.
 
 ### Testing Best Practices
 
 #### ARIA Roles for E2E Testing
 
-We use ARIA roles (`role="listbox"` and `role="option"`) on our custom token selector components primarily to make E2E tests more reliable and maintainable:
+We use ARIA roles (`role="listbox"` and `role="option"`) on our custom token selector components to make E2E tests more reliable and maintainable:
 
 - **Stable selectors**: ARIA roles provide semantic selectors that won't break when CSS classes change
 - **Easy token detection**: Tests can reliably find and interact with token options using `[role="option"]`
-- **Stable selectors**: Won't break when CSS classes or implementation details change
 
 Example in tests:
 ```typescript
@@ -81,19 +80,19 @@ const tokens = await page.locator('[role="option"]').allTextContents()
 await page.locator('[role="option"][aria-selected="false"]').first().click()
 ```
 
-**Note on linter warnings**: Biome suggests using native `<select>` elements, but our custom components need features that native elements can't provide (token icons, balance displays, custom styling). The biome-ignore comments are intentional.
+**Note**: Biome suggests using native `<select>` elements, but our custom components need features that native elements can't provide (token icons, balance displays, custom styling). The biome-ignore comments are intentional.
 
 
 ## Building and Publishing
 
-### Build Library
 ```bash
-pnpm build       # Build the library
+# From SDK root directory:
+pnpm build:libs  # Build all libraries including ui-react
 ```
 
 ### Release Process
 
-When ready to publish a new version to npm:
+To publish a new version to npm:
 
 ```bash
 pnpm change:add  # Create changeset
@@ -113,16 +112,16 @@ pnpm change:publish      # Publish to npm
 git push
 ```
 
-**Result:** Package is published to npm registry and users can install: `npm install @betswirl/ui-react@X.X.X`
+Package is published to npm registry and users can install: `npm install @betswirl/ui-react@X.X.X`
 
 ## Deployment
 
 ### Storybook Deployment
 
-The Storybook for this library is deployed at: http://demo.betswirl-sdk.chainhackers.xyz/
+The Storybook is deployed at: http://demo.betswirl-sdk.chainhackers.xyz/
 
 #### Server Setup
-Before deploying, ensure proper permissions are set on the server:
+Ensure proper permissions are set on the server:
 
 ```shell
 setfacl -R -m u:dev-components:rwx /var/www/betswirl-sdk/
@@ -131,7 +130,7 @@ setfacl -R -m u:dev-components:rwx /var/www/betswirl-sdk/
 This command:
 - Sets ACL (Access Control List) permissions
 - Grants read/write/execute permissions to the `dev-components` user
-- Applies to `/var/www/betswirl-sdk/` directory recursively
+- Applies to `/var/www/betswirl-sdk/` directory
 
 #### Manual Deployment Process
 ```shell
@@ -141,5 +140,5 @@ pnpm storybook:build
 # Copy build output to server
 ```
 
-**Note**: This process should be automated via CI/CD. The manual steps are for emergency deployments only.
+**Note**: This process should be automated via CI/CD. The manual steps are for emergency deployments.
 
