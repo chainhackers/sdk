@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.13
+
+### Patch Changes
+
+- Add freebet code campaings fetches
+
 ## 0.1.12
 
 ### Patch Changes

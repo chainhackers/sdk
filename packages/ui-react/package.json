@@ -34,7 +34,16 @@
     "build-storybook": "storybook build",
     "chromatic": "chromatic --exit-zero-on-changes",
     "prepublishOnly": "pnpm build",
-    "test:e2e": "pnpm exec playwright install chromium && pnpm exec synpress && pnpm exec playwright test --reporter=line"
+    "test:e2e-setup": "pnpm exec playwright install chromium && pnpm exec synpress",
+    "test:e2e": "pnpm exec playwright test --reporter=line",
+    "test:clear-cache": "rm -rf test-results .cache-synpress ~/.cache-synpress 2>/dev/null || true",
+    "test:cointoss": "pnpm exec playwright test tests/coinToss.spec.ts --reporter=line",
+    "test:dice": "pnpm exec playwright test tests/dice.spec.ts --reporter=line",
+    "test:roulette": "pnpm exec playwright test tests/roulette.spec.ts --reporter=line",
+    "test:keno": "pnpm exec playwright test tests/keno.spec.ts --reporter=line",
+    "test:chain-switching": "pnpm exec playwright test tests/chainSwitching.spec.ts --reporter=line",
+    "test:token-selection": "pnpm exec playwright test tests/tokenSelection.spec.ts --reporter=line",
+    "test:chain-token-list": "pnpm exec playwright test tests/chainTokenList.spec.ts --reporter=line"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
