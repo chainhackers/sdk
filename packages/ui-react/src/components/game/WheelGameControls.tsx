@@ -3,7 +3,7 @@ import { forwardRef, RefObject, useEffect, useImperativeHandle, useMemo } from "
 import wheelArrow from "../../assets/game/wheel-arrow.svg"
 import wheelDark from "../../assets/game/wheel-dark.svg"
 import wheelLight from "../../assets/game/wheel-light.svg"
-import { useWheelAnimation } from "../../hooks/useWheelAnimation"
+import { useWheelAnimation, WHEEL_ANIMATION_CONFIG } from "../../hooks/useWheelAnimation"
 import { Theme, TokenWithImage } from "../../types/types"
 import { TokenIcon } from "../ui/TokenIcon"
 import { Tooltip, TooltipPrimitive, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
@@ -55,8 +55,6 @@ interface WheelProps {
   theme?: Theme
   isTransitionEnabled: boolean
 }
-
-const SPIN_DURATION = 3000
 
 /**
  * Formats a multiplier value for display
@@ -198,7 +196,7 @@ function Wheel({
           style={{
             transform: `rotate(${rotationAngle}deg)`,
             transition: isTransitionEnabled
-              ? `transform ${SPIN_DURATION}ms cubic-bezier(0.25, 0.1, 0.25, 1)`
+              ? `transform ${WHEEL_ANIMATION_CONFIG.SPIN_DURATION}ms cubic-bezier(0.25, 0.1, 0.25, 1)`
               : "none",
             transformOrigin: "center center",
           }}
@@ -232,7 +230,6 @@ export const WheelGameControls = forwardRef<WheelController, WheelGameControlsPr
       spinWheelWithResult,
       stopSpin,
     } = useWheelAnimation({
-      spinDuration: SPIN_DURATION,
       segments,
     })
 

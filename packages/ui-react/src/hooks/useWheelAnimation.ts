@@ -13,14 +13,13 @@ interface WheelAnimationState {
 
 type WheelAnimationAction =
   | { type: "START_SPIN" }
-  | { type: "TICK"; payload: { speed: number } }
+  | { type: "TICK"; payload: { deltaTime: number } }
   | { type: "SET_RESULT"; payload: { sectorIndex: number; segments: WheelSegment[] } }
   | { type: "FINISH_SPIN" }
   | { type: "STOP" }
   | { type: "RESET" }
 
 interface UseWheelAnimationParams {
-  spinDuration: number
   segments: WheelSegment[]
 }
 
@@ -36,10 +35,13 @@ interface UseWheelAnimationReturn {
   stopSpin: () => void
 }
 
-const ANGLE_VARIANCE = 32
-const MIN_FULL_ROTATIONS = 5
-const MAX_FULL_ROTATIONS = 8
-const CONTINUOUS_SPIN_SPEED = 4
+export const WHEEL_ANIMATION_CONFIG = {
+  ANGLE_VARIANCE: 32,
+  MIN_FULL_ROTATIONS: 5,
+  MAX_FULL_ROTATIONS: 8,
+  CONTINUOUS_SPIN_SPEED: 240, // degrees per second
+  SPIN_DURATION: 3000, // milliseconds
+} as const
 
 function getTargetAngleForSectorIndex(
   segments: WheelSegment[],
@@ -50,10 +52,13 @@ function getTargetAngleForSectorIndex(
     console.warn(`Could not find segment for sector index: ${winningSectorIndex}`)
     return 0
   }
-  const randomOffset = (Math.random() - 0.5) * ANGLE_VARIANCE
+  const randomOffset = (Math.random() - 0.5) * WHEEL_ANIMATION_CONFIG.ANGLE_VARIANCE
   const targetAngle = 360 - segment.startAngle + randomOffset
   const fullRotations =
-    Math.floor(Math.random() * (MAX_FULL_ROTATIONS - MIN_FULL_ROTATIONS + 1)) + MIN_FULL_ROTATIONS
+    Math.floor(
+      Math.random() *
+        (WHEEL_ANIMATION_CONFIG.MAX_FULL_ROTATIONS - WHEEL_ANIMATION_CONFIG.MIN_FULL_ROTATIONS + 1),
+    ) + WHEEL_ANIMATION_CONFIG.MIN_FULL_ROTATIONS
   return targetAngle + fullRotations * 360
 }
 
@@ -81,7 +86,9 @@ function wheelAnimationReducer(
     case "TICK":
       return {
         ...state,
-        rotationAngle: state.rotationAngle + action.payload.speed,
+        rotationAngle:
+          state.rotationAngle +
+          (WHEEL_ANIMATION_CONFIG.CONTINUOUS_SPIN_SPEED * action.payload.deltaTime) / 1000,
       }
 
     case "SET_RESULT":
@@ -126,34 +133,58 @@ function wheelAnimationReducer(
   }
 }
 
-export function useWheelAnimation({
-  spinDuration,
-  segments,
-}: UseWheelAnimationParams): UseWheelAnimationReturn {
+export function useWheelAnimation({ segments }: UseWheelAnimationParams): UseWheelAnimationReturn {
   const [state, dispatch] = useReducer(wheelAnimationReducer, initialState)
 
-  const continuousSpinIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
+  const lastTimeRef = useRef<number>(0)
   const spinCompleteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pendingSectorIndexRef = useRef<number | null>(null)
 
   const cleanupTimers = useCallback(() => {
-    if (continuousSpinIntervalRef.current) {
-      clearInterval(continuousSpinIntervalRef.current)
-      continuousSpinIntervalRef.current = null
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
     }
     if (spinCompleteTimeoutRef.current) {
       clearTimeout(spinCompleteTimeoutRef.current)
       spinCompleteTimeoutRef.current = null
     }
+    lastTimeRef.current = 0
+  }, [])
+
+  const animate = useCallback((currentTime: number) => {
+    if (lastTimeRef.current === 0) {
+      lastTimeRef.current = currentTime
+    }
+
+    const deltaTime = currentTime - lastTimeRef.current
+    lastTimeRef.current = currentTime
+
+    dispatch({
+      type: "TICK",
+      payload: { deltaTime },
+    })
+
+    if (animationFrameRef.current !== null) {
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }
   }, [])
 
   useEffect(() => {
     if (state.status === "SPINNING_CONTINUOUS") {
-      continuousSpinIntervalRef.current = setInterval(() => {
+      lastTimeRef.current = 0
+      animationFrameRef.current = requestAnimationFrame(animate)
+
+      if (pendingSectorIndexRef.current !== null) {
+        const sectorIndex = pendingSectorIndexRef.current
+        pendingSectorIndexRef.current = null
+
         dispatch({
-          type: "TICK",
-          payload: { speed: CONTINUOUS_SPIN_SPEED },
+          type: "SET_RESULT",
+          payload: { sectorIndex, segments },
         })
-      }, 16)
+      }
     }
 
     if (state.status === "SPINNING_TO_RESULT" && state.winningSectorIndex !== null) {
@@ -161,7 +192,7 @@ export function useWheelAnimation({
 
       spinCompleteTimeoutRef.current = setTimeout(() => {
         dispatch({ type: "FINISH_SPIN" })
-      }, spinDuration)
+      }, WHEEL_ANIMATION_CONFIG.SPIN_DURATION)
     }
 
     if (state.status === "IDLE" || state.status === "STOPPED") {
@@ -169,7 +200,7 @@ export function useWheelAnimation({
     }
 
     return cleanupTimers
-  }, [state.status, state.winningSectorIndex, segments, spinDuration, cleanupTimers])
+  }, [state.status, state.winningSectorIndex, segments, cleanupTimers, animate])
 
   const startEndlessSpin = useCallback(() => {
     dispatch({ type: "START_SPIN" })
@@ -178,13 +209,8 @@ export function useWheelAnimation({
   const spinWheelWithResult = useCallback(
     (sectorIndex: number) => {
       if (state.status === "IDLE" || state.status === "STOPPED") {
+        pendingSectorIndexRef.current = sectorIndex
         dispatch({ type: "START_SPIN" })
-        setTimeout(() => {
-          dispatch({
-            type: "SET_RESULT",
-            payload: { sectorIndex, segments },
-          })
-        }, 100)
       } else if (state.status === "SPINNING_CONTINUOUS") {
         dispatch({
           type: "SET_RESULT",
@@ -196,6 +222,7 @@ export function useWheelAnimation({
   )
 
   const stopSpin = useCallback(() => {
+    pendingSectorIndexRef.current = null
     dispatch({ type: "STOP" })
   }, [])
 
