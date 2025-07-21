@@ -4,6 +4,7 @@ import { useRef } from "react"
 import { Address } from "viem"
 import { WheelController, WheelGameControls } from "../../components/game/WheelGameControls"
 import { Button } from "../../components/ui/button"
+import { getTokenImage } from "../../lib/utils"
 import { TokenWithImage } from "../../types/types"
 
 const mockWheelConfig: WeightedGameConfiguration = {
@@ -30,7 +31,7 @@ const DEGEN_TOKEN: TokenWithImage = {
   address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Address,
   symbol: "DEGEN",
   decimals: 18,
-  image: "https://www.betswirl.com/img/tokens/DEGEN.svg",
+  image: getTokenImage("DEGEN"),
 }
 
 function createMockTooltipContent(token: TokenWithImage) {
@@ -100,14 +101,6 @@ const meta = {
         defaultValue: { summary: "undefined" },
       },
     },
-    onSpinComplete: {
-      action: "onSpinComplete",
-      description: "Callback when spin animation completes",
-      table: {
-        type: { summary: "() => void" },
-        defaultValue: { summary: "undefined" },
-      },
-    },
     tooltipContent: {
       control: "object",
       description: "Tooltip content for each multiplier",
@@ -152,10 +145,6 @@ function InteractiveWheelGameControls({
     wheelControllerRef.current?.stopSpin()
   }
 
-  const handleSpinComplete = () => {
-    console.log("Spin completed!")
-  }
-
   return (
     <div className={theme}>
       <div className="flex flex-col items-center space-y-4">
@@ -168,7 +157,6 @@ function InteractiveWheelGameControls({
             config={config}
             theme={theme}
             parent={containerRef}
-            onSpinComplete={handleSpinComplete}
             tooltipContent={tooltipContent}
           />
         </div>

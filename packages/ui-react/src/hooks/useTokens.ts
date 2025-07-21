@@ -7,6 +7,7 @@ import { useConfig } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger, type Logger } from "../lib/logger"
+import { getTokenImage } from "../lib/utils"
 import { QueryParameter, TokenWithImage } from "../types/types"
 import { type FilterTokensResult, filterTokensByAllowed } from "../utils/tokenUtils"
 
@@ -131,7 +132,7 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
     () =>
       tokensQuery.data?.map((token) => ({
         ...token,
-        image: `https://www.betswirl.com/img/tokens/${token.symbol}.svg`,
+        image: getTokenImage(token.symbol),
       })) || [],
     [tokensQuery.data],
   )

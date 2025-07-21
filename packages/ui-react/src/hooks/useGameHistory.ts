@@ -16,7 +16,7 @@ import { Address } from "viem"
 import { useAccount } from "wagmi"
 import { useTokenContext } from "../context/tokenContext"
 import { createLogger } from "../lib/logger"
-import { toLowerCase } from "../lib/utils"
+import { getTokenImage, toLowerCase } from "../lib/utils"
 import { HistoryEntryStatus, QueryParameter, TokenWithImage } from "../types/types"
 
 const logger = createLogger("useGameHistory")
@@ -122,8 +122,7 @@ export const useGameHistory: UseGameHistory = ({ gameType, filter, offset, limit
 
         const tokenWithImage: TokenWithImage = matchingToken || {
           ...bet.token,
-          // Use BetSwirl's token image URL pattern as fallback
-          image: `https://www.betswirl.com/img/tokens/${bet.token.symbol.toUpperCase()}.svg`,
+          image: getTokenImage(bet.token.symbol),
         }
 
         return {
