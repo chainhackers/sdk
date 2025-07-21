@@ -355,7 +355,7 @@ export function BettingPanel({
                 "absolute right-[12px] top-1/2 -translate-y-1/2 transform",
                 "flex items-center text-foreground font-medium gap-1",
                 "h-auto w-fit p-0 bg-transparent hover:bg-transparent hover:opacity-80 transition-opacity",
-                "border-0 shadow-none outline-none focus:outline-none focus-visible:ring-0",
+                "border-0 shadow-none outline-none focus:outline-none ",
               )}
               disabled={isInputDisabled}
             >
