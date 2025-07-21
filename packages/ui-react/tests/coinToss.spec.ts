@@ -48,13 +48,9 @@ test.describe("Coin Toss Game", () => {
     try {
       await metamask.switchNetwork("Base")
       console.log("Switched to Base network")
-      
-      // Wait for network switch to complete
+
+      // Wait for UI to update
       await page.waitForTimeout(3000)
-      
-      // Reload page to ensure chain change is reflected
-      await page.reload()
-      await page.waitForLoadState("networkidle")
     } catch (error) {
       console.log("Error switching to Base network:", error)
       // Continue anyway - we might already be on Base
@@ -261,13 +257,9 @@ test.describe("Coin Toss Game", () => {
     try {
       await metamask.switchNetwork("Base")
       console.log("Switched to Base network")
-      
-      // Wait for network switch to complete
+
+      // Wait for UI to update
       await page.waitForTimeout(3000)
-      
-      // Reload page to ensure chain change is reflected
-      await page.reload()
-      await page.waitForLoadState("networkidle")
     } catch (error) {
       console.log("Error switching to Base network:", error)
       // Continue anyway - we might already be on Base
