@@ -1,5 +1,5 @@
 import { BP_VALUE, WeightedGameConfiguration } from "@betswirl/sdk-core"
-import { forwardRef, RefObject, useImperativeHandle, useMemo } from "react"
+import { forwardRef, RefObject, useImperativeHandle, useMemo, useEffect } from "react"
 import wheelArrow from "../../assets/game/wheel-arrow.svg"
 import wheelDark from "../../assets/game/wheel-dark.svg"
 import wheelLight from "../../assets/game/wheel-light.svg"
@@ -37,6 +37,7 @@ interface WheelGameControlsProps {
   theme?: Theme
   parent?: RefObject<HTMLDivElement | null>
   tooltipContent?: Record<number, TooltipItemContent>
+  onSpinningChange?: (isSpinning: boolean) => void
 }
 
 interface MultiplierItemProps {
@@ -217,7 +218,7 @@ function Wheel({
 }
 
 export const WheelGameControls = forwardRef<WheelController, WheelGameControlsProps>(
-  ({ config, theme = "light", parent: containerRef, tooltipContent }, ref) => {
+  ({ config, theme = "light", parent: containerRef, tooltipContent, onSpinningChange }, ref) => {
     const segments = useMemo(() => createWheelSegments(config), [config])
 
     const {
@@ -234,6 +235,12 @@ export const WheelGameControls = forwardRef<WheelController, WheelGameControlsPr
       spinDuration: SPIN_DURATION,
       segments,
     })
+
+    useEffect(() => {
+      if (onSpinningChange) {
+        onSpinningChange(internalIsSpinning)
+      }
+    }, [internalIsSpinning, onSpinningChange])
 
     // Expose the controller methods via ref
     useImperativeHandle(

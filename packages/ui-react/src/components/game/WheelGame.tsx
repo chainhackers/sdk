@@ -5,7 +5,7 @@ import {
   WeightedGame,
   type WeightedGameConfiguration,
 } from "@betswirl/sdk-core"
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import wheelBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
@@ -28,6 +28,7 @@ export function WheelGame({
 }: WheelGameProps) {
   const gameFrameRef = useRef<HTMLDivElement>(null)
   const wheelControllerRef = useRef<WheelController>(null)
+  const [isSpinning, setIsSpinning] = useState(false)
 
   const { selectedToken: token } = useTokenContext()
   const { appChainId } = useChain()
@@ -179,10 +180,11 @@ export function WheelGame({
             theme={theme}
             parent={gameFrameRef}
             tooltipContent={tooltipContent}
+            onSpinningChange={setIsSpinning}
           />
         </GameFrame.GameControls>
         <GameFrame.ResultWindow
-          gameResult={wheelControllerRef.current?.isSpinning ? null : gameResult}
+          gameResult={isSpinning ? null : gameResult}
           currency={token.symbol}
         />
       </GameFrame.GameArea>
@@ -205,7 +207,7 @@ export function WheelGame({
         onBetAmountChange={handleBetAmountChange}
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
-        isGamePaused={isGamePaused || !!wheelControllerRef.current?.isSpinning}
+        isGamePaused={isGamePaused || isSpinning}
         needsTokenApproval={needsTokenApproval}
         isApprovePending={isApprovePending}
         isApproveConfirming={isApproveConfirming}
