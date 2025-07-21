@@ -190,6 +190,7 @@ test.describe("Coin Toss Game", () => {
     const balanceChanged = Math.abs(finalBalance - initialBalance) > 0
     if (!balanceChanged) {
       console.log("Balance appears unchanged due to rounding, but bet was processed successfully")
+      // TODO: Test with BETS token and POL on Polygon to verify balance changes are visible with larger decimal precision
     }
 
     if (balanceChanged) {
@@ -215,7 +216,11 @@ test.describe("Coin Toss Game", () => {
     expect(canPlayAgain).toBe(true)
 
     console.log("\n✅ Coin toss game test completed successfully!")
-    console.log(`Balance change: ${initialBalance} ETH → ${finalBalance} ETH`)
+    if (balanceChanged) {
+      console.log(`Balance change: ${initialBalance} ETH → ${finalBalance} ETH`)
+    } else {
+      console.log(`Balance: ${finalBalance} ETH (no visible change due to small bet amount)`)
+    }
   })
 
   test("should play multiple coin toss games in a row", async ({

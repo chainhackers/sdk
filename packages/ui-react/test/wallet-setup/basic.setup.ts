@@ -37,7 +37,7 @@ const { seedPhrase: SEED_PHRASE, password: PASSWORD } = getCredentials()
 
 const basicSetup = defineWalletSetup(PASSWORD, async (context, walletPage) => {
   console.log("=== STARTING WALLET SETUP ===")
-  
+
   const metamask = new MetaMask(context, walletPage, PASSWORD)
   console.log("Created MetaMask instance")
 
@@ -93,7 +93,7 @@ const basicSetup = defineWalletSetup(PASSWORD, async (context, walletPage) => {
 
   // Don't switch networks during setup - let the tests handle network switching
   // The switchNetwork call in setup was causing the hanging issue
-  
+
   console.log("=== WALLET SETUP COMPLETED - All networks added ===")
 })
 

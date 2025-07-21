@@ -48,7 +48,7 @@ test.describe("Keno Game", () => {
     try {
       await metamask.switchNetwork("Base")
       console.log("Switched to Base network")
-      
+
       // Wait for UI to update
       await page.waitForTimeout(3000)
     } catch (error) {
@@ -62,7 +62,7 @@ test.describe("Keno Game", () => {
     // Wait for balance to be visible - try multiple selectors
     let balanceElement = page.locator("text=/Balance:/").first()
     const balanceVisible = await balanceElement.isVisible({ timeout: 5000 }).catch(() => false)
-    
+
     if (!balanceVisible) {
       // Try alternative selector
       balanceElement = page.locator(':text("Balance:")').first()
@@ -98,16 +98,16 @@ test.describe("Keno Game", () => {
     // Select 5 numbers using the data-testid attributes
     console.log("Selecting keno numbers...")
     const selectedNumbers = []
-    
+
     // Select numbers 1-5 using data-testid
-    for (let num of [1, 2, 3, 4, 5]) {
+    for (const num of [1, 2, 3, 4, 5]) {
       const numberButton = page.locator(`[data-testid="keno-number-${num}"]`)
       await expect(numberButton).toBeVisible({ timeout: 5000 })
       await numberButton.click()
       selectedNumbers.push(num)
       await page.waitForTimeout(200) // Small delay between selections
     }
-    
+
     console.log("Selected numbers:", selectedNumbers.join(", "))
 
     // Place bet
@@ -178,6 +178,7 @@ test.describe("Keno Game", () => {
     const balanceChanged = Math.abs(finalBalance - initialBalance) > 0
     if (!balanceChanged) {
       console.log("Balance appears unchanged due to rounding, but bet was processed successfully")
+      // TODO: Test with BETS token and POL on Polygon to verify balance changes are visible with larger decimal precision
     }
 
     if (balanceChanged) {

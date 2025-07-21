@@ -48,7 +48,7 @@ test.describe("Roulette Game", () => {
     try {
       await metamask.switchNetwork("Base")
       console.log("Switched to Base network")
-      
+
       // Wait for UI to update
       await page.waitForTimeout(3000)
     } catch (error) {
@@ -58,7 +58,7 @@ test.describe("Roulette Game", () => {
 
     // Check current balance
     console.log("\n=== CHECKING WALLET STATUS ===")
-    
+
     // Wait for balance to be visible
     const balanceElement = page.locator("text=/Balance:/").first()
     await expect(balanceElement).toBeVisible({ timeout: 20000 })
@@ -91,7 +91,7 @@ test.describe("Roulette Game", () => {
 
     // Place a bet - try different options
     console.log("Looking for betting options...")
-    
+
     // Try to bet on "Even" which has better odds than a single number
     const evenButton = page.locator('button:has-text("Even")').first()
     if (await evenButton.isVisible({ timeout: 3000 }).catch(() => false)) {
@@ -99,13 +99,13 @@ test.describe("Roulette Game", () => {
       console.log("Placed bet on: Even")
     } else {
       // Alternative: bet on a specific number (17 is red)
-      const number17 = page.locator('button').filter({ hasText: "17" }).first()
+      const number17 = page.locator("button").filter({ hasText: "17" }).first()
       if (await number17.isVisible({ timeout: 3000 }).catch(() => false)) {
         await number17.click()
         console.log("Placed bet on: Number 17")
       } else {
         // Fallback: click any red number
-        const redNumber = page.locator('button.bg-roulette-red').first()
+        const redNumber = page.locator("button.bg-roulette-red").first()
         await redNumber.click()
         console.log("Placed bet on: Red number")
       }
@@ -182,6 +182,7 @@ test.describe("Roulette Game", () => {
     const balanceChanged = Math.abs(finalBalance - initialBalance) > 0
     if (!balanceChanged) {
       console.log("Balance appears unchanged due to rounding, but bet was processed successfully")
+      // TODO: Test with BETS token and POL on Polygon to verify balance changes are visible with larger decimal precision
     }
 
     if (balanceChanged) {
