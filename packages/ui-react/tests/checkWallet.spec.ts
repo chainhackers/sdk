@@ -62,31 +62,34 @@ test("check wallet balance and display funding info", async ({
   console.log("\n=== OPENING CHAIN SELECTOR ===")
   console.log("Step 1: Clicking balance button to open sheet...")
   await balanceButton.click()
-  
+
   // First, the sheet opens with "Current chain" section
   const chainSheet = page.locator('[role="dialog"]').filter({ hasText: /Current chain/i })
   await expect(chainSheet).toBeVisible({ timeout: 5000 })
   console.log("✓ Chain sheet opened")
-  
+
   // Find and click the current chain button to go to chain selection view
   console.log("Step 2: Clicking current chain button to see all chains...")
-  const currentChainButton = chainSheet.locator('button').filter({ has: page.locator('svg, img') }).first()
+  const currentChainButton = chainSheet
+    .locator("button")
+    .filter({ has: page.locator("svg, img") })
+    .first()
   await currentChainButton.click()
-  
+
   // Now we should see the "Select Chain" view with all available chains
   const selectChainView = page.locator('[role="dialog"]').filter({ hasText: /Select Chain/i })
   await expect(selectChainView).toBeVisible({ timeout: 5000 })
   console.log("✓ Chain selection view opened")
-  
+
   // Get all chain buttons (they contain ChainIcon components)
-  const chainButtons = selectChainView.locator('button').filter({ has: page.locator('svg, img') })
+  const chainButtons = selectChainView.locator("button").filter({ has: page.locator("svg, img") })
   const chainCount = await chainButtons.count()
-  
+
   console.log(`\nAvailable chains (${chainCount} found):`)
   for (let i = 0; i < chainCount; i++) {
     const chainButton = chainButtons.nth(i)
     const chainText = await chainButton.textContent()
-    if (chainText && chainText.trim()) {
+    if (chainText?.trim()) {
       console.log(`- ${chainText.trim()}`)
     }
   }

@@ -112,7 +112,9 @@ export async function waitForBettingStates(page: Page, chainId?: number): Promis
       await expect(rollingButton).toBeHidden({ timeout: rollingTimeout })
     } catch (error) {
       if (chainId === 137) {
-        console.warn("⚠️ Bet resolution timeout on Polygon - this is a known issue with VRF on Polygon mainnet")
+        console.warn(
+          "⚠️ Bet resolution timeout on Polygon - this is a known issue with VRF on Polygon mainnet",
+        )
         console.warn("The bet was placed successfully but VRF callback may be delayed")
         // Take a screenshot for debugging
         await page.screenshot({ path: "polygon-vrf-timeout.png", fullPage: true })
