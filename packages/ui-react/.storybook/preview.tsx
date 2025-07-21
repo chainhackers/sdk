@@ -8,6 +8,33 @@ const withAppProviders: Decorator = (Story) => (
   </StorybookProviders>
 )
 
+const withVersionOnHeader: Decorator = (Story) => {
+  //@ts-ignore
+  const version = import.meta.env.VITE_STORYBOOK_VERSION
+  return (
+    <>
+      {version && (
+        <div
+          style={{
+            display: "inline-block",
+            background: "#f2f2f2",
+            padding: "4px 16px",
+            fontSize: "12px",
+            fontWeight: "bold",
+            marginBottom: "10px",
+            borderRadius: "4px",
+            color: "#333333",
+            letterSpacing: 1,
+          }}
+        >
+          {version}
+        </div>
+      )}
+      <Story />
+    </>
+  )
+}
+
 const preview: Preview = {
   parameters: {
     controls: {
@@ -22,7 +49,7 @@ const preview: Preview = {
       },
     },
   },
-  decorators: [withAppProviders],
+  decorators: [withVersionOnHeader, withAppProviders],
 }
 
 export default preview
