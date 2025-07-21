@@ -24,12 +24,13 @@ const queryClient = new QueryClient({
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
-  
+
   // Get RPC URLs for each chain, fallback to public RPCs if not configured
   const baseRpcUrl = import.meta.env.VITE_BASE_RPC_URL || "https://mainnet.base.org"
   const polygonRpcUrl = import.meta.env.VITE_POLYGON_RPC_URL || "https://polygon-rpc.com"
-  const avalancheRpcUrl = import.meta.env.VITE_AVALANCHE_RPC_URL || "https://api.avax.network/ext/bc/C/rpc"
-  
+  const avalancheRpcUrl =
+    import.meta.env.VITE_AVALANCHE_RPC_URL || "https://api.avax.network/ext/bc/C/rpc"
+
   const config = createConfig({
     chains: [CHAIN, polygon, avalanche],
     transports: {

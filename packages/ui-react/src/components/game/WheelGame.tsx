@@ -30,6 +30,7 @@ export function WheelGame({
   const [isSpinning, setIsSpinning] = useState(false)
 
   const { selectedToken: token } = useTokenContext()
+  console.log({ token })
   const { appChainId } = useChain()
   const { houseEdge } = useHouseEdge({
     game: CASINO_GAME_TYPE.WHEEL,

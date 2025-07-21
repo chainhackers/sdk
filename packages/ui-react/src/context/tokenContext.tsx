@@ -9,7 +9,7 @@ import { useChain } from "./chainContext"
 const STORAGE_KEY = "betswirl-selected-token-address"
 
 interface TokenContextValue {
-  selectedToken: TokenWithImage | undefined
+  selectedToken: TokenWithImage
   setSelectedToken: (token: TokenWithImage) => void
   activeTokens: TokenWithImage[]
   allTokens: TokenWithImage[]
@@ -52,7 +52,9 @@ function storeTokenAddress(address: Address, chainId: number): void {
 export function TokenProvider({ children }: TokenProviderProps) {
   const { appChainId } = useChain()
   const queryClient = useQueryClient()
-  const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage>(chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency) as TokenWithImage)
+  const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage>(
+    chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency) as TokenWithImage,
+  )
   const [previousChainId, setPreviousChainId] = useState<number | undefined>(appChainId)
 
   // Cancel and remove token queries when chain changes
@@ -62,7 +64,9 @@ export function TokenProvider({ children }: TokenProviderProps) {
       queryClient.cancelQueries({ queryKey: ["casino-tokens"] })
       queryClient.removeQueries({ queryKey: ["casino-tokens"] })
       // Clear selected token immediately to prevent showing old chain's token
-      setSelectedTokenInternal(chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency) as TokenWithImage)
+      setSelectedTokenInternal(
+        chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency) as TokenWithImage,
+      )
     }
     setPreviousChainId(appChainId)
   }, [appChainId, previousChainId, queryClient])
