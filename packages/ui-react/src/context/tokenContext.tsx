@@ -1,8 +1,8 @@
+import { chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
 import { type Address } from "viem"
 import { useTokens } from "../hooks/useTokens"
 import { TokenWithImage } from "../types/types"
-import { chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import { useChain } from "./chainContext"
 
 const STORAGE_KEY = "betswirl-selected-token-address"
@@ -48,7 +48,7 @@ export function TokenProvider({ children, initialToken }: TokenProviderProps) {
   const { tokens, loading } = useTokens()
   const { appChainId } = useChain()
   const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage>(
-    chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency) as TokenWithImage
+    chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency) as TokenWithImage,
   )
 
   useEffect(() => {

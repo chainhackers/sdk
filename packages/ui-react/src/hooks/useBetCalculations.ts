@@ -1,7 +1,7 @@
 import { CASINO_GAME_TYPE, getPayoutDetails } from "@betswirl/sdk-core"
 import { useMemo } from "react"
-import { GameChoice, GameDefinition } from "../types/types"
 import { useTokenContext } from "../context/tokenContext"
+import { GameChoice, GameDefinition } from "../types/types"
 import { useHouseEdge } from "./useHouseEdge"
 
 interface UseBetCalculationsProps<T extends GameChoice> {

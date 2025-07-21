@@ -1,5 +1,5 @@
 import { BP_VALUE, WeightedGameConfiguration } from "@betswirl/sdk-core"
-import { forwardRef, RefObject, useImperativeHandle, useMemo, useEffect } from "react"
+import { forwardRef, RefObject, useEffect, useImperativeHandle, useMemo } from "react"
 import wheelArrow from "../../assets/game/wheel-arrow.svg"
 import wheelDark from "../../assets/game/wheel-dark.svg"
 import wheelLight from "../../assets/game/wheel-light.svg"

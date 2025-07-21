@@ -13,6 +13,7 @@ import kenoBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { useHouseEdge } from "../../hooks/useHouseEdge"
 import { useKenoConfiguration } from "../../hooks/useKenoConfiguration"
 import { useKenoMultipliers } from "../../hooks/useKenoMultipliers"
 import { GameDefinition } from "../../types/types"
@@ -21,7 +22,6 @@ import { KenoGameControls } from "./KenoGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
 import { useGameControls } from "./shared/useGameControls"
-import { useHouseEdge } from "../../hooks/useHouseEdge"
 
 const DEFAULT_KENO_SELECTION: KenoBall[] = []
 

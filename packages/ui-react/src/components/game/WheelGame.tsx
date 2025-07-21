@@ -8,15 +8,14 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react"
 import wheelBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
+import { useTokenContext } from "../../context/tokenContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { useHouseEdge } from "../../hooks/useHouseEdge"
 import { GameDefinition, TokenWithImage } from "../../types/types"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
 import { BaseGameProps } from "./shared/types"
-
 import { WheelController, WheelGameControls } from "./WheelGameControls"
-import { useHouseEdge } from "../../hooks/useHouseEdge"
-import { useTokenContext } from "../../context/tokenContext"
 
 export interface WheelGameProps extends BaseGameProps {}
 
@@ -45,7 +44,7 @@ export function WheelGame({
 
     const wheelConfig = {
       ...wheelChoiceInput.config,
-      multipliers: (wheelChoiceInput.netMultiplier as number[]).map(m => BigInt(Math.round(m))),
+      multipliers: (wheelChoiceInput.netMultiplier as number[]).map((m) => BigInt(Math.round(m))),
     }
 
     return {
@@ -65,7 +64,10 @@ export function WheelGame({
         return config.multipliers.map((_, index) => WeightedGame.getWinChancePercent(config, index))
       },
       formatDisplayResult: (rolledResult) => {
-        if (rolledResult.game !== CASINO_GAME_TYPE.WHEEL || !wheelChoiceInput.formattedNetMultiplier) {
+        if (
+          rolledResult.game !== CASINO_GAME_TYPE.WHEEL ||
+          !wheelChoiceInput.formattedNetMultiplier
+        ) {
           return ""
         }
         const winningIndex = rolledResult.rolled as number
@@ -155,15 +157,16 @@ export function WheelGame({
   }, [wheelConfig, betAmount, token, houseEdge, appChainId])
 
   // Show loading state while configuration is being fetched
-  const gameArea = isConfigurationLoading || !wheelGameDefinition || !wheelConfig ? (
-        <GameFrame.GameArea variant="wheel">
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent mx-auto mb-4" />
-            </div>
+  const gameArea =
+    isConfigurationLoading || !wheelGameDefinition || !wheelConfig ? (
+      <GameFrame.GameArea variant="wheel">
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent mx-auto mb-4" />
           </div>
-        </GameFrame.GameArea>
-  ) : (
+        </div>
+      </GameFrame.GameArea>
+    ) : (
       <GameFrame.GameArea variant="wheel">
         <GameFrame.InfoButton
           rngFee={formattedVrfFees}
@@ -188,7 +191,7 @@ export function WheelGame({
           currency={token.symbol}
         />
       </GameFrame.GameArea>
-  )
+    )
 
   return (
     <GameFrame ref={gameFrameRef} themeSettings={themeSettings} {...props} variant="wheel">
