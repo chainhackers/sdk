@@ -113,6 +113,7 @@ export function RouletteGame({
             onNumbersChange={handleNumbersChange}
             multiplier={formattedNetMultiplier}
             isDisabled={isControlsDisabled}
+            token={token}
           />
         </GameFrame.GameControls>
         <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
