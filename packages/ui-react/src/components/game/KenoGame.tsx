@@ -13,6 +13,7 @@ import kenoBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
+import { useHouseEdge } from "../../hooks/useHouseEdge"
 import { useKenoConfiguration } from "../../hooks/useKenoConfiguration"
 import { useKenoMultipliers } from "../../hooks/useKenoMultipliers"
 import { GameDefinition } from "../../types/types"
@@ -51,6 +52,12 @@ function KenoGameContent({
         return Keno.getMultiplier(kenoConfig, choice.length, maxMultiplierHits)
       },
       encodeInput: (choice) => Keno.encodeInput(choice, kenoConfig),
+      formatDisplayResult: (rolledResult) => {
+        if (Array.isArray(rolledResult.rolled)) {
+          return rolledResult.rolled.join(", ")
+        }
+        return rolledResult.rolled.toString()
+      },
     }
   }, [kenoConfig])
 
@@ -71,7 +78,6 @@ function KenoGameContent({
     gasPrice,
     targetPayoutAmount,
     grossMultiplier,
-    houseEdge,
     isInGameResultState,
     isGamePaused,
     nativeCurrencySymbol,
@@ -98,6 +104,10 @@ function KenoGameContent({
 
   const selectedNumbers = (selection as { game: CASINO_GAME_TYPE.KENO; choice: KenoBall[] }).choice
 
+  const { houseEdge } = useHouseEdge({
+    game: CASINO_GAME_TYPE.KENO,
+    token,
+  })
   const { multipliers } = useKenoMultipliers({
     kenoConfig,
     selectedNumbersCount: selectedNumbers.length,

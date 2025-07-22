@@ -26,6 +26,9 @@ const coinTossGameDefinition: GameDefinition<{
   getMultiplier: (choice) => CoinToss.getMultiplier(choice),
   encodeInput: (choice) => CoinToss.encodeInput(choice),
   getWinChancePercent: (choice) => CoinToss.getWinChancePercent(choice),
+  formatDisplayResult: (rolledResult) => {
+    return String(rolledResult.rolled)
+  },
 }
 
 export interface CoinTossGameProps extends BaseGameProps {}

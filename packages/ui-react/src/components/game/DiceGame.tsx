@@ -25,6 +25,9 @@ const diceGameDefinition: GameDefinition<{ game: CASINO_GAME_TYPE.DICE; choice: 
   getMultiplier: (choice) => Dice.getMultiplier(choice),
   encodeInput: (choice) => Dice.encodeInput(choice),
   getWinChancePercent: (choice) => Dice.getWinChancePercent(choice),
+  formatDisplayResult: (rolledResult) => {
+    return rolledResult.rolled.toString()
+  },
 }
 
 export interface DiceGameProps extends BaseGameProps {}
