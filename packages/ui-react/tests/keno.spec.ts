@@ -178,7 +178,7 @@ test.describe("Keno Game", () => {
     const balanceChanged = Math.abs(finalBalance - initialBalance) > 0
     if (!balanceChanged) {
       console.log("Balance appears unchanged due to rounding, but bet was processed successfully")
-      // TODO: Test with BETS token and POL on Polygon to verify balance changes are visible with larger decimal precision
+      // TODO #202: Test with BETS token and POL on Polygon to verify balance changes are visible with larger decimal precision
     }
 
     if (balanceChanged) {
