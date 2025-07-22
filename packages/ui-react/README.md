@@ -87,22 +87,26 @@ Before running E2E tests, you need to set up a test wallet:
 
 3. **Get your test wallet address**:
    ```bash
-   # Install Foundry (one time only)
-   curl -L https://foundry.paradigm.xyz | bash
+   # You can use Foundry
+   curl -L https://foundry.paradigm.xyz | bash # install: one time only
    source ~/.zshenv  # or source ~/.bashrc for bash users
    foundryup
    
-   # Get wallet address from seed phrase
-   cd path/to/sdk
-   SEED=$(grep SEED_PHRASE .secrets | cut -d"'" -f2)
-   cast wallet address --mnemonic "$SEED"
+   # Get wallet address (run from SDK root)
+   cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d"'" -f2)"
    ```
 
 4. **Fund your test wallet** with small amounts for testing:
    - **Base**: Send 0.0003 ETH and 10 DEGEN tokens
    - **Polygon**: Send 0.5 POL (MATIC)
-   
-   Check balances at: `https://basescan.org` or `https://polygonscan.com`
+
+5. **Check balances** (run from SDK root):
+   ```bash
+   # For example, using Foundry
+   cast balance $(cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d"'" -f2)") --rpc-url https://mainnet.base.org --ether # ETH on Base
+   cast call 0x4ed4e862860bed51a9570b96d89af5e1b0efefed "balanceOf(address)(uint256)" $(cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d"'" -f2)") --rpc-url https://mainnet.base.org | cast from-wei    # DEGEN on Base
+   cast balance $(cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d"'" -f2)") --rpc-url https://polygon-rpc.com --ether    # POL on Polygon  
+   ```
 
 ### Run e2e tests:
 
