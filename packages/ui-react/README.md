@@ -77,6 +77,20 @@ Dev server: http://localhost:5173/
 
 ## Testing
 
+### E2E Test Setup
+
+Before running E2E tests, you need to set up a test wallet:
+
+1. **Create a test wallet**: Generate a new wallet mnemonic (12-24 words) using MetaMask or any wallet generator. **Never use your main wallet for testing!**
+
+2. **Configure the test wallet**: Create a `.secrets` file in the SDK project root with your test wallet mnemonic
+
+3. **Fund your test wallet** with small amounts for testing:
+   - **Base**: Send 0.0003 ETH and 10 DEGEN tokens
+   - **Polygon**: Send 0.5 POL (MATIC)
+   
+   Check balances at: `https://basescan.org` or `https://polygonscan.com`
+
 ### Run e2e tests:
 
 Start development server (if not already running):
