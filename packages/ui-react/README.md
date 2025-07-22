@@ -104,7 +104,7 @@ Before running E2E tests, you need to set up a test wallet:
    ```bash
    # For example, using Foundry
    cast balance $(cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d"'" -f2)") --rpc-url https://mainnet.base.org --ether # ETH on Base
-   cast call 0x4ed4e862860bed51a9570b96d89af5e1b0efefed "balanceOf(address)(uint256)" $(cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d"'" -f2)") --rpc-url https://mainnet.base.org | cast from-wei    # DEGEN on Base
+   cast call 0x4ed4e862860bed51a9570b96d89af5e1b0efefed "balanceOf(address)(uint256)" $(cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d"'" -f2)") --rpc-url https://mainnet.base.org | sed 's/ \[.*\]//' | cast from-wei    # DEGEN on Base
    cast balance $(cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d"'" -f2)") --rpc-url https://polygon-rpc.com --ether    # POL on Polygon  
    ```
 
