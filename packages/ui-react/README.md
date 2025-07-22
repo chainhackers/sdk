@@ -85,7 +85,20 @@ Before running E2E tests, you need to set up a test wallet:
 
 2. **Configure the test wallet**: Create a `.secrets` file in the SDK project root with your test wallet mnemonic
 
-3. **Fund your test wallet** with small amounts for testing:
+3. **Get your test wallet address**:
+   ```bash
+   # Install Foundry (one time only)
+   curl -L https://foundry.paradigm.xyz | bash
+   source ~/.zshenv  # or source ~/.bashrc for bash users
+   foundryup
+   
+   # Get wallet address from seed phrase
+   cd path/to/sdk
+   SEED=$(grep SEED_PHRASE .secrets | cut -d"'" -f2)
+   cast wallet address --mnemonic "$SEED"
+   ```
+
+4. **Fund your test wallet** with small amounts for testing:
    - **Base**: Send 0.0003 ETH and 10 DEGEN tokens
    - **Polygon**: Send 0.5 POL (MATIC)
    
