@@ -162,6 +162,7 @@ export function BettingPanel({
 
   const isApprovingToken = isApprovePending || isApproveConfirming
   const isInputDisabled = !isConnected || isWaiting || isBetSuccess || isApprovingToken
+  const isChainSwitchingDisabled = isWaiting || isBetSuccess || isApprovingToken
 
   const isPlayButtonDisabled: boolean =
     !isConnected ||
@@ -303,6 +304,7 @@ export function BettingPanel({
             <Button
               variant="ghost"
               onClick={handleBalanceClick}
+              disabled={isChainSwitchingDisabled}
               className={cn(
                 "text-sm font-medium flex items-center w-fit h-auto p-0",
                 "bg-secondary rounded-[8px] px-2 py-1",
