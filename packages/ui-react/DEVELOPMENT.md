@@ -87,17 +87,31 @@ Before running E2E tests, you need to set up a test wallet:
 
 ### Run e2e tests:
 
-Start development server (if not already running):
-```bash
-pnpm dev
-```
+All test commands must be run from `packages/ui-react` directory:
 
-Run tests:
 ```bash
-pnpm test:e2e
-```
+cd packages/ui-react
 
-On the first run, installing Chromium and MetaMask wallet setup may take some time.
+pnpm test:e2e-setup        # First-time setup (installs Chromium and MetaMask)
+pnpm test:clear-cache      # Clear test cache if you have issues
+
+# Terminal 1: Start dev server (keep it running)
+pnpm dev                   
+
+# Terminal 2: Run tests
+pnpm test:e2e              # Run all test files
+
+# Game tests
+pnpm test:cointoss         # Test coin toss game
+pnpm test:dice             # Test dice game  
+pnpm test:roulette         # Test roulette game
+pnpm test:keno             # Test keno game
+
+# Chain and token tests
+pnpm test:chain-switching  # Test network switching
+pnpm test:chain-token-list # Test chain/token list UI
+pnpm test:token-selection  # Test token selection
+```
 
 ### Testing Best Practices
 
