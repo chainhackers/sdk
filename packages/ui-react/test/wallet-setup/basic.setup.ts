@@ -1,39 +1,11 @@
 // Detailed debug setup with network switching
-import fs from "node:fs"
-import path from "node:path"
 import { defineWalletSetup } from "@synthetixio/synpress"
 import { MetaMask } from "@synthetixio/synpress/playwright"
 import { config } from "../../app.config"
 
-// Try to read from .secrets file first, fallback to config
-function getCredentials() {
-  try {
-    const secretsPath = path.resolve(process.cwd(), "../../.secrets")
-    if (fs.existsSync(secretsPath)) {
-      const secretsContent = fs.readFileSync(secretsPath, "utf8")
-      const seedMatch = secretsContent.match(/SEED_PHRASE='([^']+)'/)
-      const passwordMatch = secretsContent.match(/WALLET_PASSWORD='([^']+)'/)
+const { seedPhrase: SEED_PHRASE, walletPassword: PASSWORD } = config.test
 
-      if (seedMatch && passwordMatch) {
-        console.log("Using credentials from .secrets file")
-        return {
-          seedPhrase: seedMatch[1],
-          password: passwordMatch[1],
-        }
-      }
-    }
-  } catch (_error) {
-    // Ignore errors and use fallback
-  }
-
-  console.log("Using default test credentials")
-  return {
-    seedPhrase: config.test.seedPhrase,
-    password: config.test.walletPassword,
-  }
-}
-
-const { seedPhrase: SEED_PHRASE, password: PASSWORD } = getCredentials()
+console.log("Using test credentials from environment variables")
 
 const basicSetup = defineWalletSetup(PASSWORD, async (context, walletPage) => {
   console.log("=== STARTING WALLET SETUP ===")
