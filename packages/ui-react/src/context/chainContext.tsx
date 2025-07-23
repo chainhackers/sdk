@@ -83,7 +83,7 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
         return
       }
 
-      // Save chain preference to localStorage
+      // Save chain preference to localStorage (only if wallet connected)
       if (address && typeof window !== "undefined") {
         try {
           localStorage.setItem(`${CHAIN_STORAGE_KEY}-${address}`, chainId.toString())

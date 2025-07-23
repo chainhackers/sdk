@@ -2,6 +2,7 @@ import { chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
 import { useQueryClient } from "@tanstack/react-query"
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
 import { type Address, zeroAddress } from "viem"
+import { useAllChainsTokens } from "../hooks/useAllChainsTokens"
 import { useTokens } from "../hooks/useTokens"
 import { getTokenImage } from "../lib/utils"
 import { TokenWithImage } from "../types/types"
@@ -67,12 +68,22 @@ export function TokenProvider({ children }: TokenProviderProps) {
   })
   const [previousChainId, setPreviousChainId] = useState<number | undefined>(appChainId)
 
+  // Prefetch tokens for all chains in the background
+  useAllChainsTokens()
+
   // Cancel and remove token queries when chain changes
   useEffect(() => {
     if (previousChainId !== undefined && previousChainId !== appChainId) {
       // Chain has changed, cancel all in-flight queries and remove from cache
       queryClient.cancelQueries({ queryKey: ["casino-tokens"] })
       queryClient.removeQueries({ queryKey: ["casino-tokens"] })
+
+      // Also invalidate to force fresh fetches
+      queryClient.invalidateQueries({ queryKey: ["casino-tokens"] })
+
+      // Reset the query state to force immediate refetch
+      queryClient.resetQueries({ queryKey: ["casino-tokens"] })
+
       // Clear selected token immediately to prevent showing old chain's token
       setSelectedTokenInternal(getNativeToken(appChainId))
     }

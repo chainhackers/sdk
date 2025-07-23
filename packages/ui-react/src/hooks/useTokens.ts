@@ -116,7 +116,8 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
       wallet.getChainId = () => appChainId
 
       try {
-        return await getCasinoTokens(wallet, onlyActive)
+        const tokens = await getCasinoTokens(wallet, onlyActive)
+        return tokens
       } finally {
         // Restore original method
         wallet.getChainId = originalGetChainId
