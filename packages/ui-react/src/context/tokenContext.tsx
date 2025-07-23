@@ -81,21 +81,15 @@ export function TokenProvider({ children }: TokenProviderProps) {
   }, [appChainId, previousChainId, queryClient])
 
   const {
-    tokens: activeTokens,
-    loading: activeLoading,
-    error: activeError,
-  } = useTokens({ onlyActive: true })
-  const {
     tokens: allTokens,
-    loading: allLoading,
-    error: allError,
+    loading: tokensLoading,
+    error: tokenError,
   } = useTokens({ onlyActive: false })
 
-  const loading = activeLoading || allLoading
-  const error = activeError || allError
+  const activeTokens = allTokens.filter((token) => !token.paused)
 
   useEffect(() => {
-    if (activeLoading || activeTokens.length === 0) {
+    if (tokensLoading || activeTokens.length === 0) {
       return
     }
 
@@ -135,7 +129,7 @@ export function TokenProvider({ children }: TokenProviderProps) {
       return
     }
     setSelectedTokenInternal(nativeToken ?? selectedToken)
-  }, [activeTokens, activeLoading, appChainId, selectedToken])
+  }, [activeTokens, tokensLoading, appChainId, selectedToken])
 
   const setSelectedToken = (token: TokenWithImage) => {
     setSelectedTokenInternal(token)
@@ -146,7 +140,14 @@ export function TokenProvider({ children }: TokenProviderProps) {
 
   return (
     <TokenContext.Provider
-      value={{ selectedToken, setSelectedToken, activeTokens, allTokens, loading, error }}
+      value={{
+        selectedToken,
+        setSelectedToken,
+        activeTokens,
+        allTokens,
+        loading: tokensLoading,
+        error: tokenError,
+      }}
     >
       {children}
     </TokenContext.Provider>

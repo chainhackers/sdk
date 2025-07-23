@@ -8,7 +8,7 @@ import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger, type Logger } from "../lib/logger"
 import { getTokenImage } from "../lib/utils"
-import { QueryParameter, TokenWithImage } from "../types/types"
+import { CasinoTokenWithImage, QueryParameter, TokenWithImage } from "../types/types"
 import { type FilterTokensResult, filterTokensByAllowed } from "../utils/tokenUtils"
 
 const logger = createLogger("useTokens")
@@ -67,7 +67,7 @@ type UseTokensProps = {
 }
 
 type UseTokensResult = {
-  tokens: TokenWithImage[]
+  tokens: CasinoTokenWithImage[]
   loading: boolean
   error: Error | null
 }
@@ -107,9 +107,9 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
     queryFn: async () => {
       // Create a modified wallet that uses the app chain ID
       const wagmiClient = initWagmiBetSwirlClient(wagmiConfig)
-
       try {
-        return await wagmiClient.getCasinoTokens(onlyActive, appChainId)
+        const casinoTokens = await wagmiClient.getCasinoTokens(onlyActive, appChainId)
+        return casinoTokens
       } finally {
         // Restore original method
       }
@@ -120,7 +120,7 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
     ...query,
   })
 
-  const tokens: TokenWithImage[] = useMemo(
+  const tokens: CasinoTokenWithImage[] = useMemo(
     () =>
       tokensQuery.data?.map((token) => ({
         ...token,
