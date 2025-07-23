@@ -3,6 +3,7 @@ import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
 import {
   closeAllDialogs,
   extractBalance,
+  TEST_BET_AMOUNT,
   verifyCanPlayAgain,
   waitForBettingStates,
 } from "../test/helpers/testHelpers"
@@ -64,7 +65,7 @@ test.describe("Dice Game", () => {
     await expect(balanceElement).toBeVisible({ timeout: 20000 })
 
     // Get initial balance
-    const balanceContainer = await balanceElement.locator("..").first()
+    const balanceContainer = balanceElement.locator("..").first()
     const initialBalanceText = await balanceContainer.textContent()
     console.log("Initial balance text:", initialBalanceText)
 
@@ -86,8 +87,8 @@ test.describe("Dice Game", () => {
     const betAmountInput = page.locator("#betAmount")
     await expect(betAmountInput).toBeVisible()
     await betAmountInput.clear()
-    await betAmountInput.fill("0.0001")
-    console.log("Bet amount: 0.0001 ETH")
+    await betAmountInput.fill(TEST_BET_AMOUNT)
+    console.log(`Bet amount: ${TEST_BET_AMOUNT} ETH`)
 
     // Set dice number using slider
     console.log("Setting dice number...")
@@ -148,7 +149,7 @@ test.describe("Dice Game", () => {
     const hasResultModal = await resultModal.isVisible({ timeout: 10000 }).catch(() => false)
 
     let isWin = false
-    let rolledNumber = null
+    let rolledNumber: number | null = null
     if (hasResultModal) {
       const resultText = await resultModal.textContent()
       isWin = resultText?.toLowerCase().includes("won") || false

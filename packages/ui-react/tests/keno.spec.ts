@@ -3,6 +3,7 @@ import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
 import {
   closeAllDialogs,
   extractBalance,
+  TEST_BET_AMOUNT,
   verifyCanPlayAgain,
   waitForBettingStates,
 } from "../test/helpers/testHelpers"
@@ -70,7 +71,7 @@ test.describe("Keno Game", () => {
     }
 
     // Get initial balance
-    const balanceContainer = await balanceElement.locator("..").first()
+    const balanceContainer = balanceElement.locator("..").first()
     const initialBalanceText = await balanceContainer.textContent()
     console.log("Initial balance text:", initialBalanceText)
 
@@ -92,12 +93,12 @@ test.describe("Keno Game", () => {
     const betAmountInput = page.locator("#betAmount")
     await expect(betAmountInput).toBeVisible()
     await betAmountInput.clear()
-    await betAmountInput.fill("0.0001")
-    console.log("Bet amount: 0.0001 ETH")
+    await betAmountInput.fill(TEST_BET_AMOUNT)
+    console.log(`Bet amount: ${TEST_BET_AMOUNT} ETH`)
 
     // Select 5 numbers using the data-testid attributes
     console.log("Selecting keno numbers...")
-    const selectedNumbers = []
+    const selectedNumbers: number[] = []
 
     // Select numbers 1-5 using data-testid
     for (const num of [1, 2, 3, 4, 5]) {

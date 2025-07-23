@@ -3,6 +3,7 @@ import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
 import {
   closeAllDialogs,
   extractBalance,
+  TEST_BET_AMOUNT,
   verifyCanPlayAgain,
   waitForBettingStates,
 } from "../test/helpers/testHelpers"
@@ -64,7 +65,7 @@ test.describe("Coin Toss Game", () => {
     await expect(balanceElement).toBeVisible({ timeout: 20000 })
 
     // Get initial balance
-    const balanceContainer = await balanceElement.locator("..").first()
+    const balanceContainer = balanceElement.locator("..").first()
     const initialBalanceText = await balanceContainer.textContent()
     console.log("Initial balance text:", initialBalanceText)
 
@@ -89,8 +90,8 @@ test.describe("Coin Toss Game", () => {
     const betAmountInput = page.locator("#betAmount")
     await expect(betAmountInput).toBeVisible()
     await betAmountInput.clear()
-    await betAmountInput.fill("0.0001")
-    console.log("Bet amount: 0.0001 ETH")
+    await betAmountInput.fill(TEST_BET_AMOUNT)
+    console.log(`Bet amount: ${TEST_BET_AMOUNT} ETH`)
 
     // Select heads using proper locator
     console.log("Looking for coin selection button...")
@@ -231,8 +232,12 @@ test.describe("Coin Toss Game", () => {
   }) => {
     const metamask = new MetaMask(context, metamaskPage, basicSetup.walletPassword, extensionId)
     const numberOfGames = 3 // Play 3 games in a row
-    const betAmount = "0.0001"
-    const gameResults = []
+    const gameResults: {
+      gameNumber: number
+      selection: string
+      result: string
+      balanceAfter: number
+    }[] = []
 
     // Navigate to coin toss game
     await page.goto("/coinToss.html")
@@ -274,7 +279,7 @@ test.describe("Coin Toss Game", () => {
     console.log("\n=== CHECKING INITIAL BALANCE ===")
     const balanceElement = page.locator("text=/Balance:/").first()
     await expect(balanceElement).toBeVisible({ timeout: 20000 })
-    const balanceContainer = await balanceElement.locator("..").first()
+    const balanceContainer = balanceElement.locator("..").first()
     const initialBalanceText = await balanceContainer.textContent()
 
     // We're on Base chain, so the balance shown is ETH
@@ -284,7 +289,7 @@ test.describe("Coin Toss Game", () => {
     console.log("Starting ETH balance:", startingBalance)
 
     // Check if wallet has sufficient balance for multiple games
-    const totalBetAmount = Number.parseFloat(betAmount) * numberOfGames
+    const totalBetAmount = Number.parseFloat(TEST_BET_AMOUNT) * numberOfGames
     if (startingBalance < totalBetAmount) {
       console.log("\n⚠️  WALLET NEEDS MORE FUNDING FOR MULTIPLE GAMES")
       console.log(`Please send at least ${totalBetAmount} ETH to ${address} on Base chain`)
@@ -307,8 +312,8 @@ test.describe("Coin Toss Game", () => {
       const isInputEnabled = await betAmountInput.isEnabled()
       if (isInputEnabled) {
         await betAmountInput.clear()
-        await betAmountInput.fill(betAmount)
-        console.log(`Game ${gameNumber} - Bet amount: ${betAmount} ETH`)
+        await betAmountInput.fill(TEST_BET_AMOUNT)
+        console.log(`Game ${gameNumber} - Bet amount: ${TEST_BET_AMOUNT} ETH`)
       } else {
         console.log(`Game ${gameNumber} - Using previous bet amount (input disabled)`)
       }
@@ -397,7 +402,7 @@ test.describe("Coin Toss Game", () => {
         // Determine result from balance
         const currentBalanceText = await balanceContainer.textContent()
         const newBalance = extractBalance(currentBalanceText)
-        isWin = newBalance > currentBalance - Number.parseFloat(betAmount)
+        isWin = newBalance > currentBalance - Number.parseFloat(TEST_BET_AMOUNT)
       }
 
       // Update current balance after the game
@@ -458,9 +463,9 @@ test.describe("Coin Toss Game", () => {
     // Verify balance changed (should have decreased by at least the gas fees) or stayed the same if wins balanced losses
     // In Base network, gas fees are very low so balance might stay the same if wins equal losses
     // We just verify that we tracked the balance correctly
-    const expectedBalanceChange = (totalWins - totalLosses) * Number.parseFloat(betAmount)
+    const expectedBalanceChange = (totalWins - totalLosses) * Number.parseFloat(TEST_BET_AMOUNT)
     const actualBalanceChange = currentBalance - startingBalance
-    const tolerance = 0.001 // Allow for gas fees and floating point precision
+    const tolerance = 0.000000001 // Allow for gas fees and floating point precision
 
     console.log(`Expected balance change: ${expectedBalanceChange} ETH`)
     console.log(`Actual balance change: ${actualBalanceChange} ETH`)

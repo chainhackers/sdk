@@ -3,6 +3,7 @@ import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
 import {
   closeAllDialogs,
   extractBalance,
+  UNIFIED_TEST_BET_AMOUNT,
   verifyCanPlayAgain,
   waitForBettingStates,
 } from "../test/helpers/testHelpers"
@@ -123,12 +124,12 @@ test.describe("Chain Switching Tests", () => {
     // Play coin toss on Polygon
     console.log("\n=== PLAYING COIN TOSS ON POLYGON ===")
 
-    // Enter bet amount (smaller amount for MATIC)
+    // Enter bet amount
     const betAmountInput = page.locator("#betAmount")
     await expect(betAmountInput).toBeVisible()
     await betAmountInput.clear()
-    await betAmountInput.fill("0.01") // 0.01 MATIC bet
-    console.log("Bet amount: 0.01 MATIC")
+    await betAmountInput.fill(UNIFIED_TEST_BET_AMOUNT)
+    console.log(`Bet amount: ${UNIFIED_TEST_BET_AMOUNT} MATIC`)
 
     // Select heads
     const coinButton = page.locator('button[aria-label*="Select"][aria-label*="side"]')

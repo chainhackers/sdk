@@ -2,6 +2,13 @@ import { expect, Page } from "@playwright/test"
 import { MetaMask } from "@synthetixio/synpress/playwright"
 
 /**
+ * Unified test bet amount used across all E2E tests to ensure consistency
+ * and reduce the risk of test failures due to insufficient wallet balance.
+ * This very small amount (1 gwei) works reliably across all supported networks.
+ */
+export const TEST_BET_AMOUNT = "0.000000001"
+
+/**
  * Extract balance from text containing ETH amount
  * @param balanceText - Text containing balance like "Balance: 0.002" or "0.002 ETH"
  * @returns Numeric balance value
