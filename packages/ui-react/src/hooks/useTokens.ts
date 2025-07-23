@@ -75,8 +75,7 @@ type UseTokensResult = {
 /**
  * Hook to fetch casino tokens with optional filtering and validation
  *
- * @param onlyActive - Only return active (non-paused) tokens
- * @param query - Optional query parameters for React Query
+ * @param props{onlyActive, query} - Only return active (non-paused) tokens, optional query parameters for React Query
  * @returns Object containing tokens array, loading state, and error
  *
  * The hook now includes enhanced validation for filteredTokens configuration:
@@ -116,8 +115,7 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
       wallet.getChainId = () => appChainId
 
       try {
-        const tokens = await getCasinoTokens(wallet, onlyActive)
-        return tokens
+        return await getCasinoTokens(wallet, onlyActive)
       } finally {
         // Restore original method
         wallet.getChainId = originalGetChainId

@@ -74,12 +74,6 @@ export function TokenProvider({ children }: TokenProviderProps) {
       queryClient.cancelQueries({ queryKey: ["casino-tokens"] })
       queryClient.removeQueries({ queryKey: ["casino-tokens"] })
 
-      // Also invalidate to force fresh fetches
-      queryClient.invalidateQueries({ queryKey: ["casino-tokens"] })
-
-      // Reset the query state to force immediate refetch
-      queryClient.resetQueries({ queryKey: ["casino-tokens"] })
-
       // Clear selected token immediately to prevent showing old chain's token
       setSelectedTokenInternal(getNativeToken(appChainId))
     }
