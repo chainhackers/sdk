@@ -62,16 +62,13 @@ export class WagmiBetSwirlWallet extends BetSwirlWallet {
         gasPrice,
         gas: 3000000n, // workaround to avoid not enough gas issue
         account: wrappedGasTokenById[this.getChainId()], // workaround to avoid not enough gas issue
-        chainId: this.getChainId(),
       }) as Promise<CallReturnType>;
     }
-    const chainId = this.getChainId();
     return readContract(this.wagmiConfig, {
       address: functionData.data.to,
       abi: functionData.data.abi,
       functionName: functionData.data.functionName,
       args: functionData.data.args,
-      chainId,
     }) as Promise<TReturnType>;
   }
 

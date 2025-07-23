@@ -1,5 +1,5 @@
-import { CasinoToken, getCasinoTokens } from "@betswirl/sdk-core"
-import { WagmiBetSwirlWallet } from "@betswirl/wagmi-provider"
+import { CasinoToken } from "@betswirl/sdk-core"
+import { initWagmiBetSwirlClient } from "@betswirl/wagmi-provider"
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { type Address } from "viem"
@@ -106,19 +106,12 @@ export function useTokens(props: UseTokensProps = {}): UseTokensResult {
     queryKey: ["casino-tokens", appChainId, onlyActive],
     queryFn: async () => {
       // Create a modified wallet that uses the app chain ID
-      const wallet = new WagmiBetSwirlWallet(wagmiConfig)
-
-      // Store the original getChainId method
-      const originalGetChainId = wallet.getChainId.bind(wallet)
-
-      // Override getChainId to return the app chain
-      wallet.getChainId = () => appChainId
+      const wagmiClient = initWagmiBetSwirlClient(wagmiConfig)
 
       try {
-        return await getCasinoTokens(wallet, onlyActive)
+        return await wagmiClient.getCasinoTokens(onlyActive, appChainId)
       } finally {
         // Restore original method
-        wallet.getChainId = originalGetChainId
       }
     },
     enabled: !!appChainId,

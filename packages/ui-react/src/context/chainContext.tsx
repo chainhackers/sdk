@@ -96,7 +96,7 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
       setAppChainId(chainId)
 
       // Try to switch the wallet chain if connected
-      if (address && switchWalletChain) {
+      if (switchWalletChain) {
         try {
           switchWalletChain({ chainId })
         } catch (error) {
