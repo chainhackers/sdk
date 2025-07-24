@@ -265,6 +265,7 @@ interface BettingSectionProps {
   game: CASINO_GAME_TYPE
   balance: bigint
   isConnected: boolean
+  isWalletConnecting: boolean
   token: TokenWithImage
   betStatus: BetStatus | null
   betAmount: bigint | undefined

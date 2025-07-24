@@ -5,6 +5,7 @@ import {
   FORMAT_TYPE,
   formatRawAmount,
 } from "@betswirl/sdk-core"
+import { useAccount } from "wagmi"
 import diceBackground from "../../assets/game/game-background.jpg"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { GameDefinition } from "../../types/types"
@@ -80,6 +81,8 @@ export function DiceGame({
     isGamePaused,
   )
 
+  const { status: walletStatus } = useAccount()
+
   const selectedDiceNumber = (selection as { game: CASINO_GAME_TYPE.DICE; choice: DiceNumber })
     .choice
 
@@ -119,6 +122,7 @@ export function DiceGame({
         grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
+        isWalletConnecting={walletStatus === "connecting"}
         token={token}
         betStatus={betStatus}
         betAmount={betAmount}
