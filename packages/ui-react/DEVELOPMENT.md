@@ -54,13 +54,72 @@ Configuration uses two files:
 
 ## Testing
 
-### E2E Tests
-```bash
-pnpm dev         # Start development server if not running
-pnpm test:e2e    # Run tests
-```
+### E2E Test Setup
 
-Installing Chromium and MetaMask wallet setup may take some time.
+Before running E2E tests, you need to set up a test wallet:
+
+1. **Create a test wallet**: Generate a new wallet mnemonic (12-24 words) using MetaMask or any wallet generator. **Never use your main wallet for testing!**
+
+2. **Configure environment variables**: Create a `.env` file in the `packages/ui-react` directory based on `.env.example`:
+   ```bash
+   # Copy the example file
+   cp .env.example .env
+   
+   # Edit .env and add your test wallet credentials:
+   # SEED_PHRASE=your test wallet seed phrase here (12-24 words)
+   # WALLET_PASSWORD=your test wallet password here
+   ```
+
+3. **Get your test wallet address**:
+   ```bash
+   # You can use Foundry
+   curl -L https://foundry.paradigm.xyz | bash # install: one time only
+   source ~/.zshenv  # or source ~/.bashrc for bash users
+   foundryup
+   
+   # Get wallet address (run from packages/ui-react directory)
+   cast wallet address --mnemonic "$(grep SEED_PHRASE .env | cut -d'=' -f2)"
+   ```
+
+4. **Fund your test wallet** with small amounts for testing:
+   - **Base**: Send 0.0003 ETH and 10 DEGEN tokens
+   - **Polygon**: Send 0.5 POL (MATIC)
+
+5. **Check balances** (run from packages/ui-react directory):
+   ```bash
+   # For example, using Foundry
+   cast balance $(cast wallet address --mnemonic "$(grep SEED_PHRASE .env | cut -d'=' -f2)") --rpc-url https://mainnet.base.org --ether # ETH on Base
+   cast call 0x4ed4e862860bed51a9570b96d89af5e1b0efefed "balanceOf(address)(uint256)" $(cast wallet address --mnemonic "$(grep SEED_PHRASE .env | cut -d'=' -f2)") --rpc-url https://mainnet.base.org | sed 's/ \[.*\]//' | cast from-wei    # DEGEN on Base
+   cast balance $(cast wallet address --mnemonic "$(grep SEED_PHRASE .env | cut -d'=' -f2)") --rpc-url https://polygon-rpc.com --ether    # POL on Polygon  
+   ```
+
+### Run e2e tests:
+
+All test commands must be run from `packages/ui-react` directory:
+
+```bash
+cd packages/ui-react
+
+pnpm test:e2e-setup        # First-time setup (installs Chromium and MetaMask)
+pnpm test:clear-cache      # Clear test cache if you have issues
+
+# Terminal 1: Start dev server (keep it running)
+pnpm dev                   
+
+# Terminal 2: Run tests
+pnpm test:e2e              # Run all test files
+
+# Game tests
+pnpm test:cointoss         # Test coin toss game
+pnpm test:dice             # Test dice game  
+pnpm test:roulette         # Test roulette game
+pnpm test:keno             # Test keno game
+
+# Chain and token tests
+pnpm test:chain-switching  # Test network switching
+pnpm test:chain-token-list # Test chain/token list UI
+pnpm test:token-selection  # Test token selection
+```
 
 ### Testing Best Practices
 
