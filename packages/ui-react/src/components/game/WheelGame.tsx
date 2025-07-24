@@ -6,6 +6,7 @@ import {
   type WeightedGameConfiguration,
 } from "@betswirl/sdk-core"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useAccount } from "wagmi"
 import wheelBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
@@ -112,6 +113,8 @@ export function WheelGame({
 
   const themeSettings = { ...baseThemeSettings, theme, customTheme }
 
+  const { status: walletStatus } = useAccount()
+
   useEffect(() => {
     if (betStatus === "rolling") {
       wheelControllerRef.current?.startEndlessSpin()
@@ -204,6 +207,7 @@ export function WheelGame({
         grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
+        isWalletConnecting={walletStatus === "connecting"}
         token={token}
         betStatus={betStatus}
         betAmount={betAmount}

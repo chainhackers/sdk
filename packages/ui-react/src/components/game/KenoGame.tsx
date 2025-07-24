@@ -9,6 +9,7 @@ import {
   KenoConfiguration,
 } from "@betswirl/sdk-core"
 import { useEffect, useMemo, useState } from "react"
+import { useAccount } from "wagmi"
 import kenoBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
@@ -102,6 +103,8 @@ function KenoGameContent({
     isGamePaused,
   )
 
+  const { status: walletStatus } = useAccount()
+
   const selectedNumbers = (selection as { game: CASINO_GAME_TYPE.KENO; choice: KenoBall[] }).choice
 
   const { houseEdge } = useHouseEdge({
@@ -161,6 +164,7 @@ function KenoGameContent({
         grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
+        isWalletConnecting={walletStatus === "connecting"}
         token={token}
         betStatus={betStatus}
         betAmount={betAmount}

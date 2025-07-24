@@ -5,6 +5,7 @@ import {
   FORMAT_TYPE,
   formatRawAmount,
 } from "@betswirl/sdk-core"
+import { useAccount } from "wagmi"
 import coinTossBackground from "../../assets/game/game-background.jpg"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { GameDefinition } from "../../types/types"
@@ -81,6 +82,8 @@ export function CoinTossGame({
     isGamePaused,
   )
 
+  const { status: walletStatus } = useAccount()
+
   const selectedSide = (selection as { game: CASINO_GAME_TYPE.COINTOSS; choice: COINTOSS_FACE })
     .choice
 
@@ -121,6 +124,7 @@ export function CoinTossGame({
         grossMultiplier={grossMultiplier}
         balance={balance}
         isConnected={isWalletConnected}
+        isWalletConnecting={walletStatus === "connecting"}
         token={token}
         betStatus={betStatus}
         betAmount={betAmount}
