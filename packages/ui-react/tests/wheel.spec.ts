@@ -1,7 +1,6 @@
 import { testWithSynpress } from "@synthetixio/synpress"
 import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
 import {
-  closeAllDialogs,
   extractBalance,
   TEST_BET_AMOUNT,
   verifyCanPlayAgain,
@@ -112,58 +111,20 @@ test.describe("Wheel Game", () => {
 
     // Wait for bet to be processed through its various states
     await waitForBettingStates(page)
+    console.log("On-chain bet result received, wheel animation starting...")
 
-    // Check for result - it might appear in different ways
-    console.log("Checking for game result...")
+    const resultWindow = page.getByTestId("game-result-window")
+    await expect(resultWindow).toBeVisible({ timeout: 10000 })
 
-    // First check if result modal appears
-    const resultModal = page.locator('[role="dialog"]').filter({ hasText: /You (won|lost)/i })
-    const hasResultModal = await resultModal.isVisible({ timeout: 10000 }).catch(() => false)
+    await expect(resultWindow).toHaveAttribute("data-result-type", /win|loss/, { timeout: 10000 })
 
-    let isWin = false
-    let wheelResult: string | null = null
-    if (hasResultModal) {
-      const resultText = await resultModal.textContent()
-      isWin = resultText?.toLowerCase().includes("won") || false
+    const resultType = await resultWindow.getAttribute("data-result-type")
+    const isWin = resultType === "win"
 
-      // Try to extract the wheel result from the result
-      const wheelMatch = resultText?.match(/wheel stopped at (\d+\.?\d*)/i)
-      if (wheelMatch) {
-        wheelResult = wheelMatch[1]
-      }
+    const rolled = await resultWindow.getByTestId("rolled").textContent()
+    console.log({ resultType, rolled })
 
-      console.log(`\n🎡 RESULT FROM MODAL: ${isWin ? "WON! 🎉" : "Lost 😢"}`)
-      if (wheelResult) {
-        console.log(`Wheel stopped at: ${wheelResult}`)
-      }
-
-      // Close result modal using aria-label
-      const resultCloseButton = resultModal.locator('button[aria-label="Close"]')
-      if (await resultCloseButton.isVisible()) {
-        await resultCloseButton.click()
-        console.log("Result modal closed")
-      }
-    } else {
-      // No modal found, determine result from balance change
-      console.log("No result modal found, determining result from balance...")
-
-      // Get current balance to determine win/loss
-      const currentBalanceText = await balanceContainer.textContent()
-      const currentBalance = extractBalance(currentBalanceText)
-
-      // If balance increased (accounting for bet amount), player won
-      // If balance decreased, player lost
-      if (currentBalance > initialBalance - 0.0001) {
-        isWin = true
-        console.log(`\n🎡 RESULT FROM BALANCE: WON! 🎉 (${initialBalance} → ${currentBalance})`)
-      } else {
-        isWin = false
-        console.log(`\n🎡 RESULT FROM BALANCE: Lost 😢 (${initialBalance} → ${currentBalance})`)
-      }
-    }
-
-    // Close bet history if it's open
-    await closeAllDialogs(page)
+    console.log(`\n🎡 WHEEL RESULT: ${isWin ? "WON! 🎉" : "Lost 😢"}`)
 
     // Verify balance changed
     console.log("\n=== VERIFYING BALANCE CHANGE ===")
@@ -194,6 +155,10 @@ test.describe("Wheel Game", () => {
 
     // Verify we can play again
     console.log("\n=== VERIFYING READY TO PLAY AGAIN ===")
+
+    // Note: For WheelGame, the "Place Bet" button remains disabled during the wheel animation
+    // (isGamePaused || isSpinning condition). Only after the animation completes and the result
+    // modal appears/closes, the button becomes enabled again.
 
     // First ensure bet amount input is visible
     await expect(betAmountInput).toBeVisible({ timeout: 5000 })
