@@ -18,16 +18,7 @@ const server = {
 
 console.log("Base URL: ", baseUrl)
 
-if (!process.env.SEED_PHRASE || !process.env.WALLET_PASSWORD) {
-  console.warn("⚠️  WARNING: SEED_PHRASE and WALLET_PASSWORD must be set in environment variables")
-}
-
 export const config = {
   baseUrl,
   server,
-  test: {
-    seedPhrase:
-      process.env.SEED_PHRASE || "test test test test test test test test test test test junk",
-    walletPassword: process.env.WALLET_PASSWORD || "Tester@1234",
-  },
 }

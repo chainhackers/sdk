@@ -1,9 +1,9 @@
 // Detailed debug setup with network switching
 import { defineWalletSetup } from "@synthetixio/synpress"
 import { MetaMask } from "@synthetixio/synpress/playwright"
-import { config } from "../../app.config"
+import { testConfig } from "../spec.config"
 
-const { seedPhrase: SEED_PHRASE, walletPassword: PASSWORD } = config.test
+const { seedPhrase: SEED_PHRASE, walletPassword: PASSWORD } = testConfig
 
 console.log("Using test credentials from environment variables")
 
