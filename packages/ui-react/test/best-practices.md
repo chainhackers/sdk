@@ -155,7 +155,7 @@ try {
 
 ### 5. Test Data Management
 - Use environment variables for sensitive data
-- Store test credentials in `.secrets` file (git-ignored)
+- Store test credentials in `.env` file (git-ignored)
 - Use consistent test amounts (e.g., 0.0001 ETH)
 
 ### 6. Page Object Pattern (Optional)
@@ -185,14 +185,14 @@ class CoinTossPage {
 
 1. **Create test wallet configuration**:
    ```bash
-   cd ../..         # Navigate to SDK root directory (from packages/ui-react)
-   nano .secrets    # Create .secrets file
+   cd packages/ui-react  # Navigate to ui-react directory
+   cp .env.example .env  # Create .env file from example
    ```
    
-   Add your test wallet credentials:
+   Edit the `.env` file and add your test wallet credentials:
    ```
-   SEED_PHRASE='your twelve word test wallet seed phrase here'
-   WALLET_PASSWORD='YourTestPassword123'
+   SEED_PHRASE=your twelve word test wallet seed phrase here
+   WALLET_PASSWORD=YourTestPassword123
    ```
    
    **To generate a new test wallet seed phrase** (if you don't have one):
@@ -203,7 +203,7 @@ class CoinTossPage {
    ⚠️ **CRITICAL**: 
    - Use a TEST wallet only - NEVER your main wallet!
    - **Default public wallet ("test test test...") is shared** - everyone has access to it and any funds deposited will be immediately stolen
-   - If you see "Using default test credentials", you MUST create .secrets file with your private test wallet
+   - If you see "Using default test credentials", you MUST create .env file with your private test wallet credentials
    - **Tests require real funds** - they place 0.0001 ETH bets and confirm transactions
    - Wallet needs funds on Base, Polygon, and Avalanche networks
 

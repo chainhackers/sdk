@@ -41,6 +41,7 @@
     "test:dice": "pnpm exec playwright test tests/dice.spec.ts --reporter=line",
     "test:roulette": "pnpm exec playwright test tests/roulette.spec.ts --reporter=line",
     "test:keno": "pnpm exec playwright test tests/keno.spec.ts --reporter=line",
+    "test:wheel": "pnpm exec playwright test tests/wheel.spec.ts --reporter=line",
     "test:chain-switching": "pnpm exec playwright test tests/chainSwitching.spec.ts --reporter=line",
     "test:token-selection": "pnpm exec playwright test tests/tokenSelection.spec.ts --reporter=line",
     "test:chain-token-list": "pnpm exec playwright test tests/chainTokenList.spec.ts --reporter=line"

@@ -53,7 +53,7 @@ export function ChainAndTokenSheetPanel({
 
   const handleChainSelect = (chainId: CasinoChainId) => {
     switchAppChain(chainId)
-    setCurrentView("main")
+    setCurrentView("token")
   }
 
   return (
@@ -116,6 +116,7 @@ export function ChainAndTokenSheetPanel({
 
         {currentView === "token" && (
           <TokenSelectionView
+            key={`token-view-${appChainId}`}
             tokens={tokens}
             tokensLoading={tokensLoading}
             selectedToken={effectiveToken}
