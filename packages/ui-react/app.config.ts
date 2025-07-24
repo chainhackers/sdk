@@ -18,6 +18,10 @@ const server = {
 
 console.log("Base URL: ", baseUrl)
 
+if (!process.env.SEED_PHRASE || !process.env.WALLET_PASSWORD) {
+  throw new Error("SEED_PHRASE and WALLET_PASSWORD must be set in environment variables")
+}
+
 export const config = {
   baseUrl,
   server,
