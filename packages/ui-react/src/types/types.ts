@@ -1,6 +1,7 @@
 import {
   CASINO_GAME_TYPE,
   type CasinoRolledBet,
+  CasinoToken,
   COINTOSS_FACE,
   CoinTossEncodedInput,
   DiceEncodedInput,
@@ -68,6 +69,10 @@ export type BetStatus =
   | null
 
 export interface TokenWithImage extends Token {
+  image: string
+}
+
+export interface CasinoTokenWithImage extends CasinoToken {
   image: string
 }
 
