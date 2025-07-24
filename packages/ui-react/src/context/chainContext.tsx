@@ -77,6 +77,12 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
 
   const switchAppChain = useCallback(
     (chainId: CasinoChainId) => {
+      console.log("switchAppChain called:", {
+        targetChainId: chainId,
+        currentAppChainId: appChainId,
+        currentWalletChainId: walletChainId,
+      })
+
       // Validate chain is supported
       if (!availableChainIds.includes(chainId)) {
         console.warn(`Chain ${chainId} is not in supported chains`)
@@ -95,8 +101,9 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
       // Set app chain immediately for better UX
       setAppChainId(chainId)
 
-      // Try to switch the wallet chain if connected
-      if (switchWalletChain) {
+      // Try to switch the wallet chain if connected and it's different
+      if (switchWalletChain && walletChainId !== chainId) {
+        console.log("Attempting to switch wallet chain to:", chainId)
         try {
           switchWalletChain({ chainId })
         } catch (error) {
@@ -106,18 +113,25 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
         }
       }
     },
-    [switchWalletChain, availableChainIds, address],
+    [switchWalletChain, availableChainIds, address, walletChainId, appChainId],
   )
 
   const appChain = useMemo(() => casinoChainById[appChainId], [appChainId])
 
   // Try to switch the app chain automatically each time the wallet chain changes
   useEffect(() => {
+    console.log("Chain sync effect:", { walletChainId, appChainId })
+
     // Check if the wallet chain is supported by the authorized chains
-    if (walletChainId && availableChainIds.includes(walletChainId as CasinoChainId)) {
+    if (
+      walletChainId &&
+      availableChainIds.includes(walletChainId as CasinoChainId) &&
+      walletChainId !== appChainId // Only switch if different
+    ) {
+      console.log("Auto-switching app chain to match wallet:", walletChainId)
       switchAppChain(walletChainId as CasinoChainId)
     }
-  }, [walletChainId, switchAppChain, availableChainIds])
+  }, [walletChainId, appChainId, switchAppChain, availableChainIds])
 
   // Clear chain preference when wallet disconnects
   useEffect(() => {
