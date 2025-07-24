@@ -1,4 +1,9 @@
 import "dotenv/config"
+import path from "node:path"
+import dotenv from "dotenv"
+
+// Load secrets from .secrets file in project root
+dotenv.config({ path: path.resolve(process.cwd(), ".secrets") })
 
 export interface TestConfig {
   seedPhrase: string
@@ -7,7 +12,8 @@ export interface TestConfig {
 
 if (!process.env.SEED_PHRASE || !process.env.WALLET_PASSWORD) {
   throw new Error(
-    "SEED_PHRASE and WALLET_PASSWORD must be set in environment variables for E2E tests",
+    "SEED_PHRASE and WALLET_PASSWORD must be set in .secrets file for E2E tests. " +
+      "Copy .secrets.example to .secrets and fill in your test wallet credentials.",
   )
 }
 

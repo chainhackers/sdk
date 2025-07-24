@@ -60,15 +60,26 @@ Before running E2E tests, you need to set up a test wallet:
 
 1. **Create a test wallet**: Generate a new wallet mnemonic (12-24 words) using MetaMask or any wallet generator. **Never use your main wallet for testing!**
 
-2. **Configure environment variables**: Create a `.env` file in the `packages/ui-react` directory based on `.env.example`:
-   ```bash
-   # Copy the example file
-   cp .env.example .env
+2. **Configure environment variables**: The project uses two configuration files for better security:
    
-   # Edit .env and add your test wallet credentials:
+   **For application configuration (non-sensitive):**
+   ```bash
+   # Copy the example file for app configuration
+   cp .env.example .env
+   # This file contains RPC URLs and other non-sensitive settings
+   ```
+   
+   **For testing secrets (sensitive data):**
+   ```bash
+   # Copy the example file for secrets
+   cp .secrets.example .secrets
+   
+   # Edit .secrets and add your test wallet credentials:
    # SEED_PHRASE=your test wallet seed phrase here (12-24 words)
    # WALLET_PASSWORD=your test wallet password here
    ```
+   
+   > **Important**: Both `.env` and `.secrets` files are git-ignored and should never be committed to the repository.
 
 3. **Get your test wallet address**:
    ```bash
@@ -78,7 +89,7 @@ Before running E2E tests, you need to set up a test wallet:
    foundryup
    
    # Get wallet address (run from packages/ui-react directory)
-   cast wallet address --mnemonic "$(grep SEED_PHRASE .env | cut -d'=' -f2)"
+   cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d'=' -f2)"
    ```
 
 4. **Fund your test wallet** with small amounts for testing:
@@ -88,9 +99,9 @@ Before running E2E tests, you need to set up a test wallet:
 5. **Check balances** (run from packages/ui-react directory):
    ```bash
    # For example, using Foundry
-   cast balance $(cast wallet address --mnemonic "$(grep SEED_PHRASE .env | cut -d'=' -f2)") --rpc-url https://mainnet.base.org --ether # ETH on Base
-   cast call 0x4ed4e862860bed51a9570b96d89af5e1b0efefed "balanceOf(address)(uint256)" $(cast wallet address --mnemonic "$(grep SEED_PHRASE .env | cut -d'=' -f2)") --rpc-url https://mainnet.base.org | sed 's/ \[.*\]//' | cast from-wei    # DEGEN on Base
-   cast balance $(cast wallet address --mnemonic "$(grep SEED_PHRASE .env | cut -d'=' -f2)") --rpc-url https://polygon-rpc.com --ether    # POL on Polygon  
+   cast balance $(cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d'=' -f2)") --rpc-url https://mainnet.base.org --ether # ETH on Base
+   cast call 0x4ed4e862860bed51a9570b96d89af5e1b0efefed "balanceOf(address)(uint256)" $(cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d'=' -f2)") --rpc-url https://mainnet.base.org | sed 's/ \[.*\]//' | cast from-wei    # DEGEN on Base
+   cast balance $(cast wallet address --mnemonic "$(grep SEED_PHRASE .secrets | cut -d'=' -f2)") --rpc-url https://polygon-rpc.com --ether    # POL on Polygon  
    ```
 
 ### Run e2e tests:
