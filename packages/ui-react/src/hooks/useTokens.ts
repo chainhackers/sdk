@@ -75,7 +75,8 @@ type UseTokensResult = {
 /**
  * Hook to fetch casino tokens with optional filtering and validation
  *
- * @param props{onlyActive, query} - Only return active (non-paused) tokens, optional query parameters for React Query
+ * @param props.onlyActive - Only return active (non-paused) tokens
+ * @param props.query - Optional query parameters for React Query
  * @returns Object containing tokens array, loading state, and error
  *
  * The hook now includes enhanced validation for filteredTokens configuration:
