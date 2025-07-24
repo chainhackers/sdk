@@ -2,6 +2,7 @@ import { testWithSynpress } from "@synthetixio/synpress"
 import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
 import {
   extractBalance,
+  getGameResult,
   TEST_BET_AMOUNT,
   verifyCanPlayAgain,
   waitForBettingStates,
@@ -113,18 +114,10 @@ test.describe("Wheel Game", () => {
     await waitForBettingStates(page)
     console.log("On-chain bet result received, wheel animation starting...")
 
-    const resultWindow = page.getByTestId("game-result-window")
-    await expect(resultWindow).toBeVisible({ timeout: 10000 })
-
-    await expect(resultWindow).toHaveAttribute("data-result-type", /win|loss/, { timeout: 10000 })
-
-    const resultType = await resultWindow.getAttribute("data-result-type")
-    const isWin = resultType === "win"
-
-    const rolled = await resultWindow.getByTestId("rolled").textContent()
-    console.log({ resultType, rolled })
-
-    console.log(`\n🎡 WHEEL RESULT: ${isWin ? "WON! 🎉" : "Lost 😢"}`)
+    // Check for game result using the standardized approach
+    console.log("Checking for game result...")
+    const { isWin, rolled } = await getGameResult(page)
+    console.log(`\n🎡 WHEEL RESULT: ${isWin ? "WON! 🎉" : "Lost 😢"}, Rolled: ${rolled}`)
 
     // Verify balance changed
     console.log("\n=== VERIFYING BALANCE CHANGE ===")

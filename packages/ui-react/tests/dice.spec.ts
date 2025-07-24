@@ -3,6 +3,7 @@ import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
 import {
   closeAllDialogs,
   extractBalance,
+  getGameResult,
   TEST_BET_AMOUNT,
   verifyCanPlayAgain,
   waitForBettingStates,
@@ -141,54 +142,10 @@ test.describe("Dice Game", () => {
     // Wait for bet to be processed through its various states
     await waitForBettingStates(page)
 
-    // Check for result - it might appear in different ways
+    // Check for game result using the standardized approach
     console.log("Checking for game result...")
-
-    // First check if result modal appears
-    const resultModal = page.locator('[role="dialog"]').filter({ hasText: /You (won|lost)/i })
-    const hasResultModal = await resultModal.isVisible({ timeout: 10000 }).catch(() => false)
-
-    let isWin = false
-    let rolledNumber: number | null = null
-    if (hasResultModal) {
-      const resultText = await resultModal.textContent()
-      isWin = resultText?.toLowerCase().includes("won") || false
-
-      // Try to extract the rolled number from the result
-      const numberMatch = resultText?.match(/rolled (\d+)/i)
-      if (numberMatch) {
-        rolledNumber = Number.parseInt(numberMatch[1])
-      }
-
-      console.log(`\n🎲 RESULT FROM MODAL: ${isWin ? "WON! 🎉" : "Lost 😢"}`)
-      if (rolledNumber) {
-        console.log(`Rolled: ${rolledNumber}, Target: ≤${newValue}`)
-      }
-
-      // Close result modal using aria-label
-      const resultCloseButton = resultModal.locator('button[aria-label="Close"]')
-      if (await resultCloseButton.isVisible()) {
-        await resultCloseButton.click()
-        console.log("Result modal closed")
-      }
-    } else {
-      // No modal found, determine result from balance change
-      console.log("No result modal found, determining result from balance...")
-
-      // Get current balance to determine win/loss
-      const currentBalanceText = await balanceContainer.textContent()
-      const currentBalance = extractBalance(currentBalanceText)
-
-      // If balance increased (accounting for bet amount), player won
-      // If balance decreased, player lost
-      if (currentBalance > initialBalance - 0.0001) {
-        isWin = true
-        console.log(`\n🎲 RESULT FROM BALANCE: WON! 🎉 (${initialBalance} → ${currentBalance})`)
-      } else {
-        isWin = false
-        console.log(`\n🎲 RESULT FROM BALANCE: Lost 😢 (${initialBalance} → ${currentBalance})`)
-      }
-    }
+    const { isWin, rolled } = await getGameResult(page)
+    console.log(`\n🎲 DICE RESULT: ${isWin ? "WON! 🎉" : "Lost 😢"}, Rolled: ${rolled}`)
 
     // Close bet history if it's open
     await closeAllDialogs(page)

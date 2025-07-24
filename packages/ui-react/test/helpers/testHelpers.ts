@@ -21,6 +21,44 @@ export function extractBalance(balanceText: string | null): number {
 }
 
 /**
+ * Result data extracted from the game result window UI
+ */
+export interface GameResultFromUI {
+  isWin: boolean
+  rolled: string | null
+}
+
+/**
+ * Extract game result from the GameResultWindow component
+ * This function provides a reliable way to get game outcomes by reading
+ * the data-result-type attribute and rolled value from the standardized
+ * game result window component.
+ *
+ * @param page - Playwright page object
+ * @returns Promise resolving to game result data
+ */
+export async function getGameResult(page: Page): Promise<GameResultFromUI> {
+  console.log("Looking for game result window...")
+
+  const resultWindow = page.getByTestId("game-result-window")
+  await expect(resultWindow).toBeVisible({ timeout: 10000 })
+
+  await expect(resultWindow).toHaveAttribute("data-result-type", /win|loss/, { timeout: 10000 })
+
+  const resultType = await resultWindow.getAttribute("data-result-type")
+  const isWin = resultType === "win"
+
+  const rolled = await resultWindow.getByTestId("rolled").textContent()
+
+  console.log(`Game result extracted: ${resultType}, rolled: ${rolled}`)
+
+  return {
+    isWin,
+    rolled,
+  }
+}
+
+/**
  * Close all open dialogs and panels
  * @param page - Playwright page object
  */
