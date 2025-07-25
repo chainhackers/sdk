@@ -99,6 +99,8 @@ const NumberButton = React.memo<NumberButtonProps>(
         onClick={() => onClick(number)}
         disabled={isDisabled}
         className={buttonClasses}
+        aria-label={`Keno number ${number}`}
+        data-testid={`keno-number-${number}`}
       >
         {number}
       </Button>

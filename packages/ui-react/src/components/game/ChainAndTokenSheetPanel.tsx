@@ -53,9 +53,7 @@ export function ChainAndTokenSheetPanel({
 
   const handleChainSelect = (chainId: CasinoChainId) => {
     switchAppChain(chainId)
-    // Let the token context handle resetting to native token with proper image
-    setSelectedToken(undefined)
-    setCurrentView("main")
+    setCurrentView("token")
   }
 
   return (
@@ -118,6 +116,7 @@ export function ChainAndTokenSheetPanel({
 
         {currentView === "token" && (
           <TokenSelectionView
+            key={`token-view-${appChainId}`}
             tokens={tokens}
             tokensLoading={tokensLoading}
             selectedToken={effectiveToken}
