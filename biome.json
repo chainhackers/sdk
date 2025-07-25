@@ -14,8 +14,10 @@
       "!**/.turbo/**/*",
       "!**/tsconfig*.json",
       "!**/documents/**/*.ts",
-      "!**/packages/ui-react/**/*",
-      "!**/examples/farcaster-frame/**/*"
+      "!**/.cache-synpress/**/*",
+      "!**/playwright-report/**/*",
+      "!**/examples/**/*",
+      "!**/.next/**/*"
     ]
   },
   "formatter": {

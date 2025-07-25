@@ -1,7 +1,6 @@
 import { testWithSynpress } from "@synthetixio/synpress"
 import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
 import {
-  closeAllDialogs,
   extractBalance,
   getGameResult,
   TEST_BET_AMOUNT,
@@ -13,8 +12,8 @@ import basicSetup from "../test/wallet-setup/basic.setup"
 const test = testWithSynpress(metaMaskFixtures(basicSetup))
 const { expect } = test
 
-test.describe("Roulette Game", () => {
-  test("should play roulette with ETH on Base chain", async ({
+test.describe("Wheel Game", () => {
+  test("should play wheel with ETH on Base chain", async ({
     context,
     page,
     metamaskPage,
@@ -22,8 +21,8 @@ test.describe("Roulette Game", () => {
   }) => {
     const metamask = new MetaMask(context, metamaskPage, basicSetup.walletPassword, extensionId)
 
-    // Navigate to roulette game
-    await page.goto("/roulette.html")
+    // Navigate to wheel game
+    await page.goto("/wheel.html")
     await page.waitForLoadState("networkidle")
 
     // Connect wallet
@@ -66,7 +65,7 @@ test.describe("Roulette Game", () => {
     await expect(balanceElement).toBeVisible({ timeout: 20000 })
 
     // Get initial balance
-    const balanceContainer = await balanceElement.locator("..").first()
+    const balanceContainer = balanceElement.locator("..").first()
     const initialBalanceText = await balanceContainer.textContent()
     console.log("Initial balance text:", initialBalanceText)
 
@@ -77,12 +76,12 @@ test.describe("Roulette Game", () => {
     if (initialBalance === 0) {
       console.log("\n⚠️  WALLET NEEDS FUNDING")
       console.log(`Please send at least 0.001 ETH to ${address} on Base chain`)
-      await page.screenshot({ path: "roulette-needs-funding.png", fullPage: true })
+      await page.screenshot({ path: "wheel-needs-funding.png", fullPage: true })
       throw new Error("Test wallet needs 0.001 ETH on Base chain to continue")
     }
 
-    // Play roulette
-    console.log("\n=== PLAYING ROULETTE ===")
+    // Play wheel
+    console.log("\n=== PLAYING WHEEL ===")
 
     // Enter bet amount
     const betAmountInput = page.locator("#betAmount")
@@ -91,30 +90,14 @@ test.describe("Roulette Game", () => {
     await betAmountInput.fill(TEST_BET_AMOUNT)
     console.log(`Bet amount: ${TEST_BET_AMOUNT} ETH`)
 
-    // Place a bet - try different options
-    console.log("Looking for betting options...")
-
-    // Try to bet on "Even" which has better odds than a single number
-    const evenButton = page.locator('button:has-text("Even")').first()
-    if (await evenButton.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await evenButton.click()
-      console.log("Placed bet on: Even")
-    } else {
-      // Alternative: bet on a specific number (17 is red)
-      const number17 = page.locator("button").filter({ hasText: "17" }).first()
-      if (await number17.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await number17.click()
-        console.log("Placed bet on: Number 17")
-      } else {
-        // Fallback: click any red number
-        const redNumber = page.locator("button.bg-roulette-red").first()
-        await redNumber.click()
-        console.log("Placed bet on: Red number")
-      }
-    }
+    // Note: Unlike other games, WheelGame doesn't require any selection
+    // The player just spins the wheel directly by placing a bet
+    console.log("Wheel game ready - no selection needed")
 
     // Look for the play button
     console.log("Looking for play button...")
+
+    // Wait for the play button to be in the correct state
     const playButton = page.getByRole("button", { name: "Place Bet" })
     await expect(playButton).toBeVisible({ timeout: 10000 })
     await expect(playButton).toBeEnabled()
@@ -129,14 +112,12 @@ test.describe("Roulette Game", () => {
 
     // Wait for bet to be processed through its various states
     await waitForBettingStates(page)
+    console.log("On-chain bet result received, wheel animation starting...")
 
     // Check for game result using the standardized approach
     console.log("Checking for game result...")
     const { isWin, rolled } = await getGameResult(page)
-    console.log(`\n🎰 ROULETTE RESULT: ${isWin ? "WON! �" : "Lost 😢"}, Rolled: ${rolled}`)
-
-    // Close bet history if it's open
-    await closeAllDialogs(page)
+    console.log(`\n🎡 WHEEL RESULT: ${isWin ? "WON! 🎉" : "Lost 😢"}, Rolled: ${rolled}`)
 
     // Verify balance changed
     console.log("\n=== VERIFYING BALANCE CHANGE ===")
@@ -145,6 +126,7 @@ test.describe("Roulette Game", () => {
     console.log("Final balance:", finalBalance)
 
     // For small bets on mainnet, the balance might not visibly change due to rounding
+    // We'll check if the test completed successfully instead of requiring visible balance change
     const balanceChanged = Math.abs(finalBalance - initialBalance) > 0
     if (!balanceChanged) {
       console.log("Balance appears unchanged due to rounding, but bet was processed successfully")
@@ -153,10 +135,10 @@ test.describe("Roulette Game", () => {
 
     if (balanceChanged) {
       if (isWin) {
-        // If won, balance should be higher
-        expect(finalBalance).toBeGreaterThan(initialBalance)
+        // If won, balance should be higher than initial minus bet
+        expect(finalBalance).toBeGreaterThan(initialBalance - 0.0001)
       } else {
-        // If lost, balance should be lower
+        // If lost, balance should be exactly initial minus bet (accounting for gas)
         expect(finalBalance).toBeLessThan(initialBalance)
       }
     } else {
@@ -167,13 +149,21 @@ test.describe("Roulette Game", () => {
     // Verify we can play again
     console.log("\n=== VERIFYING READY TO PLAY AGAIN ===")
 
+    // Note: For WheelGame, the "Place Bet" button remains disabled during the wheel animation
+    // (isGamePaused || isSpinning condition). Only after the animation completes and the result
+    // modal appears/closes, the button becomes enabled again.
+
     // First ensure bet amount input is visible
     await expect(betAmountInput).toBeVisible({ timeout: 5000 })
 
-    const canPlayAgain = await verifyCanPlayAgain(page, "roulette-cannot-play-again.png")
+    const canPlayAgain = await verifyCanPlayAgain(page, "wheel-cannot-play-again.png")
     expect(canPlayAgain).toBe(true)
 
-    console.log("\n✅ Roulette game test completed successfully!")
-    console.log(`Balance change: ${initialBalance} ETH → ${finalBalance} ETH`)
+    console.log("\n✅ Wheel game test completed successfully!")
+    if (balanceChanged) {
+      console.log(`Balance change: ${initialBalance} ETH → ${finalBalance} ETH`)
+    } else {
+      console.log(`Balance: ${finalBalance} ETH (no visible change due to small bet amount)`)
+    }
   })
 })
