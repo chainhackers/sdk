@@ -18,6 +18,9 @@ This is a **game widget library** for BetSwirl protocol casino games built with 
 * 🎮 [Live Demo](https://betswirl-ui-react-demo.vercel.app/) - See it in action ([source code](https://github.com/BetSwirl/betswirl-ui-react-demo))
 * 🎨 [Storybook](http://demo.betswirl-sdk.chainhackers.xyz/) - Explore all components interactively
 
+🪐 **Create a Farcaster Frame with BetSwirl game**
+
+* 📖 [Farcaster Integration Guide](../../examples/farcaster-frame/docs/betswirl-farcaster-guide.md)
 
 ## Installation
 
