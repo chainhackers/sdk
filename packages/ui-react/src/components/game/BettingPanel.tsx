@@ -9,8 +9,8 @@ import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { Sheet } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
-import { BetAmountInput } from "./BetAmountInput"
 import { ChainAndTokenSheetPanel } from "./ChainAndTokenSheetPanel"
+import { FreeBetInput } from "./FreeBetInput"
 
 interface BettingPanelProps {
   game: CASINO_GAME_TYPE
@@ -253,13 +253,11 @@ export function BettingPanel({
           </Button>
         </div>
 
-        <BetAmountInput
-          betAmount={betAmount}
-          onBetAmountChange={onBetAmountChange}
+        <FreeBetInput
           token={token}
           isDisabled={isInputDisabled}
           onTokenClick={handleTokenClick}
-          formattedBalance={formattedBalance}
+          onRemoveFreebet={() => {}}
         />
 
         <div className="grid grid-cols-3 gap-2">
