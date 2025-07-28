@@ -3,14 +3,25 @@ import { WalletModal } from "@coinbase/onchainkit/wallet"
 import { useEffect, useRef, useState } from "react"
 import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
-import { cn } from "../../lib/utils"
+import { cn, getTokenImage } from "../../lib/utils"
 import { BetStatus, ChainTokenPanelView, TokenWithImage } from "../../types/types"
+
+export interface FreeBet {
+  id: string
+  amount: number
+  token: TokenWithImage
+  expiresAt?: string
+}
+
+import { Hex } from "viem"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { Sheet } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
+import { BetAmountInput } from "./BetAmountInput"
 import { ChainAndTokenSheetPanel } from "./ChainAndTokenSheetPanel"
 import { FreeBetInput } from "./FreeBetInput"
+import { FreeBetSheetPanel } from "./FreeBetSheetPanel"
 
 interface BettingPanelProps {
   game: CASINO_GAME_TYPE
@@ -36,6 +47,51 @@ interface BettingPanelProps {
   portalContainer: HTMLElement | null
   isMounted: boolean
 }
+
+// Mock FreeBet data
+const mockFreeBets: FreeBet[] = [
+  {
+    id: "1",
+    amount: 4,
+    token: {
+      address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
+      symbol: "DEGEN",
+      decimals: 18,
+      image: getTokenImage("DEGEN"),
+    },
+  },
+  {
+    id: "2",
+    amount: 3,
+    token: {
+      address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
+      symbol: "DEGEN",
+      decimals: 18,
+      image: getTokenImage("DEGEN"),
+    },
+    expiresAt: "10/12/2025, 12:27:00 PM GTM+3",
+  },
+  {
+    id: "3",
+    amount: 2,
+    token: {
+      address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
+      symbol: "DEGEN",
+      decimals: 18,
+      image: getTokenImage("DEGEN"),
+    },
+  },
+  {
+    id: "4",
+    amount: 1,
+    token: {
+      address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
+      symbol: "DEGEN",
+      decimals: 18,
+      image: getTokenImage("DEGEN"),
+    },
+  },
+]
 
 export function BettingPanel({
   game,
@@ -65,6 +121,8 @@ export function BettingPanel({
   const [isChainTokenSheetOpen, setIsChainTokenSheetOpen] = useState<boolean>(false)
   const [panelInitialView, setPanelInitialView] = useState<ChainTokenPanelView>("main")
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false)
+  const [isFreeBetSheetOpen, setIsFreeBetSheetOpen] = useState(false)
+  const [selectedFreeBet, setSelectedFreeBet] = useState<FreeBet | null>(mockFreeBets[0]) // Default to first freebet
 
   // Track previous values to detect actual changes
   const prevChainIdRef = useRef(appChainId)
@@ -230,6 +288,19 @@ export function BettingPanel({
     }
   }
 
+  const handleFreeBetSelect = (freeBet: FreeBet) => {
+    setSelectedFreeBet(freeBet)
+    setIsFreeBetSheetOpen(false)
+  }
+
+  const handleRemoveFreeBet = () => {
+    setSelectedFreeBet(null)
+  }
+
+  const handleFreeBetClick = () => {
+    setIsFreeBetSheetOpen(true)
+  }
+
   return (
     <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
       <div className="flex flex-col gap-3">
@@ -253,12 +324,24 @@ export function BettingPanel({
           </Button>
         </div>
 
-        <FreeBetInput
-          token={token}
-          isDisabled={isInputDisabled}
-          onTokenClick={handleTokenClick}
-          onRemoveFreebet={() => {}}
-        />
+        {selectedFreeBet ? (
+          <FreeBetInput
+            amount={selectedFreeBet.amount}
+            token={selectedFreeBet.token}
+            isDisabled={isInputDisabled}
+            onClick={handleFreeBetClick}
+            onRemoveFreebet={handleRemoveFreeBet}
+          />
+        ) : (
+          <BetAmountInput
+            betAmount={betAmount}
+            onBetAmountChange={onBetAmountChange}
+            token={token}
+            isDisabled={isInputDisabled}
+            onTokenClick={handleTokenClick}
+            formattedBalance={formattedBalance}
+          />
+        )}
 
         <div className="grid grid-cols-3 gap-2">
           <Button
@@ -314,6 +397,23 @@ export function BettingPanel({
           <ChainAndTokenSheetPanel
             portalContainer={portalContainer}
             initialView={panelInitialView}
+          />
+        )}
+      </Sheet>
+      <Sheet
+        open={isFreeBetSheetOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsFreeBetSheetOpen(false)
+          }
+        }}
+      >
+        {isMounted && portalContainer && (
+          <FreeBetSheetPanel
+            portalContainer={portalContainer}
+            freeBets={mockFreeBets}
+            selectedFreeBet={selectedFreeBet}
+            onSelect={handleFreeBetSelect}
           />
         )}
       </Sheet>
