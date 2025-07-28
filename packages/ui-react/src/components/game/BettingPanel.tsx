@@ -1,5 +1,6 @@
 import { CASINO_GAME_TYPE, formatRawAmount, GAS_TOKEN_ADDRESS } from "@betswirl/sdk-core"
 import { WalletModal } from "@coinbase/onchainkit/wallet"
+import { Gift } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
@@ -304,24 +305,43 @@ export function BettingPanel({
   return (
     <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
       <div className="flex flex-col gap-3">
-        <div className="text-sm font-medium flex items-center">
-          <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
-          <Button
-            variant="ghost"
-            onClick={handleBalanceClick}
-            disabled={isChainSwitchingDisabled}
-            className={cn(
-              "text-sm font-medium flex items-center w-fit h-auto p-0",
-              "bg-secondary rounded-[8px] px-2 py-1",
-              "hover:opacity-80 hover:bg-secondary transition-opacity",
-            )}
-          >
-            <span className="font-semibold">{formattedBalance}</span>
-            <div className="flex items-center ml-1">
-              <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
-              <TokenIcon token={token} size={18} />
-            </div>
-          </Button>
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium flex items-center">
+            <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
+            <Button
+              variant="ghost"
+              onClick={handleBalanceClick}
+              disabled={isChainSwitchingDisabled}
+              className={cn(
+                "text-sm font-medium flex items-center w-fit h-auto p-0",
+                "bg-secondary rounded-[8px] px-2 py-1",
+                "hover:opacity-80 hover:bg-secondary transition-opacity",
+              )}
+            >
+              <span className="font-semibold">{formattedBalance}</span>
+              <div className="flex items-center ml-1">
+                <ChainIcon
+                  chainId={appChainId}
+                  size={18}
+                  className="-mr-[4px] mask-overlap-cutout"
+                />
+                <TokenIcon token={token} size={18} />
+              </div>
+            </Button>
+          </div>
+
+          {mockFreeBets.length > 0 && (
+            <Button
+              variant="ghost"
+              onClick={() => setIsFreeBetSheetOpen(true)}
+              className="w-[60px] h-[27px] bg-game-win/20 border border-free-bet-border rounded-[8px] flex items-center gap-1 hover:bg-game-win/30 transition-colors"
+            >
+              <Gift size={20} className="text-game-win" />
+              <span className="text-sm font-semibold text-free-bet-border">
+                ({mockFreeBets.length})
+              </span>
+            </Button>
+          )}
         </div>
 
         {selectedFreeBet ? (
