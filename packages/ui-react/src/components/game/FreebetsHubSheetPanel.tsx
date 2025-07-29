@@ -7,6 +7,9 @@ import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import type { FreeBet } from "./BettingPanel"
 
+const PANEL_HEIGHT_CONNECTED = "!h-[70%]" // Larger height for connected state
+const PANEL_HEIGHT_DISCONNECTED = "!h-[238px]" // Smaller height for disconnected state
+
 interface FreebetsHubSheetPanelProps {
   portalContainer: HTMLElement
   isConnected: boolean
@@ -34,23 +37,29 @@ export function FreebetsHubSheetPanel({
   return (
     <SheetPortal container={portalContainer}>
       <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
-      <SheetBottomPanelContent className={cn("!h-[70%] !max-h-full", "p-0")}>
+      <SheetBottomPanelContent
+        className={cn(
+          isConnected ? PANEL_HEIGHT_CONNECTED : PANEL_HEIGHT_DISCONNECTED,
+          "!max-h-full",
+          "p-0",
+        )}
+      >
         <ScrollArea className="h-full w-full rounded-t-[16px] overflow-hidden">
-          <div className="flex flex-col p-4">
-            <h2 className="text-xl font-bold mb-6">Freebets</h2>
+          <div className="flex flex-col p-[16px]">
+            <h2 className="text-xl font-bold mb-[12px] leading-[24px]">Freebets</h2>
 
             {!isConnected ? (
               // Disconnected state
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center gap-[12px]">
                 <Button
                   onClick={onConnectWallet}
                   size="lg"
                   className={cn(
-                    "w-full mb-6",
-                    "bg-primary text-primary-foreground",
+                    "w-full",
+                    "bg-primary",
                     "rounded-[16px]",
-                    "h-14",
-                    "text-base font-semibold",
+                    "h-[48px]",
+                    "text-play-btn-font font-bold",
                   )}
                 >
                   Connect Wallet
@@ -58,14 +67,14 @@ export function FreebetsHubSheetPanel({
 
                 <div
                   className={cn(
-                    "w-full p-4 rounded-[16px]",
+                    "w-full h-[110px] p-[12px] rounded-[16px]",
                     "bg-surface-secondary",
                     "text-text-on-surface-variant",
                   )}
                 >
-                  <h3 className="font-semibold text-base mb-2 text-foreground">Casino freebets</h3>
-                  <p className="text-sm leading-relaxed">Connect to check your freebets.</p>
-                  <p className="text-sm leading-relaxed mt-2">
+                  <h3 className="font-semibold text-foreground mb-1">Casino freebets</h3>
+                  <p className="leading-relaxed text-[12px]">Connect to check your freebets.</p>
+                  <p className="leading-relaxed text-[12px]">
                     When you win a casino freebet, you receive the entire won payout.
                   </p>
                 </div>
