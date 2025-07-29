@@ -12,6 +12,8 @@ export interface FreeBet {
   amount: number
   token: TokenWithImage
   expiresAt?: string
+  title?: string
+  category?: string
 }
 
 import { Hex } from "viem"
@@ -23,6 +25,7 @@ import { BetAmountInput } from "./BetAmountInput"
 import { ChainAndTokenSheetPanel } from "./ChainAndTokenSheetPanel"
 import { FreeBetInput } from "./FreeBetInput"
 import { FreeBetSheetPanel } from "./FreeBetSheetPanel"
+import { FreebetsHubSheetPanel } from "./FreebetsHubSheetPanel"
 
 interface BettingPanelProps {
   game: CASINO_GAME_TYPE
@@ -60,6 +63,9 @@ const mockFreeBets: FreeBet[] = [
       decimals: 18,
       image: getTokenImage("DEGEN"),
     },
+    title: "Test ChainHackers",
+    category: "Casino",
+    expiresAt: "in 3 months",
   },
   {
     id: "2",
@@ -70,7 +76,9 @@ const mockFreeBets: FreeBet[] = [
       decimals: 18,
       image: getTokenImage("DEGEN"),
     },
-    expiresAt: "10/12/2025, 12:27:00 PM GTM+3",
+    title: "Test ChainHackers",
+    category: "Casino",
+    expiresAt: "in 3 months",
   },
   {
     id: "3",
@@ -81,6 +89,9 @@ const mockFreeBets: FreeBet[] = [
       decimals: 18,
       image: getTokenImage("DEGEN"),
     },
+    title: "Test ChainHackers",
+    category: "Casino",
+    expiresAt: "10/12/2025, 12:27:00 PM GTM+3",
   },
   {
     id: "4",
@@ -91,6 +102,9 @@ const mockFreeBets: FreeBet[] = [
       decimals: 18,
       image: getTokenImage("DEGEN"),
     },
+    title: "Test ChainHackers",
+    category: "Casino",
+    expiresAt: "in 3 months",
   },
 ]
 
@@ -123,11 +137,23 @@ export function BettingPanel({
   const [panelInitialView, setPanelInitialView] = useState<ChainTokenPanelView>("main")
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false)
   const [isFreeBetSheetOpen, setIsFreeBetSheetOpen] = useState(false)
+  const [isFreebetsHubOpen, setIsFreebetsHubOpen] = useState(false)
+  const [wasFreebetsHubOpenBeforeWallet, setWasFreebetsHubOpenBeforeWallet] = useState(false)
   const [selectedFreeBet, setSelectedFreeBet] = useState<FreeBet | null>(mockFreeBets[0]) // Default to first freebet
 
   // Track previous values to detect actual changes
   const prevChainIdRef = useRef(appChainId)
   const prevTokenAddressRef = useRef(token.address)
+  const prevIsConnectedRef = useRef(isConnected)
+
+  // Reopen freebets hub if it was open before wallet connection
+  useEffect(() => {
+    if (!prevIsConnectedRef.current && isConnected && wasFreebetsHubOpenBeforeWallet) {
+      setIsFreebetsHubOpen(true)
+      setWasFreebetsHubOpenBeforeWallet(false)
+    }
+    prevIsConnectedRef.current = isConnected
+  }, [isConnected, wasFreebetsHubOpenBeforeWallet])
 
   // Clear bet amount when chain or token actually changes
   useEffect(() => {
@@ -333,7 +359,7 @@ export function BettingPanel({
           {mockFreeBets.length > 0 && (
             <Button
               variant="ghost"
-              onClick={() => setIsFreeBetSheetOpen(true)}
+              onClick={() => setIsFreebetsHubOpen(true)}
               className="w-[60px] h-[27px] bg-game-win/20 border border-free-bet-border rounded-[8px] flex items-center gap-1 hover:bg-game-win/30 transition-colors"
             >
               <Gift size={20} className="text-game-win" />
@@ -434,6 +460,22 @@ export function BettingPanel({
             freeBets={mockFreeBets}
             selectedFreeBet={selectedFreeBet}
             onSelect={handleFreeBetSelect}
+          />
+        )}
+      </Sheet>
+      <Sheet open={isFreebetsHubOpen} onOpenChange={setIsFreebetsHubOpen}>
+        {isMounted && portalContainer && (
+          <FreebetsHubSheetPanel
+            portalContainer={portalContainer}
+            isConnected={isConnected}
+            freebets={mockFreeBets}
+            onConnectWallet={() => {
+              setWasFreebetsHubOpenBeforeWallet(true)
+              setIsFreebetsHubOpen(false)
+              // Small delay to ensure sheet closes before opening wallet modal
+              setTimeout(() => setIsWalletModalOpen(true), 100)
+            }}
+            onClaimCode={(code) => console.log("Claiming code:", code)}
           />
         )}
       </Sheet>
