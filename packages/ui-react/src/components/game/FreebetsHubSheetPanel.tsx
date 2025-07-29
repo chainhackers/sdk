@@ -81,10 +81,19 @@ export function FreebetsHubSheetPanel({
               </div>
             ) : (
               // Connected state
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-[12px]">
                 {/* Code claim section */}
-                <div className={cn("p-4 rounded-[16px] mb-4", "bg-surface-secondary")}>
-                  <p className="text-sm text-text-on-surface-variant mb-3">
+                <div
+                  className={cn(
+                    "rounded-[16px]",
+                    "bg-surface-secondary",
+                    "gap-[8px]",
+                    "flex flex-col",
+                    "py-[16px]",
+                    "px-[12px]",
+                  )}
+                >
+                  <p className="text-[12px] text-text-on-surface-variant">
                     If you have a code, you can claim your freebet here.
                   </p>
                   <div className="flex gap-2">
@@ -101,9 +110,8 @@ export function FreebetsHubSheetPanel({
                         "flex-1",
                         "bg-surface-secondary",
                         "border-border-stroke",
-                        "rounded-[8px]",
+                        "rounded-[12px]",
                         "h-10",
-                        "placeholder:text-text-on-surface-variant/60",
                         "brightness-95",
                       )}
                     />
@@ -111,10 +119,10 @@ export function FreebetsHubSheetPanel({
                       onClick={handleClaimCode}
                       disabled={!codeInput.trim()}
                       className={cn(
-                        "bg-primary text-primary-foreground",
-                        "rounded-[8px]",
+                        "bg-primary",
+                        "text-play-btn-font font-bold text-[14px]",
+                        "rounded-[16px]",
                         "h-10 px-4",
-                        "font-semibold",
                         "disabled:opacity-50",
                       )}
                     >
@@ -124,8 +132,8 @@ export function FreebetsHubSheetPanel({
                 </div>
 
                 {/* Casino freebets section */}
-                <div>
-                  <h3 className="font-semibold text-base mb-3">Casino freebets</h3>
+                <div className="flex flex-col gap-[8px]">
+                  <h3 className="font-bold text-[16px] leading-[24px]">Casino freebets</h3>
 
                   <div className="flex flex-col gap-2">
                     {freebets.map((freeBet) => (
@@ -135,38 +143,39 @@ export function FreebetsHubSheetPanel({
                           "p-4 rounded-[12px]",
                           "bg-surface-secondary",
                           "flex flex-col gap-3",
+                          "text-[14px] leading-[22px]",
                         )}
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex flex-col gap-2">
-                            <h4 className="font-semibold text-base">{freeBet.title}</h4>
-                            <span
-                              className={cn(
-                                "inline-flex px-3 py-1 rounded-full",
-                                "bg-game-win/20 text-game-win",
-                                "text-xs font-medium",
-                                "w-fit",
-                              )}
-                            >
-                              {freeBet.category}
-                            </span>
-                          </div>
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-base">{freeBet.title}</h4>
                           <div className="flex items-center gap-2">
                             <Gift size={20} className="text-primary" />
-                            <span className="font-bold text-lg">
+                            <span className="font-bold text-[12px] leading-[20px]">
                               {freeBet.amount} {freeBet.token.symbol}
                             </span>
                           </div>
                         </div>
-                        <p className="text-sm text-text-on-surface-variant">
-                          Expire: {freeBet.expiresAt}
-                        </p>
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={cn(
+                              "inline-flex px-3 py-1 rounded-full",
+                              "bg-game-win/20 text-game-win",
+                              "text-[12px] font-bold leading-[20px]",
+                              "w-fit",
+                            )}
+                          >
+                            {freeBet.category}
+                          </span>
+                          <p className="text-[12px] leading-[18px] text-text-on-surface-variant text-right max-w-[120px]">
+                            Expire: {freeBet.expiresAt}
+                          </p>
+                        </div>
                       </div>
                     ))}
                   </div>
 
                   {/* Footer text */}
-                  <p className="text-sm text-text-on-surface-variant mt-4 leading-relaxed">
+                  <p className="text-[12px] leading-[18px] text-text-on-surface-variant">
                     You can use your freebets directly while playing casino games. When you win a
                     casino freebet, you receive the entire won payout
                   </p>
