@@ -24,13 +24,13 @@ export function FreeBetSheetPanel({
     <SheetPortal container={portalContainer}>
       <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
       <SheetBottomPanelContent className={cn("!h-auto !max-h-[70%]", "p-4")}>
-        <div className="flex flex-col">
-          <div className="flex items-center gap-3 mb-6">
-            <h2 className="text-base font-semibold">Freebets</h2>
-          </div>
+        <TooltipProvider>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-3 mb-6">
+              <h2 className="text-base font-semibold">Freebets</h2>
+            </div>
 
-          <ScrollArea className="h-60 [&>[data-slot=scroll-area-scrollbar]]:w-[6px] [&>[data-slot=scroll-area-scrollbar]]:border-l-0 [&>[data-slot=scroll-area-scrollbar]]:z-10 [&>[data-slot=scroll-area-scrollbar]]:-translate-x-[1px] [&_[data-slot=scroll-area-thumb]]:bg-scrollbar-thumb">
-            <TooltipProvider>
+            <ScrollArea className="h-60 [&>[data-slot=scroll-area-scrollbar]]:w-[6px] [&>[data-slot=scroll-area-scrollbar]]:border-l-0 [&>[data-slot=scroll-area-scrollbar]]:z-10 [&>[data-slot=scroll-area-scrollbar]]:-translate-x-[1px] [&_[data-slot=scroll-area-thumb]]:bg-scrollbar-thumb">
               <div className="flex flex-col gap-1 p-1">
                 {freeBets.map((freeBet) => (
                   <Button
@@ -46,7 +46,13 @@ export function FreeBetSheetPanel({
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <TokenIcon token={freeBet.token} size={18} />
+                      <div
+                        role="img"
+                        aria-label={`${freeBet.token.symbol} token icon`}
+                        title={`${freeBet.token.symbol} token`}
+                      >
+                        <TokenIcon token={freeBet.token} size={18} />
+                      </div>
                       <span className="font-medium text-foreground">
                         {freeBet.amount} {freeBet.token.symbol}
                       </span>
@@ -77,9 +83,9 @@ export function FreeBetSheetPanel({
                   </Button>
                 ))}
               </div>
-            </TooltipProvider>
-          </ScrollArea>
-        </div>
+            </ScrollArea>
+          </div>
+        </TooltipProvider>
       </SheetBottomPanelContent>
     </SheetPortal>
   )

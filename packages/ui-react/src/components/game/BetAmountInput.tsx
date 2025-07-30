@@ -1,5 +1,4 @@
 import { FORMAT_TYPE, formatRawAmount } from "@betswirl/sdk-core"
-import Decimal from "decimal.js"
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { parseUnits } from "viem"
 
@@ -76,15 +75,9 @@ export function BetAmountInput({
     }
 
     try {
-      new Decimal(newInputValue)
-
-      try {
-        const weiValue = parseUnits(newInputValue, token.decimals)
-        onBetAmountChange(weiValue)
-        setIsValidInput(true)
-      } catch (_error) {
-        setIsValidInput(false)
-      }
+      const weiValue = parseUnits(newInputValue, token.decimals)
+      onBetAmountChange(weiValue)
+      setIsValidInput(true)
     } catch (_error) {
       setIsValidInput(false)
     }
@@ -101,7 +94,7 @@ export function BetAmountInput({
           type="number"
           placeholder="0"
           min={0}
-          max={Number.parseFloat(formattedBalance)}
+          max={formattedBalance}
           step={BET_AMOUNT_INPUT_STEP}
           value={inputValue}
           onChange={handleInputChange}

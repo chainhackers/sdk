@@ -80,7 +80,9 @@ export function FreebetsHubSheetPanel({
                   )}
                 >
                   <h3 className="font-semibold text-foreground mb-1">Casino freebets</h3>
-                  <p className="leading-relaxed text-[12px]">Connect to check your freebets.</p>
+                  <p className="leading-relaxed text-[12px]">
+                    Connect your wallet to view and manage your freebets.
+                  </p>
                   <p className="leading-relaxed text-[12px]">
                     When you win a casino freebet, you receive the entire won payout.
                   </p>
@@ -176,7 +178,7 @@ export function FreebetsHubSheetPanel({
                   {/* Footer text */}
                   <p className="text-[12px] leading-[18px] text-text-on-surface-variant">
                     You can use your freebets directly while playing casino games. When you win a
-                    casino freebet, you receive the entire won payout
+                    casino freebet, you receive the entire won payout.
                   </p>
                 </div>
               </div>
