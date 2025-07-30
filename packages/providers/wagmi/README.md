@@ -33,4 +33,4 @@ import { initWagmiBetSwirlClient} from "@betswirl/wagmi-provider";
 
 ## Example
 
-- [NodeJs CLI](https://github.com/BetSwirl/sdk/tree/main/examples/node)
+- [NodeJs CLI](https://github.com/BetSwirl/node-core-demo)

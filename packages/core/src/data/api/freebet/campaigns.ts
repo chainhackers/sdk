@@ -83,6 +83,7 @@ export const fetchFreebetCampaigns = async (
   offset = 0,
   status?: FREEBET_CAMPAIGN_STATUS,
   affiliate?: Address,
+  chainId?: CasinoChainId,
   testMode = false,
 ): Promise<{ campaigns: FreebetCampaign[]; total: number; offset: number; limit: number }> => {
   try {
@@ -94,6 +95,9 @@ export const fetchFreebetCampaigns = async (
     }
     if (affiliate) {
       params.set("affiliate", affiliate);
+    }
+    if (chainId) {
+      params.set("chain_id", chainId.toString());
     }
     const res = await fetch(
       `${getBetSwirlApiUrl(testMode)}/affiliate/v1/freebet/campaigns?${params.toString()}`,
