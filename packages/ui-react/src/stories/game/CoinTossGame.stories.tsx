@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import type { FreeBet } from "../../components/game/BettingPanel"
 import { CoinTossGame, type CoinTossGameProps } from "../../components/game/CoinTossGame"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
 import { THEME_OPTIONS } from "../../types/types"
-import type { FreeBet } from "../../components/game/BettingPanel"
 import gameBg1 from "../assets/game/game-background-1.jpg"
 import gameBg2 from "../assets/game/game-background-2.jpg"
 import gameBg3 from "../assets/game/game-background-3.jpg"
@@ -211,7 +211,7 @@ export const ChickletLightThemeWithFreebets: Story = {
       "--play-btn-font": "#ffffff",
     } as React.CSSProperties,
     backgroundImage: gameBg3,
-    freeBets: mockFreeBets.filter(fb => fb.token.symbol === "DEGEN"),
+    freeBets: mockFreeBets.filter((fb) => fb.token.symbol === "DEGEN"),
   },
   parameters: {
     chromatic: { disable: true },

@@ -204,7 +204,7 @@
 
     --free-bet-border: oklch(0.7126 0.1322 165.92);
     --free-bet-text-label: oklch(1 0 0);
-    --free-bet-card-section-bg: oklch(0.9126 0.0029 264.54)
+    --free-bet-card-section-bg: oklch(0.9126 0.0029 264.54);
   }
 
   .dark {

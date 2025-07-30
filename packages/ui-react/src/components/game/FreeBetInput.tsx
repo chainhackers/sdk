@@ -1,6 +1,7 @@
 import { ChevronDown, Gift, X } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { TokenWithImage } from "../../types/types"
+import { Button } from "../ui/button"
 import { Label } from "../ui/label"
 import { TokenIcon } from "../ui/TokenIcon"
 
@@ -26,8 +27,9 @@ export function FreeBetInput({
       </Label>
       <div className="relative mt-4 flex h-12 w-full items-center text-sm">
         {/* Freebet Tag */}
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={onRemoveFreebet}
           className={cn(
             "absolute right-0 bottom-full z-10",
@@ -35,15 +37,21 @@ export function FreeBetInput({
             "rounded-t-lg bg-game-win px-2 py-1",
             "text-xs font-bold text-free-bet-text-label",
             "cursor-pointer transition-opacity hover:opacity-90",
+            "h-auto w-auto",
+            "hover:bg-game-win hover:text-free-bet-text-label",
+            "rounded-t-lg rounded-b-none",
+            "ring-0 ring-offset-0 focus-visible:ring-0",
+            "inline-flex whitespace-nowrap",
           )}
         >
           <Gift size={16} />
           <span>Freebet</span>
           <X size={16} className="ml-1" />
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => !isDisabled && onClick()}
           disabled={isDisabled}
           className={cn(
@@ -56,6 +64,9 @@ export function FreeBetInput({
             "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "hover:bg-neutral-background-hover transition-colors",
+            "hover:text-foreground",
+            "justify-start",
+            "whitespace-normal",
           )}
           aria-label="Select freebet amount"
         >
@@ -70,7 +81,7 @@ export function FreeBetInput({
             <ChevronDown size={22} />
           </div>
           <span className="ml-8">{amount}</span>
-        </button>
+        </Button>
         <div
           className={cn(
             "absolute right-[12px] top-1/2 -translate-y-1/2 transform",
