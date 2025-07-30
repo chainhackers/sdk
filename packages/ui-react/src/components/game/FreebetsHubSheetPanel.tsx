@@ -98,7 +98,6 @@ export function FreebetsHubSheetPanel({
                     "flex flex-col",
                     "py-[16px]",
                     "px-[12px]",
-                    // "pb-[4px]",
                   )}
                 >
                   <p className="text-[12px] text-text-on-surface-variant">
