@@ -13,7 +13,8 @@
       "!**/node_modules/**/*",
       "!**/.turbo/**/*",
       "!**/tsconfig*.json",
-      "!**/documents/**/*.ts"
+      "!**/documents/**/*.ts",
+      "!**/packages/ui-react/**/*"
     ]
   },
   "formatter": {

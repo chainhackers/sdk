@@ -1,0 +1,58 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*storybook.log
+storybook-static
+
+# Environment files
+.env
+.env.*
+!/.env.example
+
+tasks/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Synpress cache
+.cache-synpress/
+
+# Test screenshots
+*.png
+*.jpg
+*.jpeg
+
+# Local secrets
+.secrets
+
+# Allow test directories (override root .gitignore)
+!test/
+!tests/
+
+# Internal documentation
+docs/internal/
