@@ -1,8 +1,9 @@
-import { Gift, Info } from "lucide-react"
+import { Info } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
+import { TokenIcon } from "../ui/TokenIcon"
 import { Tooltip, TooltipPrimitive, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
 import type { FreeBet } from "./BettingPanel"
 
@@ -45,7 +46,7 @@ export function FreeBetSheetPanel({
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <Gift size={18} className="text-primary" />
+                      <TokenIcon token={freeBet.token} size={18} />
                       <span className="font-medium text-foreground">
                         {freeBet.amount} {freeBet.token.symbol}
                       </span>

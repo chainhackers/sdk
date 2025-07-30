@@ -1,10 +1,11 @@
-import { Gift } from "lucide-react"
 import { useState } from "react"
 import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
+import { ChainIcon } from "../ui/ChainIcon"
 import { Input } from "../ui/input"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
+import { TokenIcon } from "../ui/TokenIcon"
 import type { FreeBet } from "./BettingPanel"
 
 const PANEL_HEIGHT_CONNECTED = "!h-[70%]" // Larger height for connected state
@@ -137,40 +138,35 @@ export function FreebetsHubSheetPanel({
 
                   <div className="flex flex-col gap-2">
                     {freebets.map((freeBet) => (
-                      <div
+                      <Button
                         key={freeBet.id}
+                        variant="ghost"
+                        onClick={() => console.log("FreeBet clicked:", freeBet)}
                         className={cn(
-                          "p-4 rounded-[12px]",
+                          "p-4 rounded-[12px] h-auto w-full",
                           "bg-surface-secondary",
                           "flex flex-col gap-3",
                           "text-[14px] leading-[22px]",
+                          "hover:bg-surface-secondary/80 transition-colors",
+                          "text-left justify-start items-stretch",
                         )}
                       >
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between w-full">
                           <h4 className="font-semibold text-base">{freeBet.title}</h4>
                           <div className="flex items-center gap-2">
-                            <Gift size={20} className="text-primary" />
+                            <TokenIcon token={freeBet.token} size={20} />
                             <span className="font-bold text-[12px] leading-[20px]">
                               {freeBet.amount} {freeBet.token.symbol}
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={cn(
-                              "inline-flex px-3 py-1 rounded-full",
-                              "bg-game-win/20 text-game-win",
-                              "text-[12px] font-bold leading-[20px]",
-                              "w-fit",
-                            )}
-                          >
-                            {freeBet.category}
-                          </span>
-                          <p className="text-[12px] leading-[18px] text-text-on-surface-variant text-right max-w-[120px]">
+                        <div className="flex items-center justify-between w-full">
+                          <ChainIcon chainId={freeBet.chainId} size={18} className="" />
+                          <p className="text-[12px] leading-[18px] text-text-on-surface-variant text-right break-words">
                             Expire: {freeBet.expiresAt}
                           </p>
                         </div>
-                      </div>
+                      </Button>
                     ))}
                   </div>
 

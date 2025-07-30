@@ -64,18 +64,16 @@ export function FreeBetInput({
           )}
           aria-label="Select freebet amount"
         >
-          <Button
-            variant="ghost"
+          <div
             className={cn(
               "absolute left-[12px] top-1/2 -translate-y-1/2 transform z-10",
               "flex items-center text-foreground font-medium gap-1",
               "h-auto w-fit p-0 bg-transparent hover:bg-transparent hover:opacity-80 transition-opacity",
               "border-0 shadow-none outline-none focus:outline-none",
             )}
-            disabled={isDisabled}
           >
             <ChevronDown size={22} />
-          </Button>
+          </div>
           <span className="ml-8">{amount}</span>
         </button>
         <div
