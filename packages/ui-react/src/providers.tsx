@@ -40,6 +40,8 @@ export function AppProviders({ children }: { children: ReactNode }) {
     },
   })
 
+  const freebetsAffiliates = affiliate ? [affiliate] : undefined
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
@@ -61,6 +63,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
             initialChainId={CHAIN.id}
             affiliate={affiliate}
             supportedChains={[base.id, polygon.id, avalanche.id]}
+            freebetsAffiliates={freebetsAffiliates}
           >
             <TokenProvider>
               <BalanceProvider>{children}</BalanceProvider>

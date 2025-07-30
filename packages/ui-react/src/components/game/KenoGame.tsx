@@ -13,6 +13,7 @@ import { useAccount } from "wagmi"
 import kenoBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
+import { useFreebets } from "../../hooks/useFreebets"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { useHouseEdge } from "../../hooks/useHouseEdge"
 import { useKenoConfiguration } from "../../hooks/useKenoConfiguration"
@@ -202,6 +203,10 @@ export function KenoGame({
   }, [selectedToken, appChainId])
 
   const { config: kenoConfig, loading: kenoConfigLoading } = useKenoConfiguration({ token })
+
+  const { freebets, freebetsInCurrentChain } = useFreebets()
+  console.log("freebets: ", freebets)
+  console.log("freebetsInCurrentChain: ", freebetsInCurrentChain)
 
   if (kenoConfigLoading || !kenoConfig) {
     return (
