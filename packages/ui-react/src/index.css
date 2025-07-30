@@ -86,6 +86,8 @@
   --color-surface-secondary: var(--surface-secondary);
   --color-scrollbar-thumb: var(--scrollbar-thumb);
   --color-free-bet-border: var(--free-bet-border);
+  --color-free-bet-text-label: var(--free-bet-text-label);
+  --color-free-bet-card-section-bg: var(--free-bet-card-section-bg);
 }
 
 @layer base {
@@ -201,6 +203,8 @@
     --scrollbar-thumb: oklch(0.1559 0.02 269.69 / 0.08);
 
     --free-bet-border: oklch(0.7126 0.1322 165.92);
+    --free-bet-text-label: oklch(1 0 0);
+    --free-bet-card-section-bg: oklch(0.9126 0.0029 264.54)
   }
 
   .dark {
@@ -263,6 +267,9 @@
     --surface-selected: oklch(0.311 0.0055 236.69);
     --surface-hover: oklch(0.311 0.0055 236.69 / 0.5);
     --scrollbar-thumb: oklch(0.1559 0.02 269.69 / 0.08);
+
+    --free-bet-text-label: oklch(0 0 0);
+    --free-bet-card-section-bg: oklch(0.3303 0.0045 219.61);
   }
 
   @font-face {

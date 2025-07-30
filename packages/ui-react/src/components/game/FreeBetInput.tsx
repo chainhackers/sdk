@@ -1,7 +1,6 @@
 import { ChevronDown, Gift, X } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { TokenWithImage } from "../../types/types"
-import { Button } from "../ui/button"
 import { Label } from "../ui/label"
 import { TokenIcon } from "../ui/TokenIcon"
 
@@ -27,25 +26,21 @@ export function FreeBetInput({
       </Label>
       <div className="relative mt-4 flex h-12 w-full items-center text-sm">
         {/* Freebet Tag */}
-        <div
+        <button
+          type="button"
+          onClick={onRemoveFreebet}
           className={cn(
             "absolute right-0 bottom-full z-10",
             "flex items-center gap-1.5",
             "rounded-t-lg bg-game-win px-2 py-1",
-            "text-xs font-bold text-white",
+            "text-xs font-bold text-free-bet-text-label",
+            "cursor-pointer transition-opacity hover:opacity-90",
           )}
         >
           <Gift size={16} />
           <span>Freebet</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onRemoveFreebet}
-            className="ml-1 h-4 w-4 rounded-full p-0 text-white hover:bg-transparent"
-          >
-            <X size={16} />
-          </Button>
-        </div>
+          <X size={16} className="ml-1" />
+        </button>
 
         <button
           type="button"

@@ -69,7 +69,7 @@ export function FreebetsHubSheetPanel({
                 <div
                   className={cn(
                     "w-full h-[110px] p-[12px] rounded-[16px]",
-                    "bg-surface-secondary",
+                    "bg-free-bet-card-section-bg",
                     "text-text-on-surface-variant",
                   )}
                 >
@@ -87,7 +87,7 @@ export function FreebetsHubSheetPanel({
                 <div
                   className={cn(
                     "rounded-[16px]",
-                    "bg-surface-secondary",
+                    "bg-free-bet-card-section-bg",
                     "gap-[8px]",
                     "flex flex-col",
                     "py-[16px]",
@@ -109,7 +109,7 @@ export function FreebetsHubSheetPanel({
                       }}
                       className={cn(
                         "flex-1",
-                        "bg-surface-secondary",
+                        "bg-free-bet-card-section-bg",
                         "border-border-stroke",
                         "rounded-[12px]",
                         "h-10",
@@ -144,10 +144,10 @@ export function FreebetsHubSheetPanel({
                         onClick={() => console.log("FreeBet clicked:", freeBet)}
                         className={cn(
                           "p-4 rounded-[12px] h-auto w-full",
-                          "bg-surface-secondary",
+                          "bg-free-bet-card-section-bg",
                           "flex flex-col gap-3",
                           "text-[14px] leading-[22px]",
-                          "hover:bg-surface-secondary/80 transition-colors",
+                          "hover:bg-free-bet-card-section-bg/80 transition-colors",
                           "text-left justify-start items-stretch",
                         )}
                       >
