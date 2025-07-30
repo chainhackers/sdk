@@ -310,6 +310,7 @@ export function BettingPanel({
             <Button
               variant="ghost"
               onClick={() => setIsFreebetsHubOpen(true)}
+              disabled={isChainSwitchingDisabled}
               className="w-[60px] h-[27px] bg-game-win/20 border border-free-bet-border rounded-[8px] flex items-center gap-1 hover:bg-game-win/30 transition-colors"
             >
               <Gift size={20} className="text-game-win" />

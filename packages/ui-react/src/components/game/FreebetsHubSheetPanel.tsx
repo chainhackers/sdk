@@ -2,11 +2,11 @@ import { useState } from "react"
 import { cn } from "../../lib/utils"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
-import { Input } from "../ui/input"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
 import type { FreeBet } from "./BettingPanel"
+import { PromoCodeInput } from "./PromoCodeInput"
 
 const PANEL_HEIGHT_CONNECTED = "!h-[70%]" // Larger height for connected state
 const PANEL_HEIGHT_DISCONNECTED = "!h-[238px]" // Smaller height for disconnected state
@@ -19,6 +19,8 @@ interface FreebetsHubSheetPanelProps {
   onClaimCode: (code: string) => void
 }
 
+const MAX_CODE_LENGTH = 10
+
 export function FreebetsHubSheetPanel({
   portalContainer,
   isConnected,
@@ -27,12 +29,16 @@ export function FreebetsHubSheetPanel({
   onClaimCode,
 }: FreebetsHubSheetPanelProps) {
   const [codeInput, setCodeInput] = useState("")
+  const [error, setError] = useState<string | null>(null)
 
   const handleClaimCode = () => {
-    if (codeInput.trim()) {
-      onClaimCode(codeInput.trim())
-      setCodeInput("")
+    if (codeInput.trim().length !== MAX_CODE_LENGTH) {
+      setError("Code must be 10 chars long")
+      return
     }
+    setError(null)
+    onClaimCode(codeInput.trim())
+    setCodeInput("")
   }
 
   return (
@@ -92,29 +98,27 @@ export function FreebetsHubSheetPanel({
                     "flex flex-col",
                     "py-[16px]",
                     "px-[12px]",
+                    // "pb-[4px]",
                   )}
                 >
                   <p className="text-[12px] text-text-on-surface-variant">
                     If you have a code, you can claim your freebet here.
                   </p>
                   <div className="flex gap-2">
-                    <Input
-                      placeholder="Code"
+                    <PromoCodeInput
                       value={codeInput}
-                      onChange={(e) => setCodeInput(e.target.value)}
+                      onChange={(e) => {
+                        setCodeInput(e.target.value)
+                        if (error) setError(null) // Reset error when user starts typing
+                      }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           handleClaimCode()
                         }
                       }}
-                      className={cn(
-                        "flex-1",
-                        "bg-free-bet-card-section-bg",
-                        "border-border-stroke",
-                        "rounded-[12px]",
-                        "h-10",
-                        "brightness-95",
-                      )}
+                      maxLength={MAX_CODE_LENGTH}
+                      error={error}
+                      placeholder="Code"
                     />
                     <Button
                       onClick={handleClaimCode}
