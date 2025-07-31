@@ -1,6 +1,6 @@
-import { CASINO_GAME_TYPE, WeightedGameConfiguration } from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, WeightedGame, WeightedGameConfiguration } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react"
-import { useRef } from "react"
+import { useMemo, useRef } from "react"
 import { Address } from "viem"
 import { WheelController, WheelGameControls } from "../../components/game/WheelGameControls"
 import { Button } from "../../components/ui/button"
@@ -119,6 +119,7 @@ function InteractiveWheelGameControls({
   config = mockWheelConfig,
   theme = "dark" as "light" | "dark",
   tooltipContent,
+  houseEdge = 200, // 2% house edge for stories
 }: {
   config?: WeightedGameConfiguration
   theme?: "light" | "dark"
@@ -126,11 +127,21 @@ function InteractiveWheelGameControls({
     number,
     { chance?: string | React.ReactNode; profit?: number; token: TokenWithImage }
   >
+  houseEdge?: number
 }) {
   const wheelControllerRef = useRef<WheelController>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const totalSectors = config.multipliers.length
+
+  const uniqueMultipliers = useMemo(() => {
+    const outputs = WeightedGame.getUniqueOutputs(config, houseEdge)
+    return outputs.map((output) => ({
+      multiplier: output.multiplier,
+      formattedMultiplier: `${output.formattedMultiplier.toFixed(2)}x`,
+      color: output.color,
+    }))
+  }, [config, houseEdge])
 
   const handleContinuousSpin = () => {
     wheelControllerRef.current?.startEndlessSpin()
@@ -158,6 +169,7 @@ function InteractiveWheelGameControls({
             theme={theme}
             parent={containerRef}
             tooltipContent={tooltipContent}
+            uniqueMultipliers={uniqueMultipliers}
           />
         </div>
 
