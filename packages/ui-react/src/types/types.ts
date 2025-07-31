@@ -1,5 +1,6 @@
 import {
   CASINO_GAME_TYPE,
+  type CasinoChainId,
   type CasinoRolledBet,
   CasinoToken,
   COINTOSS_FACE,
@@ -99,4 +100,35 @@ export interface GameDefinition<T extends GameChoice> {
   encodeInput: (choice: T["choice"]) => GameEncodedInput["encodedInput"]
   getWinChancePercent?: (choice: T["choice"]) => number | number[]
   formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
+}
+
+// Leaderboard types
+export type LeaderboardStatus = "ongoing" | "ended"
+
+export type LeaderboardBadgeStatus = "pending" | "expired"
+
+export type LeaderboardUserAction =
+  | { type: "play" }
+  | { type: "overview" }
+  | { type: "claim"; amount: string; tokenSymbol: string }
+  | { type: "none" }
+
+export interface LeaderboardPrize {
+  token: TokenWithImage
+  amount: string
+}
+
+export interface LeaderboardItem {
+  id: string
+  rank: number
+  title: string
+  chainId: CasinoChainId
+  startDate: string // ISO 8601 format
+  endDate: string // ISO 8601 format
+  status: LeaderboardStatus
+  badgeStatus?: LeaderboardBadgeStatus
+  prize: LeaderboardPrize
+  participants: number
+  isPartner: boolean
+  userAction: LeaderboardUserAction
 }
