@@ -20,6 +20,7 @@ interface ThemeSettings {
   customTheme?: {
     "--primary"?: string
     "--play-btn-font"?: string
+    "--connect-btn-font"?: string
     "--game-window-overlay"?: string
   } & React.CSSProperties
   backgroundImage: string
@@ -62,6 +63,15 @@ const GameFrameRoot = forwardRef<HTMLDivElement, GameFrameProps>(
     const themeClass = theme === "system" ? undefined : theme
     const variantConfig = getVariantConfig(variant)
 
+    const customTheme = themeSettings.customTheme
+      ? {
+          ...themeSettings.customTheme,
+          "--connect-btn-font":
+            themeSettings.customTheme["--connect-btn-font"] ??
+            themeSettings.customTheme["--primary"],
+        }
+      : undefined
+
     useEffect(() => {
       setIsMounted(true)
     }, [])
@@ -81,7 +91,7 @@ const GameFrameRoot = forwardRef<HTMLDivElement, GameFrameProps>(
         <div
           ref={ref}
           className={cn("cointoss-game-wrapper game-global-styles", themeClass, props.className)}
-          style={themeSettings.customTheme as React.CSSProperties}
+          style={customTheme as React.CSSProperties}
           {...props}
         >
           <Card

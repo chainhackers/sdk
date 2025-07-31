@@ -84,6 +84,7 @@
   --color-surface-selected: var(--surface-selected);
   --color-surface-hover: var(--surface-hover);
   --color-scrollbar-thumb: var(--scrollbar-thumb);
+  --color-connect-btn-font: var(--connect-btn-font);
 }
 
 @layer base {
@@ -196,6 +197,8 @@
     --surface-selected: oklch(0.9401 0 0);
     --surface-hover: oklch(0.9672 0 0);
     --scrollbar-thumb: oklch(0.1559 0.02 269.69 / 0.08);
+
+    --connect-btn-font: var(--primary);
   }
 
   .dark {

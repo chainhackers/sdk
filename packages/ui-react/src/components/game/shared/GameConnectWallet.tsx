@@ -12,7 +12,7 @@ export function GameConnectWallet() {
           "rounded-[12px]",
           "border border-border-stroke",
           "px-3 py-1.5 h-[44px]",
-          "text-primary",
+          "text-connect-btn-font",
         )}
         disconnectedLabel="Connect"
       >

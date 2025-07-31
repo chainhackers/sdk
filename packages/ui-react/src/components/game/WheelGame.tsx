@@ -12,6 +12,7 @@ import { useChain } from "../../context/chainContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { useHouseEdge } from "../../hooks/useHouseEdge"
+import { useWheelMultipliers } from "../../hooks/useWheelMultipliers"
 import { GameDefinition, TokenWithImage } from "../../types/types"
 import { GameFrame } from "./GameFrame"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -130,6 +131,8 @@ export function WheelGame({
 
   const wheelConfig = wheelGameDefinition?.defaultSelection.choice
 
+  const uniqueMultipliers = useWheelMultipliers(wheelConfig, houseEdge)
+
   const tooltipContent = useMemo(() => {
     if (!wheelConfig || !betAmount || houseEdge === undefined) return undefined
 
@@ -188,6 +191,7 @@ export function WheelGame({
             parent={gameFrameRef}
             tooltipContent={tooltipContent}
             onSpinningChange={setIsSpinning}
+            uniqueMultipliers={uniqueMultipliers}
           />
         </GameFrame.GameControls>
         <GameFrame.ResultWindow

@@ -6,6 +6,7 @@ export interface BaseGameProps extends React.HTMLAttributes<HTMLDivElement> {
   customTheme?: {
     "--primary"?: string
     "--play-btn-font"?: string
+    "--connect-btn-font"?: string
     "--game-window-overlay"?: string
   } & React.CSSProperties
   backgroundImage?: string
