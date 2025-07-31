@@ -148,6 +148,7 @@ const SheetBottomPanelContent = React.forwardRef<
         "-top-8",
         "focus-visible:ring-1 focus-visible:ring-primary",
       )}
+      autoFocus
     >
       <XIcon className="h-5 w-5 text-close-btn-color" />
       <span className="sr-only">Close</span>

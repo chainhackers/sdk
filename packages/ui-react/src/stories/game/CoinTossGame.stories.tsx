@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react"
+import type { FreeBet } from "../../components/game/BettingPanel"
 import { CoinTossGame, type CoinTossGameProps } from "../../components/game/CoinTossGame"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
 import { THEME_OPTIONS } from "../../types/types"
@@ -10,6 +11,42 @@ import gameBg5 from "../assets/game/game-background-5.png"
 import gameBg6 from "../assets/game/game-background-6.jpg"
 import gameBg7 from "../assets/game/game-background-7.png"
 import gameBg8 from "../assets/game/game-background-8.jpg"
+
+// Mock free bets data
+const mockFreeBets: FreeBet[] = [
+  {
+    id: "1",
+    amount: 25,
+    token: STORYBOOK_TOKENS.ETH,
+    chainId: 8453,
+    title: "Welcome Bonus",
+    expiresAt: "31.12.2024",
+  },
+  {
+    id: "2",
+    amount: 100,
+    token: STORYBOOK_TOKENS.DEGEN,
+    chainId: 8453,
+    title: "First Deposit Bonus",
+    expiresAt: "15.01.2025",
+  },
+  {
+    id: "3",
+    amount: 50,
+    token: STORYBOOK_TOKENS.ETH,
+    chainId: 8453,
+    title: "Daily Challenge Reward",
+    expiresAt: "07.08.2024",
+  },
+  {
+    id: "4",
+    amount: 200,
+    token: STORYBOOK_TOKENS.DEGEN,
+    chainId: 8453,
+    title: "VIP Member Bonus",
+    expiresAt: "30.09.2024",
+  },
+]
 
 interface StoryArgs extends CoinTossGameProps {
   token?: keyof typeof STORYBOOK_TOKENS
@@ -98,6 +135,28 @@ export const DarkTheme: Story = {
   },
 }
 
+export const LightThemeWithFreebets: Story = {
+  ...Template,
+  args: {
+    theme: "light",
+    token: "ETH",
+    freeBets: mockFreeBets,
+  },
+}
+
+export const DarkThemeWithFreebets: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    token: "ETH",
+    backgroundImage: gameBg2,
+    freeBets: mockFreeBets,
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+}
+
 export const SystemTheme: Story = {
   ...Template,
   args: {
@@ -136,6 +195,23 @@ export const ChickletLightTheme: Story = {
       "--play-btn-font": "#ffffff",
     } as React.CSSProperties,
     backgroundImage: gameBg3,
+  },
+  parameters: {
+    chromatic: { disable: true },
+  },
+}
+
+export const ChickletLightThemeWithFreebets: Story = {
+  ...Template,
+  args: {
+    theme: "light",
+    token: "DEGEN",
+    customTheme: {
+      "--primary": "rgb(239 185 1)",
+      "--play-btn-font": "#ffffff",
+    } as React.CSSProperties,
+    backgroundImage: gameBg3,
+    freeBets: mockFreeBets.filter((fb) => fb.token.symbol === "DEGEN"),
   },
   parameters: {
     chromatic: { disable: true },
@@ -184,6 +260,23 @@ export const MarticoinDarkTheme: Story = {
       "--play-btn-font": "#ffffff",
     } as React.CSSProperties,
     backgroundImage: gameBg7,
+  },
+  parameters: {
+    chromatic: { disable: true },
+  },
+}
+
+export const MarticoinDarkThemeWithFreebets: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    token: "ETH",
+    customTheme: {
+      "--primary": "hsl(13.9deg 83.1% 41.76%)",
+      "--play-btn-font": "#ffffff",
+    } as React.CSSProperties,
+    backgroundImage: gameBg7,
+    freeBets: [mockFreeBets[0], mockFreeBets[2]], // Only ETH freebets
   },
   parameters: {
     chromatic: { disable: true },

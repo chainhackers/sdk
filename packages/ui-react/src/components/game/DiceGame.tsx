@@ -37,6 +37,7 @@ export function DiceGame({
   theme = "system",
   customTheme,
   backgroundImage = diceBackground,
+  freeBets,
   ...props
 }: DiceGameProps) {
   const {
@@ -136,6 +137,7 @@ export function DiceGame({
         isApproveConfirming={isApproveConfirming}
         isRefetchingAllowance={isRefetchingAllowance}
         approveError={approveError}
+        freeBets={freeBets}
       />
     </GameFrame>
   )
