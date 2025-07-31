@@ -8,7 +8,7 @@
 
 ```shell
 # Install dependencies
-pnpm install
+npm install
 ```
 
 ### Create from Scratch
