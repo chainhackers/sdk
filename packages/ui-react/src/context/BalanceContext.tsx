@@ -126,6 +126,12 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
     }
   }, [address, queryClient, refetch])
 
+  useEffect(() => {
+    if (!nativeLoading && !erc20Loading) {
+      refetch()
+    }
+  }, [nativeLoading, erc20Loading, refetch])
+
   const contextValue = useMemo<BalanceContextValue>(
     () => ({
       balances,
