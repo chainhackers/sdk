@@ -1,16 +1,14 @@
-# Farcaster MiniKit Integration Guide
+# Farcaster Mini App Integration Guide
 
 ## Create MiniKit Project with BetSwirl
 
 ### Using Existing Template
 
-```shell
-# Clone the SDK repository
-git clone https://github.com/betswirl/sdk.git
-cd sdk/examples/farcaster-frame
+**Fork this repository:** https://github.com/BetSwirl/miniapp-ui-react-demo
 
+```shell
 # Install dependencies
-pnpm install --ignore-workspace
+pnpm install
 ```
 
 ### Create from Scratch
@@ -45,7 +43,7 @@ import { type ReactNode, useState } from "react";
 import { http, type Hex } from "viem";
 import { WagmiProvider, createConfig } from "wagmi";
 import { base } from "wagmi/chains";
-import { BetSwirlSDKProvider, type TokenWithImage } from "@betswirl/ui-react";
+import { BetSwirlSDKProvider, type TokenWithImage, TokenProvider, BalanceProvider } from "@betswirl/ui-react";
 
 const DEGEN_TOKEN: TokenWithImage = {
   address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
@@ -80,7 +78,11 @@ export function Providers(props: { children: ReactNode }) {
           config={onChainKitConfig}
         >
           <BetSwirlSDKProvider initialChainId={base.id} bankrollToken={DEGEN_TOKEN}>
-            {props.children}
+            <TokenProvider>
+              <BalanceProvider>
+                {props.children}
+              </BalanceProvider>
+            </TokenProvider>
           </BetSwirlSDKProvider>
         </MiniKitProvider>
       </QueryClientProvider>
@@ -321,7 +323,7 @@ If you added environment variables for the manifest in Vercel project settings a
 After deployment, the manifest can be viewed at this URL - `https://[your-app].vercel.app/.well-known/farcaster.json`
 
 To test your manifest:
-1. Go to `https://farcaster.xyz/~/developers/mini-apps/manifest`
+1. Go to https://farcaster.xyz/~/developers/mini-apps/manifest
 2. Paste your domain in the field without https and trailing slash (`[your-app].vercel.app`)
 
 After that, you'll be able to see your manifest and launch the mini-app in the Farcaster frame. 
