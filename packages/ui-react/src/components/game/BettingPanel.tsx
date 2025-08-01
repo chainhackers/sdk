@@ -164,8 +164,9 @@ export function BettingPanel({
     hasValidSelection
 
   const isApprovingToken = isApprovePending || isApproveConfirming
-  const isInputDisabled = !isConnected || isWaiting || isBetSuccess || isApprovingToken
-  const isChainSwitchingDisabled = isWaiting || isBetSuccess || isApprovingToken
+  const isInputDisabled =
+    !isMounted || !isConnected || isWaiting || isBetSuccess || isApprovingToken
+  const isChainSwitchingDisabled = !isMounted || isWaiting || isBetSuccess || isApprovingToken
 
   const isPlayButtonDisabled: boolean =
     isWalletConnecting ||
