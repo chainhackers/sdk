@@ -8,14 +8,14 @@
 
 ```shell
 # Install dependencies
-npm install
+pnpm install
 ```
 
 ### Create from Scratch
 
 ```shell
 # Create new MiniKit project
-npx create-onchain --mini
+pnpm create onchain --mini
 
 # ═════════════════════════════════════════════════════════════════════
 # ? Enter your Coinbase Developer Platform Client API Key: (optional) ›
@@ -26,7 +26,7 @@ npx create-onchain --mini
 cd your-mini-project
 
 # Install BetSwirl UI
-npm install @betswirl/ui-react
+pnpm add @betswirl/ui-react
 ```
 
 ### Set up Providers
@@ -168,7 +168,7 @@ export default function App() {
 ### Start dev server
 
 ```shell
-npm run dev
+pnpm dev
 ```
 
 Open in browser `http://localhost:3000/`
@@ -243,16 +243,16 @@ Choose one of the following deployment methods: **Vercel CLI** or **Git Integrat
 
 ```shell
 # Install Vercel CLI
-npm i -g vercel
+pnpm add -D vercel
 
 # Check for linting errors and fix if any
-npm run lint
+pnpm lint
 
 # Log in to Vercel
-vercel login
+pnpm vercel login
 
 # Run deployment from root project
-vercel --prod
+pnpm vercel --prod
 ```
 
 ![Vercel deploy](screenshots/vercel-deploy.png)

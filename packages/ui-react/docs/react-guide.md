@@ -6,15 +6,15 @@ bwonс## Create Demo Project
 # node --version
 # v24.2.0
 
-npm create vite@latest betswirl-ui-react-demo -- --template react-ts
+pnpm create vite@latest betswirl-ui-react-demo -- --template react-ts
 cd betswirl-ui-react-demo
-npm install
+pnpm install
 ```
 
 ## Verify Installation
 
 ```shell
-npm run dev
+pnpm dev
 # Open http://localhost:5173
 ```
 
@@ -23,7 +23,7 @@ npm run dev
 ### Install
 
 ```shell
-npm install @betswirl/ui-react
+pnpm add @betswirl/ui-react
 ```
 
 Package: [npmjs.com/package/@betswirl/ui-react](https://www.npmjs.com/package/@betswirl/ui-react)
@@ -121,7 +121,7 @@ import { CoinTossGame, DiceGame, RouletteGame, KenoGame, WheelGame } from '@bets
 ### Run
 
 ```shell
-npm run dev
+pnpm dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173)
