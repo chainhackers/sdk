@@ -7,6 +7,7 @@ export type ConfigContextValue = {
   affiliate: Address
   bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
+  freebetsAffiliates?: Address[]
 }
 
 const ConfigContext = createContext<ConfigContextValue | null>(null)
@@ -22,10 +23,17 @@ export type ConfigProviderProps = {
   affiliate?: Address
   bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
+  freebetsAffiliates?: Address[]
 }
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
-  const { children, affiliate: initialAffiliate, bankrollToken, filteredTokens } = props
+  const {
+    children,
+    affiliate: initialAffiliate,
+    bankrollToken,
+    filteredTokens,
+    freebetsAffiliates,
+  } = props
   const { appChain } = useChain()
 
   // Use the initial affiliate if provided, otherwise use the default affiliate for the app chain
@@ -39,8 +47,9 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
       affiliate,
       bankrollToken,
       filteredTokens,
+      freebetsAffiliates,
     }),
-    [affiliate, bankrollToken, filteredTokens],
+    [affiliate, bankrollToken, filteredTokens, freebetsAffiliates],
   )
 
   return <ConfigContext.Provider value={context}>{children}</ConfigContext.Provider>
