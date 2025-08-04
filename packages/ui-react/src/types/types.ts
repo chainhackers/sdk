@@ -132,3 +132,27 @@ export interface LeaderboardItem {
   isPartner: boolean
   userAction: LeaderboardUserAction
 }
+
+// Additional types for detailed leaderboard overview view
+export interface LeaderboardUserStats {
+  status: "Finalized" | "Ongoing" | "Claimable"
+  position: number
+  points: number
+  prize: {
+    amount: string
+    tokenSymbol: string
+    tokenIconUrl?: string
+  }
+  contractAddress: string
+}
+
+export interface LeaderboardRule {
+  text: string
+  isHighlighted?: boolean
+}
+
+export interface LeaderboardOverviewData extends LeaderboardItem {
+  userStats: LeaderboardUserStats
+  rules: LeaderboardRule[]
+  isExpired: boolean
+}

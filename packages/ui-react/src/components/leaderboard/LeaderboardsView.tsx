@@ -3,7 +3,11 @@ import { cn } from "../../lib/utils"
 import { LeaderboardCard } from "./LeaderboardCard"
 import { Switch } from "../ui/switch"
 
-export function LeaderboardsView() {
+interface Props {
+  onViewOverview?: (id: string) => void
+}
+
+export function LeaderboardsView({ onViewOverview }: Props) {
   const { ongoingLeaderboards, endedLeaderboards, showPartner, setShowPartner, isLoading, error } =
     useLeaderboards()
 
@@ -51,7 +55,7 @@ export function LeaderboardsView() {
         {ongoingLeaderboards.length > 0 && (
           <div className="flex flex-col gap-2">
             {ongoingLeaderboards.map((item) => (
-              <LeaderboardCard key={item.id} item={item} />
+              <LeaderboardCard key={item.id} item={item} onViewOverview={onViewOverview} />
             ))}
           </div>
         )}
@@ -62,7 +66,7 @@ export function LeaderboardsView() {
             <h2 className="text-[16px] font-semibold text-gray-900 mt-2">Ended</h2>
             <div className="flex flex-col gap-2">
               {endedLeaderboards.map((item) => (
-                <LeaderboardCard key={item.id} item={item} />
+                <LeaderboardCard key={item.id} item={item} onViewOverview={onViewOverview} />
               ))}
             </div>
           </>

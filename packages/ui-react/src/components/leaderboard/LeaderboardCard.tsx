@@ -6,9 +6,10 @@ import { ChainIcon } from "../ui/ChainIcon"
 
 interface LeaderboardCardProps {
   item: LeaderboardItem
+  onViewOverview?: (id: string) => void
 }
 
-export function LeaderboardCard({ item }: LeaderboardCardProps) {
+export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) {
   const formatDateRange = (startDate: string, endDate: string) => {
     const start = new Date(startDate)
     const end = new Date(endDate)
@@ -49,6 +50,7 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
           <Button
             key="overview"
             variant="secondary"
+            onClick={() => onViewOverview?.(item.id)}
             className={cn(
               "bg-leaderboard-overview-bg",
               "text-primary font-semibold",
@@ -78,6 +80,7 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
           <Button
             key="overview"
             variant="secondary"
+            onClick={() => onViewOverview?.(item.id)}
             className={cn(
               "bg-leaderboard-overview-bg",
               "text-primary font-semibold",
@@ -94,6 +97,7 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
           <Button
             key="overview"
             variant="secondary"
+            onClick={() => onViewOverview?.(item.id)}
             className={cn(
               "bg-leaderboard-overview-bg",
               "text-primary font-semibold",
