@@ -320,7 +320,13 @@ export function BettingPanel({
           >
             <span className="font-semibold">{formattedBalance}</span>
             <div className="flex items-center ml-1">
-              <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
+              {isMounted && (
+                <ChainIcon
+                  chainId={appChainId}
+                  size={18}
+                  className="-mr-[4px] mask-overlap-cutout"
+                />
+              )}
               <TokenIcon token={token} size={18} />
             </div>
           </Button>
