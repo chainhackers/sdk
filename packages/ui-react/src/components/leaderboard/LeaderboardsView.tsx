@@ -1,7 +1,7 @@
 import { useLeaderboards } from "../../hooks/useLeaderboards"
 import { cn } from "../../lib/utils"
-import { ScrollArea } from "../ui/scroll-area"
 import { LeaderboardCard } from "./LeaderboardCard"
+import { Switch } from "../ui/switch"
 
 export function LeaderboardsView() {
   const { ongoingLeaderboards, endedLeaderboards, showPartner, setShowPartner, isLoading, error } =
@@ -32,25 +32,16 @@ export function LeaderboardsView() {
       <div className="flex items-center justify-between mb-4">
         <span className="text-[16px] font-semibold text-gray-900">Ongoing</span>
         <label className="flex items-center gap-2 cursor-pointer">
-          <span className="text-[13px] text-gray-600">Show partner leaderboards</span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={showPartner}
-            onClick={() => setShowPartner(!showPartner)}
+          <span className="text-[12px] leading-[18px] text-gray-900">Show partner leaderboards</span>
+          <Switch
+            checked={showPartner}
+            onCheckedChange={setShowPartner}
             className={cn(
-              "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              showPartner ? "bg-blue-600" : "bg-gray-300",
+              "h-[20px] w-[36px]",
+              "data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-300",
+              "rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             )}
-          >
-            <span
-              className={cn(
-                "inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform",
-                showPartner ? "translate-x-[22px]" : "translate-x-[2px]",
-              )}
-            />
-          </button>
+          />
         </label>
       </div>
 
