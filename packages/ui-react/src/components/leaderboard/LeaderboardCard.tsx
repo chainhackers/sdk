@@ -3,7 +3,6 @@ import { cn } from "../../lib/utils"
 import type { LeaderboardItem } from "../../types/types"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
-import { TokenIcon } from "../ui/TokenIcon"
 
 interface LeaderboardCardProps {
   item: LeaderboardItem
@@ -67,9 +66,9 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
             key="claim"
             className={cn(
               "bg-primary hover:bg-primary/90",
-              "text-primary-foreground font-semibold",
-              "rounded-full h-10 flex-1",
-              "text-[14px]",
+              "text-white font-semibold",
+              "rounded-[8px] h-[32px] flex-1",
+              "text-[12px] leading-[20px]",
             )}
           >
             Claim {item.userAction.amount} {item.userAction.tokenSymbol}
@@ -82,8 +81,8 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
             className={cn(
               "bg-gray-200 hover:bg-gray-300",
               "text-foreground font-semibold",
-              "rounded-full h-10 flex-1",
-              "text-[14px]",
+              "rounded-[8px] h-[32px] flex-1",
+              "text-[12px] leading-[20px]",
             )}
           >
             Overview
@@ -98,8 +97,8 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
             className={cn(
               "bg-gray-200 hover:bg-gray-300",
               "text-foreground font-semibold",
-              "rounded-full h-10 w-full",
-              "text-[14px]",
+              "rounded-[8px] h-[32px] w-full",
+              "text-[12px] leading-[20px]",
             )}
           >
             Overview
