@@ -50,8 +50,8 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
             key="overview"
             variant="secondary"
             className={cn(
-              "bg-gray-200 hover:bg-gray-300",
-              "text-foreground font-semibold",
+              "bg-leaderboard-overview-bg",
+              "text-primary font-semibold",
               "rounded-[8px] h-[32px] flex-1",
               "text-[12px] leading-[20px]",
             )}
@@ -79,8 +79,8 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
             key="overview"
             variant="secondary"
             className={cn(
-              "bg-gray-200 hover:bg-gray-300",
-              "text-foreground font-semibold",
+              "bg-leaderboard-overview-bg",
+              "text-primary font-semibold",
               "rounded-[8px] h-[32px] flex-1",
               "text-[12px] leading-[20px]",
             )}
@@ -95,8 +95,8 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
             key="overview"
             variant="secondary"
             className={cn(
-              "bg-gray-200 hover:bg-gray-300",
-              "text-foreground font-semibold",
+              "bg-leaderboard-overview-bg",
+              "text-primary font-semibold",
               "rounded-[8px] h-[32px] w-full",
               "text-[12px] leading-[20px]",
             )}
@@ -112,7 +112,12 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
 
   return (
     <div
-      className={cn("p-[12px] rounded-[12px]", "bg-gray-100", "flex flex-col gap-[10px] h-[156px]")}
+      className={cn(
+        "p-[12px] rounded-[12px]",
+        // Use themed surface secondary background
+        "bg-surface-secondary",
+        "flex flex-col gap-[10px] h-[156px]"
+      )}
     >
       {/* Header with rank, date and badge */}
       <div className="flex items-center justify-between">
@@ -126,7 +131,7 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
           {/* Vertical Separator */}
           <span
             aria-hidden
-            className="block w-px h-[23px] bg-[var(--border)]"
+            className="block w-px h-[23px] bg-leaderboard-separator"
           />
           <span className="text-gray-500 text-[12px] leading-[18px] font-regular">
             {formatDateRange(item.startDate, item.endDate)}

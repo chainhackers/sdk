@@ -88,6 +88,8 @@
   --color-free-bet-border: var(--free-bet-border);
   --color-free-bet-text-label: var(--free-bet-text-label);
   --color-free-bet-card-section-bg: var(--free-bet-card-section-bg);
+  --color-leaderboard-overview-bg: var(--leaderboard-overview-bg);
+  --color-leaderboard-separator: var(--leaderboard-separator);
 }
 
 @layer base {
@@ -205,6 +207,10 @@
     --free-bet-border: oklch(0.7126 0.1322 165.92);
     --free-bet-text-label: oklch(1 0 0);
     --free-bet-card-section-bg: oklch(0.9126 0.0029 264.54);
+
+    --leaderboard-overview-bg: oklch(0.8453 0.0043 271.36);
+    /* Leaderboard separator color (light theme) */
+    --leaderboard-separator: oklch(0.8605 0.003 264.54);
   }
 
   .dark {
