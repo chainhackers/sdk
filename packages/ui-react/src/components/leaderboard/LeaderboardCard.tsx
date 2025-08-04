@@ -116,13 +116,18 @@ export function LeaderboardCard({ item }: LeaderboardCardProps) {
     >
       {/* Header with rank, date and badge */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-[16px]">
+        <div className="flex items-center gap-[8px]">
           <div className="flex items-center gap-[4px]">
             <ChainIcon chainId={item.chainId} size={20} />
             <span className="text-gray-600 text-[14px] leading-[22px] font-medium">
               #{item.rank}
             </span>
           </div>
+          {/* Vertical Separator */}
+          <span
+            aria-hidden
+            className="block w-px h-[23px] bg-[var(--border)]"
+          />
           <span className="text-gray-500 text-[12px] leading-[18px] font-regular">
             {formatDateRange(item.startDate, item.endDate)}
           </span>
