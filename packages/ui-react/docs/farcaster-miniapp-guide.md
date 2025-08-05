@@ -75,7 +75,7 @@ export function Providers(props: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <WagmiProvider config={config} reconnectOnMount={true}>
+    <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <MiniKitProvider
           apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
