@@ -75,13 +75,13 @@ export function Providers(props: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <MiniKitProvider
-      apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-      chain={base}
-      config={onChainKitConfig}
-    >
-      <WagmiProvider config={config} reconnectOnMount={true}>
-        <QueryClientProvider client={queryClient}>
+    <WagmiProvider config={config} reconnectOnMount={true}>
+      <QueryClientProvider client={queryClient}>
+        <MiniKitProvider
+          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+          chain={base}
+          config={onChainKitConfig}
+        >
           <BetSwirlSDKProvider 
             initialChainId={base.id}
             supportedChains={SUPPORTED_CHAIN_IDS}
@@ -92,9 +92,9 @@ export function Providers(props: { children: ReactNode }) {
               </BalanceProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>
-        </QueryClientProvider>
-      </WagmiProvider>
-    </MiniKitProvider>
+        </MiniKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 ```
