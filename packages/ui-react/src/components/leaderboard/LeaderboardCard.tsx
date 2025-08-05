@@ -146,9 +146,9 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
             className={cn(
               "px-3 py-1 rounded-full text-[11px] font-medium",
               item.badgeStatus === "pending" &&
-                "text-blue-600 border border-blue-600 rounded-[8px]",
+                "text-primary border border-primary rounded-[8px]",
               item.badgeStatus === "expired" &&
-                "text-gray-600 border border-gray-600 rounded-[8px]",
+                "text-roulette-disabled-text border border-roulette-disabled-text rounded-[8px]",
             )}
           >
             {item.badgeStatus.charAt(0).toUpperCase() + item.badgeStatus.slice(1)}

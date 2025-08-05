@@ -1,4 +1,4 @@
-import { ArrowLeft, Info, AlertCircle } from "lucide-react"
+import { ArrowLeft, Info, AlertCircle, ExternalLink } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
 import { Button } from "../ui/button"
@@ -42,7 +42,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
         <div className="p-4 flex flex-col gap-4">
           {/* Status and user stats card */}
           <div className="bg-surface-secondary rounded-[12px] p-3 flex flex-col gap-3">
-            <div className="text-[12px] text-gray-600">Status: <span className="px-2 py-0.5 rounded-full border text-[11px]">{data.userStats.status}</span></div>
+            <div className="text-[12px] text-roulette-disabled-text">Status: <span className="px-2 py-0.5 rounded-[8px] border text-[11px] border-roulette-disabled-text">{data.userStats.status}</span></div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <div className="text-[12px] text-gray-500">Your position:</div>
@@ -53,14 +53,29 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 <div className="text-[16px] font-semibold">{data.userStats.points}</div>
               </div>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="text-[12px] text-gray-500">Your current prize:</div>
-              <Button variant="secondary" className={cn("h-8 rounded-[8px] text-[12px]", "bg-leaderboard-overview-bg text-primary")}
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-1">
+                <div className="text-[12px] text-gray-500">Your current prize:</div>
+                <div className="flex items-center gap-2">
+                  <img src={data.prize.token.image} alt={data.userStats.prize.tokenSymbol} className="w-4 h-4" />
+                  <div className="text-[16px] font-semibold">{data.userStats.prize.amount}</div>
+                </div>
+              </div>
+              <Button
+                className={cn(
+                  "bg-primary hover:bg-primary/90",
+                  "text-white font-semibold",
+                  "rounded-[8px] h-[32px] px-4 py-1.5 w-fit",
+                  "text-[12px] leading-[20px]",
+                )}
               >
                 Claim {data.userStats.prize.amount} {data.userStats.prize.tokenSymbol}
               </Button>
             </div>
-            <a className="text-[12px] text-primary underline" href="#" onClick={(e)=>e.preventDefault()}>Leaderboard contract</a>
+            <a className="text-[12px] leading-[20px] text-primary flex items-center gap-1 font-bold" href="#" onClick={(e)=>e.preventDefault()}>
+              Leaderboard contract
+              <ExternalLink size={12} />
+            </a>
           </div>
 
           {/* Rules */}

@@ -15,7 +15,7 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
       symbol: "Avax",
       address: "0x0000000000000000000000000000000000000000",
       decimals: 18,
-      image: "/tokens/avax.svg",
+      image: "https://www.betswirl.com/img/tokens/AVAX.svg",
     } as any
 
     // Simple mocked item matching list structure and enriched for overview
