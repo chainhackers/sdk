@@ -1,4 +1,4 @@
-import { AlertCircle, ExternalLink, ChevronLeft } from "lucide-react"
+import { AlertCircle, ExternalLink, ChevronLeft, InfoIcon, StarIcon } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
 import { Button } from "../ui/button"
@@ -31,9 +31,13 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
       </div>
 
       <Tabs value="overview" className="px-4">
-        <TabsList className="grid grid-cols-2 w-full">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsList>
+          <TabsTrigger value="overview">
+            <InfoIcon size={20} />
+            Overview
+          </TabsTrigger>
           <TabsTrigger value="ranking" disabled>
+            <StarIcon size={20} />
             Ranking
           </TabsTrigger>
         </TabsList>
@@ -58,7 +62,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
               <div className="flex flex-col gap-1">
                 <div className="text-[12px] text-gray-500">Your current prize:</div>
                 <div className="flex items-center gap-2">
-                  <img src={data.prize.token.image} alt={data.userStats.prize.tokenSymbol} className="w-4 h-4" />
+                  <img src={data.prize.token.image} alt={data.userStats.prize.tokenSymbol} className="w-5 h-5" />
                   <div className="text-[16px] font-semibold">{data.userStats.prize.amount}</div>
                 </div>
               </div>
