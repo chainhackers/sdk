@@ -211,7 +211,7 @@ When multiple chains are configured:
 #### Simple Setup (Using Default RPCs)
 
 ```tsx
-import { createConfig, WagmiProvider } from 'wagmi'
+import { createConfig, WagmiProvider, http } from 'wagmi'
 import { base, polygon, arbitrum } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { OnchainKitProvider } from '@coinbase/onchainkit'
@@ -221,7 +221,14 @@ import { BetSwirlSDKProvider, TokenProvider, BalanceProvider } from '@betswirl/u
 const chains = [base, polygon, arbitrum]
 
 // 2. Create wagmi config (uses default public RPCs)
-const config = createConfig({ chains })
+const config = createConfig({
+  chains,
+  transports: {
+    [base.id]: http(),
+    [polygon.id]: http(),
+    [arbitrum.id]: http(),
+  },
+})
 
 // 3. Create query client
 const queryClient = new QueryClient()
