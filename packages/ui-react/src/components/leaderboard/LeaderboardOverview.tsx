@@ -1,4 +1,4 @@
-import { ArrowLeft, Info, AlertCircle, ExternalLink } from "lucide-react"
+import { AlertCircle, ExternalLink, ChevronLeft } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
 import { Button } from "../ui/button"
@@ -6,6 +6,7 @@ import { ScrollArea } from "../ui/scroll-area"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { ChainIcon } from "../ui/ChainIcon"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
+import { getChainName } from "../../lib/chainIcons"
 
 interface LeaderboardOverviewProps {
   leaderboardId: string
@@ -21,7 +22,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-2 p-4 pb-2">
         <Button variant="ghost" size="icon" onClick={onBack} className="h-8 w-8">
-          <ArrowLeft size={18} />
+          <ChevronLeft size={18} />
         </Button>
         <div className="flex items-center gap-2">
           <ChainIcon chainId={data.chainId} size={18} />
@@ -81,13 +82,44 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
           {/* Rules */}
           <div className="bg-surface-secondary rounded-[12px] p-3 flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <Info size={16} className="text-primary" />
-              <h3 className="text-[14px] font-semibold">Rules</h3>
+              <h3 className="text-[16px] leading-[24px] font-semibold">Rules</h3>
+            <div className="flex items-center gap-2 ml-auto">
+              <ChainIcon chainId={data.chainId} size={18} />
+              <span className="text-[12px] leading-[20px] text-gray-500">
+                {getChainName(data.chainId).charAt(0).toUpperCase() + getChainName(data.chainId).slice(1)}
+              </span>
+            </div>
+
             </div>
             <ul className="flex flex-col gap-2">
-              {data.rules.map((r, idx) => (
-                <li key={idx} className={cn("text-[12px] leading-[18px]", r.isHighlighted && "border border-gray-300 rounded-[8px] p-3")}>{r.text}</li>
-              ))}
+              {data.rules[0]?.isHighlighted && (
+                <Alert variant="info" >
+                  <AlertCircle className="h-[16px] w-[16px]" />
+                  <AlertDescription className="text-[12px] leading-[20px] text-black">
+                    {"A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking."}
+                  </AlertDescription>
+                </Alert>
+              )}
+              <ul className="flex flex-col gap-2">
+                <li className="text-[14px] leading-[22px] text-gray-600">
+                  <strong>The competition is scored using a point system:</strong>
+                </li>
+                <li className="text-[14px] leading-[22px] text-gray-600 ml-4">
+                  • You have to play on the dice or cointoss or roulette or keno or wheel games and on the chain Base
+                </li>
+                <li className="text-[14px] leading-[22px] text-gray-600 ml-4">
+                  • You have to play with BETS tokens
+                </li>
+                <li className="text-[14px] leading-[22px] text-gray-600 ml-4">
+                  • You earn 100 points per interval of 100 BETS
+                </li>
+                <li className="text-[14px] leading-[22px] text-gray-600">
+                  <strong>Example 1:</strong> You bet 300 BETS at dice ⇒ You earn 300 points
+                </li>
+                <li className="text-[14px] leading-[22px] text-gray-600">
+                  <strong>Example 2:</strong> You bet 1050 BETS at cointoss ⇒ You earn 1000 points
+                </li>
+              </ul>
             </ul>
           </div>
 

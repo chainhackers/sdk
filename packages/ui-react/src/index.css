@@ -91,6 +91,7 @@
   --color-leaderboard-overview-bg: var(--leaderboard-overview-bg);
   --color-leaderboard-separator: var(--leaderboard-separator);
   --color-warning-outline: var(--warning-outline);
+  --color-alert-info-outline: var(--alert-info-outline);
 }
 
 @layer base {
@@ -213,6 +214,7 @@
     --leaderboard-overview-bg: oklch(0.8453 0.0043 271.36);
     /* Leaderboard separator color (light theme) */
     --leaderboard-separator: oklch(0.8605 0.003 264.54);
+    --alert-info-outline: oklch(0.6572 0.1519 255.97);
   }
 
   .dark {
