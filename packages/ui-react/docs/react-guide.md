@@ -168,7 +168,7 @@ You can customize the SDK behavior with these optional props:
 | `affiliate` | `string` | Optional. Your wallet address to receive affiliate commissions. If not provided, default affiliate will be used |
 | `bankrollToken` | `TokenWithImage` | Optional. Default token for betting. Must include `address`, `symbol`, `decimals`, and `image` properties. [See available tokens →](./checking-available-tokens.md) |
 | `filteredTokens` | `string[]` | Optional. Array of token addresses to limit which tokens are available for selection. If not provided, all supported tokens will be available. [Learn more about token filtering →](./checking-available-tokens.md#token-filtering) |
-| `supportedChains` | `number[]` | Optional. Array of chain IDs to enable multi-chain support. If not specified, all BetSwirl-supported chains are available |
+| `supportedChains` | `number[]` | **Required.** Array of chain IDs to enable multi-chain support. Must include at least one supported chain ID |
 
 ### Multi-Chain Support
 
