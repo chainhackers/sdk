@@ -26,7 +26,7 @@ This is a **game widget library** for BetSwirl protocol casino games built with 
 ## Installation
 
 ```shell
-pnpm add @betswirl/ui-react
+npm i @betswirl/ui-react
 ```
 
 ## Features
