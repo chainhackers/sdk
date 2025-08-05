@@ -51,7 +51,7 @@ const CHAINS = [base, polygon, arbitrum, avalanche] as const;
 const SUPPORTED_CHAIN_IDS = CHAINS.map((chain) => chain.id);
 
 // Optional: You can set custom RPC URLs in the .env file.
-// If not provided, default public RPC URLs from wagmi.
+// If not provided, default public RPC URLs from wagmi will be used.
 const TRANSPORTS = {
   [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || undefined),
   [polygon.id]: http(process.env.NEXT_PUBLIC_POLYGON_RPC_URL || undefined),
