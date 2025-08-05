@@ -172,10 +172,61 @@ You can customize the SDK behavior with these optional props:
 
 ### Multi-Chain Support
 
+#### Supported Chains
+
+BetSwirl SDK supports the following chains:
+
+**Mainnet:**
+- Base (8453)
+- Polygon (137)
+- Avalanche (43114)
+- Arbitrum (42161)
+- BSC/BNB Chain (56)
+
+**Testnet:**
+- Base Sepolia (84532)
+- Polygon Amoy (80002)
+- Avalanche Fuji (43113)
+- Arbitrum Sepolia (421614)
+
 When multiple chains are configured:
 - Players can switch between chains using the chain selector in the betting panel
 - Chain preferences are persisted per wallet address
 - Token balances update automatically when switching chains
+
+**Important:** The chains specified in `supportedChains` must match the chains configured in your wagmi config:
+
+```tsx
+import { createConfig, WagmiProvider } from 'wagmi'
+import { base, polygon, arbitrum } from 'wagmi/chains'
+import { BetSwirlSDKProvider } from '@betswirl/ui-react'
+import { casinoChainIds } from '@betswirl/sdk-core' // All supported chain IDs
+
+// Define your supported chains
+const chains = [base, polygon, arbitrum]
+
+// Configure wagmi with RPC endpoints for each chain
+const config = createConfig({
+  chains,
+  transports: {
+    [base.id]: http('YOUR_BASE_RPC_URL'),
+    [polygon.id]: http('YOUR_POLYGON_RPC_URL'),
+    [arbitrum.id]: http('YOUR_ARBITRUM_RPC_URL'),
+  },
+})
+
+// Use the same chains in BetSwirlSDKProvider
+<WagmiProvider config={config}>
+  <BetSwirlSDKProvider
+    initialChainId={base.id}
+    supportedChains={chains.map(chain => chain.id)} // Must match wagmi chains!
+  >
+    <App />
+  </BetSwirlSDKProvider>
+</WagmiProvider>
+```
+
+⚠️ **Warning:** If you include a chain in `supportedChains` that is not configured in wagmi, users will see the chain option but it won't work when selected.
 
 #### TokenWithImage Interface
 
