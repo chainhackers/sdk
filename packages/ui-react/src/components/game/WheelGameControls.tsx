@@ -38,6 +38,7 @@ interface WheelGameControlsProps {
   parent?: RefObject<HTMLDivElement | null>
   tooltipContent?: Record<number, TooltipItemContent>
   onSpinningChange?: (isSpinning: boolean) => void
+  uniqueMultipliers: Array<{ multiplier: number; formattedMultiplier: string; color: string }>
 }
 
 interface MultiplierItemProps {
@@ -99,32 +100,6 @@ function createWheelSegments(config: WeightedGameConfiguration): WheelSegment[] 
       weight,
     }
   })
-}
-
-/**
- * Extracts unique multipliers from wheel segments
- * @param segments - Array of wheel segments
- * @returns Array of unique multipliers sorted by value
- */
-function getUniqueMultipliers(
-  segments: WheelSegment[],
-): Array<{ multiplier: number; formattedMultiplier: string; color: string }> {
-  const uniqueMultipliers = new Map<
-    number,
-    { multiplier: number; formattedMultiplier: string; color: string }
-  >()
-
-  for (const segment of segments) {
-    if (!uniqueMultipliers.has(segment.multiplier)) {
-      uniqueMultipliers.set(segment.multiplier, {
-        multiplier: segment.multiplier,
-        formattedMultiplier: segment.formattedMultiplier,
-        color: segment.color,
-      })
-    }
-  }
-
-  return Array.from(uniqueMultipliers.values()).sort((a, b) => a.multiplier - b.multiplier)
 }
 
 /**
@@ -216,7 +191,17 @@ function Wheel({
 }
 
 export const WheelGameControls = forwardRef<WheelController, WheelGameControlsProps>(
-  ({ config, theme = "light", parent: containerRef, tooltipContent, onSpinningChange }, ref) => {
+  (
+    {
+      config,
+      theme = "light",
+      parent: containerRef,
+      tooltipContent,
+      onSpinningChange,
+      uniqueMultipliers,
+    },
+    ref,
+  ) => {
     const segments = useMemo(() => createWheelSegments(config), [config])
 
     const {
@@ -256,8 +241,6 @@ export const WheelGameControls = forwardRef<WheelController, WheelGameControlsPr
       const winningSegment = segments[internalWinningSectorIndex]
       return winningSegment && winningSegment.multiplier === itemMultiplier
     }
-
-    const uniqueMultipliers = useMemo(() => getUniqueMultipliers(segments), [segments])
 
     return (
       <TooltipProvider>

@@ -219,6 +219,6 @@ export async function placeBet(
 
 ## Examples
 
-- [NodeJs CLI using Wagmi external client](https://github.com/BetSwirl/sdk/tree/main/examples/node)
+- [NodeJs CLI using Wagmi external client](https://github.com/BetSwirl/node-core-demo)
 - [Goat plugin using function data](https://github.com/goat-sdk/goat/pull/392)
 - [Moxie plugin using function data](https://github.com/moxie-protocol/moxie-agent-skills/pull/11)

@@ -162,8 +162,9 @@ export function BettingPanel({
     hasValidSelection
 
   const isApprovingToken = isApprovePending || isApproveConfirming
-  const isInputDisabled = !isConnected || isWaiting || isBetSuccess || isApprovingToken
-  const isChainSwitchingDisabled = isWaiting || isBetSuccess || isApprovingToken
+  const isInputDisabled =
+    !isMounted || !isConnected || isWaiting || isBetSuccess || isApprovingToken
+  const isChainSwitchingDisabled = !isMounted || isWaiting || isBetSuccess || isApprovingToken
 
   const isPlayButtonDisabled: boolean =
     isWalletConnecting ||
@@ -282,7 +283,7 @@ export function BettingPanel({
     <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-medium flex items-center">
+          <div className="text-sm font-medium flex items-center ">
             <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
             <Button
               variant="ghost"
@@ -296,31 +297,31 @@ export function BettingPanel({
             >
               <span className="font-semibold">{formattedBalance}</span>
               <div className="flex items-center ml-1">
-                <ChainIcon
-                  chainId={appChainId}
-                  size={18}
-                  className="-mr-[4px] mask-overlap-cutout"
-                />
+                {isMounted && (
+                  <ChainIcon
+                    chainId={appChainId}
+                    size={18}
+                    className="-mr-[4px] mask-overlap-cutout"
+                  />
+                )}
                 <TokenIcon token={token} size={18} />
               </div>
             </Button>
           </div>
 
-          {
-            <Button
-              variant="ghost"
-              onClick={() => setIsFreebetsHubOpen(true)}
-              disabled={isChainSwitchingDisabled}
-              className="w-[60px] h-[27px] bg-game-win/20 border border-free-bet-border rounded-[8px] flex items-center gap-1 hover:bg-game-win/30 transition-colors"
-            >
-              <Gift size={20} className="text-game-win" />
-              {freeBets.length > 0 && (
-                <span className="text-sm font-semibold text-free-bet-border">
-                  ({freeBets.length})
-                </span>
-              )}
-            </Button>
-          }
+          <Button
+            variant="ghost"
+            onClick={() => setIsFreebetsHubOpen(true)}
+            disabled={isChainSwitchingDisabled}
+            className="w-[60px] h-[27px] bg-game-win/20 border border-free-bet-border rounded-[8px] flex items-center gap-1 hover:bg-game-win/30 transition-colors"
+          >
+            <Gift size={20} className="text-game-win" />
+            {freeBets.length > 0 && (
+              <span className="text-sm font-semibold text-free-bet-border">
+                ({freeBets.length})
+              </span>
+            )}
+          </Button>
         </div>
 
         {selectedFreeBet ? (

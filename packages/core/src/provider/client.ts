@@ -37,10 +37,13 @@ import {
   type ChainId,
   FREEBET_CAMPAIGN_STATUS,
   type FreebetCampaign,
+  type FreebetCodeCampaign,
   fetchAffiliateLeaderboard,
   fetchAffiliateLeaderboards,
   fetchFreebetCampaign,
   fetchFreebetCampaigns,
+  fetchFreebetCodeCampaign,
+  fetchFreebetCodeCampaigns,
   fetchFreebets,
   fetchLeaderboard,
   fetchLeaderboards,
@@ -401,18 +404,41 @@ export abstract class BetSwirlClient {
     offset = 0,
     status?: FREEBET_CAMPAIGN_STATUS,
     affiliate?: Address,
+    chainId?: CasinoChainId,
   ): Promise<{ campaigns: FreebetCampaign[]; total: number; offset: number; limit: number }> {
     return fetchFreebetCampaigns(
       limit,
       offset,
       status,
       affiliate,
+      chainId,
       Boolean(this.betSwirlDefaultOptions.api?.testMode),
     );
   }
 
   async fetchFreebetCampaign(id: number): Promise<FreebetCampaign | null> {
     return fetchFreebetCampaign(id, Boolean(this.betSwirlDefaultOptions.api?.testMode));
+  }
+
+  async fetchFreebetCodeCampaigns(
+    limit = 10,
+    offset = 0,
+    status?: FREEBET_CAMPAIGN_STATUS,
+    affiliate?: Address,
+    chainId?: CasinoChainId,
+  ): Promise<{ campaigns: FreebetCodeCampaign[]; total: number; offset: number; limit: number }> {
+    return fetchFreebetCodeCampaigns(
+      limit,
+      offset,
+      status,
+      affiliate,
+      chainId,
+      Boolean(this.betSwirlDefaultOptions.api?.testMode),
+    );
+  }
+
+  async fetchFreebetCodeCampaign(id: number): Promise<FreebetCodeCampaign | null> {
+    return fetchFreebetCodeCampaign(id, Boolean(this.betSwirlDefaultOptions.api?.testMode));
   }
 
   async fetchLeaderboards(

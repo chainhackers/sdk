@@ -63,6 +63,7 @@ interface UseGameLogicResult<T extends GameChoice = GameChoice> {
     customTheme?: {
       "--primary"?: string
       "--play-btn-font"?: string
+      "--connect-btn-font"?: string
       "--game-window-overlay"?: string
     } & React.CSSProperties
     backgroundImage: string
