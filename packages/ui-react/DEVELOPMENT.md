@@ -192,10 +192,30 @@ The Storybook is deployed at: http://demo.betswirl-sdk.chainhackers.xyz/
 
 #### Deployment to Vercel
 
-Set **Root Directory** to `packages/ui-react` when importing. The `vercel.json` handles monorepo build commands:
-- Installs from root (`cd ../.. && pnpm install`)
-- Builds library dependencies before Storybook
-- Outputs to `storybook-static`
+**Important Configuration:**
+
+![Vercel Configuration](./docs/screenshots/storybook-vercel.png)
+
+When importing the project to Vercel, configure these settings:
+
+1. **Framework Preset**: Select `Vite`
+2. **Root Directory**: Set to `packages/ui-react`
+3. **Project Name**: Choose your project name (e.g., `ui-react-storybook`)
+
+The `vercel.json` file will automatically configure the build commands:
+- **Build Command**: `cd ../.. && pnpm build:libs && cd packages/ui-react && pnpm build-storybook`
+- **Output Directory**: `dist`
+- **Install Command**: `cd ../.. && pnpm install`
+
+**Environment Variables (Optional):**
+If you want to use custom RPC endpoints instead of default public ones, add these environment variables:
+```
+VITE_BASE_RPC_URL=https://your-base-rpc.com
+VITE_POLYGON_RPC_URL=https://your-polygon-rpc.com
+VITE_ARBITRUM_RPC_URL=https://your-arbitrum-rpc.com
+VITE_AVALANCHE_RPC_URL=https://your-avalanche-rpc.com
+```
+
 
 #### Server Setup (Alternative Deployment)
 Ensure proper permissions are set on the server:
