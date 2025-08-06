@@ -8,14 +8,14 @@
 
 ```shell
 # Install dependencies
-pnpm install
+npm install
 ```
 
 ### Create from Scratch
 
 ```shell
 # Create new MiniKit project
-pnpm create onchain --mini
+npx create-onchain --mini
 
 # ═════════════════════════════════════════════════════════════════════
 # ? Enter your Coinbase Developer Platform Client API Key: (optional) ›
@@ -26,12 +26,14 @@ pnpm create onchain --mini
 cd your-mini-project
 
 # Install BetSwirl UI
-pnpm add @betswirl/ui-react
+npm i @betswirl/ui-react
 ```
 
 ### Set up Providers
 
 Replace the code in `app/providers.tsx` with:
+
+> **Note:** For information about available networks and tokens, see [How to Check Available Tokens](checking-available-tokens.md).
 
 ```tsx
 "use client";
@@ -40,31 +42,34 @@ import { MiniKitProvider } from "@coinbase/onchainkit/minikit";
 import { type AppConfig } from '@coinbase/onchainkit'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
-import { http, type Hex } from "viem";
+import { http } from "viem";
 import { WagmiProvider, createConfig } from "wagmi";
-import { base } from "wagmi/chains";
-import { BetSwirlSDKProvider, type TokenWithImage, TokenProvider, BalanceProvider } from "@betswirl/ui-react";
+import { base, arbitrum, avalanche, polygon } from "wagmi/chains";
+import { BetSwirlSDKProvider, TokenProvider, BalanceProvider } from "@betswirl/ui-react";
 
-const DEGEN_TOKEN: TokenWithImage = {
-  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
-  symbol: "DEGEN",
-  decimals: 18,
-  image: "https://www.betswirl.com/img/tokens/DEGEN.svg",
+const CHAINS = [base, polygon, arbitrum, avalanche] as const;
+const SUPPORTED_CHAIN_IDS = CHAINS.map((chain) => chain.id);
+
+// Optional: You can set custom RPC URLs in the .env file.
+// If not provided, default public RPC URLs from wagmi will be used.
+const TRANSPORTS = {
+  [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || undefined),
+  [polygon.id]: http(process.env.NEXT_PUBLIC_POLYGON_RPC_URL || undefined),
+  [arbitrum.id]: http(process.env.NEXT_PUBLIC_ARBITRUM_RPC_URL || undefined),
+  [avalanche.id]: http(process.env.NEXT_PUBLIC_AVALANCHE_RPC_URL || undefined),
 };
 
 const config = createConfig({
-  chains: [base],
-  transports: {
-    [base.id]: http(),
-  },
+  chains: CHAINS,
+  transports: TRANSPORTS,
   ssr: true,
 });
 
 const onChainKitConfig: AppConfig = {
   wallet: {
     display: "modal",
-  }
-}
+  },
+};
 
 export function Providers(props: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -77,7 +82,10 @@ export function Providers(props: { children: ReactNode }) {
           chain={base}
           config={onChainKitConfig}
         >
-          <BetSwirlSDKProvider initialChainId={base.id} bankrollToken={DEGEN_TOKEN}>
+          <BetSwirlSDKProvider 
+            initialChainId={base.id}
+            supportedChains={SUPPORTED_CHAIN_IDS}
+          >
             <TokenProvider>
               <BalanceProvider>
                 {props.children}
@@ -168,7 +176,7 @@ export default function App() {
 ### Start dev server
 
 ```shell
-pnpm dev
+npm run dev
 ```
 
 Open in browser `http://localhost:3000/`
@@ -243,16 +251,16 @@ Choose one of the following deployment methods: **Vercel CLI** or **Git Integrat
 
 ```shell
 # Install Vercel CLI
-pnpm add -D vercel
+npm i -g vercel
 
 # Check for linting errors and fix if any
-pnpm lint
+npm run lint
 
 # Log in to Vercel
-pnpm vercel login
+vercel login
 
 # Run deployment from root project
-pnpm vercel --prod
+vercel --prod
 ```
 
 ![Vercel deploy](screenshots/vercel-deploy.png)
@@ -401,3 +409,4 @@ For more information, see: [App Discovery & Search](https://miniapps.farcaster.x
 - [MiniKit Documentation](https://docs.base.org/wallet-app/build-with-minikit/quickstart)
 - [Farcaster Mini Apps Publishing](https://miniapps.farcaster.xyz/docs/guides/publishing)
 - [Deploying to Vercel](https://vercel.com/docs/deployments)
+- [How to Check Available Tokens](checking-available-tokens.md)

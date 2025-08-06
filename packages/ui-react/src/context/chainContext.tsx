@@ -1,4 +1,4 @@
-import { CasinoChain, CasinoChainId, casinoChainById, casinoChainIds } from "@betswirl/sdk-core"
+import { CasinoChain, CasinoChainId, casinoChainById } from "@betswirl/sdk-core"
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { type Chain } from "viem"
 import { useAccount, useSwitchChain } from "wagmi"
@@ -25,14 +25,14 @@ export const useChain = () => {
 export type ChainProviderProps = {
   children: React.ReactNode
   initialChainId: CasinoChainId
-  supportedChains?: CasinoChainId[]
+  supportedChains: CasinoChainId[]
 }
 
 export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
   const { children, initialChainId, supportedChains } = props
 
-  // Use provided chains or all casino chains
-  const availableChainIds = useMemo(() => supportedChains || casinoChainIds, [supportedChains])
+  // Use provided chains
+  const availableChainIds = useMemo(() => supportedChains, [supportedChains])
 
   // Validate initialChainId is in supported chains
   const validatedInitialChainId = useMemo(
