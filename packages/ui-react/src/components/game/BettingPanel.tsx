@@ -1,23 +1,35 @@
 import {
   CASINO_GAME_TYPE,
-  FORMAT_TYPE,
+  type CasinoChainId,
   formatRawAmount,
   GAS_TOKEN_ADDRESS,
 } from "@betswirl/sdk-core"
 import { WalletModal } from "@coinbase/onchainkit/wallet"
-import Decimal from "decimal.js"
-import { ChangeEvent, useEffect, useRef, useState } from "react"
-import { parseUnits } from "viem"
+import { Gift } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { cn } from "../../lib/utils"
 import { BetStatus, ChainTokenPanelView, TokenWithImage } from "../../types/types"
+
+export interface FreeBet {
+  id: string
+  amount: number
+  token: TokenWithImage
+  chainId: CasinoChainId
+  expiresAt?: string
+  title?: string
+}
+
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
-import { Label } from "../ui/label"
 import { Sheet } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
+import { BetAmountInput } from "./BetAmountInput"
 import { ChainAndTokenSheetPanel } from "./ChainAndTokenSheetPanel"
+import { FreeBetInput } from "./FreeBetInput"
+import { FreeBetSheetPanel } from "./FreeBetSheetPanel"
+import { FreebetsHubSheetPanel } from "./FreebetsHubSheetPanel"
 
 interface BettingPanelProps {
   game: CASINO_GAME_TYPE
@@ -42,9 +54,8 @@ interface BettingPanelProps {
   approveError?: any
   portalContainer: HTMLElement | null
   isMounted: boolean
+  freeBets?: FreeBet[]
 }
-
-const BET_AMOUNT_INPUT_STEP = 0.0001
 
 export function BettingPanel({
   game,
@@ -69,27 +80,30 @@ export function BettingPanel({
   approveError,
   portalContainer,
   isMounted,
+  freeBets = [],
 }: BettingPanelProps) {
   const { appChainId, switchWalletChain } = useChain()
-  const [inputValue, setInputValue] = useState<string>("")
-  const [isValidInput, setIsValidInput] = useState<boolean>(true)
-  const [isUserTyping, setIsUserTyping] = useState<boolean>(false)
   const [isChainTokenSheetOpen, setIsChainTokenSheetOpen] = useState<boolean>(false)
   const [panelInitialView, setPanelInitialView] = useState<ChainTokenPanelView>("main")
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false)
-
-  useEffect(() => {
-    return () => {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current)
-      }
-    }
-  }, [])
+  const [isFreeBetSheetOpen, setIsFreeBetSheetOpen] = useState(false)
+  const [isFreebetsHubOpen, setIsFreebetsHubOpen] = useState(false)
+  const [wasFreebetsHubOpenBeforeWallet, setWasFreebetsHubOpenBeforeWallet] = useState(false)
+  const [selectedFreeBet, setSelectedFreeBet] = useState<FreeBet | null>(freeBets[0] || null) // Default to first freebet
 
   // Track previous values to detect actual changes
   const prevChainIdRef = useRef(appChainId)
   const prevTokenAddressRef = useRef(token.address)
+  const prevIsConnectedRef = useRef(isConnected)
+
+  // Reopen freebets hub if it was open before wallet connection
+  useEffect(() => {
+    if (!prevIsConnectedRef.current && isConnected && wasFreebetsHubOpenBeforeWallet) {
+      setIsFreebetsHubOpen(true)
+      setWasFreebetsHubOpenBeforeWallet(false)
+    }
+    prevIsConnectedRef.current = isConnected
+  }, [isConnected, wasFreebetsHubOpenBeforeWallet])
 
   // Clear bet amount when chain or token actually changes
   useEffect(() => {
@@ -98,27 +112,11 @@ export function BettingPanel({
 
     if (chainChanged || tokenChanged) {
       onBetAmountChange(undefined)
-      setInputValue("")
-      setIsValidInput(true)
     }
 
     prevChainIdRef.current = appChainId
     prevTokenAddressRef.current = token.address
   }, [appChainId, token.address, onBetAmountChange]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Sync input value with betAmount when user is not typing
-  useEffect(() => {
-    if (isUserTyping) return
-
-    if (betAmount === undefined) {
-      setInputValue("")
-      setIsValidInput(true)
-    } else {
-      const formatted = formatRawAmount(betAmount, token.decimals, FORMAT_TYPE.PRECISE)
-      setInputValue(formatted)
-      setIsValidInput(true)
-    }
-  }, [betAmount, token.decimals, isUserTyping])
 
   const {
     isAllowed: isTokenAllowed,
@@ -267,106 +265,82 @@ export function BettingPanel({
     }
   }
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newInputValue = e.target.value
+  const handleFreeBetSelect = (freeBet: FreeBet) => {
+    setSelectedFreeBet(freeBet)
+    setIsFreeBetSheetOpen(false)
+  }
 
-    setInputValue(newInputValue)
-    setIsUserTyping(true)
+  const handleRemoveFreeBet = () => {
+    setSelectedFreeBet(null)
+  }
 
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current)
-    }
-
-    typingTimeoutRef.current = setTimeout(() => {
-      setIsUserTyping(false)
-    }, 1000)
-
-    if (newInputValue === "") {
-      onBetAmountChange(undefined)
-      setIsValidInput(true)
-      return
-    }
-
-    try {
-      new Decimal(newInputValue)
-
-      try {
-        const weiValue = parseUnits(newInputValue, token.decimals)
-        onBetAmountChange(weiValue)
-        setIsValidInput(true)
-      } catch (_error) {
-        setIsValidInput(false)
-      }
-    } catch (_error) {
-      setIsValidInput(false)
-    }
+  const handleFreeBetClick = () => {
+    setIsFreeBetSheetOpen(true)
   }
 
   return (
     <div className="bg-control-panel-background p-4 rounded-[16px] flex flex-col gap-4">
       <div className="flex flex-col gap-3">
-        <div className="text-sm font-medium flex items-center">
-          <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
-          <Button
-            variant="ghost"
-            onClick={handleBalanceClick}
-            disabled={isChainSwitchingDisabled}
-            className={cn(
-              "text-sm font-medium flex items-center w-fit h-auto p-0",
-              "bg-secondary rounded-[8px] px-2 py-1",
-              "hover:opacity-80 hover:bg-secondary transition-opacity",
-            )}
-          >
-            <span className="font-semibold">{formattedBalance}</span>
-            <div className="flex items-center ml-1">
-              <ChainIcon chainId={appChainId} size={18} className="-mr-[4px] mask-overlap-cutout" />
-              <TokenIcon token={token} size={18} />
-            </div>
-          </Button>
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium flex items-center">
+            <span className="text-text-on-surface-variant">Balance:&nbsp;</span>
+            <Button
+              variant="ghost"
+              onClick={handleBalanceClick}
+              disabled={isChainSwitchingDisabled}
+              className={cn(
+                "text-sm font-medium flex items-center w-fit h-auto p-0",
+                "bg-secondary rounded-[8px] px-2 py-1",
+                "hover:opacity-80 hover:bg-secondary transition-opacity",
+              )}
+            >
+              <span className="font-semibold">{formattedBalance}</span>
+              <div className="flex items-center ml-1">
+                <ChainIcon
+                  chainId={appChainId}
+                  size={18}
+                  className="-mr-[4px] mask-overlap-cutout"
+                />
+                <TokenIcon token={token} size={18} />
+              </div>
+            </Button>
+          </div>
+
+          {
+            <Button
+              variant="ghost"
+              onClick={() => setIsFreebetsHubOpen(true)}
+              disabled={isChainSwitchingDisabled}
+              className="w-[60px] h-[27px] bg-game-win/20 border border-free-bet-border rounded-[8px] flex items-center gap-1 hover:bg-game-win/30 transition-colors"
+            >
+              <Gift size={20} className="text-game-win" />
+              {freeBets.length > 0 && (
+                <span className="text-sm font-semibold text-free-bet-border">
+                  ({freeBets.length})
+                </span>
+              )}
+            </Button>
+          }
         </div>
 
-        <Label
-          htmlFor="betAmount"
-          className="text-sm font-medium -mb-1 text-text-on-surface-variant"
-        >
-          Bet amount
-        </Label>
-        <div className="relative flex h-12 w-full items-center text-sm">
-          <input
-            id="betAmount"
-            type="number"
-            placeholder="0"
-            min={0}
-            max={Number.parseFloat(formattedBalance)}
-            step={BET_AMOUNT_INPUT_STEP}
-            value={inputValue}
-            onChange={handleInputChange}
-            disabled={isInputDisabled}
-            className={cn(
-              "flex h-full w-full rounded-[12px] border-0",
-              "bg-neutral-background text-foreground font-semibold",
-              "px-4 py-2 pr-16",
-              "text-base placeholder:text-muted-foreground",
-              "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              !isValidInput && "text-muted-foreground",
-            )}
+        {selectedFreeBet ? (
+          <FreeBetInput
+            amount={selectedFreeBet.amount}
+            token={selectedFreeBet.token}
+            isDisabled={isInputDisabled}
+            onClick={handleFreeBetClick}
+            onRemoveFreebet={handleRemoveFreeBet}
           />
-          <Button
-            variant="ghost"
-            onClick={handleTokenClick}
-            className={cn(
-              "absolute right-[12px] top-1/2 -translate-y-1/2 transform",
-              "flex items-center text-foreground font-medium gap-1",
-              "h-auto w-fit p-0 bg-transparent hover:bg-transparent hover:opacity-80 transition-opacity",
-              "border-0 shadow-none outline-none focus:outline-none",
-            )}
-            disabled={isInputDisabled}
-          >
-            <TokenIcon token={token} size={18} />
-            <span>{token.symbol}</span>
-          </Button>
-        </div>
+        ) : (
+          <BetAmountInput
+            betAmount={betAmount}
+            onBetAmountChange={onBetAmountChange}
+            token={token}
+            isDisabled={isInputDisabled}
+            onTokenClick={handleTokenClick}
+            formattedBalance={formattedBalance}
+          />
+        )}
 
         <div className="grid grid-cols-3 gap-2">
           <Button
@@ -422,6 +396,39 @@ export function BettingPanel({
           <ChainAndTokenSheetPanel
             portalContainer={portalContainer}
             initialView={panelInitialView}
+          />
+        )}
+      </Sheet>
+      <Sheet
+        open={isFreeBetSheetOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsFreeBetSheetOpen(false)
+          }
+        }}
+      >
+        {isMounted && portalContainer && (
+          <FreeBetSheetPanel
+            portalContainer={portalContainer}
+            freeBets={freeBets}
+            selectedFreeBet={selectedFreeBet}
+            onSelect={handleFreeBetSelect}
+          />
+        )}
+      </Sheet>
+      <Sheet open={isFreebetsHubOpen} onOpenChange={setIsFreebetsHubOpen}>
+        {isMounted && portalContainer && (
+          <FreebetsHubSheetPanel
+            portalContainer={portalContainer}
+            isConnected={isConnected}
+            freebets={freeBets}
+            onConnectWallet={() => {
+              setWasFreebetsHubOpenBeforeWallet(true)
+              setIsFreebetsHubOpen(false)
+              // Small delay to ensure sheet closes before opening wallet modal
+              setTimeout(() => setIsWalletModalOpen(true), 100)
+            }}
+            onClaimCode={(code) => console.log("Claiming code:", code)}
           />
         )}
       </Sheet>

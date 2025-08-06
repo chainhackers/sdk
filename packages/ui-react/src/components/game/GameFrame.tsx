@@ -8,7 +8,7 @@ import { BetStatus, GameResult, HistoryEntry, Theme, TokenWithImage } from "../.
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Sheet, SheetTrigger } from "../ui/sheet"
-import { BettingPanel } from "./BettingPanel"
+import { BettingPanel, type FreeBet } from "./BettingPanel"
 import { GameResultWindow } from "./GameResultWindow"
 import { HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
@@ -282,6 +282,7 @@ interface BettingSectionProps {
   hasValidSelection?: boolean
   isRefetchingAllowance?: boolean
   approveError?: any
+  freeBets?: FreeBet[]
 }
 
 function BettingSection(props: BettingSectionProps) {
