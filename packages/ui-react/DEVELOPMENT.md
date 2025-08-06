@@ -190,7 +190,14 @@ Package is published to npm registry and users can install: `pnpm add @betswirl/
 
 The Storybook is deployed at: http://demo.betswirl-sdk.chainhackers.xyz/
 
-#### Server Setup
+#### Deployment to Vercel
+
+Set **Root Directory** to `packages/ui-react` when importing. The `vercel.json` handles monorepo build commands:
+- Installs from root (`cd ../.. && pnpm install`)
+- Builds library dependencies before Storybook
+- Outputs to `storybook-static`
+
+#### Server Setup (Alternative Deployment)
 Ensure proper permissions are set on the server:
 
 ```shell
