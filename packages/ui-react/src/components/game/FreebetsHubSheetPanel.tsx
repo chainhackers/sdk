@@ -53,7 +53,7 @@ export function FreebetsHubSheetPanel({
       >
         <ScrollArea className="h-full w-full rounded-t-[16px] overflow-hidden">
           <div className="flex flex-col p-[16px]">
-            <h2 className="text-xl font-bold mb-[12px] leading-[24px]">Freebets</h2>
+            <h2 className="text-xl font-bold mb-[12px] leading-[24px] text-[18px]">Freebets</h2>
 
             {!isConnected ? (
               // Disconnected state
@@ -77,14 +77,15 @@ export function FreebetsHubSheetPanel({
                     "w-full h-[110px] p-[12px] rounded-[16px]",
                     "bg-free-bet-card-section-bg",
                     "text-text-on-surface-variant",
+                    "flex flex-col gap-3",
                   )}
                 >
-                  <h3 className="font-semibold text-foreground mb-1">Casino freebets</h3>
-                  <p className="leading-relaxed text-[12px]">
-                    Connect your wallet to view and manage your freebets.
-                  </p>
-                  <p className="leading-relaxed text-[12px]">
-                    When you win a casino freebet, you receive the entire won payout.
+                  <h3 className="font-semibold text-foreground text-[16px] leading-[16px]">
+                    Casino freebets
+                  </h3>
+                  <p className="leading-relaxed text-[12px] leading-[18px]">
+                    Connect your wallet to view and manage your freebets. When you win a casino
+                    freebet, you receive the entire won payout.
                   </p>
                 </div>
               </div>
@@ -141,39 +142,41 @@ export function FreebetsHubSheetPanel({
                 <div className="flex flex-col gap-[8px]">
                   <h3 className="font-bold text-[16px] leading-[24px]">Casino freebets</h3>
 
-                  <div className="flex flex-col gap-2">
-                    {freebets.map((freeBet) => (
-                      <Button
-                        key={freeBet.id}
-                        variant="ghost"
-                        onClick={() => console.log("FreeBet clicked:", freeBet)}
-                        className={cn(
-                          "p-4 rounded-[12px] h-auto w-full",
-                          "bg-free-bet-card-section-bg",
-                          "flex flex-col gap-3",
-                          "text-[14px] leading-[22px]",
-                          "hover:bg-free-bet-card-section-bg/80 transition-colors",
-                          "text-left justify-start items-stretch",
-                        )}
-                      >
-                        <div className="flex items-center justify-between w-full">
-                          <h4 className="font-semibold text-base">{freeBet.title}</h4>
-                          <div className="flex items-center gap-2">
-                            <TokenIcon token={freeBet.token} size={20} />
-                            <span className="font-bold text-[12px] leading-[20px]">
-                              {freeBet.amount} {freeBet.token.symbol}
-                            </span>
+                  {freebets.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      {freebets.map((freeBet) => (
+                        <Button
+                          key={freeBet.id}
+                          variant="ghost"
+                          onClick={() => console.log("FreeBet clicked:", freeBet)}
+                          className={cn(
+                            "p-4 rounded-[12px] h-auto w-full",
+                            "bg-free-bet-card-section-bg",
+                            "flex flex-col gap-3",
+                            "text-[14px] leading-[22px]",
+                            "hover:bg-free-bet-card-section-bg/80 transition-colors",
+                            "text-left justify-start items-stretch",
+                          )}
+                        >
+                          <div className="flex items-center justify-between w-full">
+                            <h4 className="font-semibold text-base">{freeBet.title}</h4>
+                            <div className="flex items-center gap-2">
+                              <TokenIcon token={freeBet.token} size={20} />
+                              <span className="font-bold text-[12px] leading-[20px]">
+                                {freeBet.amount} {freeBet.token.symbol}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center justify-between w-full">
-                          <ChainIcon chainId={freeBet.chainId} size={18} className="" />
-                          <p className="text-[12px] leading-[18px] text-text-on-surface-variant text-right break-words">
-                            Expire: {freeBet.expiresAt}
-                          </p>
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
+                          <div className="flex items-center justify-between w-full">
+                            <ChainIcon chainId={freeBet.chainId} size={18} className="" />
+                            <p className="text-[12px] leading-[18px] text-text-on-surface-variant text-right break-words">
+                              Expire: {freeBet.expiresAt}
+                            </p>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Footer text */}
                   <p className="text-[12px] leading-[18px] text-text-on-surface-variant">
