@@ -156,3 +156,12 @@ export interface LeaderboardOverviewData extends LeaderboardItem {
   rules: LeaderboardRule[]
   isExpired: boolean
 }
+
+// Types for ranking tab
+export interface RankingEntry {
+  rank: number
+  playerAddress: string
+  points: number
+  rewardAmount: string
+  rewardToken: TokenWithImage
+}

@@ -92,6 +92,9 @@
   --color-leaderboard-separator: var(--leaderboard-separator);
   --color-warning-outline: var(--warning-outline);
   --color-alert-info-outline: var(--alert-info-outline);
+  --color-leaderboard-rank-gold: var(--leaderboard-rank-gold);
+  --color-leaderboard-rank-silver: var(--leaderboard-rank-silver);
+  --color-leaderboard-rank-bronze: var(--leaderboard-rank-bronze);
 }
 
 @layer base {
@@ -215,6 +218,10 @@
     /* Leaderboard separator color (light theme) */
     --leaderboard-separator: oklch(0.8605 0.003 264.54);
     --alert-info-outline: oklch(0.6572 0.1519 255.97);
+
+    --leaderboard-rank-gold: oklch(0.6138 0.1181 77.78);
+    --leaderboard-rank-silver: oklch(0.5852 0.0106 286.07);
+    --leaderboard-rank-bronze: oklch(0.482 0.1079 43.87);
   }
 
   .dark {
