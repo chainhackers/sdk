@@ -1,5 +1,17 @@
 # @betswirl/ui-react
 
+## 0.1.9
+
+### Patch Changes
+
+- Make supportedChains parameter required, update provider configs, update docs
+
+## 0.1.8
+
+### Patch Changes
+
+- Update documentation and fix configuration files
+
 ## 0.1.7
 
 ### Patch Changes

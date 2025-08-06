@@ -25,7 +25,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "bg-neutral-background text-foreground font-normal",
             "px-4 py-2",
             hasTokenInfo ? "pr-16 md:pr-20" : "",
-            "text-base placeholder:text-muted-foreground",
+            "placeholder:text-muted-foreground",
             "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary",
             "disabled:cursor-not-allowed disabled:opacity-50",
           )}

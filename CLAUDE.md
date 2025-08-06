@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Build
 - `pnpm build` - Build all packages using Turborepo
-- `pnpm build:libs` - Build only library packages (excludes examples)
+- `pnpm build:libs` - Build only library packages
 - `pnpm build:libs:prod` - Production build with NODE_ENV=production
 
 ### Linting

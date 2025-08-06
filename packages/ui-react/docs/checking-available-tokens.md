@@ -2,7 +2,7 @@
 
 This guide explains how to find which tokens are available for betting in the BetSwirl protocol on different blockchain networks.
 
-> **Note:** Currently, this library only supports **Base network**. Multi-chain support is coming soon.
+> **Note:** This library supports multiple blockchain networks. See the list below for all supported chains.
 
 ## Bank Contract Addresses
 
@@ -17,19 +17,30 @@ All mainnet networks use the same Bank contract address: `0x8FB3110015FBCAA469ee
 - **Avalanche** (43114): [0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA](https://snowtrace.io/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA#readContract)
 - **BSC** (56): [0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA](https://bscscan.com/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA#readContract)
 
+### Testnet Networks
+- **Base Sepolia** (84532): [0x637D401554875a330264e910A3778DAf549F2021](https://sepolia.basescan.org/address/0x637D401554875a330264e910A3778DAf549F2021#readContract)
+- **Polygon Amoy** (80002): [0x89D47048152581633579450DC4888C931CD4c28C](https://amoy.polygonscan.com/address/0x89D47048152581633579450DC4888C931CD4c28C#readContract)
+- **Avalanche Fuji** (43113): [0x25bED5A341218Df801a64951d02d3c968E84a6d4](https://testnet.snowtrace.io/address/0x25bED5A341218Df801a64951d02d3c968E84a6d4#readContract)
+- **Arbitrum Sepolia** (421614): [0x3ca54e047aE5f9141b49c6817aa7994CDc589d19](https://sepolia.arbiscan.io/address/0x3ca54e047aE5f9141b49c6817aa7994CDc589d19#readContract)
 
 ## Step-by-Step Guide to Check Tokens
 
 ### 1. Open the Block Explorer
 
-For Base network (currently the only supported network):
-- **Base**: https://basescan.org
+Choose the appropriate block explorer for your network:
 
-For other networks (when multi-chain support is added):
+**Mainnet:**
+- **Base**: https://basescan.org
 - **Arbitrum**: https://arbiscan.io
 - **Polygon**: https://polygonscan.com
 - **Avalanche**: https://snowtrace.io
 - **BSC**: https://bscscan.com
+
+**Testnet:**
+- **Base Sepolia**: https://sepolia.basescan.org
+- **Arbitrum Sepolia**: https://sepolia.arbiscan.io
+- **Polygon Amoy**: https://amoy.polygonscan.com
+- **Avalanche Fuji**: https://testnet.snowtrace.io
 
 ### 2. Navigate to the Bank Contract
 
@@ -79,7 +90,7 @@ Once you know which tokens are available, you can use them in your app:
 
 ```tsx
 import type { TokenWithImage } from '@betswirl/ui-react'
-import { base } from 'wagmi/chains'
+import { base, polygon, arbitrum } from 'wagmi/chains'
 
 // Example token configuration
 const DEGEN_TOKEN: TokenWithImage = {
@@ -89,27 +100,28 @@ const DEGEN_TOKEN: TokenWithImage = {
   image: "https://www.betswirl.com/img/tokens/DEGEN.svg"
 }
 
-// Native token (ETH on Base)
-const ETH_TOKEN: TokenWithImage = {
+// Native token (ETH on Base, MATIC on Polygon, etc.)
+const NATIVE_TOKEN: TokenWithImage = {
   address: "0x0000000000000000000000000000000000000000",
-  symbol: "ETH",
+  symbol: "ETH", // or "MATIC", "AVAX", etc. depending on chain
   decimals: 18,
   image: "https://www.betswirl.com/img/tokens/ETH.svg"
 }
 
-// USDC token
+// USDC token (address may vary by chain)
 const USDC_TOKEN: TokenWithImage = {
-  address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // Base address
   symbol: "USDC",
   decimals: 6,
   image: "https://www.betswirl.com/img/tokens/USDC.svg"
 }
 
-// Use in BetSwirlSDKProvider
+// Use in BetSwirlSDKProvider with multi-chain support
 <BetSwirlSDKProvider
   initialChainId={base.id}
+  supportedChains={[base.id, polygon.id, arbitrum.id]}
   bankrollToken={DEGEN_TOKEN}
-  filteredTokens={[DEGEN_TOKEN.address, ETH_TOKEN.address]} // Optional: limit available tokens
+  filteredTokens={[DEGEN_TOKEN.address, NATIVE_TOKEN.address]} // Optional: limit available tokens
 >
   <YourApp />
 </BetSwirlSDKProvider>
@@ -170,7 +182,7 @@ return (
 )
 ```
 
-## Available Tokens by Network (as of July 2025)
+## Available Tokens by Network (as of August 2025)
 
 ### Base
 - **ETH** - Native token

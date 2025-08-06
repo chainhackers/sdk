@@ -182,7 +182,7 @@ pnpm change:publish      # Publish to npm
 git push
 ```
 
-Package is published to npm registry and users can install: `npm install @betswirl/ui-react@X.X.X`
+Package is published to npm registry and users can install: `pnpm add @betswirl/ui-react@X.X.X`
 
 ## Deployment
 

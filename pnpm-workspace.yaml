@@ -2,7 +2,8 @@ packages:
   - 'packages/core'
   - 'packages/ui-react'
   - 'packages/providers/*'
-  - 'examples/node'
+  - documentation
+
 
 catalog:
     viem: ^2.22.23

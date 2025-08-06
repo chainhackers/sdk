@@ -27,9 +27,9 @@ export function useIsGamePaused(props: UseIsGamePausedProps) {
   }, [props.game, appChainId, isEnabled])
 
   const wagmiHook = useReadContract({
-    abi: functionData?.data.abi || [],
+    abi: functionData?.data.abi,
     address: functionData?.data.to,
-    functionName: functionData?.data.functionName || "paused",
+    functionName: functionData?.data.functionName,
     args: functionData?.data.args,
     chainId: appChainId,
     query: {

@@ -5,7 +5,7 @@ import { ConfigProvider, ConfigProviderProps } from "./configContext"
 
 type BetSwirlSDKProviderProps = ChainProviderProps &
   ConfigProviderProps & {
-    supportedChains?: CasinoChainId[]
+    supportedChains: CasinoChainId[]
   }
 
 export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) => {
