@@ -43,11 +43,6 @@ tasks/
 # Synpress cache
 .cache-synpress/
 
-# Test screenshots
-*.png
-*.jpg
-*.jpeg
-
 # Allow test directories (override root .gitignore)
 !test/
 !tests/
