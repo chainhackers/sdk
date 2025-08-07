@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@import "nextra-theme-docs/style.css";
 :root {
   --background: #ffffff;
   --foreground: #171717;
