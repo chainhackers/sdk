@@ -52,7 +52,7 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
             variant="secondary"
             onClick={() => onViewOverview?.(item.id)}
             className={cn(
-              "bg-leaderboard-overview-bg",
+              "bg-button-secondary-bg",
               "text-primary font-semibold",
               "rounded-[8px] h-[32px] flex-1",
               "text-[12px] leading-[20px]",
@@ -82,7 +82,7 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
             variant="secondary"
             onClick={() => onViewOverview?.(item.id)}
             className={cn(
-              "bg-leaderboard-overview-bg",
+              "bg-button-secondary-bg",
               "text-primary font-semibold",
               "rounded-[8px] h-[32px] flex-1",
               "text-[12px] leading-[20px]",
@@ -99,7 +99,7 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
             variant="secondary"
             onClick={() => onViewOverview?.(item.id)}
             className={cn(
-              "bg-leaderboard-overview-bg",
+              "bg-button-secondary-bg",
               "text-primary font-semibold",
               "rounded-[8px] h-[32px] w-full",
               "text-[12px] leading-[20px]",
@@ -118,8 +118,7 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
     <div
       className={cn(
         "p-[12px] rounded-[12px]",
-        // Use themed surface secondary background
-        "bg-surface-secondary",
+        "bg-free-bet-card-section-bg text-foreground",
         "flex flex-col gap-[10px] h-[156px]",
       )}
     >
@@ -128,13 +127,13 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
         <div className="flex items-center gap-[8px]">
           <div className="flex items-center gap-[4px]">
             <ChainIcon chainId={item.chainId} size={20} />
-            <span className="text-gray-600 text-[14px] leading-[22px] font-medium">
+            <span className="text-foreground text-[14px] leading-[22px] font-medium">
               #{item.rank}
             </span>
           </div>
           {/* Vertical Separator */}
           <span aria-hidden className="block w-px h-[23px] bg-leaderboard-separator" />
-          <span className="text-gray-500 text-[12px] leading-[18px] font-regular">
+          <span className="text-roulette-disabled-text text-[12px] leading-[18px] font-regular">
             {formatDateRange(item.startDate, item.endDate)}
           </span>
         </div>
@@ -154,7 +153,7 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
 
       {/* Title with chain icon */}
       <div className="flex items-center">
-        <h3 className="text-gray-900 font-semibold text-[14px] leading-[22px]">{item.title}</h3>
+        <h3 className="text-foreground font-semibold text-[14px] leading-[22px]">{item.title}</h3>
       </div>
 
       {/* Prize and participants */}
@@ -173,7 +172,9 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
           </span>
         </div>
         <span>
-          <span className="text-gray-500 text-[12px] leading-[18px]">Participants:</span>{" "}
+          <span className="text-roulette-disabled-text text-[12px] leading-[18px]">
+            Participants:
+          </span>{" "}
           <span className="text-[12px] leading-[20px]">
             {formatParticipants(item.participants)}
           </span>

@@ -101,6 +101,7 @@
   --color-leaderboard-rank-bronze-start: var(--color-leaderboard-rank-bronze-start);
   --color-leaderboard-rank-bronze-mid: var(--color-leaderboard-rank-bronze-mid);
   --color-leaderboard-rank-bronze-end: var(--color-leaderboard-rank-bronze-end);
+  --color-button-secondary-bg: var(--button-secondary-bg);
 }
 
 @layer base {
@@ -147,7 +148,7 @@
     --destructive-foreground: var(--white);
 
     --border: oklch(0.93 0.0058 264.53);
-    --input: oklch(0.16 0.02 269.69 / 10%);
+    --input: oklch(0.8399 0.0061 239.84);
     --ring: transparent;
 
     --chart-1: oklch(0.646 0.222 41.116);
@@ -235,6 +236,8 @@
     --color-leaderboard-rank-bronze-start: oklch(0.482 0.1079 43.87);
     --color-leaderboard-rank-bronze-mid: oklch(0.6159 0.1039 46.17);
     --color-leaderboard-rank-bronze-end: oklch(0.7881 0.0981 48.38);
+
+    --button-secondary-bg: oklch(0.8453 0.0043 271.36);
   }
 
   .dark {
@@ -256,7 +259,7 @@
     --destructive: oklch(0.577 0.245 27.325);
     --destructive-foreground: oklch(0.9 0 0);
     --border: oklch(0.3 0 0 / 0.5);
-    --input: oklch(1 0 0 / 10%);
+    --input: oklch(0.3966 0.0078 255.53);
 
     --control-panel-background: var(--dark-stroke);
     --transparent-button-border: var(--dark-gray);
@@ -300,6 +303,9 @@
 
     --free-bet-text-label: oklch(0 0 0);
     --free-bet-card-section-bg: oklch(0.3303 0.0045 219.61);
+
+    --button-secondary-bg: oklch(0.4076 0.0031 228.85);
+    --leaderboard-separator: oklch(0.3868 0.0052 271.28);
   }
 
   @font-face {

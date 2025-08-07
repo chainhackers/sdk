@@ -30,13 +30,13 @@ export function LeaderboardsView({ onViewOverview }: Props) {
   return (
     <div className="flex flex-col p-[16px]">
       {/* Header */}
-      <h1 className="text-[24px] font-bold text-gray-900 mb-4">Leaderboards</h1>
+      <h1 className="text-[24px] font-bold text-foreground mb-4">Leaderboards</h1>
 
       {/* Partner toggle */}
       <div className="flex items-center justify-between mb-4">
-        <span className="text-[16px] font-semibold text-gray-900">Ongoing</span>
+        <span className="text-[16px] font-semibold text-foreground">Ongoing</span>
         <label className="flex items-center gap-2 cursor-pointer">
-          <span className="text-[12px] leading-[18px] text-gray-900">
+          <span className="text-[12px] leading-[18px] text-foreground">
             Show partner leaderboards
           </span>
           <Switch
@@ -65,7 +65,7 @@ export function LeaderboardsView({ onViewOverview }: Props) {
         {/* Ended section */}
         {endedLeaderboards.length > 0 && (
           <>
-            <h2 className="text-[16px] font-semibold text-gray-900 mt-2">Ended</h2>
+            <h2 className="text-[16px] font-semibold text-foreground mt-2">Ended</h2>
             <div className="flex flex-col gap-2">
               {endedLeaderboards.map((item) => (
                 <LeaderboardCard key={item.id} item={item} onViewOverview={onViewOverview} />
@@ -77,7 +77,7 @@ export function LeaderboardsView({ onViewOverview }: Props) {
         {/* Empty state */}
         {ongoingLeaderboards.length === 0 && endedLeaderboards.length === 0 && (
           <div className="flex items-center justify-center py-8">
-            <p className="text-gray-500 text-center">
+            <p className="text-foreground text-center">
               No leaderboards available
               {!showPartner && (
                 <>
