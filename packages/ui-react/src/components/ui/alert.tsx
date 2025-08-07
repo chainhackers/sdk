@@ -11,8 +11,9 @@ const alertVariants = cva(
         default: "bg-card text-card-foreground",
         destructive:
           "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90",
-        warning: "border-warning-outline bg-orange-50 text-black [&>svg]:text-warning-outline",
-        info: "border-alert-info-outline bg-alert-info-outline/10 text-black [&>svg]:text-alert-info-outline",
+        warning:
+          "border-warning-outline bg-warning-outline/10 text-foreground [&>svg]:text-warning-outline",
+        info: "border-alert-info-outline bg-alert-info-outline/10 text-foreground [&>svg]:text-alert-info-outline",
       },
     },
     defaultVariants: {
@@ -52,9 +53,8 @@ function AlertDescription({ className, ...props }: React.ComponentProps<"div">) 
     <div
       data-slot="alert-description"
       className={cn(
-        "text-muted-foreground col-span-full grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
-        // For info variant without title, position description as title and style it accordingly
-        "[div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:col-start-2 [div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:font-medium [div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:text-current [div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:text-black",
+        "col-span-full grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
+        "[div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:col-start-2 [div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:font-medium [div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:text-current",
         className,
       )}
       {...props}

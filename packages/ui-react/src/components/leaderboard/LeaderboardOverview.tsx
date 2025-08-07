@@ -110,7 +110,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
           <ScrollArea className="h-full">
             <div className="pb-4 px-4 pt-1 flex flex-col gap-4">
               {/* Status and user stats card */}
-              <div className="bg-surface-secondary rounded-[12px] p-3 flex flex-col gap-3">
+              <div className="bg-free-bet-card-section-bg rounded-[12px] p-3 flex flex-col gap-3">
                 <div className="text-[12px] text-roulette-disabled-text">
                   Status:{" "}
                   <span className="px-2 py-0.5 rounded-[8px] border text-[11px] border-roulette-disabled-text">
@@ -119,18 +119,20 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <div className="text-[12px] text-gray-500">Your position:</div>
+                    <div className="text-[12px] text-roulette-disabled-text">Your position:</div>
                     <div className="text-[16px] font-semibold">#{data.userStats.position}</div>
                   </div>
                   <div>
-                    <div className="text-[12px] text-gray-500">Your points:</div>
+                    <div className="text-[12px] text-roulette-disabled-text">Your points:</div>
                     <div className="text-[16px] font-semibold">{data.userStats.points}</div>
                   </div>
                 </div>
                 <div className="w-full h-[1px] bg-leaderboard-separator" />
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col gap-1">
-                    <div className="text-[12px] text-gray-500">Your current prize:</div>
+                    <div className="text-[12px] text-roulette-disabled-text">
+                      Your current prize:
+                    </div>
                     <div className="flex items-center gap-2">
                       <img
                         src={data.prize.token.image}
@@ -162,12 +164,12 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
               </div>
 
               {/* Rules */}
-              <div className="bg-surface-secondary rounded-[12px] p-3 flex flex-col gap-3">
+              <div className="bg-free-bet-card-section-bg rounded-[12px] p-3 flex flex-col gap-3">
                 <div className="flex items-center gap-2">
                   <h3 className="text-[16px] leading-[24px] font-semibold">Rules</h3>
                   <div className="flex items-center gap-2 ml-auto">
                     <ChainIcon chainId={data.chainId} size={18} />
-                    <span className="text-[12px] leading-[20px] text-gray-500">
+                    <span className="text-[12px] leading-[20px] text-roulette-disabled-text">
                       {getChainName(data.chainId).charAt(0).toUpperCase() +
                         getChainName(data.chainId).slice(1)}
                     </span>
@@ -177,7 +179,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                   {data.rules[0]?.isHighlighted && (
                     <Alert variant="info">
                       <AlertCircle className="h-[16px] w-[16px]" />
-                      <AlertDescription className="text-[12px] leading-[20px] text-black">
+                      <AlertDescription className="text-[12px] leading-[20px]">
                         {
                           "A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking."
                         }
@@ -185,23 +187,23 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                     </Alert>
                   )}
                   <ul className="flex flex-col gap-2">
-                    <li className="text-[14px] leading-[22px] text-gray-600">
+                    <li className="text-[14px] leading-[22px] text-foreground">
                       <strong>The competition is scored using a point system:</strong>
                     </li>
-                    <li className="text-[14px] leading-[22px] text-gray-600 ml-4">
+                    <li className="text-[14px] leading-[22px] text-foreground ml-4">
                       • You have to play on the dice or cointoss or roulette or keno or wheel games
                       and on the chain Base
                     </li>
-                    <li className="text-[14px] leading-[22px] text-gray-600 ml-4">
+                    <li className="text-[14px] leading-[22px] text-foreground ml-4">
                       • You have to play with BETS tokens
                     </li>
-                    <li className="text-[14px] leading-[22px] text-gray-600 ml-4">
+                    <li className="text-[14px] leading-[22px] text-foreground ml-4">
                       • You earn 100 points per interval of 100 BETS
                     </li>
-                    <li className="text-[14px] leading-[22px] text-gray-600">
+                    <li className="text-[14px] leading-[22px] text-foreground">
                       <strong>Example 1:</strong> You bet 300 BETS at dice ⇒ You earn 300 points
                     </li>
-                    <li className="text-[14px] leading-[22px] text-gray-600">
+                    <li className="text-[14px] leading-[22px] text-foreground">
                       <strong>Example 2:</strong> You bet 1050 BETS at cointoss ⇒ You earn 1000
                       points
                     </li>
@@ -212,10 +214,10 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
               {data.isExpired && (
                 <Alert variant="warning">
                   <AlertCircle className="h-[16px] w-[16px]" />
-                  <AlertTitle className="text-[14px] leading-[22px] font-medium text-black">
+                  <AlertTitle className="text-[14px] leading-[22px] font-medium">
                     Event expired
                   </AlertTitle>
-                  <AlertDescription className="text-[12px] leading-[20px] text-black">
+                  <AlertDescription className="text-[12px] leading-[20px]">
                     Prizes cannot be withdrawn anymore
                   </AlertDescription>
                 </Alert>
