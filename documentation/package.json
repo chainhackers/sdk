@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@napi-rs/simple-git": "^0.1.21",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "^20",
     "@types/react": "^19",
