@@ -1,25 +1,11 @@
-import {
-  CASINO_GAME_TYPE,
-  type CasinoChainId,
-  formatRawAmount,
-  GAS_TOKEN_ADDRESS,
-} from "@betswirl/sdk-core"
+import { CASINO_GAME_TYPE, formatRawAmount, GAS_TOKEN_ADDRESS } from "@betswirl/sdk-core"
 import { WalletModal } from "@coinbase/onchainkit/wallet"
 import { Gift } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useChain } from "../../context/chainContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { cn } from "../../lib/utils"
-import { BetStatus, ChainTokenPanelView, TokenWithImage } from "../../types/types"
-
-export interface FreeBet {
-  id: string
-  amount: number
-  token: TokenWithImage
-  chainId: CasinoChainId
-  expiresAt?: string
-  title?: string
-}
+import { BetStatus, ChainTokenPanelView, FreeBet, TokenWithImage } from "../../types/types"
 
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"

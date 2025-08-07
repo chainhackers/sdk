@@ -1,5 +1,6 @@
 import {
   CASINO_GAME_TYPE,
+  CasinoChainId,
   type CasinoRolledBet,
   CasinoToken,
   COINTOSS_FACE,
@@ -99,4 +100,13 @@ export interface GameDefinition<T extends GameChoice> {
   encodeInput: (choice: T["choice"]) => GameEncodedInput["encodedInput"]
   getWinChancePercent?: (choice: T["choice"]) => number | number[]
   formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
+}
+
+export interface FreeBet {
+  id: string
+  amount: number
+  token: TokenWithImage
+  chainId: CasinoChainId
+  expiresAt?: string
+  title?: string
 }

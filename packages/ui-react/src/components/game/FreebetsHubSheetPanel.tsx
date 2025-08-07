@@ -1,11 +1,11 @@
 import { useState } from "react"
 import { cn } from "../../lib/utils"
+import { FreeBet } from "../../types/types"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
-import type { FreeBet } from "./BettingPanel"
 import { PromoCodeInput } from "./PromoCodeInput"
 
 const PANEL_HEIGHT_CONNECTED = "!h-[70%]" // Larger height for connected state
@@ -159,7 +159,9 @@ export function FreebetsHubSheetPanel({
                           )}
                         >
                           <div className="flex items-center justify-between w-full">
-                            <h4 className="font-semibold text-base">{freeBet.title}</h4>
+                            <h4 className="font-semibold text-sm max-w-[150px] overflow-hidden text-ellipsis">
+                              {freeBet.title}
+                            </h4>
                             <div className="flex items-center gap-2">
                               <TokenIcon token={freeBet.token} size={20} />
                               <span className="font-bold text-[12px] leading-[20px]">

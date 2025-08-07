@@ -1,11 +1,11 @@
 import { Info } from "lucide-react"
 import { cn } from "../../lib/utils"
+import { FreeBet } from "../../types/types"
 import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
 import { Tooltip, TooltipPrimitive, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
-import type { FreeBet } from "./BettingPanel"
 
 interface FreeBetSheetPanelProps {
   portalContainer: HTMLElement

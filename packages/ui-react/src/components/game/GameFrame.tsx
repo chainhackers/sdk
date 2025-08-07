@@ -4,11 +4,18 @@ import React, { createContext, forwardRef, useContext, useEffect, useRef, useSta
 import { zeroAddress } from "viem"
 
 import { cn } from "../../lib/utils"
-import { BetStatus, GameResult, HistoryEntry, Theme, TokenWithImage } from "../../types/types"
+import {
+  BetStatus,
+  FreeBet,
+  GameResult,
+  HistoryEntry,
+  Theme,
+  TokenWithImage,
+} from "../../types/types"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Sheet, SheetTrigger } from "../ui/sheet"
-import { BettingPanel, type FreeBet } from "./BettingPanel"
+import { BettingPanel } from "./BettingPanel"
 import { GameResultWindow } from "./GameResultWindow"
 import { HistorySheetPanel } from "./HistorySheetPanel"
 import { InfoSheetPanel } from "./InfoSheetPanel"
