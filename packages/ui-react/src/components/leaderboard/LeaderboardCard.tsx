@@ -159,7 +159,14 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
 
       {/* Prize and participants */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center px-[8px] py-[2px] h-[24px] rounded-[8px] text-free-bet-border bg-free-bet-border/20 border border-free-bet-border hover:bg-free-bet-border/30 transition-colors">
+        <div
+          className={cn(
+            "flex items-center px-[8px] py-[2px] h-[24px] rounded-[8px] border transition-colors",
+            item.badgeStatus === "expired"
+              ? "text-roulette-disabled-text bg-roulette-disabled-text/20 border-roulette-disabled-text"
+              : "text-free-bet-border bg-free-bet-border/20 border-free-bet-border",
+          )}
+        >
           <Gift size={16} />
           <span className="font-medium text-[12px] leading-[20px]">
             {item.prize.token.symbol} {item.prize.amount}
