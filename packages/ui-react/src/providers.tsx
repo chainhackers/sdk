@@ -9,7 +9,9 @@ import { BalanceProvider } from "./context/BalanceContext"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
 import { TokenProvider } from "./context/tokenContext"
 
-const CHAIN = base
+// Define supported chains in one place
+const SUPPORTED_CHAINS = [base, polygon, avalanche] as const
+const DEFAULT_CHAIN = base
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,9 +34,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
     import.meta.env.VITE_AVALANCHE_RPC_URL || "https://api.avax.network/ext/bc/C/rpc"
 
   const config = createConfig({
-    chains: [CHAIN, polygon, avalanche],
+    chains: SUPPORTED_CHAINS,
     transports: {
-      [CHAIN.id]: http(baseRpcUrl),
+      [base.id]: http(baseRpcUrl),
       [polygon.id]: http(polygonRpcUrl),
       [avalanche.id]: http(avalancheRpcUrl),
     },
@@ -44,7 +46,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
-          chain={CHAIN}
+          chain={DEFAULT_CHAIN}
           config={{
             wallet: {
               display: "modal",
@@ -58,9 +60,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
           }}
         >
           <BetSwirlSDKProvider
-            initialChainId={CHAIN.id}
+            initialChainId={DEFAULT_CHAIN.id}
             affiliate={affiliate}
-            supportedChains={[base.id, polygon.id, avalanche.id]}
+            supportedChains={SUPPORTED_CHAINS.map((chain) => chain.id)}
           >
             <TokenProvider>
               <BalanceProvider>{children}</BalanceProvider>

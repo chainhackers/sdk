@@ -1,6 +1,6 @@
 # React Integration Guide
 
-bwonс## Create Demo Project
+## Create Demo Project
 
 ```shell
 # node --version
@@ -23,10 +23,10 @@ npm run dev
 ### Install
 
 ```shell
-npm install @betswirl/ui
+npm i @betswirl/ui-react
 ```
 
-Package: [npmjs.com/package/@betswirl/ui](https://www.npmjs.com/package/@betswirl/ui)
+Package: [npmjs.com/package/@betswirl/ui-react](https://www.npmjs.com/package/@betswirl/ui-react)
 
 ### Update main.tsx
 
@@ -39,19 +39,35 @@ import { OnchainKitProvider, type AppConfig } from '@coinbase/onchainkit'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, type Hex } from 'viem'
 import { WagmiProvider, createConfig } from 'wagmi'
-import { base } from 'wagmi/chains'
-import { BetSwirlSDKProvider, type TokenWithImage } from '@betswirl/ui'
-import '@betswirl/ui/styles.css'
+import { base, polygon, arbitrum } from 'wagmi/chains'
+import { BalanceProvider, BetSwirlSDKProvider, TokenProvider, type TokenWithImage } from '@betswirl/ui-react'
 import './index.css'
+import '@betswirl/ui-react/styles.css'
 import App from './App.tsx'
 
 const queryClient = new QueryClient()
+
+// Create wagmi config
+// http() without parameters = use default public RPC from wagmi
+// http('your-url') = use your custom RPC
 const config = createConfig({
-  chains: [base],
+  chains: [base, polygon, arbitrum],
   transports: {
-    [base.id]: http(),
+    [base.id]: http(),     // uses wagmi's default RPC for Base
+    [polygon.id]: http(),  // uses wagmi's default RPC for Polygon
+    [arbitrum.id]: http(), // uses wagmi's default RPC for Arbitrum
   },
 })
+
+// For production with custom RPCs from .env file:
+// const config = createConfig({
+//   chains: [base, polygon, arbitrum],
+//   transports: {
+//     [base.id]: http(import.meta.env.VITE_BASE_RPC_URL),
+//     [polygon.id]: http(import.meta.env.VITE_POLYGON_RPC_URL),
+//     [arbitrum.id]: http(import.meta.env.VITE_ARBITRUM_RPC_URL),
+//   },
+// })
 
 const onChainKitConfig: AppConfig = {
   wallet: {
@@ -61,14 +77,14 @@ const onChainKitConfig: AppConfig = {
 
 // Optional: Define tokens for your application
 const DEGEN_TOKEN: TokenWithImage = {
-  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed",
+  address: "0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed" as Hex,
   symbol: "DEGEN",
   decimals: 18,
   image: "https://www.betswirl.com/img/tokens/DEGEN.svg"
 }
 
 const ETH_TOKEN: TokenWithImage = {
-  address: "0x0000000000000000000000000000000000000000",
+  address: "0x0000000000000000000000000000000000000000" as Hex,
   symbol: "ETH",
   decimals: 18,
   image: "https://www.betswirl.com/img/tokens/ETH.svg"
@@ -78,36 +94,49 @@ const ETH_TOKEN: TokenWithImage = {
 const ALLOWED_TOKENS = [
   DEGEN_TOKEN.address,
   ETH_TOKEN.address,
-  "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC
+  "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as Hex, // USDC
 ]
 
 createRoot(document.getElementById('root')!).render(
-  <WagmiProvider config={config}>
-    <QueryClientProvider client={queryClient}>
-      <OnchainKitProvider chain={base} config={onChainKitConfig}>
-        <BetSwirlSDKProvider
-          initialChainId={base.id}
-          bankrollToken={DEGEN_TOKEN}     // Optional: set default betting token
-          filteredTokens={ALLOWED_TOKENS} // Optional: limit available tokens
-        >
-          <App />
-        </BetSwirlSDKProvider>
-      </OnchainKitProvider>
-    </QueryClientProvider>
-  </WagmiProvider>,
+  <StrictMode>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <OnchainKitProvider chain={base} config={onChainKitConfig}>
+          <BetSwirlSDKProvider
+            initialChainId={base.id}
+            supportedChains={[base.id, polygon.id, arbitrum.id]}
+            bankrollToken={DEGEN_TOKEN}     // Optional: set default betting token
+            filteredTokens={ALLOWED_TOKENS} // Optional: limit available tokens
+          >
+            <TokenProvider>
+              <BalanceProvider>
+                <App />
+              </BalanceProvider>
+            </TokenProvider>
+          </BetSwirlSDKProvider>
+        </OnchainKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  </StrictMode>,
 )
 ```
+
+This code uses default public RPCs from wagmi. No environment variables needed.
 
 ### Add Game Component
 
 In `src/App.tsx`:
 
 ```tsx
-import { CoinTossGame } from '@betswirl/ui'
+import { CoinTossGame, DiceGame, RouletteGame, KenoGame, WheelGame } from '@betswirl/ui-react'
 
-// Add component
+// Add component (choose one or multiple)
 <div style={{ margin: '2rem 0' }}>
   <CoinTossGame />
+  {/* <DiceGame /> */}
+  {/* <RouletteGame /> */}
+  {/* <KenoGame /> */}
+  {/* <WheelGame /> */}
 </div>
 ```
 
@@ -141,34 +170,115 @@ git commit -m "Add BetSwirl casino game"
 
 ### BetSwirlSDKProvider Props
 
-You can customize the SDK behavior with these optional props:
-
-```tsx
-<BetSwirlSDKProvider
-  initialChainId={base.id}
-  affiliate="0x1234567890123456789012345678901234567890"  // Your affiliate address
-  bankrollToken={customToken}                            // Default betting token
-  filteredTokens={["0x...", "0x..."]}                   // Limit available tokens
-  supportedChains={[base.id, arbitrum.id, polygon.id]}  // Enable multi-chain support
->
-  <App />
-</BetSwirlSDKProvider>
-```
-
 | Prop | Type | Description |
 |------|------|-------------|
 | `initialChainId` | `number` | **Required.** Chain ID to initialize the SDK with |
+| `supportedChains` | `number[]` | **Required.** Array of chain IDs to enable multi-chain support. Must include at least one supported chain ID |
 | `affiliate` | `string` | Optional. Your wallet address to receive affiliate commissions. If not provided, default affiliate will be used |
 | `bankrollToken` | `TokenWithImage` | Optional. Default token for betting. Must include `address`, `symbol`, `decimals`, and `image` properties. [See available tokens →](./checking-available-tokens.md) |
 | `filteredTokens` | `string[]` | Optional. Array of token addresses to limit which tokens are available for selection. If not provided, all supported tokens will be available. [Learn more about token filtering →](./checking-available-tokens.md#token-filtering) |
-| `supportedChains` | `number[]` | Optional. Array of chain IDs to enable multi-chain support. If not specified, all BetSwirl-supported chains are available |
 
 ### Multi-Chain Support
+
+To enable multiple chains, you need to:
+1. Configure the chains in wagmi config
+2. Pass the same chain IDs to `supportedChains` prop
+
+#### Supported Chains
+
+BetSwirl protocol is deployed on the following chains:
+
+**Mainnet:**
+- Base (8453)
+- Polygon (137)
+- Avalanche (43114)
+- Arbitrum (42161)
+- BSC/BNB Chain (56)
+
+**Testnet:**
+- Base Sepolia (84532)
+- Polygon Amoy (80002)
+- Avalanche Fuji (43113)
+- Arbitrum Sepolia (421614)
 
 When multiple chains are configured:
 - Players can switch between chains using the chain selector in the betting panel
 - Chain preferences are persisted per wallet address
 - Token balances update automatically when switching chains
+
+**⚠️ IMPORTANT:** You must configure the same chains in both wagmi and BetSwirlSDKProvider!
+
+#### Simple Setup (Using Default RPCs)
+
+```tsx
+import { createConfig, WagmiProvider, http } from 'wagmi'
+import { base, polygon, arbitrum } from 'wagmi/chains'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { OnchainKitProvider } from '@coinbase/onchainkit'
+import { BetSwirlSDKProvider, TokenProvider, BalanceProvider } from '@betswirl/ui-react'
+
+// 1. Choose your chains
+const chains = [base, polygon, arbitrum]
+
+// 2. Create wagmi config (uses default public RPCs)
+const config = createConfig({
+  chains,
+  transports: {
+    [base.id]: http(),
+    [polygon.id]: http(),
+    [arbitrum.id]: http(),
+  },
+})
+
+// 3. Create query client
+const queryClient = new QueryClient()
+
+// 4. Setup providers
+<WagmiProvider config={config}>
+  <QueryClientProvider client={queryClient}>
+    <OnchainKitProvider chain={base}>
+      <BetSwirlSDKProvider
+        initialChainId={base.id}
+        supportedChains={chains.map(chain => chain.id)} // Same chains!
+      >
+        <TokenProvider>
+          <BalanceProvider>
+            <App />
+          </BalanceProvider>
+        </TokenProvider>
+      </BetSwirlSDKProvider>
+    </OnchainKitProvider>
+  </QueryClientProvider>
+</WagmiProvider>
+```
+
+#### Production Setup (Custom RPCs)
+
+If you need your own RPC endpoints (recommended for production), use environment variables:
+
+```tsx
+const config = createConfig({
+  chains,
+  transports: {
+    [base.id]: http(import.meta.env.VITE_BASE_RPC_URL),
+    [polygon.id]: http(import.meta.env.VITE_POLYGON_RPC_URL),
+    [arbitrum.id]: http(import.meta.env.VITE_ARBITRUM_RPC_URL),
+  },
+})
+```
+
+Create `.env` file in your project root:
+
+```bash
+VITE_BASE_RPC_URL=https://your-base-rpc.com
+VITE_POLYGON_RPC_URL=https://your-polygon-rpc.com
+VITE_ARBITRUM_RPC_URL=https://your-arbitrum-rpc.com
+```
+
+**Why custom RPCs?** Default public RPCs have rate limits and can be slow or unreliable.
+
+⚠️ **Warning:** If you include a chain in `supportedChains` that is not configured in wagmi, users will see the chain option but it won't work when selected.
+
 
 #### TokenWithImage Interface
 
@@ -180,29 +290,6 @@ interface TokenWithImage {
   image: string        // URL to token icon image
 }
 ```
-
-### Environment Variables
-
-**You do NOT need any environment variables** when using this library. All configuration is done through React props.
-
-### Advanced Configuration (Optional)
-
-If you want to use a custom RPC endpoint for better performance, you can set:
-
-```env
-VITE_RPC_URL=https://your-custom-base-rpc.com
-```
-
-This library currently supports **Base network only**. The custom RPC URL will be used instead of the default Base RPC (`https://mainnet.base.org`).
-
-**When to use custom RPC:**
-- You have a premium RPC provider (Alchemy, Infura, etc.)
-- You want better reliability or speed
-- You're hitting rate limits on the default public RPC
-
-**When NOT needed:**
-- For most applications the default RPC works fine
-- If you're just testing or getting started
 
 ## Common Issues and Solutions
 
@@ -268,6 +355,6 @@ Use `filteredTokens` to limit available options:
 
 ## Example Result
 
-* **GitHub Repository**: [github.com/chainhackers/betswirl-ui-react-demo](https://github.com/chainhackers/betswirl-ui-react-demo)
+* **GitHub Repository**: [github.com/BetSwirl/betswirl-ui-react-demo](https://github.com/BetSwirl/betswirl-ui-react-demo)
 * **Live Demo**: [betswirl-ui-react-demo.vercel.app](https://betswirl-ui-react-demo.vercel.app)
 

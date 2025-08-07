@@ -27,3 +27,4 @@ examples/test**
 .npmrc
 
 .secrets
+.vercel
