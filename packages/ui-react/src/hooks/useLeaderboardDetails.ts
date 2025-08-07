@@ -40,9 +40,14 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
         contractAddress: "0x0000000000000000000000000000000000000000",
       },
       rules: [
-        { text: "A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking.", isHighlighted: true },
+        {
+          text: "A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking.",
+          isHighlighted: true,
+        },
         { text: "The competition is scored using a point system:" },
-        { text: "You have to play on the dice or cointoss or roulette or keno or wheel games and on the chain Base" },
+        {
+          text: "You have to play on the dice or cointoss or roulette or keno or wheel games and on the chain Base",
+        },
         { text: "You have to play with BETS tokens" },
         { text: "You earn 100 points per interval of 100 BETS" },
         { text: "Example 1: You bet 300 BETS at dice ⇒ You earn 300 points" },

@@ -1,6 +1,6 @@
+import type { RankingEntry } from "../../types/types"
 import { TokenIcon } from "../ui/TokenIcon"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
-import type { RankingEntry } from "../../types/types"
 
 interface LeaderboardRankingListProps {
   entries: RankingEntry[]
@@ -25,15 +25,9 @@ export function LeaderboardRankingList({ entries }: LeaderboardRankingListProps)
       <Table className="text-sm font-medium">
         <TableHeader>
           <TableRow className="border-b border-table-separator text-[12px] leading-[20px]">
-            <TableHead className="text-text-on-surface-variant text-left">
-              Player
-            </TableHead>
-            <TableHead className="text-text-on-surface-variant text-right">
-              Points
-            </TableHead>
-            <TableHead className="text-text-on-surface-variant text-right">
-              Reward
-            </TableHead>
+            <TableHead className="text-text-on-surface-variant text-left">Player</TableHead>
+            <TableHead className="text-text-on-surface-variant text-right">Points</TableHead>
+            <TableHead className="text-text-on-surface-variant text-right">Reward</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -44,24 +38,18 @@ export function LeaderboardRankingList({ entries }: LeaderboardRankingListProps)
             >
               <TableCell>
                 <div className="flex gap-2">
-                  <span className="text-muted-foreground font-medium">
-                    #{entry.rank}
-                  </span>
+                  <span className="text-muted-foreground font-medium">#{entry.rank}</span>
                   <span className="font-medium text-foreground">
                     {formatAddress(entry.playerAddress)}
                   </span>
                 </div>
               </TableCell>
               <TableCell className="text-right text-table-text">
-                <span className="font-medium">
-                  {entry.points.toLocaleString()}
-                </span>
+                <span className="font-medium">{entry.points.toLocaleString()}</span>
               </TableCell>
               <TableCell>
                 <div className="flex items-center justify-end gap-1">
-                  <span className="font-medium text-table-text">
-                    {entry.rewardAmount}
-                  </span>
+                  <span className="font-medium text-table-text">{entry.rewardAmount}</span>
                   <TokenIcon token={entry.rewardToken} size={16} />
                 </div>
               </TableCell>

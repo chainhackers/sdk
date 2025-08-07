@@ -92,9 +92,15 @@
   --color-leaderboard-separator: var(--leaderboard-separator);
   --color-warning-outline: var(--warning-outline);
   --color-alert-info-outline: var(--alert-info-outline);
-  --color-leaderboard-rank-gold: var(--leaderboard-rank-gold);
-  --color-leaderboard-rank-silver: var(--leaderboard-rank-silver);
-  --color-leaderboard-rank-bronze: var(--leaderboard-rank-bronze);
+  --color-leaderboard-rank-gold-start: var(--color-leaderboard-rank-gold-start);
+  --color-leaderboard-rank-gold-mid: var(--color-leaderboard-rank-gold-mid);
+  --color-leaderboard-rank-gold-end: var(--color-leaderboard-rank-gold-end);
+  --color-leaderboard-rank-silver-start: var(--color-leaderboard-rank-silver-start);
+  --color-leaderboard-rank-silver-mid: var(--color-leaderboard-rank-silver-mid);
+  --color-leaderboard-rank-silver-end: var(--color-leaderboard-rank-silver-end);
+  --color-leaderboard-rank-bronze-start: var(--color-leaderboard-rank-bronze-start);
+  --color-leaderboard-rank-bronze-mid: var(--color-leaderboard-rank-bronze-mid);
+  --color-leaderboard-rank-bronze-end: var(--color-leaderboard-rank-bronze-end);
 }
 
 @layer base {
@@ -215,13 +221,20 @@
     --free-bet-card-section-bg: oklch(0.9126 0.0029 264.54);
 
     --leaderboard-overview-bg: oklch(0.8453 0.0043 271.36);
-    /* Leaderboard separator color (light theme) */
     --leaderboard-separator: oklch(0.8605 0.003 264.54);
     --alert-info-outline: oklch(0.6572 0.1519 255.97);
 
-    --leaderboard-rank-gold: oklch(0.6138 0.1181 77.78);
-    --leaderboard-rank-silver: oklch(0.5852 0.0106 286.07);
-    --leaderboard-rank-bronze: oklch(0.482 0.1079 43.87);
+    --color-leaderboard-rank-gold-start: oklch(0.9 0.12 95);
+    --color-leaderboard-rank-gold-mid: oklch(0.8653 0.1255 100.61);
+    --color-leaderboard-rank-gold-end: oklch(0.8002 0.1342 84.37);
+
+    --color-leaderboard-rank-silver-start: oklch(0.5852 0.0106 286.07);
+    --color-leaderboard-rank-silver-mid: oklch(0.6949 0.0059 182.95);
+    --color-leaderboard-rank-silver-end: oklch(0.8092 0.0083 216.64);
+
+    --color-leaderboard-rank-bronze-start: oklch(0.482 0.1079 43.87);
+    --color-leaderboard-rank-bronze-mid: oklch(0.6159 0.1039 46.17);
+    --color-leaderboard-rank-bronze-end: oklch(0.7881 0.0981 48.38);
   }
 
   .dark {

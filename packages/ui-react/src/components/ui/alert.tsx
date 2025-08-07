@@ -1,5 +1,5 @@
-import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react"
 
 import { cn } from "../../lib/utils"
 
@@ -11,16 +11,14 @@ const alertVariants = cva(
         default: "bg-card text-card-foreground",
         destructive:
           "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90",
-        warning:
-          "border-warning-outline bg-orange-50 text-black [&>svg]:text-warning-outline",
-        info:
-          "border-alert-info-outline bg-alert-info-outline/10 text-black [&>svg]:text-alert-info-outline",
+        warning: "border-warning-outline bg-orange-50 text-black [&>svg]:text-warning-outline",
+        info: "border-alert-info-outline bg-alert-info-outline/10 text-black [&>svg]:text-alert-info-outline",
       },
     },
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 )
 
 function Alert({
@@ -43,19 +41,13 @@ function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="alert-title"
-      className={cn(
-        "col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight",
-        className
-      )}
+      className={cn("col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight", className)}
       {...props}
     />
   )
 }
 
-function AlertDescription({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+function AlertDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="alert-description"
@@ -63,7 +55,7 @@ function AlertDescription({
         "text-muted-foreground col-span-full grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
         // For info variant without title, position description as title and style it accordingly
         "[div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:col-start-2 [div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:font-medium [div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:text-current [div[data-variant='info']:not(:has([data-slot='alert-title']))_&]:text-black",
-        className
+        className,
       )}
       {...props}
     />

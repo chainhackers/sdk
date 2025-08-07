@@ -1,14 +1,14 @@
-import { AlertCircle, ExternalLink, ChevronLeft, InfoIcon, StarIcon } from "lucide-react"
-import { cn } from "../../lib/utils"
+import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "lucide-react"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
-import { Button } from "../ui/button"
-import { ScrollArea } from "../ui/scroll-area"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs"
-import { ChainIcon } from "../ui/ChainIcon"
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { getChainName } from "../../lib/chainIcons"
-import { LeaderboardRankingTab } from "./LeaderboardRankingTab"
+import { cn } from "../../lib/utils"
 import type { RankingEntry } from "../../types/types"
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
+import { Button } from "../ui/button"
+import { ChainIcon } from "../ui/ChainIcon"
+import { ScrollArea } from "../ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
+import { LeaderboardRankingTab } from "./LeaderboardRankingTab"
 
 interface LeaderboardOverviewProps {
   leaderboardId: string
@@ -111,7 +111,12 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
             <div className="pb-4 px-4 pt-1 flex flex-col gap-4">
               {/* Status and user stats card */}
               <div className="bg-surface-secondary rounded-[12px] p-3 flex flex-col gap-3">
-                <div className="text-[12px] text-roulette-disabled-text">Status: <span className="px-2 py-0.5 rounded-[8px] border text-[11px] border-roulette-disabled-text">{data.userStats.status}</span></div>
+                <div className="text-[12px] text-roulette-disabled-text">
+                  Status:{" "}
+                  <span className="px-2 py-0.5 rounded-[8px] border text-[11px] border-roulette-disabled-text">
+                    {data.userStats.status}
+                  </span>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <div className="text-[12px] text-gray-500">Your position:</div>
@@ -126,7 +131,11 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                   <div className="flex flex-col gap-1">
                     <div className="text-[12px] text-gray-500">Your current prize:</div>
                     <div className="flex items-center gap-2">
-                      <img src={data.prize.token.image} alt={data.userStats.prize.tokenSymbol} className="w-5 h-5" />
+                      <img
+                        src={data.prize.token.image}
+                        alt={data.userStats.prize.tokenSymbol}
+                        className="w-5 h-5"
+                      />
                       <div className="text-[16px] font-semibold">{data.userStats.prize.amount}</div>
                     </div>
                   </div>
@@ -141,7 +150,11 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                     Claim {data.userStats.prize.amount} {data.userStats.prize.tokenSymbol}
                   </Button>
                 </div>
-                <a className="text-[12px] leading-[20px] text-primary flex items-center gap-1 font-bold" href="#" onClick={(e)=>e.preventDefault()}>
+                <a
+                  className="text-[12px] leading-[20px] text-primary flex items-center gap-1 font-bold"
+                  href="#"
+                  onClick={(e) => e.preventDefault()}
+                >
                   Leaderboard contract
                   <ExternalLink size={12} />
                 </a>
@@ -151,20 +164,22 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
               <div className="bg-surface-secondary rounded-[12px] p-3 flex flex-col gap-3">
                 <div className="flex items-center gap-2">
                   <h3 className="text-[16px] leading-[24px] font-semibold">Rules</h3>
-                <div className="flex items-center gap-2 ml-auto">
-                  <ChainIcon chainId={data.chainId} size={18} />
-                  <span className="text-[12px] leading-[20px] text-gray-500">
-                    {getChainName(data.chainId).charAt(0).toUpperCase() + getChainName(data.chainId).slice(1)}
-                  </span>
-                </div>
-
+                  <div className="flex items-center gap-2 ml-auto">
+                    <ChainIcon chainId={data.chainId} size={18} />
+                    <span className="text-[12px] leading-[20px] text-gray-500">
+                      {getChainName(data.chainId).charAt(0).toUpperCase() +
+                        getChainName(data.chainId).slice(1)}
+                    </span>
+                  </div>
                 </div>
                 <ul className="flex flex-col gap-2">
                   {data.rules[0]?.isHighlighted && (
-                    <Alert variant="info" >
+                    <Alert variant="info">
                       <AlertCircle className="h-[16px] w-[16px]" />
                       <AlertDescription className="text-[12px] leading-[20px] text-black">
-                        {"A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking."}
+                        {
+                          "A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking."
+                        }
                       </AlertDescription>
                     </Alert>
                   )}
@@ -173,7 +188,8 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                       <strong>The competition is scored using a point system:</strong>
                     </li>
                     <li className="text-[14px] leading-[22px] text-gray-600 ml-4">
-                      • You have to play on the dice or cointoss or roulette or keno or wheel games and on the chain Base
+                      • You have to play on the dice or cointoss or roulette or keno or wheel games
+                      and on the chain Base
                     </li>
                     <li className="text-[14px] leading-[22px] text-gray-600 ml-4">
                       • You have to play with BETS tokens
@@ -185,16 +201,19 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                       <strong>Example 1:</strong> You bet 300 BETS at dice ⇒ You earn 300 points
                     </li>
                     <li className="text-[14px] leading-[22px] text-gray-600">
-                      <strong>Example 2:</strong> You bet 1050 BETS at cointoss ⇒ You earn 1000 points
+                      <strong>Example 2:</strong> You bet 1050 BETS at cointoss ⇒ You earn 1000
+                      points
                     </li>
                   </ul>
                 </ul>
               </div>
 
               {data.isExpired && (
-                <Alert variant="warning" >
+                <Alert variant="warning">
                   <AlertCircle className="h-[16px] w-[16px]" />
-                  <AlertTitle className="text-[14px] leading-[22px] font-medium text-black">Event expired</AlertTitle>
+                  <AlertTitle className="text-[14px] leading-[22px] font-medium text-black">
+                    Event expired
+                  </AlertTitle>
                   <AlertDescription className="text-[12px] leading-[20px] text-black">
                     Prizes cannot be withdrawn anymore
                   </AlertDescription>

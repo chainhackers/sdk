@@ -1,7 +1,7 @@
 import { useLeaderboards } from "../../hooks/useLeaderboards"
 import { cn } from "../../lib/utils"
-import { LeaderboardCard } from "./LeaderboardCard"
 import { Switch } from "../ui/switch"
+import { LeaderboardCard } from "./LeaderboardCard"
 
 interface Props {
   onViewOverview?: (id: string) => void
@@ -36,7 +36,9 @@ export function LeaderboardsView({ onViewOverview }: Props) {
       <div className="flex items-center justify-between mb-4">
         <span className="text-[16px] font-semibold text-gray-900">Ongoing</span>
         <label className="flex items-center gap-2 cursor-pointer">
-          <span className="text-[12px] leading-[18px] text-gray-900">Show partner leaderboards</span>
+          <span className="text-[12px] leading-[18px] text-gray-900">
+            Show partner leaderboards
+          </span>
           <Switch
             checked={showPartner}
             onCheckedChange={setShowPartner}

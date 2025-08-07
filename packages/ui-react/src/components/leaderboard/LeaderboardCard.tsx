@@ -120,7 +120,7 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
         "p-[12px] rounded-[12px]",
         // Use themed surface secondary background
         "bg-surface-secondary",
-        "flex flex-col gap-[10px] h-[156px]"
+        "flex flex-col gap-[10px] h-[156px]",
       )}
     >
       {/* Header with rank, date and badge */}
@@ -133,10 +133,7 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
             </span>
           </div>
           {/* Vertical Separator */}
-          <span
-            aria-hidden
-            className="block w-px h-[23px] bg-leaderboard-separator"
-          />
+          <span aria-hidden className="block w-px h-[23px] bg-leaderboard-separator" />
           <span className="text-gray-500 text-[12px] leading-[18px] font-regular">
             {formatDateRange(item.startDate, item.endDate)}
           </span>
@@ -145,8 +142,7 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
           <div
             className={cn(
               "px-3 py-1 rounded-full text-[11px] font-medium",
-              item.badgeStatus === "pending" &&
-                "text-primary border border-primary rounded-[8px]",
+              item.badgeStatus === "pending" && "text-primary border border-primary rounded-[8px]",
               item.badgeStatus === "expired" &&
                 "text-roulette-disabled-text border border-roulette-disabled-text rounded-[8px]",
             )}
