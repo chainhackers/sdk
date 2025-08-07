@@ -12,7 +12,6 @@ import { useEffect, useMemo, useState } from "react"
 import { useAccount } from "wagmi"
 import kenoBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
-import { useFreebetsContext } from "../../context/FreebetsContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { useHouseEdge } from "../../hooks/useHouseEdge"
@@ -118,10 +117,6 @@ function KenoGameContent({
     houseEdge,
   })
 
-  const { freebets, freebetsInCurrentChain } = useFreebetsContext()
-  console.log("freebets: ", freebets)
-  console.log("freebetsInCurrentChain: ", freebetsInCurrentChain)
-
   useEffect(() => {
     if (gameResult?.rolled?.game === CASINO_GAME_TYPE.KENO) {
       setLastWinningNumbers(gameResult.rolled.rolled)
@@ -184,7 +179,6 @@ function KenoGameContent({
         isApproveConfirming={isApproveConfirming}
         isRefetchingAllowance={isRefetchingAllowance}
         approveError={approveError}
-        freeBets={freebets}
       />
     </GameFrame>
   )

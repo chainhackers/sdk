@@ -21,6 +21,7 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: QUERY_DEFAULTS.REFETCH_ON_WINDOW_FOCUS,
       refetchOnReconnect: QUERY_DEFAULTS.REFETCH_ON_RECONNECT,
       retry: QUERY_DEFAULTS.RETRY_COUNT,
+      structuralSharing: true,
     },
   },
 })

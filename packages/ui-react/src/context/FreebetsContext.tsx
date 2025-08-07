@@ -1,6 +1,14 @@
 import { fetchFreebets } from "@betswirl/sdk-core"
 import { useQuery } from "@tanstack/react-query"
-import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react"
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 import { useAccount } from "wagmi"
 import { QUERY_DEFAULTS } from "../constants/queryDefaults"
 import { FreeBet, TokenWithImage } from "../types/types"
@@ -10,6 +18,8 @@ import { useBettingConfig } from "./configContext"
 interface FreebetsContextValue {
   freebets: FreeBet[]
   freebetsInCurrentChain: FreeBet[]
+  selectedFreebet: FreeBet | null
+  selectFreebet: (freebet: FreeBet | null) => void
 }
 
 const FreebetsContext = createContext<FreebetsContextValue | undefined>(undefined)
@@ -22,7 +32,8 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
   const { appChainId } = useChain()
   const { affiliate, freebetsAffiliates } = useBettingConfig()
-  const [freebetsInCurrentChain, setFreebetsInCurrentChain] = useState<FreeBet[]>([])
+  //const [freebetsInCurrentChain, setFreebetsInCurrentChain] = useState<FreeBet[]>([])
+  const [selectedFreebet, setSelectedFreebet] = useState<FreeBet | null>(null)
 
   const { data: freebets = [] } = useQuery({
     queryKey: ["freebets", accountAddress],
@@ -31,17 +42,22 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     staleTime: QUERY_DEFAULTS.STALE_TIME,
   })
 
-  useEffect(() => {
+  const freebetsInCurrentChain = useMemo(() => {
     console.log("appChainId: ", appChainId)
     if (!freebets.length || !appChainId) {
-      setFreebetsInCurrentChain([])
-      return
+      return []
     }
 
     console.log("freebets.filter")
     const filteredFreebets = freebets.filter((freebet) => freebet.chainId === appChainId)
-    setFreebetsInCurrentChain(filteredFreebets)
+    return filteredFreebets
   }, [freebets, appChainId])
+
+  useEffect(() => {
+    if (freebetsInCurrentChain.length > 0 && !selectedFreebet) {
+      setSelectedFreebet(freebetsInCurrentChain[0])
+    }
+  }, [freebetsInCurrentChain])
 
   async function fetchFreebetsTokens() {
     if (!accountAddress) {
@@ -70,12 +86,19 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     return formatedFreebets
   }
 
+  const selectFreebet = useCallback((freebet: FreeBet | null) => {
+    console.log("selectFreebet: ", freebet)
+    setSelectedFreebet(freebet)
+  }, [])
+
   const contextValue = useMemo(
     () => ({
       freebets,
       freebetsInCurrentChain,
+      selectedFreebet,
+      selectFreebet,
     }),
-    [freebets, freebetsInCurrentChain],
+    [freebets, freebetsInCurrentChain, selectedFreebet, selectFreebet],
   )
 
   return <FreebetsContext.Provider value={contextValue}>{children}</FreebetsContext.Provider>

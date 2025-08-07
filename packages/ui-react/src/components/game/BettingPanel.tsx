@@ -3,10 +3,10 @@ import { WalletModal } from "@coinbase/onchainkit/wallet"
 import { Gift } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useChain } from "../../context/chainContext"
+import { useFreebetsContext } from "../../context/FreebetsContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { cn } from "../../lib/utils"
 import { BetStatus, ChainTokenPanelView, FreeBet, TokenWithImage } from "../../types/types"
-
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { Sheet } from "../ui/sheet"
@@ -40,7 +40,6 @@ interface BettingPanelProps {
   approveError?: any
   portalContainer: HTMLElement | null
   isMounted: boolean
-  freeBets?: FreeBet[]
 }
 
 export function BettingPanel({
@@ -66,7 +65,6 @@ export function BettingPanel({
   approveError,
   portalContainer,
   isMounted,
-  freeBets = [],
 }: BettingPanelProps) {
   const { appChainId, switchWalletChain } = useChain()
   const [isChainTokenSheetOpen, setIsChainTokenSheetOpen] = useState<boolean>(false)
@@ -75,7 +73,8 @@ export function BettingPanel({
   const [isFreeBetSheetOpen, setIsFreeBetSheetOpen] = useState(false)
   const [isFreebetsHubOpen, setIsFreebetsHubOpen] = useState(false)
   const [wasFreebetsHubOpenBeforeWallet, setWasFreebetsHubOpenBeforeWallet] = useState(false)
-  const [selectedFreeBet, setSelectedFreeBet] = useState<FreeBet | null>(freeBets[0] || null) // Default to first freebet
+  const { freebets, freebetsInCurrentChain, selectedFreebet, selectFreebet } = useFreebetsContext()
+  //const [selectedFreeBet, setSelectedFreeBet] = useState<FreeBet | null>(freebets.length ? freebets[0] : null) // Default to first freebet
 
   // Track previous values to detect actual changes
   const prevChainIdRef = useRef(appChainId)
@@ -253,12 +252,12 @@ export function BettingPanel({
   }
 
   const handleFreeBetSelect = (freeBet: FreeBet) => {
-    setSelectedFreeBet(freeBet)
+    selectFreebet(freeBet)
     setIsFreeBetSheetOpen(false)
   }
 
   const handleRemoveFreeBet = () => {
-    setSelectedFreeBet(null)
+    selectFreebet(null)
   }
 
   const handleFreeBetClick = () => {
@@ -302,18 +301,18 @@ export function BettingPanel({
             className="w-[60px] h-[27px] bg-game-win/20 border border-free-bet-border rounded-[8px] flex items-center gap-1 hover:bg-game-win/30 transition-colors"
           >
             <Gift size={20} className="text-game-win" />
-            {freeBets.length > 0 && (
+            {freebets.length > 0 && (
               <span className="text-sm font-semibold text-free-bet-border">
-                ({freeBets.length})
+                ({freebets.length})
               </span>
             )}
           </Button>
         </div>
 
-        {selectedFreeBet ? (
+        {selectedFreebet ? (
           <FreeBetInput
-            amount={selectedFreeBet.amount}
-            token={selectedFreeBet.token}
+            amount={selectedFreebet.amount}
+            token={selectedFreebet.token}
             isDisabled={isInputDisabled}
             onClick={handleFreeBetClick}
             onRemoveFreebet={handleRemoveFreeBet}
@@ -397,8 +396,8 @@ export function BettingPanel({
         {isMounted && portalContainer && (
           <FreeBetSheetPanel
             portalContainer={portalContainer}
-            freeBets={freeBets}
-            selectedFreeBet={selectedFreeBet}
+            freeBets={freebetsInCurrentChain}
+            selectedFreeBet={selectedFreebet}
             onSelect={handleFreeBetSelect}
           />
         )}
@@ -408,7 +407,8 @@ export function BettingPanel({
           <FreebetsHubSheetPanel
             portalContainer={portalContainer}
             isConnected={isConnected}
-            freebets={freeBets}
+            freebets={freebets}
+            onSelectFreebet={selectFreebet}
             onConnectWallet={() => {
               setWasFreebetsHubOpenBeforeWallet(true)
               setIsFreebetsHubOpen(false)

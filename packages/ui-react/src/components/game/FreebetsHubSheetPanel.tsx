@@ -17,6 +17,7 @@ interface FreebetsHubSheetPanelProps {
   freebets: FreeBet[]
   onConnectWallet: () => void
   onClaimCode: (code: string) => void
+  onSelectFreebet: (freebet: FreeBet | null) => void
 }
 
 const MAX_CODE_LENGTH = 10
@@ -27,6 +28,7 @@ export function FreebetsHubSheetPanel({
   freebets,
   onConnectWallet,
   onClaimCode,
+  onSelectFreebet,
 }: FreebetsHubSheetPanelProps) {
   const [codeInput, setCodeInput] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -39,6 +41,10 @@ export function FreebetsHubSheetPanel({
     setError(null)
     onClaimCode(codeInput.trim())
     setCodeInput("")
+  }
+
+  const handleFreeBetClick = (freeBet: FreeBet) => {
+    onSelectFreebet(freeBet)
   }
 
   return (
@@ -148,7 +154,7 @@ export function FreebetsHubSheetPanel({
                         <Button
                           key={freeBet.id}
                           variant="ghost"
-                          onClick={() => console.log("FreeBet clicked:", freeBet)}
+                          onClick={() => handleFreeBetClick(freeBet)}
                           className={cn(
                             "p-4 rounded-[12px] h-auto w-full",
                             "bg-free-bet-card-section-bg",
