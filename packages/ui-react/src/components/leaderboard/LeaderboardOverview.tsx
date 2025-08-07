@@ -127,6 +127,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                     <div className="text-[16px] font-semibold">{data.userStats.points}</div>
                   </div>
                 </div>
+                <div className="w-full h-[1px] bg-leaderboard-separator" />
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col gap-1">
                     <div className="text-[12px] text-gray-500">Your current prize:</div>
