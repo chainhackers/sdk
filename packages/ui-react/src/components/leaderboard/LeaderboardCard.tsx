@@ -1,8 +1,8 @@
 import { Gift } from "lucide-react"
 import { cn } from "../../lib/utils"
 import type { LeaderboardItem } from "../../types/types"
-import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
+import { LeaderboardCardActions } from "./LeaderboardCardActions"
 
 interface LeaderboardCardProps {
   item: LeaderboardItem
@@ -26,92 +26,6 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
       return count.toLocaleString()
     }
     return count.toString()
-  }
-
-  const renderActionButtons = () => {
-    const buttons = []
-
-    switch (item.userAction.type) {
-      case "play":
-        buttons.push(
-          <Button
-            key="play"
-            className={cn(
-              "bg-primary hover:bg-primary/90",
-              "text-white font-semibold",
-              "rounded-[8px] h-[32px] flex-1",
-              "text-[12px] leading-[20px]",
-            )}
-          >
-            Play now
-          </Button>,
-        )
-        buttons.push(
-          <Button
-            key="overview"
-            variant="secondary"
-            onClick={() => onViewOverview?.(item.id)}
-            className={cn(
-              "bg-button-secondary-bg",
-              "text-primary font-semibold",
-              "rounded-[8px] h-[32px] flex-1",
-              "text-[12px] leading-[20px]",
-            )}
-          >
-            Overview
-          </Button>,
-        )
-        break
-      case "claim":
-        buttons.push(
-          <Button
-            key="claim"
-            className={cn(
-              "bg-primary hover:bg-primary/90",
-              "text-white font-semibold",
-              "rounded-[8px] h-[32px] flex-1",
-              "text-[12px] leading-[20px]",
-            )}
-          >
-            Claim {item.userAction.amount} {item.userAction.tokenSymbol}
-          </Button>,
-        )
-        buttons.push(
-          <Button
-            key="overview"
-            variant="secondary"
-            onClick={() => onViewOverview?.(item.id)}
-            className={cn(
-              "bg-button-secondary-bg",
-              "text-primary font-semibold",
-              "rounded-[8px] h-[32px] flex-1",
-              "text-[12px] leading-[20px]",
-            )}
-          >
-            Overview
-          </Button>,
-        )
-        break
-      case "overview":
-        buttons.push(
-          <Button
-            key="overview"
-            variant="secondary"
-            onClick={() => onViewOverview?.(item.id)}
-            className={cn(
-              "bg-button-secondary-bg",
-              "text-primary font-semibold",
-              "rounded-[8px] h-[32px] w-full",
-              "text-[12px] leading-[20px]",
-            )}
-          >
-            Overview
-          </Button>,
-        )
-        break
-    }
-
-    return buttons
   }
 
   return (
@@ -182,7 +96,9 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
       </div>
 
       {/* Action buttons */}
-      <div className="flex gap-[10px]">{renderActionButtons()}</div>
+      <div className="flex gap-[10px]">
+        <LeaderboardCardActions item={item} onViewOverview={onViewOverview} />
+      </div>
     </div>
   )
 }
