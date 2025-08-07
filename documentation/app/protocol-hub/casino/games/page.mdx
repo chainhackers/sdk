@@ -1,0 +1,120 @@
+import { Cards } from 'nextra/components'
+import { Callout } from 'nextra/components'
+import { Tabs, Tab } from 'nextra/components'
+import { Steps } from 'nextra/components'
+import { Dices, Coins, Circle, Target, RotateCcw, Zap, Gamepad2, Sparkles } from 'lucide-react'
+import Image from 'next/image'
+
+# 🎮 Casino Games
+
+BetSwirl's in-house game studio is the creative heartbeat of our platform, where online gaming meets the seamless integration of Web3 technology. Our passionate designers and developers craft unique, visually stunning casino games that deliver captivating gameplay with smooth, instant blockchain transactions.
+
+Every detail is carefully considered—from the intuitive interface to the immersive sounds that enhance the excitement of every spin, roll, or flip. We continually innovate, combining the best of gambling and Web3 to ensure a seamless, user-friendly experience. At BetSwirl, we don't just make games—we build an engaging, modern casino experience that reflects the thrill of interactive and fair blockchain gaming.
+
+<Image 
+  src="/img/headers/casino.png" 
+  alt="BetSwirl Banner" 
+  width={1200} 
+  height={300} 
+  className="w-full rounded-lg mb-6"
+  priority
+/>
+
+<Callout type="info">
+  All BetSwirl games are provably fair and use Chainlink VRF for random number generation, ensuring complete transparency and trust.
+</Callout>
+
+## Behind the Scene
+
+This streamlined process ensures that players can enjoy a hassle-free betting experience while benefiting from the transparency and security of blockchain technology.
+
+<Steps>
+### Step 1: Place Your Bet
+The player places their bet by confirming the transaction. This action initiates the betting process.
+
+### Step 2: Transaction Details
+The transaction will deduct the player's bet amount along with some gas token required for the transaction and the Chainlink VRF (Verifiable Random Function) fee.
+
+### Step 3: Bet Resolution
+Once the transaction is processed, the bet is resolved automatically.
+
+### Step 4: Payouts
+If the player wins, BetSwirl's bankroll will automatically initiate the transaction to transfer the winnings directly to the player's wallet. There is no need for the player to withdraw or claim their winnings manually.
+</Steps>
+
+## Available Casino Games
+
+{(() => {
+  const games = [
+    {
+      emoji: "🎲",
+      title: "Dice Game",
+      icon: <Dices className="text-blue-500" />,
+      description: "The game is played with a 100-sided dice. The user selects a number and tries to roll above it in order to win the bet.",
+      image: "/img/games/dice.png"
+    },
+    {
+      emoji: "🪙",
+      title: "Coin Toss",
+      description: "A 50%/50% bet! Heads or Tails.",
+      image: "/img/games/coin-toss.png"
+    },
+    {
+      emoji: "🛞",
+      title: "Roulette",
+      description: "One zero roulette! The player decides their picks, and their bet is distributed evenly.",
+      image: "/img/games/roulette.png"
+    },
+    {
+      emoji: "🎯",
+      title: "Keno",
+      description: "Keno is a lottery-style game where players choose numbers from a set range. To play, you select a certain number of spots and place your bet. After all bets are placed, a random drawing occurs and numbers are drawn. Your pay-out is related with how your chosen numbers match the drawn numbers.",
+      image: "/img/games/keno.png"
+    },
+    {
+      emoji: "🎡",
+      title: "Wheel",
+      description: "A wheel that turns and stops on a color. Each color is linked to a multiplier. Several configurations of the wheel exist, allowing players to take more risks if they wish.",
+      image: "/img/games/wheel.png"
+    },
+    {
+      emoji: "🎱",
+      title: "Plinko",
+      description: "Drop balls at the top, and the balls fall into holes linked to multipliers. Several configurations of the plinko exist, allowing players to take more risks if they wish.",
+      image: "/img/games/plinko.png"
+    }
+  ];
+
+  return games.map((game, index) => (
+    <div key={index}>
+      <h3 className="text-2xl font-bold p-2">{game.emoji} {game.title}</h3>
+      <div className="flex flex-col w-full bg-card text-card-foreground rounded-lg">
+        <div className="text-base leading-relaxed p-2 mb-4">
+          {game.description}
+        </div>
+        
+                 <div className="flex justify-center mb-8">
+           <Image 
+             src={game.image} 
+             alt={`${game.title} Game`} 
+             width={800} 
+             height={500} 
+             className="rounded-lg shadow-lg"
+           />
+         </div>
+      </div>
+    </div>
+  ));
+})()}
+
+## 🏦 House Edge
+
+Each token, game, and bankroll on BetSwirl has a house edge that ensures the profitability of the casino. This house edge is the source of revenue for BETS stakers. Essentially, every bet placed on any of BetSwirl's casino games generates income due to this house edge! This mechanism not only sustains the platform's operations but also rewards stakers, creating a mutually beneficial ecosystem for players and investors alike.
+
+<Callout type="warning">
+  The house edge ensures platform sustainability while providing rewards to BETS stakers, creating a win-win ecosystem.
+</Callout>
+
+## 🔗 Smart Contracts
+
+For detailed information about the smart contracts used by each game, please refer to the [Smart Contracts](/protocol-hub/protocol/contracts#-casino-game-contracts) section.
