@@ -92,7 +92,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
         </div>
       </div>
 
-      <Tabs defaultValue="ranking" className="flex flex-col flex-1">
+      <Tabs defaultValue="overview" className="flex flex-col flex-1">
         <div className="px-4">
           <TabsList>
             <TabsTrigger value="overview">

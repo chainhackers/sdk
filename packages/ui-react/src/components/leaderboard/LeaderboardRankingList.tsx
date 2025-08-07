@@ -15,7 +15,7 @@ export function LeaderboardRankingList({ entries }: LeaderboardRankingListProps)
   if (entries.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-[14px] text-muted-foreground">No additional rankings to display</p>
+        <p className="text-[14px] text-roulette-disabled-text">No additional rankings to display</p>
       </div>
     )
   }
@@ -38,7 +38,7 @@ export function LeaderboardRankingList({ entries }: LeaderboardRankingListProps)
             >
               <TableCell>
                 <div className="flex gap-2">
-                  <span className="text-muted-foreground font-medium">#{entry.rank}</span>
+                  <span className="text-roulette-disabled-text font-medium">#{entry.rank}</span>
                   <span className="font-medium text-foreground">
                     {formatAddress(entry.playerAddress)}
                   </span>

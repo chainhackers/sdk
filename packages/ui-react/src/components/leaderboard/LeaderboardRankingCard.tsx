@@ -45,7 +45,7 @@ export function LeaderboardRankingCard({ entry }: LeaderboardRankingCardProps) {
 
   if (rank > 3) {
     return (
-      <div className="bg-surface-secondary rounded-[12px] p-4 border border-gray-200">
+      <div className="bg-free-bet-card-section-bg rounded-[12px] p-4 border border-gray-200">
         <CardContent />
       </div>
     )
@@ -53,7 +53,7 @@ export function LeaderboardRankingCard({ entry }: LeaderboardRankingCardProps) {
 
   return (
     <div className={cn("rounded-[12px] p-[1px]", getGradientClasses(rank))}>
-      <div className="bg-surface-secondary rounded-[10px] p-4 h-full w-full">
+      <div className="bg-free-bet-card-section-bg rounded-[10px] p-4 h-full w-full">
         <CardContent />
       </div>
     </div>
