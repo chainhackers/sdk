@@ -12,6 +12,7 @@ export type ChainContextValue = {
   walletChainId: number | undefined
   areChainsSynced: boolean
   availableChains: CasinoChain[]
+  availableChainIds: CasinoChainId[]
   switchAppChain: (chainId: CasinoChainId) => void
   switchWalletChain: (chainId: CasinoChainId) => void
 }
@@ -133,6 +134,7 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
     walletChainId,
     areChainsSynced,
     availableChains,
+    availableChainIds,
     switchAppChain,
     switchWalletChain: (chainId: CasinoChainId) => switchWalletChain({ chainId }),
   }

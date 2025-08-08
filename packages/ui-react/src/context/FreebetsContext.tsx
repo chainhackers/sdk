@@ -30,7 +30,7 @@ interface FreebetsProviderProps {
 
 export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
-  const { appChainId } = useChain()
+  const { appChainId, switchAppChain, availableChainIds } = useChain()
   const { affiliate, freebetsAffiliates } = useBettingConfig()
   //const [freebetsInCurrentChain, setFreebetsInCurrentChain] = useState<FreeBet[]>([])
   const [selectedFreebet, setSelectedFreebet] = useState<FreeBet | null>(null)
@@ -40,6 +40,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     queryFn: fetchFreebetsTokens,
     enabled: !!accountAddress,
     staleTime: QUERY_DEFAULTS.STALE_TIME,
+    select: (data) => data.filter((freebet) => availableChainIds.includes(freebet.chainId)),
   })
 
   const freebetsInCurrentChain = useMemo(() => {
@@ -54,8 +55,13 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   }, [freebets, appChainId])
 
   useEffect(() => {
-    if (freebetsInCurrentChain.length > 0 && !selectedFreebet) {
+    const isFreebetsInCurrentChain = freebetsInCurrentChain.length > 0
+    const isSelectedFreebet = selectedFreebet !== null
+
+    if (isFreebetsInCurrentChain && !isSelectedFreebet) {
       setSelectedFreebet(freebetsInCurrentChain[0])
+    } else if (!isFreebetsInCurrentChain && isSelectedFreebet) {
+      setSelectedFreebet(null)
     }
   }, [freebetsInCurrentChain])
 
@@ -86,10 +92,18 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     return formatedFreebets
   }
 
-  const selectFreebet = useCallback((freebet: FreeBet | null) => {
-    console.log("selectFreebet: ", freebet)
-    setSelectedFreebet(freebet)
-  }, [])
+  const selectFreebet = useCallback(
+    (freebet: FreeBet | null) => {
+      console.log("selectFreebet: ", freebet)
+
+      if (freebet && freebet.chainId !== appChainId) {
+        switchAppChain(freebet.chainId)
+      }
+
+      setSelectedFreebet(freebet)
+    },
+    [appChainId, switchAppChain],
+  )
 
   const contextValue = useMemo(
     () => ({
