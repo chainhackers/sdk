@@ -1,3 +1,5 @@
+import { useCallback } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useLeaderboards } from "../../hooks/useLeaderboards"
 import { cn } from "../../lib/utils"
 import { Switch } from "../ui/switch"
@@ -10,6 +12,13 @@ interface Props {
 export function LeaderboardsView({ onViewOverview }: Props) {
   const { ongoingLeaderboards, endedLeaderboards, showPartner, setShowPartner, isLoading, error } =
     useLeaderboards()
+  const queryClient = useQueryClient()
+
+  // Callback to refresh leaderboards after successful claim
+  const handleClaimSuccess = useCallback(() => {
+    // Invalidate and refetch leaderboards data
+    queryClient.invalidateQueries({ queryKey: ["leaderboards"] })
+  }, [queryClient])
 
   if (isLoading) {
     return (
@@ -58,7 +67,12 @@ export function LeaderboardsView({ onViewOverview }: Props) {
         {ongoingLeaderboards.length > 0 && (
           <div className="flex flex-col gap-2">
             {ongoingLeaderboards.map((item) => (
-              <LeaderboardCard key={item.id} item={item} onViewOverview={onViewOverview} />
+              <LeaderboardCard
+                key={item.id}
+                item={item}
+                onViewOverview={onViewOverview}
+                onClaimSuccess={handleClaimSuccess}
+              />
             ))}
           </div>
         )}
@@ -69,7 +83,12 @@ export function LeaderboardsView({ onViewOverview }: Props) {
             <h2 className="text-[16px] font-semibold text-foreground mt-2">Ended</h2>
             <div className="flex flex-col gap-2">
               {endedLeaderboards.map((item) => (
-                <LeaderboardCard key={item.id} item={item} onViewOverview={onViewOverview} />
+                <LeaderboardCard
+                  key={item.id}
+                  item={item}
+                  onViewOverview={onViewOverview}
+                  onClaimSuccess={handleClaimSuccess}
+                />
               ))}
             </div>
           </>

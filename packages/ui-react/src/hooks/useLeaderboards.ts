@@ -1,7 +1,15 @@
-import { type CasinoChainId } from "@betswirl/sdk-core"
+import {
+  fetchLeaderboards,
+  LEADERBOARD_STATUS,
+  type BetSwirlWallet,
+} from "@betswirl/sdk-core"
+import { useQuery } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
-import { getTokenImage } from "../lib/utils"
-import { type LeaderboardItem, type TokenWithImage } from "../types/types"
+import { useAccount, usePublicClient } from "wagmi"
+import { useChain } from "../context/chainContext"
+import { useBettingConfig } from "../context/configContext"
+import { mapLeaderboardToItem } from "../utils/leaderboardUtils"
+import { type LeaderboardItem } from "../types/types"
 
 interface UseLeaderboardsResult {
   ongoingLeaderboards: LeaderboardItem[]
@@ -12,203 +20,63 @@ interface UseLeaderboardsResult {
   error: Error | null
 }
 
-// Mock token data
-const MOCK_BETS_TOKEN: TokenWithImage = {
-  address: "0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5",
-  symbol: "BETS",
-  decimals: 18,
-  image: getTokenImage("BETS"),
-}
-
-// Mock leaderboard data
-const MOCK_LEADERBOARDS: LeaderboardItem[] = [
-  {
-    id: "1",
-    rank: 1,
-    title: "Avalanche - July",
-    chainId: 43114 as CasinoChainId, // Avalanche
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ongoing",
-    badgeStatus: "pending",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 175,
-    isPartner: false,
-    userAction: { type: "play" },
-  },
-  {
-    id: "2",
-    rank: 2,
-    title: "Ethereum - July",
-    chainId: 1 as CasinoChainId, // Ethereum
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ongoing",
-    badgeStatus: "pending",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 1756,
-    isPartner: false,
-    userAction: { type: "claim", amount: "0.0001", tokenSymbol: "Avax" },
-  },
-  {
-    id: "3",
-    rank: 1,
-    title: "BNB - July",
-    chainId: 56 as CasinoChainId, // BNB Smart Chain
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ongoing",
-    badgeStatus: "pending",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 175234,
-    isPartner: false,
-    userAction: { type: "play" },
-  },
-  {
-    id: "4",
-    rank: 1,
-    title: "Ethereum - July",
-    chainId: 1 as CasinoChainId, // Ethereum
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ended",
-    badgeStatus: "expired",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 17500,
-    isPartner: false,
-    userAction: { type: "overview" },
-  },
-  {
-    id: "5",
-    rank: 1,
-    title: "Avalanche - July",
-    chainId: 43114 as CasinoChainId, // Avalanche
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ended",
-    badgeStatus: "expired",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 175,
-    isPartner: false,
-    userAction: { type: "overview" },
-  },
-  {
-    id: "6",
-    rank: 1,
-    title: "BNB - July",
-    chainId: 56 as CasinoChainId, // BNB Smart Chain
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ended",
-    badgeStatus: "expired",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 17,
-    isPartner: false,
-    userAction: { type: "overview" },
-  },
-  {
-    id: "7",
-    rank: 1,
-    title: "Partner Leaderboard - Special",
-    chainId: 137 as CasinoChainId, // Polygon
-    startDate: "2024-07-01T00:00:00Z",
-    endDate: "2024-07-31T00:00:00Z",
-    status: "ongoing",
-    badgeStatus: "pending",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "10000000",
-    },
-    participants: 500,
-    isPartner: true,
-    userAction: { type: "play" },
-  },
-  {
-    id: "8",
-    rank: 3,
-    title: "Arbitrum - July",
-    chainId: 42161 as CasinoChainId, // Arbitrum
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ongoing",
-    badgeStatus: "pending",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "3000000",
-    },
-    participants: 892,
-    isPartner: false,
-    userAction: { type: "play" },
-  },
-  {
-    id: "9",
-    rank: 1,
-    title: "Optimism - June",
-    chainId: 10 as CasinoChainId, // Optimism
-    startDate: "2024-06-01T00:00:00Z",
-    endDate: "2024-06-30T00:00:00Z",
-    status: "ended",
-    badgeStatus: "expired",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "7500000",
-    },
-    participants: 3421,
-    isPartner: false,
-    userAction: { type: "overview" },
-  },
-  {
-    id: "10",
-    rank: 2,
-    title: "Base - June",
-    chainId: 8453 as CasinoChainId, // Base
-    startDate: "2024-06-01T00:00:00Z",
-    endDate: "2024-06-30T00:00:00Z",
-    status: "ended",
-    badgeStatus: "expired",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "2500000",
-    },
-    participants: 1234,
-    isPartner: false,
-    userAction: { type: "overview" },
-  },
-]
-
+/**
+ * Hook to fetch and manage leaderboards data
+ * Uses TanStack Query for caching and automatic refetching
+ */
 export function useLeaderboards(): UseLeaderboardsResult {
   const [showPartner, setShowPartner] = useState(false)
-  const [isLoading] = useState(false)
-  const [error] = useState<Error | null>(null)
+  const { appChainId } = useChain()
+  const { affiliate } = useBettingConfig()
+  const { address } = useAccount()
+  const publicClient = usePublicClient({ chainId: appChainId })
 
+  // Fetch leaderboards using TanStack Query
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["leaderboards", appChainId, address, showPartner],
+    queryFn: async () => {
+      if (!publicClient) {
+        throw new Error("Public client not initialized")
+      }
+
+      // Create a minimal wallet wrapper for SDK functions
+      const wallet = { publicClient } as unknown as BetSwirlWallet
+
+      // Fetch leaderboards from the API
+      // Parameters: limit, offset, playerAddress, affiliate, chainId, withExternalBankrollLeaderboards
+      const result = await fetchLeaderboards(
+        100, // limit - get up to 100 leaderboards
+        0,   // offset - start from the beginning
+        address, // player address for personalized data
+        showPartner ? undefined : affiliate, // filter by affiliate if not showing partner boards
+        appChainId, // current chain
+        showPartner, // include external bankroll leaderboards
+        "desc", // sort by end date descending (newest first)
+        undefined, // no status filter - get all statuses
+        false // not test mode
+      )
+
+      // Convert SDK leaderboards to UI format
+      return result.leaderboards.map(lb => mapLeaderboardToItem(lb, address))
+    },
+    // Refetch every 30 seconds to keep data fresh
+    refetchInterval: 30000,
+    // Keep data in cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
+    enabled: !!publicClient,
+  })
+
+  // Separate leaderboards by status
   const { ongoingLeaderboards, endedLeaderboards } = useMemo(() => {
-    const filteredLeaderboards = showPartner
-      ? MOCK_LEADERBOARDS
-      : MOCK_LEADERBOARDS.filter((lb) => !lb.isPartner)
+    if (!data) {
+      return { ongoingLeaderboards: [], endedLeaderboards: [] }
+    }
 
-    const ongoing = filteredLeaderboards.filter((lb) => lb.status === "ongoing")
-    const ended = filteredLeaderboards.filter((lb) => lb.status === "ended")
+    const ongoing = data.filter((lb) => lb.status === "ongoing")
+    const ended = data.filter((lb) => lb.status === "ended")
 
     return { ongoingLeaderboards: ongoing, endedLeaderboards: ended }
-  }, [showPartner])
+  }, [data])
 
   return {
     ongoingLeaderboards,
@@ -216,6 +84,6 @@ export function useLeaderboards(): UseLeaderboardsResult {
     showPartner,
     setShowPartner,
     isLoading,
-    error,
+    error: error as Error | null,
   }
 }

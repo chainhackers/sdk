@@ -7,9 +7,10 @@ import { LeaderboardCardActions } from "./LeaderboardCardActions"
 interface LeaderboardCardProps {
   item: LeaderboardItem
   onViewOverview?: (id: string) => void
+  onClaimSuccess?: () => void
 }
 
-export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) {
+export function LeaderboardCard({ item, onViewOverview, onClaimSuccess }: LeaderboardCardProps) {
   const formatDateRange = (startDate: string, endDate: string) => {
     const start = new Date(startDate)
     const end = new Date(endDate)
@@ -97,7 +98,11 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
 
       {/* Action buttons */}
       <div className="flex gap-[10px]">
-        <LeaderboardCardActions item={item} onViewOverview={onViewOverview} />
+        <LeaderboardCardActions
+          item={item}
+          onViewOverview={onViewOverview}
+          onClaimSuccess={onClaimSuccess}
+        />
       </div>
     </div>
   )
