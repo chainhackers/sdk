@@ -4,7 +4,7 @@
 
 The goal of this repo is to give developers some tools to interact easily with the protocol. 
 
-Feel free to reach us via [Discord](https://discord.gg/4BxtJV7fbZ) or [Telegram](https://t.me/betswirl) if you need **support**!
+Feel free to reach us via [Discord](https://discord.gg/uAJXn4GJdX) or [Telegram](https://t.me/betswirl) if you need **support**!
 
 
 ## General

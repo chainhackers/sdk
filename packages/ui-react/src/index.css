@@ -103,6 +103,7 @@
   --color-leaderboard-rank-bronze-mid: var(--color-leaderboard-rank-bronze-mid);
   --color-leaderboard-rank-bronze-end: var(--color-leaderboard-rank-bronze-end);
   --color-button-secondary-bg: var(--button-secondary-bg);
+  --color-connect-btn-font: var(--connect-btn-font);
 }
 
 @layer base {
@@ -240,6 +241,7 @@
     --color-leaderboard-rank-bronze-end: oklch(0.7881 0.0981 48.38);
 
     --button-secondary-bg: oklch(0.8453 0.0043 271.36);
+    --connect-btn-font: var(--primary);
   }
 
   .dark {

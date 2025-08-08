@@ -17,7 +17,7 @@ tsconfig.tsbuildinfo
 .env.test.local
 .env.production.local
 .envrc
-**/test**
+examples/test**
 
 # subgraph type generation
 **/subgraphs/**/documents/**/*.ts
@@ -27,3 +27,4 @@ tsconfig.tsbuildinfo
 .npmrc
 
 .secrets
+.vercel

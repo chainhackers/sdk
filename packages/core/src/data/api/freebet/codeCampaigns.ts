@@ -2,6 +2,7 @@ import { type Address, formatUnits } from "viem";
 import type { Token } from "../../../interfaces";
 import { getBetSwirlApiUrl } from "../../../utils/api";
 import {
+  type CasinoChainId,
   type ChainId,
   type FREEBET_CAMPAIGN_STATUS,
   type FreebetCampaign,
@@ -88,6 +89,7 @@ export const fetchFreebetCodeCampaigns = async (
   offset = 0,
   status?: FREEBET_CAMPAIGN_STATUS,
   affiliate?: Address,
+  chainId?: CasinoChainId,
   testMode = false,
 ): Promise<{ campaigns: FreebetCodeCampaign[]; total: number; offset: number; limit: number }> => {
   try {
@@ -99,6 +101,9 @@ export const fetchFreebetCodeCampaigns = async (
     }
     if (affiliate) {
       params.set("affiliate", affiliate);
+    }
+    if (chainId) {
+      params.set("chain_id", chainId.toString());
     }
     const res = await fetch(
       `${getBetSwirlApiUrl(testMode)}/affiliate/v1/freebet/code-campaigns?${params.toString()}`,

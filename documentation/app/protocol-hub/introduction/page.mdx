@@ -1,0 +1,196 @@
+import { Cards } from 'nextra/components'
+import { Callout } from 'nextra/components'
+import { Tabs, Tab } from 'nextra/components'
+import { Sparkles,Dices, Shield, Users, Globe, Coins, Gamepad2, Volleyball, Zap, Lock, BarChart3, Shell, Droplets } from 'lucide-react'
+import Image from 'next/image'
+
+# Welcome to BetSwirl
+
+Welcome to BetSwirl, where we're revolutionizing the intersection of web3 and online gambling. As pioneers in the gamble-fi space, we're redefining what's possible in decentralized betting and gaming. Our platform isn't just another online casino—it's the embodiment of the web3 gamble-fi sector itself.
+
+<Image 
+  src="/img/headers/home.png" 
+  alt="BetSwirl Banner" 
+  width={1200} 
+  height={300} 
+  className="w-full rounded-lg mb-6"
+  priority
+/>
+
+<Callout type="info">
+  We're not following trends; we're setting them in the gamble-fi space.
+</Callout>
+
+BetSwirl is a data-centric, transparent ecosystem that leverages blockchain technology to redefine the online gaming experience. Coupled with our intuitive and sleek user interface and audited code, we provide a top-notch UX that sets a new standard in web3.
+
+Whether you're a casino enthusiast, a sports bettor, a community leader, an investor, or an aspiring web3 casino owner, BetSwirl offers something extraordinary for you, all wrapped in a user-friendly package that makes web3 gaming accessible to everyone.
+
+## Quick Access
+
+<Cards>
+  <Cards.Card
+    title="Protocol"
+    href="/protocol/bets"
+    icon={<Shell />}
+  />
+<Cards.Card
+    title="Casino"
+    href="/casino"
+    icon={<Dices />}
+  />
+  <Cards.Card
+    title="Sports Betting"
+    href="/sports-betting"
+    icon={<Volleyball />}
+  />
+  <Cards.Card
+    title="Where to bet ?"
+    href="/where-to-bet"
+    icon={<Coins />}
+  />
+  <Cards.Card
+    title="Partners"
+    href="/partners"
+    icon={<Users />}
+  />
+</Cards>
+
+## Key Features
+
+{(() => {
+  const features = [
+    {
+      id: 'decentralized',
+      title: 'Decentralized & Transparent',
+      icon: <Shield className="w-6 h-6 text-blue-500" />,
+      description: 'BetSwirl offers <strong>provably fair</strong> games across multiple blockchain networks. Every game and transaction is fully decentralized, ensuring players have complete control over their assets and can trust the fairness of every outcome.'
+      },
+        {
+      id: 'randomness',
+      title: 'Randomness',
+      icon: <Zap className="w-6 h-6 text-orange-500" />,
+      description: 'We work closely with Chainlink and utilize <strong>Chainlink VRF2.5</strong> for the VRF (Verifiable Random Function), ensuring fair and random outcomes in our games. Additionally, we leverage the <strong>Cross-Chain Interoperability Protocol (CCIP)</strong> for our bridge.'
+    },
+    {
+      id: 'gaming',
+      title: 'Diverse Gaming Options',
+      icon: <Gamepad2 className="w-6 h-6 text-green-500" />,
+      description: 'Choose from a wide range of engaging games, including <strong>Dice</strong>, <strong>Coin Toss</strong>, <strong>Roulette</strong>, <strong>Player vs. Player</strong> challenges, <strong>Sports Betting</strong>, and more. Each game is designed by our in-house gaming studio, allowing users to wager with various tokens like ETH, BNB, MATIC, AVAX, USDT, and of course, <strong>BETS</strong>.'
+    },
+    {
+      id: 'cross-chain',
+      title: 'Cross-Chain Compatibility',
+      icon: <Globe className="w-6 h-6 text-purple-500" />,
+      description: 'BetSwirl operates seamlessly across multiple blockchains, providing users with a flexible and scalable gaming experience. Whether you\'re on <strong>Base</strong>, <strong>Arbitrum</strong>, <strong>Polygon</strong>, <strong>BNB Chain</strong>, or <strong>Avalanche</strong>, enjoy smooth integration and gaming across different ecosystems.'
+    },
+    {
+      id: 'staking',
+      title: 'Revenue Sharing via Liquidity Provision',
+      icon: <Droplets className="w-6 h-6 text-cyan-500" />,
+      description: 'BetSwirl distributes <strong>30% of all platform revenue</strong> — from both casino and sports betting across all chains — to users who provide liquidity in the BETS/ETH pool on Unichain (Uniswap v4). LPs earn real yield in USDC with no custodial staking or lockups, tracked and distributed via the <strong>Merkl protocol</strong>.'
+    },
+    {
+      id: 'partnerships',
+      title: 'Become a Partner',
+      icon: <Users className="w-6 h-6 text-indigo-500" />,
+      description: 'Our new affiliate system enables the implementation of our games into decentralized applications (dApps) and more, opening the door to exciting partnership opportunities within the web3 ecosystem. Join us in expanding the BetSwirl community!'
+    },
+    {
+      id: 'transparency',
+      title: 'On-Chain Transparency & Safety',
+      icon: <Shield className="w-6 h-6 text-red-500" />,
+      description: 'Every bet and outcome is recorded on-chain, ensuring fairness and eliminating any possibility of tampering. All of our contracts, including the bankrolls, the games and the freebet system are audited by <strong>Paladin</strong>.'
+    },
+    {
+      id: 'ux',
+      title: 'Innovative User Experience',
+      icon: <Sparkles className="w-6 h-6 text-pink-500" />,
+      description: 'BetSwirl delivers a cutting-edge user experience by seamlessly integrating a sleek user interface with well-structured code. This approach not only makes web3 gaming accessible to all but also positions BetSwirl as a leader in UI/UX design within the web3 industry.'
+    },
+    {
+      id: 'privacy',
+      title: 'Non-Custodial - No KYC',
+      icon: <Lock className="w-6 h-6 text-gray-500" />,
+      description: 'At BetSwirl, you maintain complete control over your assets, as we will never require you to deposit funds. We respect your privacy and will never ask for your identity or any personal documents. To join BetSwirl, all you need is a blockchain wallet and an internet connection.'
+    }
+  ];
+
+  const tabItems = ['Decentralized', 'Randomness', 'Gaming', 'Cross-Chain', 'Staking', 'Partnerships', 'Transparency', 'UX', 'Privacy'];
+
+
+  return (
+    <Tabs items={tabItems}>
+      {tabItems.map((tabName) => {
+        const featureId = tabName.toLowerCase();
+        const feature = features.find(f => f.id === featureId);
+        
+        return (
+          <Tabs.Tab key={featureId}>
+            <div className="w-full">
+              <div className="border rounded-lg p-6 bg-card text-card-foreground">
+                <div className="flex items-center gap-3 mb-4">
+                  {feature.icon}
+                  <h3 className="text-xl font-semibold">{feature.title}</h3>
+                </div>
+                <p className="text-base text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: feature.description }} />
+              </div>
+            </div>
+          </Tabs.Tab>
+        );
+      })}
+    </Tabs>
+  );
+})()}
+
+
+## Our Story
+
+The journey of BetSwirl began in May 2021 when a small but passionate team of three — a Solidity developer, a frontend developer, and a product designer—saw the untapped potential of Web3 to power a fair, decentralized gaming experience. With the launch of Chainlink's VRF (Verifiable Random Function), the technology we needed to create a provably fair on-chain casino finally arrived, and BetSwirl was born.
+
+### Building the Foundation
+
+In late 2021, we took our first major step by launching the BetSwirl dApp on the Polygon testnet. With an initial strategic sale of $80k, we secured the funding to build out more features and expand our vision. By February 2022, BetSwirl made its grand debut on the Polygon mainnet, [introducing our first games to the public](https://betswirl.medium.com/episode-1-betswirl-joins-the-party-and-heres-what-you-should-know-1a0e9e20d4bb).
+
+However, the road wasn't always easy. As we began a private sale in Q1 2022, unforeseen geopolitical challenges and a downturn in the market impacted our goals. Our Initial DEX Offering (IDO) raised $240k—short of our $480k target—but it fueled the [launch of BETS](https://betswirl.medium.com/episode-3-the-bets-token-8c4b7ae0fe03), our native token, which set us on a path to resilience and innovation.
+
+### Expansion and Partnerships
+
+April 2022 marked a significant milestone as BetSwirl expanded to the BNB Chain and Avalanche, bringing our platform to a wider audience of blockchain enthusiasts. Then, in May, we [launched our B2B offering](https://betswirl.medium.com/betswirl-set-to-usher-in-new-suite-of-b2b-services-8e600cc3cc39), allowing other protocols to incorporate our games into their ecosystems with white-label solutions.
+
+### A Future Filled with Innovation
+
+In Q4 2023, we launched our second PvP game, [Coin Flip Battle](https://betswirl.medium.com/introducing-coin-flip-battle-pvp-c4cbdd3fd434), bringing an even more engaging experience to our players. Then, in April 2024, we released our [Telegram bot SwirlBot](https://betswirl.medium.com/swirlbot-the-game-changer-on-betswirls-decentralized-platform-eaa77e442833) (not currently available), making it even easier for our community to engage with BetSwirl's features directly from their messaging app.
+
+### BetSwirl V2 - Revolutionizing the Protocol
+
+In November 2024, we launched **BetSwirl V2**, a major evolution of our protocol that introduced three groundbreaking features designed to maximize marketing impact and user engagement:
+
+- **Affiliate System**: Our comprehensive affiliate program allows partners to earn rewards by promoting BetSwirl games, creating a powerful network effect that drives user acquisition and retention.
+
+- **Freebets System**: We implemented an innovative freebets distribution mechanism that rewards users with risk-free betting opportunities, significantly increasing user engagement and platform adoption.
+
+- **Leaderboards**: Competitive leaderboards create gamification elements that encourage user participation and foster a vibrant, competitive community around our games.
+
+These features have transformed BetSwirl from a simple gaming platform into a comprehensive ecosystem that leverages social dynamics and incentives to drive unprecedented growth.
+
+### Farcaster Integration - Breaking New Ground
+
+February 2025 marked another milestone as we launched our **miniapp on Farcaster**, the leading decentralized social media platform. This strategic move proved to be a game-changer:
+
+- **Top 2 Performance**: We maintained a top 2 position among Farcaster apps for an impressive 2 months, demonstrating the strong appeal of our gaming experience in the social web3 space.
+
+- **Massive Reach**: Our Farcaster integration generated over **1 million notifications** sent to users, creating unprecedented awareness and engagement.
+
+- **Freebets Distribution**: We successfully distributed **750,000 freebets** through the platform, driving user acquisition and platform adoption.
+
+- **Daily Active Users**: The miniapp attracted **several thousand daily users**, proving that web3 gaming can thrive in social environments and creating a new paradigm for decentralized gaming distribution.
+
+This success on Farcaster has opened new avenues for user acquisition and demonstrated the potential of integrating gaming experiences within social web3 platforms.
+
+With each milestone, BetSwirl has grown, learning from the past and building towards a future of innovation, fairness, and community-driven development. Today, we're tirelessly working on BetSwirl v2, with exciting new features on the horizon.
+
+Our journey reflects a vision—a decentralized gaming ecosystem where users can trust in provable fairness, enhanced utility, and a seamless experience across chains. At BetSwirl, the game has only just begun.
+
+## Support
+
+If you need assistance, our documentation is here to guide you. For additional help, feel free to connect with our community on [Telegram](https://t.me/betswirl), [Discord](https://discord.gg/uAJXn4GJdX), or Support Email contact@betswirl.com.

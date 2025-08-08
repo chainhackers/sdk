@@ -43,9 +43,9 @@ export function useHouseEdge(props: UseHouseEdgeProps) {
   }, [props.game, props.token, affiliate, appChainId, isEnabled])
 
   const wagmiHook = useReadContract({
-    abi: functionData?.data.abi || [],
+    abi: functionData?.data.abi,
     address: functionData?.data.to,
-    functionName: functionData?.data.functionName || "getAffiliateHouseEdge",
+    functionName: functionData?.data.functionName,
     args: functionData?.data.args,
     chainId: appChainId,
     query: {
@@ -53,7 +53,7 @@ export function useHouseEdge(props: UseHouseEdgeProps) {
     },
   })
 
-  const houseEdge = wagmiHook.data ?? 0
+  const houseEdge = Number(wagmiHook.data ?? 0n)
 
   const houseEdgePercent = useMemo(() => {
     return houseEdge / 100

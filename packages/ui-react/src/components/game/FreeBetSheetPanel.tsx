@@ -31,7 +31,7 @@ export function FreeBetSheetPanel({
             </div>
 
             <ScrollArea className="h-60 [&>[data-slot=scroll-area-scrollbar]]:w-[6px] [&>[data-slot=scroll-area-scrollbar]]:border-l-0 [&>[data-slot=scroll-area-scrollbar]]:z-10 [&>[data-slot=scroll-area-scrollbar]]:-translate-x-[1px] [&_[data-slot=scroll-area-thumb]]:bg-scrollbar-thumb">
-              <div className="flex flex-col gap-1 p-1">
+              <div className="flex flex-col p-1">
                 {freeBets.map((freeBet) => (
                   <Button
                     key={freeBet.id}
@@ -60,7 +60,7 @@ export function FreeBetSheetPanel({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div className="flex items-center">
-                          <Info size={16} className="text-muted-foreground" />
+                          <Info size={20} className="text-roulette-disabled-text rounded-full" />
                         </div>
                       </TooltipTrigger>
                       <TooltipPrimitive.Content

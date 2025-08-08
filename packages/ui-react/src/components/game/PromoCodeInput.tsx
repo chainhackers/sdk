@@ -53,7 +53,7 @@ export function PromoCodeInput({
             "rounded-[12px]",
             "h-10",
             "brightness-95",
-            "focus-visible:ring-0 focus-visible:ring-offset-0",
+            "focus-visible:ring-0 focus-visible:ring-offset-0 text-[14px]",
           )}
         />
       </div>
