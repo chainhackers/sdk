@@ -1,5 +1,5 @@
 import { chainByKey, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Info } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { InfoSheetPanel } from "../../components/game/InfoSheetPanel"

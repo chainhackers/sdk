@@ -1,4 +1,4 @@
-import { Decorator } from "@storybook/react"
+import type { Decorator } from "@storybook/react-vite"
 
 export const StorybookVersionWrapper: Decorator = (Story) => {
   const version = import.meta.env.VITE_STORYBOOK_VERSION

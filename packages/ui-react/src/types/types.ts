@@ -1,5 +1,6 @@
 import {
   CASINO_GAME_TYPE,
+  type CasinoChainId,
   type CasinoRolledBet,
   CasinoToken,
   COINTOSS_FACE,
@@ -99,4 +100,68 @@ export interface GameDefinition<T extends GameChoice> {
   encodeInput: (choice: T["choice"]) => GameEncodedInput["encodedInput"]
   getWinChancePercent?: (choice: T["choice"]) => number | number[]
   formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
+}
+
+// Leaderboard types
+export type LeaderboardStatus = "ongoing" | "ended"
+
+export type LeaderboardBadgeStatus = "pending" | "expired"
+
+export type LeaderboardUserAction =
+  | { type: "play" }
+  | { type: "overview" }
+  | { type: "claim"; amount: string; tokenSymbol: string }
+  | { type: "none" }
+
+export interface LeaderboardPrize {
+  token: TokenWithImage
+  amount: string
+}
+
+export interface LeaderboardItem {
+  id: string
+  rank: number
+  title: string
+  chainId: CasinoChainId
+  startDate: string // ISO 8601 format
+  endDate: string // ISO 8601 format
+  status: LeaderboardStatus
+  badgeStatus?: LeaderboardBadgeStatus
+  prize: LeaderboardPrize
+  participants: number
+  isPartner: boolean
+  userAction: LeaderboardUserAction
+}
+
+// Additional types for detailed leaderboard overview view
+export interface LeaderboardUserStats {
+  status: "Finalized" | "Ongoing" | "Claimable"
+  position: number
+  points: number
+  prize: {
+    amount: string
+    tokenSymbol: string
+    tokenIconUrl?: string
+  }
+  contractAddress: string
+}
+
+export interface LeaderboardRule {
+  text: string
+  isHighlighted?: boolean
+}
+
+export interface LeaderboardOverviewData extends LeaderboardItem {
+  userStats: LeaderboardUserStats
+  rules: LeaderboardRule[]
+  isExpired: boolean
+}
+
+// Types for ranking tab
+export interface RankingEntry {
+  rank: number
+  playerAddress: string
+  points: number
+  rewardAmount: string
+  rewardToken: TokenWithImage
 }

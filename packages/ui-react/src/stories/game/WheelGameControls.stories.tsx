@@ -1,5 +1,5 @@
 import { CASINO_GAME_TYPE, WeightedGame, WeightedGameConfiguration } from "@betswirl/sdk-core"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { useMemo, useRef } from "react"
 import { Address } from "viem"
 import { WheelController, WheelGameControls } from "../../components/game/WheelGameControls"

@@ -1,5 +1,5 @@
 import { COINTOSS_FACE } from "@betswirl/sdk-core"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { useState } from "react"
 import { CoinTossGameControls } from "../../components/game/CoinTossGameControls"
 

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Input } from "../../components/ui/input"
 import { TokenIcon } from "../../components/ui/TokenIcon"
 import type { TokenWithImage } from "../../types/types"
