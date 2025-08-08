@@ -35,11 +35,12 @@ export function LeaderboardsView({ onViewOverview }: Props) {
       {/* Partner toggle */}
       <div className="flex items-center justify-between mb-4">
         <span className="text-[16px] font-semibold text-foreground">Ongoing</span>
-        <label className="flex items-center gap-2 cursor-pointer">
+        <label htmlFor="partner-toggle" className="flex items-center gap-2 cursor-pointer">
           <span className="text-[12px] leading-[18px] text-foreground">
             Show partner leaderboards
           </span>
           <Switch
+            id="partner-toggle"
             checked={showPartner}
             onCheckedChange={setShowPartner}
             className={cn(

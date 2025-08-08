@@ -1,6 +1,7 @@
 import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "lucide-react"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
 import { getChainName } from "../../lib/chainIcons"
+import { getBlockExplorerUrl } from "../../lib/chainUtils"
 import { cn } from "../../lib/utils"
 import type { RankingEntry } from "../../types/types"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
@@ -80,6 +81,8 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
 
   if (!data) return null
 
+  const contractUrl = getBlockExplorerUrl(data.chainId, data.userStats.contractAddress)
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-2 p-4 pb-2">
@@ -153,14 +156,22 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                     Claim {data.userStats.prize.amount} {data.userStats.prize.tokenSymbol}
                   </Button>
                 </div>
-                <a
-                  className="text-[12px] leading-[20px] text-primary flex items-center gap-1 font-bold"
-                  href="#"
-                  onClick={(e) => e.preventDefault()}
-                >
-                  Leaderboard contract
-                  <ExternalLink size={12} />
-                </a>
+                {contractUrl ? (
+                  <a
+                    href={contractUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[12px] leading-[20px] text-primary flex items-center gap-1 font-bold"
+                  >
+                    Leaderboard contract
+                    <ExternalLink size={12} />
+                  </a>
+                ) : (
+                  <span className="text-[12px] leading-[20px] text-roulette-disabled-text flex items-center gap-1 font-bold pointer-events-none">
+                    Leaderboard contract
+                    <ExternalLink size={12} />
+                  </span>
+                )}
               </div>
 
               {/* Rules */}

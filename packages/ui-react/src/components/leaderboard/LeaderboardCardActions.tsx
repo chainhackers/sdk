@@ -59,7 +59,6 @@ export function LeaderboardCardActions({ item, onViewOverview }: LeaderboardCard
     case "overview":
       return <OverviewButton isFullWidth />
 
-    case "none":
     default:
       return null
   }
