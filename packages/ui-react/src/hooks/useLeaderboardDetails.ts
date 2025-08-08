@@ -1,3 +1,4 @@
+import { type CasinoChainId } from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { type LeaderboardOverviewData, type TokenWithImage } from "../types/types"
 
@@ -16,14 +17,14 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
       address: "0x0000000000000000000000000000000000000000",
       decimals: 18,
       image: "https://www.betswirl.com/img/tokens/AVAX.svg",
-    } as any
+    }
 
     // Simple mocked item matching list structure and enriched for overview
     return {
       id: leaderboardId,
       rank: 1,
       title: "Avalanche - July",
-      chainId: 43114 as any,
+      chainId: 43114 as CasinoChainId,
       startDate: new Date().toISOString(),
       endDate: new Date().toISOString(),
       status: "ended",
