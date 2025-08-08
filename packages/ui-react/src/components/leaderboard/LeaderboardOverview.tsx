@@ -1,5 +1,5 @@
 import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "lucide-react"
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
 import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewards"
 import { getChainName } from "../../lib/chainIcons"
@@ -25,6 +25,42 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
   const { address } = useAccount()
   const { data, refetch } = useLeaderboardDetails(leaderboardId)
   const { claim, isPending, isSuccess, error } = useClaimLeaderboardRewards()
+  const [rankingData, setRankingData] = useState<RankingEntry[]>([])
+  const [fullLeaderboard, setFullLeaderboard] = useState<any>(null)
+
+  // Fetch full leaderboard data with rankings
+  useEffect(() => {
+    const fetchFullLeaderboard = async () => {
+      if (!leaderboardId) return
+
+      try {
+        const leaderboard = await fetchLeaderboard(
+          Number(leaderboardId),
+          address,
+          false
+        )
+
+        if (leaderboard) {
+          setFullLeaderboard(leaderboard)
+
+          // Map rankings to UI format
+          if (leaderboard.rankings && leaderboard.rankings.length > 0) {
+            const mappedRankings = leaderboard.rankings.map((ranking: any) =>
+              mapRankingToEntry(ranking, leaderboard)
+            )
+            setRankingData(mappedRankings)
+          } else {
+            setRankingData([])
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch full leaderboard:", error)
+        setRankingData([])
+      }
+    }
+
+    fetchFullLeaderboard()
+  }, [leaderboardId, address])
 
   // Handle successful claim
   useEffect(() => {
@@ -38,8 +74,8 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
   const handleClaim = useCallback(async () => {
     if (!data || !leaderboardId) return
 
-    // Fetch the full leaderboard object for claiming
-    const leaderboard = await fetchLeaderboard(
+    // Use the already fetched leaderboard or fetch it again
+    const leaderboard = fullLeaderboard || await fetchLeaderboard(
       Number(leaderboardId),
       address,
       false
@@ -52,14 +88,9 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
 
     // Trigger the claim
     claim({ leaderboard })
-  }, [data, leaderboardId, address, claim])
+  }, [data, leaderboardId, address, claim, fullLeaderboard])
 
   if (!data) return null
-
-  // Convert leaderboard rankings to UI format
-  const rankingData: RankingEntry[] = data.userStats.position > 0 && leaderboardId
-    ? [] // Will be populated from actual leaderboard data when available
-    : []
 
   // Determine if user can claim
   const canClaim = data.userStats.status === "Claimable" &&
@@ -258,6 +289,8 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 lastUpdate="Last update: recently (refreshed once per hour)"
                 claimableAmount={data.userStats.prize.amount}
                 claimableTokenSymbol={data.userStats.prize.tokenSymbol}
+                leaderboardStatus={data.userStats.status}
+                isExpired={data.isExpired}
               />
             </div>
           </ScrollArea>

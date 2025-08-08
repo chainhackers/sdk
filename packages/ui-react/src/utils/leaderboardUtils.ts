@@ -3,6 +3,8 @@ import {
   type LeaderboardRanking,
   LEADERBOARD_STATUS,
   type CasinoChainId,
+  formatRawAmount,
+  FORMAT_TYPE,
 } from "@betswirl/sdk-core"
 import { type Address } from "viem"
 import type {
@@ -73,13 +75,15 @@ export function determineUserAction(
     if (userRanking && leaderboard.shares && leaderboard.shares.length > 0) {
       const winnerCount = leaderboard.shares.length
       if (userRanking.rank <= winnerCount && userRanking.rank > 0) {
-        // Calculate approximate reward (this is simplified, actual calculation may differ)
-        const sharePercentage = Number(leaderboard.shares[userRanking.rank - 1]) / 10000
-        const prizeAmount = (Number(leaderboard.totalShares) * sharePercentage).toString()
+        // The shares array already contains the reward amounts in smallest units
+        // No need to calculate percentage - shares[rank-1] IS the reward amount
+        const rewardAmount = typeof leaderboard.shares[userRanking.rank - 1] === 'bigint'
+          ? leaderboard.shares[userRanking.rank - 1]
+          : BigInt(leaderboard.shares[userRanking.rank - 1])
 
         return {
           type: "claim",
-          amount: formatTokenAmount(prizeAmount, leaderboard.token.decimals),
+          amount: formatTokenAmount(rewardAmount, leaderboard.token.decimals),
           tokenSymbol: leaderboard.token.symbol,
         }
       }
@@ -97,26 +101,46 @@ export function determineUserAction(
 
 /**
  * Format token amount for display
+ * Uses SDK's formatRawAmount for consistent formatting across the app
  */
 export function formatTokenAmount(amount: string | bigint, decimals: number): string {
-  const value = typeof amount === 'bigint' ? amount : BigInt(amount)
-  const divisor = BigInt(10 ** decimals)
-  const wholePart = value / divisor
-  const decimalPart = value % divisor
+  try {
+    let value: bigint
 
-  if (wholePart === 0n && decimalPart > 0n) {
-    return "<0.0001"
-  }
+    if (typeof amount === 'bigint') {
+      value = amount
+    } else {
+      // Handle string inputs
+      const amountStr = amount.toString().trim()
 
-  const formatted = wholePart.toString()
-  if (formatted.length > 6) {
-    return `${formatted.slice(0, -6)}M`
-  }
-  if (formatted.length > 3) {
-    return `${formatted.slice(0, -3)}K`
-  }
+      // Return 0 for empty or invalid strings
+      if (!amountStr || amountStr === "0") {
+        return "0"
+      }
 
-  return formatted
+      // Remove any decimal points for BigInt conversion
+      const cleanAmount = amountStr.split('.')[0] || "0"
+
+      // Handle scientific notation by converting to BigInt directly
+      try {
+        value = BigInt(cleanAmount)
+      } catch {
+        // If BigInt conversion fails, try parsing as number first
+        const num = Number(cleanAmount)
+        if (!isFinite(num) || isNaN(num)) {
+          return "0"
+        }
+        value = BigInt(Math.floor(num))
+      }
+    }
+
+    // Use SDK's formatRawAmount with MINIFY format for leaderboard display
+    // MINIFY format automatically handles K/M suffixes and decimal precision
+    return formatRawAmount(value, decimals, FORMAT_TYPE.MINIFY)
+  } catch (error) {
+    console.error("Error formatting token amount:", error, { amount, decimals })
+    return "0"
+  }
 }
 
 /**
@@ -246,10 +270,13 @@ export function mapLeaderboardToOverviewData(
   // Determine user's prize if they're a winner
   let userPrize = { amount: "0", tokenSymbol: leaderboard.token.symbol }
   if (userRanking && leaderboard.shares && userRanking.rank <= leaderboard.shares.length) {
-    const sharePercentage = Number(leaderboard.shares[userRanking.rank - 1]) / 10000
-    const prizeAmount = (Number(leaderboard.totalShares) * sharePercentage).toString()
+    // The shares array already contains the reward amounts in smallest units
+    // No need to calculate percentage - shares[rank-1] IS the reward amount
+    const rewardAmount = typeof leaderboard.shares[userRanking.rank - 1] === 'bigint'
+      ? leaderboard.shares[userRanking.rank - 1]
+      : BigInt(leaderboard.shares[userRanking.rank - 1])
     userPrize = {
-      amount: formatTokenAmount(prizeAmount, leaderboard.token.decimals),
+      amount: formatTokenAmount(rewardAmount, leaderboard.token.decimals),
       tokenSymbol: leaderboard.token.symbol,
     }
   }
@@ -293,9 +320,12 @@ export function mapRankingToEntry(
   // Calculate reward amount based on rank and shares
   let rewardAmount = "0"
   if (leaderboard.shares && ranking.rank <= leaderboard.shares.length && ranking.rank > 0) {
-    const sharePercentage = Number(leaderboard.shares[ranking.rank - 1]) / 10000
-    const prizeAmount = (Number(leaderboard.totalShares) * sharePercentage).toString()
-    rewardAmount = formatTokenAmount(prizeAmount, leaderboard.token.decimals)
+    // The shares array already contains the reward amounts in smallest units
+    // No need to calculate percentage - shares[rank-1] IS the reward amount
+    const rewardValue = typeof leaderboard.shares[ranking.rank - 1] === 'bigint'
+      ? leaderboard.shares[ranking.rank - 1]
+      : BigInt(leaderboard.shares[ranking.rank - 1])
+    rewardAmount = formatTokenAmount(rewardValue, leaderboard.token.decimals)
   }
 
   // Format player address for display
