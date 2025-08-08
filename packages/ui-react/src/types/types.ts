@@ -146,14 +146,8 @@ export interface LeaderboardUserStats {
   contractAddress: string
 }
 
-export interface LeaderboardRule {
-  text: string
-  isHighlighted?: boolean
-}
-
 export interface LeaderboardOverviewData extends LeaderboardItem {
   userStats: LeaderboardUserStats
-  rules: LeaderboardRule[]
   isExpired: boolean
 }
 

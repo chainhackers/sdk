@@ -1,5 +1,7 @@
 import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "lucide-react"
+import { useCallback, useEffect, useState } from "react"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
+import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewards"
 import { getChainName } from "../../lib/chainIcons"
 import { getBlockExplorerUrl } from "../../lib/chainUtils"
 import { cn } from "../../lib/utils"
@@ -10,6 +12,9 @@ import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { LeaderboardRankingTab } from "./LeaderboardRankingTab"
+import { mapRankingToEntry } from "../../utils/leaderboardUtils"
+import { fetchLeaderboard } from "@betswirl/sdk-core"
+import { useAccount } from "wagmi"
 
 interface LeaderboardOverviewProps {
   leaderboardId: string
@@ -17,69 +22,71 @@ interface LeaderboardOverviewProps {
 }
 
 export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOverviewProps) {
-  const { data } = useLeaderboardDetails(leaderboardId)
+  const { address } = useAccount()
+  const { data, refetch } = useLeaderboardDetails(leaderboardId)
+  const { claim, isPending, isSuccess, error } = useClaimLeaderboardRewards()
+  const [rankingData, setRankingData] = useState<RankingEntry[]>([])
+  const [fullLeaderboard, setFullLeaderboard] = useState<any>(null)
 
-  // Mock ranking data - replace with actual data when available
-  const avaxToken: RankingEntry["rewardToken"] = {
-    symbol: "Avax",
-    address: "0x0000000000000000000000000000000000000000",
-    decimals: 18,
-    image: "https://www.betswirl.com/img/tokens/AVAX.svg",
-  }
+  useEffect(() => {
+    const fetchFullLeaderboard = async () => {
+      if (!leaderboardId) return
 
-  const mockRankingData: RankingEntry[] = [
-    {
-      rank: 1,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 3657854,
-      rewardAmount: "20 000",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 2,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 3657854,
-      rewardAmount: "19886",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 3,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 3657854,
-      rewardAmount: "<0.001",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 17,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 151260,
-      rewardAmount: "1456",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 32,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 43667,
-      rewardAmount: "143",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 78,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 54432,
-      rewardAmount: "140",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 100,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 13342,
-      rewardAmount: "0",
-      rewardToken: avaxToken,
-    },
-  ]
+      try {
+        const leaderboard = await fetchLeaderboard(
+          Number(leaderboardId),
+          address,
+          false
+        )
+
+        if (leaderboard) {
+          setFullLeaderboard(leaderboard)
+
+          if (leaderboard.rankings && leaderboard.rankings.length > 0) {
+            const mappedRankings = leaderboard.rankings.map((ranking: any) =>
+              mapRankingToEntry(ranking, leaderboard)
+            )
+            setRankingData(mappedRankings)
+          } else {
+            setRankingData([])
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch full leaderboard:", error)
+        setRankingData([])
+      }
+    }
+
+    fetchFullLeaderboard()
+  }, [leaderboardId, address])
+
+  useEffect(() => {
+    if (isSuccess) {
+      refetch()
+    }
+  }, [isSuccess, refetch])
+
+  const handleClaim = useCallback(async () => {
+    if (!data || !leaderboardId) return
+
+    const leaderboard = fullLeaderboard || await fetchLeaderboard(
+      Number(leaderboardId),
+      address,
+    )
+
+    if (!leaderboard) {
+      console.error("Failed to fetch leaderboard for claiming")
+      return
+    }
+
+    claim({ leaderboard })
+  }, [data, leaderboardId, address, claim, fullLeaderboard])
 
   if (!data) return null
+
+  const canClaim = data.userStats.status === "Claimable" &&
+                   data.userStats.prize.amount !== "0" &&
+                   !data.isExpired
 
   const contractUrl = getBlockExplorerUrl(data.chainId, data.userStats.contractAddress)
 
@@ -145,16 +152,32 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                       <div className="text-[16px] font-semibold">{data.userStats.prize.amount}</div>
                     </div>
                   </div>
-                  <Button
-                    className={cn(
-                      "bg-primary hover:bg-primary/90",
-                      "text-white font-semibold",
-                      "rounded-[8px] h-[32px] px-4 py-1.5 w-fit",
-                      "text-[12px] leading-[20px]",
-                    )}
-                  >
-                    Claim {data.userStats.prize.amount} {data.userStats.prize.tokenSymbol}
-                  </Button>
+                  {canClaim ? (
+                    <Button
+                      onClick={handleClaim}
+                      disabled={isPending}
+                      className={cn(
+                        "bg-primary hover:bg-primary/90",
+                        "text-white font-semibold",
+                        "rounded-[8px] h-[32px] px-4 py-1.5 w-fit",
+                        "text-[12px] leading-[20px]",
+                        isPending && "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      {isPending
+                        ? "Claiming..."
+                        : `Claim ${data.userStats.prize.amount} ${data.userStats.prize.tokenSymbol}`
+                      }
+                    </Button>
+                  ) : (
+                    <div className="text-[12px] text-muted-foreground">
+                      {data.userStats.prize.amount === "0"
+                        ? "No rewards to claim"
+                        : data.isExpired
+                        ? "Claim period expired"
+                        : "Not claimable"}
+                    </div>
+                  )}
                 </div>
                 {contractUrl ? (
                   <a
@@ -187,7 +210,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                   </div>
                 </div>
                 <ul className="flex flex-col gap-2">
-                  {data.rules[0]?.isHighlighted && (
                     <Alert variant="info">
                       <AlertCircle className="h-[16px] w-[16px]" />
                       <AlertDescription className="text-[12px] leading-[20px]">
@@ -196,7 +218,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                         }
                       </AlertDescription>
                     </Alert>
-                  )}
                   <ul className="flex flex-col gap-2">
                     <li className="text-[14px] leading-[22px] text-foreground">
                       <strong>The competition is scored using a point system:</strong>
@@ -233,6 +254,18 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                   </AlertDescription>
                 </Alert>
               )}
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-[16px] w-[16px]" />
+                  <AlertTitle className="text-[14px] leading-[22px] font-medium">
+                    Claim failed
+                  </AlertTitle>
+                  <AlertDescription className="text-[12px] leading-[20px]">
+                    {error.message}
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           </ScrollArea>
         </TabsContent>
@@ -241,10 +274,12 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
           <ScrollArea className="h-full">
             <div className="pb-4 px-4 pt-1">
               <LeaderboardRankingTab
-                rankingData={mockRankingData}
-                lastUpdate="Last update: 21 days ago (refreshed once per hour)"
-                claimableAmount="<0.0001"
-                claimableTokenSymbol="Avax"
+                rankingData={rankingData}
+                lastUpdate="Last update: recently (refreshed once per hour)"
+                claimableAmount={data.userStats.prize.amount}
+                claimableTokenSymbol={data.userStats.prize.tokenSymbol}
+                leaderboardStatus={data.userStats.status}
+                isExpired={data.isExpired}
               />
             </div>
           </ScrollArea>

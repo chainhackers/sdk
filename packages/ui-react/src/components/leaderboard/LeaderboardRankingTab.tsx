@@ -8,6 +8,8 @@ interface LeaderboardRankingTabProps {
   lastUpdate: string
   claimableAmount: string
   claimableTokenSymbol: string
+  leaderboardStatus?: "Finalized" | "Ongoing" | "Claimable"
+  isExpired?: boolean
 }
 
 export function LeaderboardRankingTab({
@@ -15,6 +17,8 @@ export function LeaderboardRankingTab({
   lastUpdate,
   claimableAmount,
   claimableTokenSymbol,
+  leaderboardStatus = "Ongoing",
+  isExpired = false,
 }: LeaderboardRankingTabProps) {
   // Split top 3 and remaining entries
   const topThree = rankingData.slice(0, 3)
@@ -50,7 +54,13 @@ export function LeaderboardRankingTab({
         <div className="text-center py-8">
           <p className="text-[16px] font-semibold text-card-foreground">No rankings available</p>
           <p className="text-[14px] text-muted-foreground mt-1">
-            Rankings will appear once the competition starts
+            {leaderboardStatus === "Ongoing"
+              ? "Rankings will appear once players start participating"
+              : isExpired
+                ? "This leaderboard has expired"
+                : leaderboardStatus === "Finalized" || leaderboardStatus === "Claimable"
+                  ? "No rankings data available for this completed leaderboard"
+                  : "Rankings will appear once the competition starts"}
           </p>
         </div>
       )}
