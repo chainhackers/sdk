@@ -1,5 +1,5 @@
 import { type CasinoChainId, chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { ChevronDown, Settings } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { Button } from "../../components/ui/button"

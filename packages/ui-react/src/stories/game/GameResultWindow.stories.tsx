@@ -1,5 +1,5 @@
 import { CASINO_GAME_TYPE, COINTOSS_FACE } from "@betswirl/sdk-core"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { parseUnits } from "viem"
 import { GameResultWindow } from "../../components/game/GameResultWindow"
 import { GameResult } from "../../types/types"

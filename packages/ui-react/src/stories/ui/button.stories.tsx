@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Info } from "lucide-react"
 import coinHeadsIcon from "../../assets/game/coin-heads.svg"
 import { Button } from "../../components/ui/button"
