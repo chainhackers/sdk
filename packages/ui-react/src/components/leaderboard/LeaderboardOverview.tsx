@@ -28,7 +28,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
   const [rankingData, setRankingData] = useState<RankingEntry[]>([])
   const [fullLeaderboard, setFullLeaderboard] = useState<any>(null)
 
-  // Fetch full leaderboard data with rankings
   useEffect(() => {
     const fetchFullLeaderboard = async () => {
       if (!leaderboardId) return
@@ -43,7 +42,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
         if (leaderboard) {
           setFullLeaderboard(leaderboard)
 
-          // Map rankings to UI format
           if (leaderboard.rankings && leaderboard.rankings.length > 0) {
             const mappedRankings = leaderboard.rankings.map((ranking: any) =>
               mapRankingToEntry(ranking, leaderboard)
@@ -62,23 +60,18 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
     fetchFullLeaderboard()
   }, [leaderboardId, address])
 
-  // Handle successful claim
   useEffect(() => {
     if (isSuccess) {
-      // Refetch leaderboard data to update UI
       refetch()
     }
   }, [isSuccess, refetch])
 
-  // Handle claim button click
   const handleClaim = useCallback(async () => {
     if (!data || !leaderboardId) return
 
-    // Use the already fetched leaderboard or fetch it again
     const leaderboard = fullLeaderboard || await fetchLeaderboard(
       Number(leaderboardId),
       address,
-      false
     )
 
     if (!leaderboard) {
@@ -86,13 +79,11 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
       return
     }
 
-    // Trigger the claim
     claim({ leaderboard })
   }, [data, leaderboardId, address, claim, fullLeaderboard])
 
   if (!data) return null
 
-  // Determine if user can claim
   const canClaim = data.userStats.status === "Claimable" &&
                    data.userStats.prize.amount !== "0" &&
                    !data.isExpired
@@ -219,7 +210,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                   </div>
                 </div>
                 <ul className="flex flex-col gap-2">
-                  {data.rules[0]?.isHighlighted && (
                     <Alert variant="info">
                       <AlertCircle className="h-[16px] w-[16px]" />
                       <AlertDescription className="text-[12px] leading-[20px]">
@@ -228,7 +218,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                         }
                       </AlertDescription>
                     </Alert>
-                  )}
                   <ul className="flex flex-col gap-2">
                     <li className="text-[14px] leading-[22px] text-foreground">
                       <strong>The competition is scored using a point system:</strong>

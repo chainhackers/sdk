@@ -60,11 +60,8 @@ export function useClaimLeaderboardRewards() {
 
       const targetAddress = receiver || address!
 
-      // Create a BetSwirl wallet wrapper for SDK functions
-      // This follows the same pattern as other hooks in the project
       const wallet = { publicClient, walletClient } as unknown as BetSwirlWallet
 
-      // First check if there's anything to claim
       const claimableAmount = await getClaimableAmount(
         wallet,
         leaderboard.onChainId,
@@ -76,27 +73,22 @@ export function useClaimLeaderboardRewards() {
         throw new Error("No rewards to claim")
       }
 
-      // Call the SDK function to claim rewards
-      // The function handles the transaction submission and waiting
       const result = await claimLeaderboardRewards(
         wallet,
         leaderboard,
         targetAddress,
-        5000 // polling interval in ms
+        5000
       )
 
       return result
     },
-    onSuccess: (data, variables) => {
-      // Invalidate relevant queries after successful claim
-      // This will trigger refetch of leaderboard data to update UI
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["leaderboards"]
       })
       queryClient.invalidateQueries({
         queryKey: ["leaderboardDetails", variables.leaderboard.id]
       })
-      // Also invalidate user balance queries if they exist
       queryClient.invalidateQueries({
         queryKey: ["balances"]
       })

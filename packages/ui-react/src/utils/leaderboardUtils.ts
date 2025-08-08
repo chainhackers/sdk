@@ -13,7 +13,6 @@ import type {
   LeaderboardStatus,
   LeaderboardBadgeStatus,
   LeaderboardUserAction,
-  LeaderboardRule,
   RankingEntry,
   TokenWithImage,
 } from "../types/types"
@@ -77,9 +76,7 @@ export function determineUserAction(
       if (userRanking.rank <= winnerCount && userRanking.rank > 0) {
         // The shares array already contains the reward amounts in smallest units
         // No need to calculate percentage - shares[rank-1] IS the reward amount
-        const rewardAmount = typeof leaderboard.shares[userRanking.rank - 1] === 'bigint'
-          ? leaderboard.shares[userRanking.rank - 1]
-          : BigInt(leaderboard.shares[userRanking.rank - 1])
+        const rewardAmount = leaderboard.shares[userRanking.rank - 1]
 
         return {
           type: "claim",
@@ -103,44 +100,8 @@ export function determineUserAction(
  * Format token amount for display
  * Uses SDK's formatRawAmount for consistent formatting across the app
  */
-export function formatTokenAmount(amount: string | bigint, decimals: number): string {
-  try {
-    let value: bigint
-
-    if (typeof amount === 'bigint') {
-      value = amount
-    } else {
-      // Handle string inputs
-      const amountStr = amount.toString().trim()
-
-      // Return 0 for empty or invalid strings
-      if (!amountStr || amountStr === "0") {
-        return "0"
-      }
-
-      // Remove any decimal points for BigInt conversion
-      const cleanAmount = amountStr.split('.')[0] || "0"
-
-      // Handle scientific notation by converting to BigInt directly
-      try {
-        value = BigInt(cleanAmount)
-      } catch {
-        // If BigInt conversion fails, try parsing as number first
-        const num = Number(cleanAmount)
-        if (!isFinite(num) || isNaN(num)) {
-          return "0"
-        }
-        value = BigInt(Math.floor(num))
-      }
-    }
-
-    // Use SDK's formatRawAmount with MINIFY format for leaderboard display
-    // MINIFY format automatically handles K/M suffixes and decimal precision
-    return formatRawAmount(value, decimals, FORMAT_TYPE.MINIFY)
-  } catch (error) {
-    console.error("Error formatting token amount:", error, { amount, decimals })
-    return "0"
-  }
+function formatTokenAmount(amount: bigint, decimals: number): string {
+  return formatRawAmount(amount, decimals, FORMAT_TYPE.MINIFY)
 }
 
 /**
@@ -182,78 +143,6 @@ export function mapLeaderboardToItem(
 }
 
 /**
- * Generate rules text from leaderboard configuration
- */
-export function generateRules(leaderboard: Leaderboard): LeaderboardRule[] {
-  const rules: LeaderboardRule[] = []
-
-  // Always add the important rule about bet rolling
-  rules.push({
-    text: "A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking.",
-    isHighlighted: true,
-  })
-
-  rules.push({
-    text: "The competition is scored using a point system:",
-  })
-
-  // Add game-specific rules
-  if (leaderboard.casinoRules) {
-    const { games, tokens, interval, pointsPerInterval, minValue } = leaderboard.casinoRules
-
-    // Games rule
-    const gameNames = games.map(g => g.toLowerCase()).join(" or ")
-    const chainName = getChainName(leaderboard.chainId as CasinoChainId)
-    rules.push({
-      text: `You have to play on the ${gameNames} games and on the chain ${chainName}`,
-    })
-
-    // Tokens rule
-    const tokenSymbols = tokens.map(t => t.symbol).join(", ")
-    rules.push({
-      text: `You have to play with ${tokenSymbols} tokens`,
-    })
-
-    // Points calculation rule
-    const intervalFormatted = formatTokenAmount(interval.toString(), tokens[0]?.decimals || 18)
-    rules.push({
-      text: `You earn ${pointsPerInterval} points per interval of ${intervalFormatted} ${tokens[0]?.symbol || 'tokens'}`,
-    })
-
-    // Add examples
-    const example1Amount = Number(interval) * 3
-    const example1Points = pointsPerInterval * 3
-    rules.push({
-      text: `Example 1: You bet ${example1Amount} ${tokens[0]?.symbol} at ${games[0]?.toLowerCase()} ⇒ You earn ${example1Points} points`,
-    })
-
-    const example2Amount = Number(interval) * 10.5
-    const example2Points = pointsPerInterval * 10
-    rules.push({
-      text: `Example 2: You bet ${Math.floor(example2Amount)} ${tokens[0]?.symbol} at ${games[1]?.toLowerCase() || games[0]?.toLowerCase()} ⇒ You earn ${example2Points} points`,
-    })
-  }
-
-  return rules
-}
-
-/**
- * Get chain name helper (should be imported from chainUtils but adding here for completeness)
- */
-function getChainName(chainId: CasinoChainId): string {
-  const chainNames: Record<number, string> = {
-    1: "Ethereum",
-    56: "BNB Smart Chain",
-    137: "Polygon",
-    8453: "Base",
-    42161: "Arbitrum",
-    43114: "Avalanche",
-    10: "Optimism",
-  }
-  return chainNames[chainId] || "Unknown"
-}
-
-/**
  * Convert SDK Leaderboard to UI LeaderboardOverviewData
  */
 export function mapLeaderboardToOverviewData(
@@ -272,9 +161,7 @@ export function mapLeaderboardToOverviewData(
   if (userRanking && leaderboard.shares && userRanking.rank <= leaderboard.shares.length) {
     // The shares array already contains the reward amounts in smallest units
     // No need to calculate percentage - shares[rank-1] IS the reward amount
-    const rewardAmount = typeof leaderboard.shares[userRanking.rank - 1] === 'bigint'
-      ? leaderboard.shares[userRanking.rank - 1]
-      : BigInt(leaderboard.shares[userRanking.rank - 1])
+    const rewardAmount = leaderboard.shares[userRanking.rank - 1]
     userPrize = {
       amount: formatTokenAmount(rewardAmount, leaderboard.token.decimals),
       tokenSymbol: leaderboard.token.symbol,
@@ -298,7 +185,6 @@ export function mapLeaderboardToOverviewData(
       prize: userPrize,
       contractAddress: leaderboard.leaderboardAddress || "0x0000000000000000000000000000000000000000",
     },
-    rules: generateRules(leaderboard),
     isExpired: leaderboard.status === LEADERBOARD_STATUS.EXPIRED,
   }
 }
@@ -322,9 +208,7 @@ export function mapRankingToEntry(
   if (leaderboard.shares && ranking.rank <= leaderboard.shares.length && ranking.rank > 0) {
     // The shares array already contains the reward amounts in smallest units
     // No need to calculate percentage - shares[rank-1] IS the reward amount
-    const rewardValue = typeof leaderboard.shares[ranking.rank - 1] === 'bigint'
-      ? leaderboard.shares[ranking.rank - 1]
-      : BigInt(leaderboard.shares[ranking.rank - 1])
+    const rewardValue = leaderboard.shares[ranking.rank - 1]
     rewardAmount = formatTokenAmount(rewardValue, leaderboard.token.decimals)
   }
 

@@ -16,28 +16,20 @@ export function LeaderboardCardActions({ item, onViewOverview, onClaimSuccess }:
   const { address } = useAccount()
   const { claim, isPending, isSuccess } = useClaimLeaderboardRewards()
 
-  // Handle successful claim
   useEffect(() => {
     if (isSuccess && onClaimSuccess) {
       onClaimSuccess()
     }
   }, [isSuccess, onClaimSuccess])
 
-  // Handle claim button click
   const handleClaim = useCallback(async () => {
-    // Fetch the full leaderboard object for claiming
-    const leaderboard = await fetchLeaderboard(
-      Number(item.id),
-      address,
-      false
-    )
+    const leaderboard = await fetchLeaderboard(Number(item.id), address)
 
     if (!leaderboard) {
       console.error("Failed to fetch leaderboard for claiming")
       return
     }
 
-    // Trigger the claim
     claim({ leaderboard })
   }, [item.id, address, claim])
 

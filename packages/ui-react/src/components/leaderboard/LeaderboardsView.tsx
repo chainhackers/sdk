@@ -14,9 +14,7 @@ export function LeaderboardsView({ onViewOverview }: Props) {
     useLeaderboards()
   const queryClient = useQueryClient()
 
-  // Callback to refresh leaderboards after successful claim
   const handleClaimSuccess = useCallback(() => {
-    // Invalidate and refetch leaderboards data
     queryClient.invalidateQueries({ queryKey: ["leaderboards"] })
   }, [queryClient])
 

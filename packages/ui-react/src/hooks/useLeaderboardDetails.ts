@@ -1,7 +1,4 @@
-import {
-  fetchLeaderboard,
-  type BetSwirlWallet,
-} from "@betswirl/sdk-core"
+import { fetchLeaderboard } from "@betswirl/sdk-core"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount, usePublicClient } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -33,28 +30,16 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
         throw new Error("Public client not initialized")
       }
 
-      // Create a minimal wallet wrapper for SDK functions
-      const wallet = { publicClient } as unknown as BetSwirlWallet
-
-      // Fetch detailed leaderboard data from the API
-      const leaderboard = await fetchLeaderboard(
-        Number(leaderboardId), // leaderboard ID
-        address, // player address for personalized data
-        false // not test mode
-      )
+      const leaderboard = await fetchLeaderboard(Number(leaderboardId), address)
 
       if (!leaderboard) {
         throw new Error(`Leaderboard ${leaderboardId} not found`)
       }
 
-      // Convert SDK leaderboard to UI overview format
       return mapLeaderboardToOverviewData(leaderboard, address)
     },
-    // Only fetch if we have a leaderboard ID and public client
     enabled: !!leaderboardId && !!publicClient,
-    // Refetch every 30 seconds to keep data fresh
     refetchInterval: 30000,
-    // Keep data in cache for 5 minutes
     staleTime: 5 * 60 * 1000,
   })
 
