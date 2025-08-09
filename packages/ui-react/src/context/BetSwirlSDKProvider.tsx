@@ -17,6 +17,7 @@ export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) =
     filteredTokens,
     supportedChains,
     freebetsAffiliates,
+    withExternalBankrollFreebets,
   } = props
 
   return (
@@ -26,6 +27,7 @@ export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) =
         bankrollToken={bankrollToken}
         filteredTokens={filteredTokens}
         freebetsAffiliates={freebetsAffiliates}
+        withExternalBankrollFreebets={withExternalBankrollFreebets}
       >
         {children}
       </ConfigProvider>

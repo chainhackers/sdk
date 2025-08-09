@@ -68,6 +68,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
             affiliate={affiliate}
             supportedChains={SUPPORTED_CHAINS.map((chain) => chain.id)}
             freebetsAffiliates={freebetsAffiliates}
+            withExternalBankrollFreebets={true}
           >
             <TokenProvider>
               <FreebetsProvider>

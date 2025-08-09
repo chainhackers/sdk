@@ -17,7 +17,7 @@ interface FreebetsHubSheetPanelProps {
   freebets: FreeBet[]
   onConnectWallet: () => void
   onClaimCode: (code: string) => void
-  onSelectFreebet: (freebet: FreeBet | null) => void
+  onSelectFreebet: (freebet: FreeBet) => void
 }
 
 const MAX_CODE_LENGTH = 10

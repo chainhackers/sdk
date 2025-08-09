@@ -11,7 +11,9 @@ import {
 } from "react"
 import { useAccount } from "wagmi"
 import { QUERY_DEFAULTS } from "../constants/queryDefaults"
+import { getTokenImage } from "../lib/utils"
 import { FreeBet, TokenWithImage } from "../types/types"
+import { formatExpireAt } from "../utils/formatExpireAt"
 import { useChain } from "./chainContext"
 import { useBettingConfig } from "./configContext"
 
@@ -31,16 +33,22 @@ interface FreebetsProviderProps {
 export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
   const { appChainId, switchAppChain, availableChainIds } = useChain()
-  const { affiliate, freebetsAffiliates } = useBettingConfig()
+  const { affiliate, freebetsAffiliates, withExternalBankrollFreebets } = useBettingConfig()
   //const [freebetsInCurrentChain, setFreebetsInCurrentChain] = useState<FreeBet[]>([])
   const [selectedFreebet, setSelectedFreebet] = useState<FreeBet | null>(null)
 
   const { data: freebets = [] } = useQuery({
-    queryKey: ["freebets", accountAddress],
+    queryKey: [
+      "freebets",
+      accountAddress,
+      availableChainIds,
+      withExternalBankrollFreebets,
+      affiliate,
+      freebetsAffiliates,
+    ],
     queryFn: fetchFreebetsTokens,
     enabled: !!accountAddress,
     staleTime: QUERY_DEFAULTS.STALE_TIME,
-    select: (data) => data.filter((freebet) => availableChainIds.includes(freebet.chainId)),
   })
 
   const freebetsInCurrentChain = useMemo(() => {
@@ -77,16 +85,27 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
         : undefined
     console.log("affiliates: ", affiliates)
 
-    const allFreebets = await fetchFreebets(accountAddress, affiliates)
+    const allFreebets = await fetchFreebets(
+      accountAddress,
+      affiliates,
+      withExternalBankrollFreebets,
+    )
     console.log("allFreebets: ", allFreebets)
 
-    const formatedFreebets: FreeBet[] = allFreebets.map((freebet) => ({
+    const filteredFreebetsByChains = allFreebets.filter((freebet) =>
+      availableChainIds.includes(freebet.chainId),
+    )
+
+    const formatedFreebets: FreeBet[] = filteredFreebetsByChains.map((freebet) => ({
       id: freebet.id.toString(),
       title: freebet.campaign.label,
       amount: Number(freebet.formattedAmount),
-      token: freebet.token as TokenWithImage,
+      token: {
+        ...freebet.token,
+        image: getTokenImage(freebet.token.symbol),
+      } as TokenWithImage,
       chainId: freebet.chainId,
-      //expiresAt: new Date(freebet.expirationDate).toISOString(),
+      expiresAt: formatExpireAt(freebet.expirationDate),
     }))
 
     return formatedFreebets

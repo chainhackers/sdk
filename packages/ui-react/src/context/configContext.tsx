@@ -8,6 +8,7 @@ export type ConfigContextValue = {
   bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
   freebetsAffiliates?: Address[]
+  withExternalBankrollFreebets?: boolean
 }
 
 const ConfigContext = createContext<ConfigContextValue | null>(null)
@@ -24,6 +25,7 @@ export type ConfigProviderProps = {
   bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
   freebetsAffiliates?: Address[]
+  withExternalBankrollFreebets?: boolean
 }
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
@@ -33,6 +35,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
     bankrollToken,
     filteredTokens,
     freebetsAffiliates,
+    withExternalBankrollFreebets = false,
   } = props
   const { appChain } = useChain()
 
@@ -48,8 +51,9 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
       bankrollToken,
       filteredTokens,
       freebetsAffiliates,
+      withExternalBankrollFreebets,
     }),
-    [affiliate, bankrollToken, filteredTokens, freebetsAffiliates],
+    [affiliate, bankrollToken, filteredTokens, freebetsAffiliates, withExternalBankrollFreebets],
   )
 
   return <ConfigContext.Provider value={context}>{children}</ConfigContext.Provider>

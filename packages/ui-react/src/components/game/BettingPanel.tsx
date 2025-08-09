@@ -254,6 +254,7 @@ export function BettingPanel({
   const handleFreeBetSelect = (freeBet: FreeBet) => {
     selectFreebet(freeBet)
     setIsFreeBetSheetOpen(false)
+    setIsFreebetsHubOpen(false)
   }
 
   const handleRemoveFreeBet = () => {
@@ -408,7 +409,7 @@ export function BettingPanel({
             portalContainer={portalContainer}
             isConnected={isConnected}
             freebets={freebets}
-            onSelectFreebet={selectFreebet}
+            onSelectFreebet={handleFreeBetSelect}
             onConnectWallet={() => {
               setWasFreebetsHubOpenBeforeWallet(true)
               setIsFreebetsHubOpen(false)
