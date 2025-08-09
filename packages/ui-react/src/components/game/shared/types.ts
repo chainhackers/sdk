@@ -1,6 +1,5 @@
 import React from "react"
 import { Theme } from "../../../types/types"
-import type { FreeBet } from "../BettingPanel"
 
 export interface BaseGameProps extends React.HTMLAttributes<HTMLDivElement> {
   theme?: Theme
@@ -11,7 +10,6 @@ export interface BaseGameProps extends React.HTMLAttributes<HTMLDivElement> {
     "--game-window-overlay"?: string
   } & React.CSSProperties
   backgroundImage?: string
-  freeBets?: FreeBet[] // TODO: Remove this prop once freebets are implemented using context
 }
 
 export interface GameControlsProps {

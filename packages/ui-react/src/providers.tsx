@@ -7,6 +7,7 @@ import { avalanche, base, polygon } from "wagmi/chains"
 import { QUERY_DEFAULTS } from "./constants/queryDefaults"
 import { BalanceProvider } from "./context/BalanceContext"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
+import { FreebetsProvider } from "./context/FreebetsContext"
 import { TokenProvider } from "./context/tokenContext"
 
 // Define supported chains in one place
@@ -20,6 +21,7 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: QUERY_DEFAULTS.REFETCH_ON_WINDOW_FOCUS,
       refetchOnReconnect: QUERY_DEFAULTS.REFETCH_ON_RECONNECT,
       retry: QUERY_DEFAULTS.RETRY_COUNT,
+      structuralSharing: true,
     },
   },
 })
@@ -42,6 +44,8 @@ export function AppProviders({ children }: { children: ReactNode }) {
     },
   })
 
+  const freebetsAffiliates = affiliate ? [affiliate] : undefined
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
@@ -63,9 +67,13 @@ export function AppProviders({ children }: { children: ReactNode }) {
             initialChainId={DEFAULT_CHAIN.id}
             affiliate={affiliate}
             supportedChains={SUPPORTED_CHAINS.map((chain) => chain.id)}
+            freebetsAffiliates={freebetsAffiliates}
+            withExternalBankrollFreebets={true}
           >
             <TokenProvider>
-              <BalanceProvider>{children}</BalanceProvider>
+              <FreebetsProvider>
+                <BalanceProvider>{children}</BalanceProvider>
+              </FreebetsProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>
         </OnchainKitProvider>
