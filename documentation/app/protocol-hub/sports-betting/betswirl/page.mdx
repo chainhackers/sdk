@@ -1,0 +1,41 @@
+import { Cards } from 'nextra/components'
+import { Callout } from 'nextra/components'
+import { Tabs, Tab } from 'nextra/components'
+import { Steps } from 'nextra/components'
+import { Trophy, Shield, Globe, Zap, Gamepad2, Sparkles, Users, Target } from 'lucide-react'
+import Image from 'next/image'
+
+# ⚽ Sports Betting
+
+BetSwirl, in collaboration with [Azuro](/protocol-hub/sports-betting/azuro), offers a seamless, non-custodial environment for both sports and eSports on-chain betting for enhanced transparency and fairness.
+
+<Image 
+  src="/img/headers/sports.png" 
+  alt="BetSwirl Banner" 
+  width={1200} 
+  height={300} 
+  className="w-full rounded-lg mb-6"
+  priority
+/>
+
+**With no logins or deposits required, users can claim their winnings directly through blockchain transactions to their wallets, eliminating the need for traditional bookmakers.**
+
+## 🎯 BetSwirl's Role as Frontend
+
+BetSwirl serves as a **user-friendly frontend interface** for Azuro's decentralized sports betting protocol. This means that BetSwirl acts as a gateway to the underlying betting infrastructure, providing an intuitive way for users to interact with the protocol.
+
+### **What BetSwirl Does:**
+- **User Interface** - Provides an easy-to-use interface for placing bets
+- **Wallet Integration** - Connects users' wallets to the betting protocol
+- **Bet Display** - Shows available sports, events, and odds
+- **Transaction Facilitation** - Helps users execute betting transactions
+
+### **What BetSwirl Cannot Do:**
+- **Cancel Bets** - Once a bet is placed on-chain, it cannot be cancelled by BetSwirl
+- **Control Outcomes** - BetSwirl has no influence over game results or odds
+- **Manipulate Results** - All outcomes are determined by decentralized oracles
+- **Access User Funds** - BetSwirl never has access to users' private keys or funds
+
+<Callout type="warning">
+  BetSwirl is a frontend interface only. All betting logic, fund management, and result verification are handled by the decentralized Azuro protocol. BetSwirl cannot cancel, modify, or control any bets once they are placed on the blockchain.
+</Callout>

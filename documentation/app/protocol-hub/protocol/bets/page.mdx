@@ -1,0 +1,162 @@
+import { Cards } from 'nextra/components'
+import { Callout } from 'nextra/components'
+import { Tabs, Tab } from 'nextra/components'
+import { Coins, Flame, TrendingUp, Shield, Users, Globe, Zap, BarChart3 } from 'lucide-react'
+import Image from 'next/image'
+
+# $BETS Token
+
+BETS is BetSwirl's native token, serving as the cornerstone of our ecosystem. With its deflationary design and comprehensive utility across all our platforms, BETS represents more than just a token—it's the fuel that powers the entire BetSwirl experience.
+
+<div className="flex justify-center mb-6">
+  <Image 
+    src="/logo.png" 
+    alt="BETS logo" 
+    width={120} 
+    height={120} 
+    className="rounded-lg"
+    priority
+  />
+</div>
+
+## Contract Address
+
+The BETS contract address is **identical across all chains**: `0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5`
+
+<Callout type="info">
+  This address remains the same whether you're on Ethereum, Polygon, BNB Chain, or any other supported network.
+</Callout>
+
+### Blockchain Explorers
+
+You can verify the BETS contract on the following blockchain scanners:
+
+| Explorer | Network | Link |
+|----------|---------|------|
+| Etherscan | Ethereum | [View Contract](https://etherscan.io/token/0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5) |
+| Arbiscan | Arbitrum | [View Contract](https://arbiscan.io/token/0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5) |
+| Polygonscan | Polygon | [View Contract](https://polygonscan.com/token/0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5) |
+| Snowscan | Avalanche | [View Contract](https://snowscan.xyz/token/0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5) |
+| Bscscan | BNB Chain | [View Contract](https://bscscan.com/token/0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5) |
+| Basescan | Base | [View Contract](https://basescan.org/token/0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5) |
+
+## Analytics & Tracking
+
+Monitor BETS performance and metrics across multiple platforms:
+
+| Platform | Type | Link |
+|----------|------|------|
+| Dune Analytics | Analytics | [View Dashboards](https://dune.com/browse/dashboards?q=betswirl) |
+| DefiLlama | Token Data | [View Token](https://defillama.com/token/0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5) |
+| CoinMarketCap | Price Tracking | [View Listing](https://coinmarketcap.com/currencies/betswirl/) |
+| CoinGecko | Price Tracking | [View Listing](https://www.coingecko.com/en/coins/betswirl) |
+
+## Tokenomics
+
+### Supply
+
+<Callout type="warning">
+  **Total Supply**: 7,777,777,777 BETS (Fixed)
+</Callout>
+
+The total supply of BETS is currently **lower than the initial total supply**, thanks to the token's deflationary design. Internal burning and buy-back mechanisms ensure that the total supply will continue to decrease over time.
+
+### Deflationary Mechanism
+
+{(() => {
+  const deflationaryFeatures = [
+    {
+      id: 'burning',
+      title: 'BETS Burning',
+      icon: <Flame className="w-6 h-6 text-red-500" />,
+      description: 'Each month, as revenue from bets placed with other tokens is distributed to stakers, the revenue derived from bets placed using BETS is <strong>burned</strong>. This process guarantees the continuous decrease of BETS total supply.'
+    },
+    {
+      id: 'buyback',
+      title: 'Buy-Back Mechanism',
+      icon: <TrendingUp className="w-6 h-6 text-green-500" />,
+      description: 'Our internal buy-back mechanisms work alongside the burning process to create additional deflationary pressure, ensuring BETS becomes increasingly scarce over time.'
+    }
+  ];
+
+  const tabItems = ['Burning', 'Buy-Back'];
+
+  return (
+    <Tabs items={tabItems}>
+      {tabItems.map((tabName) => {
+        const featureId = tabName.toLowerCase().replace('-', '');
+        const feature = deflationaryFeatures.find(f => f.id === featureId);
+        
+        return (
+          <Tabs.Tab key={featureId}>
+            <div className="w-full">
+              <div className="border rounded-lg p-6 bg-card text-card-foreground">
+                <div className="flex items-center gap-3 mb-4">
+                  {feature.icon}
+                  <h3 className="text-xl font-semibold">{feature.title}</h3>
+                </div>
+                <p className="text-base text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: feature.description }} />
+              </div>
+            </div>
+          </Tabs.Tab>
+        );
+      })}
+    </Tabs>
+  );
+})()}
+
+## Utilities
+
+BETS serves multiple purposes within the BetSwirl ecosystem:
+
+### Primary Uses
+
+<Cards>
+  <Cards.Card
+    title="Casino Betting"
+    href="/protocol-hub/casino/games"
+    icon={<Zap />}
+  >
+    <div className="p-2 mt-2 text-sm opacity-90">
+      Wager BETS in any casino game: Dice, Coin Toss, Keno, Roulette, and Wheel with a lower house edge.
+    </div>
+  </Cards.Card>
+  <Cards.Card
+    title="PvP Gaming"
+    href="/protocol-hub/casino/pvp"
+    icon={<Users />}
+  >
+    <div className="p-2 mt-2 text-sm opacity-90">
+      Challenge other players in competitive PvP games using BETS.
+    </div>
+  </Cards.Card>
+  <Cards.Card
+    title="Staking Rewards"
+    href="/protocol-hub/protocol/staking"
+    icon={<Shield />}
+  >
+    <div className="p-2 mt-2 text-sm opacity-90">
+      Stake BETS/ETH on Unichain to earn rewards in USDC.
+    </div>
+  </Cards.Card>
+  <Cards.Card
+    title="Cross-Chain Utility"
+    href="/protocol-hub/protocol/contracts#-bets-token-contracts"
+    icon={<Globe />}
+  >
+    <div className="p-2 mt-2 text-sm opacity-90">
+      Use BETS seamlessly across Ethereum, Polygon, BNB Chain, Avalanche, Arbitrum and Base.
+    </div>
+  </Cards.Card>
+</Cards>
+
+## Why Choose BETS?
+
+### Deflationary Design
+With a fixed supply and continuous burning mechanisms, BETS becomes increasingly scarce over time, potentially increasing its value.
+
+### Cross-Chain Compatibility
+Use BETS on any supported blockchain without worrying about different contract addresses or complex bridging.
+
+### Comprehensive Utility
+From gambling to staking, BETS serves multiple purposes within the BetSwirl ecosystem, making it more than just a gaming token.

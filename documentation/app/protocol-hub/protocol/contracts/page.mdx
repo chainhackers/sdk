@@ -1,0 +1,124 @@
+import { Cards } from 'nextra/components'
+import { Callout } from 'nextra/components'
+import { Tabs, Tab } from 'nextra/components'
+import { Shield, Link, Database, FileText, Globe, Zap } from 'lucide-react'
+import Image from 'next/image'
+
+# 🔗 Smart Contracts
+
+BetSwirl's smart contracts are the backbone of our decentralized gaming platform. All contracts are audited by Paladin and leverage Chainlink's VRF for provably fair gaming across multiple blockchains.
+<Callout type="info">
+  All BetSwirl contracts are deployed across multiple blockchains for maximum accessibility and cross-chain compatibility.
+</Callout>
+
+## 🎯 BETS Token Contracts
+
+| Contract | Networks |
+|----------|----------|
+| **BETS Token** | [Ethereum](https://etherscan.io/token/0x94025780a1ab58868d9b2dbbb775f44b32e8e6e5), [Polygon](https://polygonscan.com/token/0x94025780a1ab58868d9b2dbbb775f44b32e8e6e5), [BNB Chain](https://bscscan.com/token/0x94025780a1ab58868d9b2dbbb775f44b32e8e6e5), [Avalanche](https://snowscan.xyz/token/0x94025780a1ab58868d9b2dbbb775f44b32e8e6e5), [Arbitrum One](https://arbiscan.io/token/0x94025780a1ab58868d9b2dbbb775f44b32e8e6e5), [Base](https://basescan.org/token/0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5), [Unichain](https://uniscan.xyz/token/0x94025780a1ab58868d9b2dbbb775f44b32e8e6e5) |
+| **Staking (inactive)** | [Ethereum](https://etherscan.io/address/0xaeaF7948C38973908fFA97c92F3384595d057135), [Polygon](https://polygonscan.com/address/0xA0D5F23dc9131597975afF96d293E5a7d0516665), [BNB Chain](https://bscscan.com/address/0x20Df34eBe5dCB1082297A18BA8d387B55fB975a0), [Avalanche](https://snowscan.xyz/address/0x9913EffA744B72385E537E092710072D21f8BC98), [Arbitrum One](https://arbiscan.io/address/0xA7Dd05a6CFC6e5238f04FD6E53D4eFa859B492e4), [Base](https://basescan.org/address/0x585ae1667d83E93f77ebEb6BbC6d4c19A3879248) |
+
+## 🎰 Casino Game Contracts
+
+| Game | Networks |
+|------|----------|
+| **Bank** | [Polygon](https://polygonscan.com/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA), [BNB Chain](https://bscscan.com/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA), [Avalanche](https://snowscan.xyz/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA), [Arbitrum One](https://arbiscan.io/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA), [Base](https://basescan.org/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA) |
+| **Coin Toss** | [Polygon](https://polygonscan.com/address/0xC3Dff2489F8241729B824e23eD01F986fcDf8ec3), [BNB Chain](https://bscscan.com/address/0xC3Dff2489F8241729B824e23eD01F986fcDf8ec3), [Avalanche](https://snowscan.xyz/address/0xC3Dff2489F8241729B824e23eD01F986fcDf8ec3), [Arbitrum One](https://arbiscan.io/address/0xC3Dff2489F8241729B824e23eD01F986fcDf8ec3), [Base](https://basescan.org/address/0xC3Dff2489F8241729B824e23eD01F986fcDf8ec3) |
+| **Dice** | [Polygon](https://polygonscan.com/address/0xAa4D2931a9fE14c3dec8AC3f12923Cbb535C0e5f), [BNB Chain](https://bscscan.com/address/0xAa4D2931a9fE14c3dec8AC3f12923Cbb535C0e5f), [Avalanche](https://snowscan.xyz/address/0xAa4D2931a9fE14c3dec8AC3f12923Cbb535C0e5f), [Arbitrum One](https://arbiscan.io/address/0xAa4D2931a9fE14c3dec8AC3f12923Cbb535C0e5f), [Base](https://basescan.org/address/0xAa4D2931a9fE14c3dec8AC3f12923Cbb535C0e5f) |
+| **Roulette** | [Polygon](https://polygonscan.com/address/0x6678e3B4AB2a8C8Cdd068F132C21293CcBda33cb), [BNB Chain](https://bscscan.com/address/0x6678e3B4AB2a8C8Cdd068F132C21293CcBda33cb), [Avalanche](https://snowscan.xyz/address/0x6678e3B4AB2a8C8Cdd068F132C21293CcBda33cb), [Arbitrum One](https://arbiscan.io/address/0x6678e3B4AB2a8C8Cdd068F132C21293CcBda33cb), [Base](https://basescan.org/address/0x6678e3B4AB2a8C8Cdd068F132C21293CcBda33cb) |
+| **Keno** | [Polygon](https://polygonscan.com/address/0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89), [BNB Chain](https://bscscan.com/address/0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89), [Avalanche](https://snowscan.xyz/address/0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89), [Arbitrum One](https://arbiscan.io/address/0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89), [Base](https://basescan.org/address/0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89) |
+| **Wheel & Plinko** | [Polygon](https://polygonscan.com/address/0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b), [BNB Chain](https://bscscan.com/address/0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b), [Avalanche](https://snowscan.xyz/address/0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b), [Arbitrum One](https://arbiscan.io/address/0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b), [Base](https://basescan.org/address/0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b) |
+
+## ⚔️ PvP Game Contracts
+
+| Game | Networks |
+|------|----------|
+| **Game Store** | [Polygon](https://polygonscan.com/address/0xfCDda7A4437c2D69e33592582D3793626710070F), [BNB Chain](https://bscscan.com/address/0xfCDda7A4437c2D69e33592582D3793626710070F), [Avalanche](https://snowscan.xyz/address/0xfCDda7A4437c2D69e33592582D3793626710070F), [Arbitrum One](https://arbiscan.io/address/0xfCDda7A4437c2D69e33592582D3793626710070F), [Base](https://basescan.org/address/0xfCDda7A4437c2D69e33592582D3793626710070F) |
+| **Coin Flip Battle** | [Polygon](https://polygonscan.com/address/0xA79FD774185b5F70e92dcC8F7437E106D648E17F), [BNB Chain](https://bscscan.com/address/0xA79FD774185b5F70e92dcC8F7437E106D648E17F), [Avalanche](https://snowscan.xyz/address/0xA79FD774185b5F70e92dcC8F7437E106D648E17F), [Arbitrum One](https://arbiscan.io/address/0xA79FD774185b5F70e92dcC8F7437E106D648E17F), [Base](https://basescan.org/address/0xA79FD774185b5F70e92dcC8F7437E106D648E17F) |
+| **Russian Roulette** | [Polygon](https://polygonscan.com/address/0xf052CcC269E4C25cDF37232f95b31FE183cf4428), [BNB Chain](https://bscscan.com/address/0xf052CcC269E4C25cDF37232f95b31FE183cf4428), [Avalanche](https://snowscan.xyz/address/0xf052CcC269E4C25cDF37232f95b31FE183cf4428), [Arbitrum One](https://arbiscan.io/address/0xf052CcC269E4C25cDF37232f95b31FE183cf4428), [Base](https://basescan.org/address/0xf052CcC269E4C25cDF37232f95b31FE183cf4428) |
+
+## 🏛️ Internal Wallets
+
+| Purpose | Networks |
+|---------|----------|
+| **Treasury (multisig)** | [Ethereum](https://etherscan.io/address/0x9f72820ee00d54330F9Ba31ff6006116D7ddFE67), [Polygon](https://polygonscan.com/address/0xfA695010bF9e757a1abCd2703259F419217aa756), [BNB Chain](https://bscscan.com/address/0xCD25325a6eF20BC5dF9bceAc0cC22a48d2e8f6eF), [Avalanche](https://snowscan.xyz/address/0x1a75280F832280Af93f588f715a5Fb4Ca7918430), [Arbitrum One](https://arbiscan.io/address/0xf14C79a7fA22c1f97C779F573c9bF39b6b43381c), [Gnosis](https://gnosisscan.io/address/0x6e36cFcD5d59b96AaBC8699C2Ad31a874224D86e), [Optimism](https://optimistic.etherscan.io/address/0xE901680E2E754Fc97288631dc29D91f7a989Cc10), [Base](https://basescan.org/address/0xBf1998e1F1cD52fBfb63e7E646bb39c091A7B70A), [Unichain](https://uniscan.xyz/address/0xBf1998e1F1cD52fBfb63e7E646bb39c091A7B70A) |
+| **Dividends (multisig)** | [Ethereum](https://etherscan.io/address/0x95239da1a084F980f81D24dDf782cac0D050F683), [Polygon](https://polygonscan.com/address/0x8164380204b66E37C8B6C495928f13c8e7e63c8d), [BNB Chain](https://bscscan.com/address/0x373B02acCd2ba3C5c23FBA1f46c04EFBCD4aD695), [Avalanche](https://snowscan.xyz/address/0x3af08e71DE969b4b3aE7EA3AaF3553b4FBDd21f1), [Arbitrum One](https://arbiscan.io/address/0xaf5782bc03cc71e1b3d84bcc3ee70c4b1bf863f4), [Base](https://basescan.org/address/0xB9c5A313d0C04D60f4ee29f01Cd101e4EA46FC34) |
+| **Core Team** | [Polygon](https://polygonscan.com/address/0x7166A89f4A274D5c9EfE88868Fdb6246bCBA6e2A), [BNB Chain](https://bscscan.com/address/0x7166A89f4A274D5c9EfE88868Fdb6246bCBA6e2A), [Avalanche](https://snowscan.xyz/address/0x7166A89f4A274D5c9EfE88868Fdb6246bCBA6e2A), [Arbitrum One](https://arbiscan.io/address/0x7166A89f4A274D5c9EfE88868Fdb6246bCBA6e2A), [Base](https://basescan.org/address/0x7166A89f4A274D5c9EfE88868Fdb6246bCBA6e2A) |
+
+
+## 🔍 Security & Audits
+
+<Cards>
+  <Cards.Card
+    title="Paladin Audit Report"
+    href="https://paladinsec.co/projects/betswirl"
+    icon={<Image src="/img/paladin.svg" alt="Paladin" width={24} height={24} />}
+    target="_blank"
+    rel="noopener noreferrer"
+  />
+</Cards>
+
+## 🔗 Chainlink Integration
+
+At BetSwirl, we leverage Chainlink's powerful decentralized oracle network to enhance the integrity and transparency of our gaming platform.
+
+### VRF Subscriptions
+
+BetSwirl uses Chainlink VRF for provably fair random number generation across all supported networks:
+
+| Network | VRF Subscription |
+|---------|------------------|
+| **Arbitrum One** | [View Subscription](https://vrf.chain.link/arbitrum#/side-drawer/subscription/arbitrum/26510450093329368004237878416199508562205945994063563127634409219041040756566) |
+| **Avalanche** | [View Subscription](https://vrf.chain.link/avalanche#/side-drawer/subscription/avalanche/87060360337790157170135218934045586905659360396458026876115663885747477615369) |
+| **Polygon** | [View Subscription](https://vrf.chain.link/polygon#/side-drawer/subscription/polygon/79838174144652451313763716789896498714546673967850869672884710820136443316484) |
+| **BNB Chain** | [View Subscription](https://vrf.chain.link/bsc#/side-drawer/subscription/bsc/64778934296371996396369853439912130360272408155611603044356319460986888838555) |
+| **Base** | [View Subscription](https://vrf.chain.link/base#/side-drawer/subscription/base/93271074453882857048982544254580571499844752099945152824703671195862788259559) |
+
+
+### VRF for Provably Fair Gaming
+
+We utilize Chainlink's Verifiable Random Function (VRF) to generate random numbers for our casino games. This ensures that every outcome is **provably fair** and **tamper-proof**, providing players with confidence in the integrity of their gaming experience.
+
+### Cross-Chain Interoperability Protocol (CCIP)
+
+We utilize CCIP to facilitate seamless transactions across different blockchain networks. This bridge allows our users to move assets effortlessly between chains, enhancing the flexibility and scalability of our platform.
+
+### Commitment to Chainlink
+
+For all these reasons, we consider ourselves a project that works very closely with Chainlink. We are dedicated to continuously investing in $LINK as a project, recognizing its vital role in the future of decentralized finance and gaming.
+
+## 📊 The Graph Integration
+
+At BetSwirl, we utilize The Graph to enhance our platform's data accessibility and performance.
+
+### Subgraphs
+
+BetSwirl maintains subgraphs across multiple blockchains for efficient data indexing and querying:
+
+| Network | Subgraph Explorer |
+|---------|-------------------|
+| **Base** | [View Subgraph](https://thegraph.com/explorer/subgraphs/6rt22DL9aaAjJHDUZ25sSsPuvuKxp1Tnf8LBXhL8WdZi?view=Query&chain=arbitrum-one) |
+| **Polygon** | [View Subgraph](https://thegraph.com/explorer/subgraphs/FL3ePDCBbShPvfRJTaSCNnehiqxsPHzpLud6CpbHoeKW?view=Query&chain=arbitrum-one) |
+| **Avalanche** | [View Subgraph](https://thegraph.com/explorer/subgraphs/4nQJ4T5TXvTxgECqQ6ox6Nwf57d5BNt6SCn7CzzxjDZN?view=Query&chain=arbitrum-one) |
+| **BNB Chain** | [View Subgraph](https://thegraph.com/explorer/subgraphs/69xMkatN58qWXZS7FXqiVQmvkHhNrq3thTfdB6t85Wvk?view=Query&chain=arbitrum-one) |
+| **Arbitrum** | [View Subgraph](https://thegraph.com/explorer/subgraphs/AsPBS4ymrjoR61r1x2avNJJtMPvzZ3quMHxvQTgDJbU?view=Query&chain=arbitrum-one) |
+
+### Efficient Data Querying
+
+By integrating with The Graph, BetSwirl can efficiently query blockchain data related to games, bets, and user activities. This capability allows us to provide real-time updates and insights.
+
+### Enhanced User Experience
+
+The Graph enables us to create a more responsive and interactive user experience. By indexing data from various blockchain networks, we can deliver seamless navigation and quick access to game statistics and betting history.
+
+### Support for Multiple Blockchains
+
+Our integration with The Graph supports multiple EVM-compatible blockchains, including Polygon, BNB Smart Chain, Avalanche, and Arbitrum. This cross-chain capability ensures that users can access data from their preferred blockchain without any friction.
+
+### Commitment to Decentralization
+
+By leveraging The Graph, we reinforce our commitment to decentralization and transparency. The protocol allows us to maintain a trustless environment where users can verify the data and outcomes of their interactions on the platform.
+
+---
+
+**All contracts are open source and audited. Transparency and security are our top priorities.**

@@ -1,0 +1,188 @@
+import { Cards } from 'nextra/components'
+import { Sparkles, Code, BookOpen, Users } from 'lucide-react';
+import Image from 'next/image';
+
+# Wecome to Betswirl Docs 📘
+ BetSwirl is a decentralized protocol for casino games on EVM chains, providing tools (SDKs) for developers to build their own gambling apps.
+
+## Quick Links
+{(() => {
+  const sectionCardList = [
+    {
+      title: "Protocol Hub",
+      href: "/protocol-hub/introduction",
+      icon: <Sparkles color="blue" />,
+      description: "Learn more about the BetSwirl protocol and its main features."
+      },
+        {
+      title: "Community",
+      href: "/community-updates",
+      icon: <Users color="purple" />,
+      description: "Stay updated with the latest community news and updates."
+    },
+    {
+      title: "Developer Hub - SDKs",
+      href: "/developer-hub/sdks",
+      icon: <Code color="green" />,
+      description: "The SDKs provides essential functionalities for building casino apps."
+    },
+    {
+      title: "Developer Hub - Guides",
+      href: "/developer-hub/guides",
+      icon: <BookOpen color="orange" />,
+      description: "Step-by-step guides to help you integrate BetSwirl into your applications."
+    }
+  ];
+
+  // Group cards by two
+  const groupedCards = [];
+  for (let i = 0; i < sectionCardList.length; i += 2) {
+    groupedCards.push(sectionCardList.slice(i, i + 2));
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      {groupedCards.map((group, groupIndex) => (
+        <Cards key={groupIndex} num={2}>
+          {group.map((card, index) => (
+            <Cards.Card
+              key={index}
+              title={card.title}
+              href={card.href}
+              icon={card.icon}
+              arrow={true}
+            >
+              <div className="p-2 mt-2 text-sm opacity-90">
+                {card.description}
+              </div>
+            </Cards.Card>
+          ))}
+        </Cards>
+      ))}
+    </div>
+  );
+})()}
+
+## Developer links
+
+{(() => {
+  const developerCardList = [
+    {
+      title: "SDKs",
+      href: "https://github.com/BetSwirl/sdk",
+        icon: <Image src="/img/socials/github.svg" alt="npm" width={20} height={20} />,
+      },
+      {
+        title: "UI React Demo (dApp)",
+        href: "https://github.com/BetSwirl/ui-react-demo",
+        icon: <Image src="/img/socials/github.svg" alt="npm" width={20} height={20} />,
+      },
+            {
+        title: "Farcaster UI React Demo (miniapp)",
+        href: "https://github.com/BetSwirl/miniapp-ui-react-demo",
+        icon: <Image src="/img/socials/github.svg" alt="npm" width={20} height={20} />,
+      },
+                  {
+        title: "SDK Core Demo (Node CLI)",
+        href: "https://github.com/BetSwirl/node-core-demo",
+        icon: <Image src="/img/socials/github.svg" alt="npm" width={20} height={20} />,
+      },
+      {
+        title: "SDK Core",
+        href: "https://www.npmjs.com/package/@betswirl/sdk-core",
+        icon: <Image src="/img/socials/npm.svg" alt="npm" width={20} height={20} />,
+      },
+      {
+        title: "SDK UI React",
+        href: "https://www.npmjs.com/package/@betswirl/ui-react",
+        icon: <Image src="/img/socials/npm.svg" alt="npm" width={20} height={20} />,
+      },
+      {
+        title: "SDK Wagmi Provider",
+        href: "https://www.npmjs.com/package/@betswirl/wagmi-provider",
+        icon: <Image src="/img/socials/npm.svg" alt="npm" width={20} height={20} />,
+      },
+  ];
+
+  // Group cards by two
+  const groupedCards = [];
+  for (let i = 0; i < developerCardList.length; i += 2) {
+    groupedCards.push(developerCardList.slice(i, i + 2));
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      {groupedCards.map((group, groupIndex) => (
+        <Cards key={groupIndex} num={2}>
+          {group.map((card, index) => (
+            <Cards.Card
+              key={index}
+              title={card.title}
+              href={card.href}
+              icon={card.icon}
+              arrow={false}
+            >
+            </Cards.Card>
+          ))}
+        </Cards>
+      ))}
+    </div>
+  );
+})()}
+
+## Socials
+
+{(() => {
+  const socialsCardList = [
+    {
+      title: "Telegram",
+      href: "https://t.me/betswirl",
+        icon: <Image src="/img/socials/telegram.svg" alt="telegram" width={20} height={20} />,
+      },
+      {
+        title: "Discord",
+        href: "https://discord.gg/fzBEYhmC",
+        icon: <Image src="/img/socials/discord.svg" alt="discord" width={20} height={20} />,
+      },
+            {
+        title: "Farcaster",
+        href: "https://farcaster.xyz/betswirl",
+        icon: <Image src="/img/socials/farcaster.svg" alt="farcaster" width={20} height={20} />,
+      },
+                  {
+        title: "X/Twitter",
+        href: "https://x.com/betswirl",
+        icon: <Image src="/img/socials/x.svg" alt="x" width={20} height={20} />,
+      },
+                        {
+        title: "Debank",
+        href: "https://debank.com/official/BetSwirl",
+        icon: <Image src="/img/socials/debank.png" alt="debank" width={20} height={20} />,
+      },
+  ];
+
+  // Group cards by two
+  const groupedCards = [];
+  for (let i = 0; i < socialsCardList.length; i += 2) {
+    groupedCards.push(socialsCardList.slice(i, i + 2));
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      {groupedCards.map((group, groupIndex) => (
+        <Cards key={groupIndex} num={2}>
+          {group.map((card, index) => (
+            <Cards.Card
+              key={index}
+              title={card.title}
+              href={card.href}
+              icon={card.icon}
+              arrow={false}
+            >
+            </Cards.Card>
+          ))}
+        </Cards>
+      ))}
+    </div>
+  );
+})()}

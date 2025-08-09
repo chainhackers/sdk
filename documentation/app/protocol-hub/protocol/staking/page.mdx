@@ -1,0 +1,89 @@
+import { Cards } from 'nextra/components'
+import { Callout } from 'nextra/components'
+import { Tabs, Tab } from 'nextra/components'
+import { Steps } from 'nextra/components'
+import { Droplets, Brain, DollarSign, Zap, Shield, TrendingUp, Users, Globe, Coins } from 'lucide-react'
+import Image from 'next/image'
+
+# 💧 BETS Revenue Sharing via Liquidity Provision
+
+BetSwirl's innovative staking system goes beyond traditional token staking. Instead of locking your tokens, you provide liquidity and earn real yield from platform revenue—the Gamble-Fi way.
+
+<div className="flex justify-center mb-6">
+  <Image 
+    src="/img/headers/staking.jpeg" 
+    alt="BETS logo" 
+  width={1200} 
+  height={300} 
+    className="rounded-lg"
+    priority
+  />
+</div>
+
+## 🧠 Overview
+
+<Callout type="info">
+  BetSwirl distributes **30% of all platform revenue** — generated from both casino and sports betting across all chains — to users who provide liquidity in the BETS/ETH pool on Unichain (Uniswap v4).
+</Callout>
+
+This system allows BETS holders to earn **real yield in USDC** by supporting the protocol's liquidity and volume, with **no custodial staking or lockups**.
+
+Rewards are tracked and distributed via the **Merkl protocol**, ensuring a transparent, verifiable, and gas-efficient claim process.
+
+## 💸 How Rewards Work
+
+Revenue is shared in USDC, and LPs earn based on:
+
+- **How long your liquidity is active** in the pool
+- **Trading volume your position supports**
+- **Your liquidity range** (more concentrated = more impact)
+
+<Callout type="warning">
+  Merkl automatically tracks LP activity off-chain and publishes claimable Merkle proofs — LPs can then claim their rewards on-chain.
+</Callout>
+
+**No staking or extra contracts. Just provide liquidity and claim.**
+
+## ✅ How to Start Earning
+
+### Use Gamma Vault for Automation
+
+Don't want to actively manage LP ranges? Use the **Gamma Uniswap v4 vault**, which automates your LP strategy:
+
+<Steps>
+### Step 1: Bridge BETS
+
+Bridge your BETS tokens to Unichain network using the [BetSwirl Bridge](https://www.betswirl.com/base/BETS/bridge).
+
+### Step 2: Bridge ETH
+
+Bridge ETH to Unichain for liquidity provision using [Jumper Exchange](https://jumper.exchange/?fromChain=130&toChain=130&toToken=0x0000000000000000000000000000000000000000).
+
+### Step 3: Provide Liquidity
+
+Provide liquidity in the BETS/ETH pool on [Gamma Vault](https://app.gamma.xyz/vault/uniswapv4/unichain/details/eth-bets-3000-gaussian).
+</Steps>
+
+### 🧠 Current Gamma Strategy
+
+The Gamma vault currently uses a **wider bell curve strategy** — balancing stable in-range coverage with increased Merkl rewards.
+
+This mitigates volatility by being less concentrated than Gamma's typical exponential ranges, and avoids the "order book" shape, which—while more reactive—would result in lower Merkl APR.
+
+This setup gives LPs both **sustainable yield** and **strategic exposure**.
+
+
+## 🎯 Key Benefits
+
+- **No Lockups**: Unlike traditional staking, your tokens remain liquid and accessible.
+- **Real Revenue**: Earn from actual platform usage, not token inflation.
+- **Cross-Chain**: Revenue comes from all chains: Ethereum, Polygon, BNB Chain, Avalanche, Arbitrum, and Base.
+- **Automated**: Use Gamma vault for hands-free liquidity management.
+
+## 💡 LP BETS to earn like the house.
+
+<Callout type="info">
+  Welcome to revenue-sharing, the **Gamble-Fi way**.
+</Callout>
+
+**Ready to start earning?** Bridge your tokens to Unichain and provide liquidity in the BETS/ETH pool to begin earning your share of BetSwirl's platform revenue!
