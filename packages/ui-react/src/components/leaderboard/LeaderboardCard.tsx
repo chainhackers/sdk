@@ -52,18 +52,22 @@ export function LeaderboardCard({ item, onViewOverview, onClaimSuccess }: Leader
             {formatDateRange(item.startDate, item.endDate)}
           </span>
         </div>
-        {item.badgeStatus && (
-          <div
-            className={cn(
-              "px-3 py-1 rounded-full text-[11px] font-medium",
-              item.badgeStatus === "pending" && "text-primary border border-primary rounded-[8px]",
-              item.badgeStatus === "expired" &&
-                "text-roulette-disabled-text border border-roulette-disabled-text rounded-[8px]",
-            )}
-          >
-            {item.badgeStatus.charAt(0).toUpperCase() + item.badgeStatus.slice(1)}
-          </div>
-        )}
+        {(() => {
+          const isEnded = item.status === "ended"
+          const badgeText = isEnded ? "Expired" : "Pending"
+          return (
+            <div
+              className={cn(
+                "px-3 py-1 rounded-full text-[11px] font-medium",
+                !isEnded && "text-primary border border-primary rounded-[8px]",
+                isEnded &&
+                  "text-roulette-disabled-text border border-roulette-disabled-text rounded-[8px]",
+              )}
+            >
+              {badgeText}
+            </div>
+          )
+        })()}
       </div>
 
       {/* Title with chain icon */}
@@ -76,7 +80,7 @@ export function LeaderboardCard({ item, onViewOverview, onClaimSuccess }: Leader
         <div
           className={cn(
             "flex items-center px-[8px] py-[2px] h-[24px] rounded-[8px] border transition-colors",
-            item.badgeStatus === "expired"
+            item.status === "ended"
               ? "text-roulette-disabled-text bg-roulette-disabled-text/20 border-roulette-disabled-text"
               : "text-free-bet-border bg-free-bet-border/20 border-free-bet-border",
           )}

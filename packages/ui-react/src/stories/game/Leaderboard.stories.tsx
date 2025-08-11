@@ -118,7 +118,6 @@ const mockLeaderboardItem: LeaderboardItem = {
   startDate: "2024-07-09T00:00:00Z",
   endDate: "2024-08-09T00:00:00Z",
   status: "ongoing",
-  badgeStatus: "pending",
   prize: {
     token: {
       address: "0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5",
@@ -186,7 +185,6 @@ export const LeaderboardCardEnded: StoryObj<{ item: LeaderboardItem; theme?: The
     item: {
       ...mockLeaderboardItem,
       status: "ended",
-      badgeStatus: "expired",
       userAction: { type: "overview" },
     },
     theme: "light",

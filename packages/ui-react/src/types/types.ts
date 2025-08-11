@@ -105,8 +105,6 @@ export interface GameDefinition<T extends GameChoice> {
 // Leaderboard types
 export type LeaderboardStatus = "ongoing" | "ended"
 
-export type LeaderboardBadgeStatus = "pending" | "expired"
-
 export type LeaderboardUserAction =
   | { type: "play" }
   | { type: "overview" }
@@ -126,7 +124,6 @@ export interface LeaderboardItem {
   startDate: string // ISO 8601 format
   endDate: string // ISO 8601 format
   status: LeaderboardStatus
-  badgeStatus?: LeaderboardBadgeStatus
   prize: LeaderboardPrize
   participants: number
   isPartner: boolean

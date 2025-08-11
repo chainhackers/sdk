@@ -11,7 +11,6 @@ import type {
   LeaderboardItem,
   LeaderboardOverviewData,
   LeaderboardStatus,
-  LeaderboardBadgeStatus,
   LeaderboardUserAction,
   RankingEntry,
   TokenWithImage,
@@ -32,23 +31,6 @@ export function mapLeaderboardStatus(status: LEADERBOARD_STATUS): LeaderboardSta
       return "ended"
     default:
       return "ended"
-  }
-}
-
-/**
- * Convert SDK leaderboard status to badge status
- */
-export function mapBadgeStatus(status: LEADERBOARD_STATUS): LeaderboardBadgeStatus {
-  switch (status) {
-    case LEADERBOARD_STATUS.NOT_STARTED:
-    case LEADERBOARD_STATUS.PENDING:
-    case LEADERBOARD_STATUS.ENDED:
-    case LEADERBOARD_STATUS.FINALIZED:
-      return "pending"
-    case LEADERBOARD_STATUS.EXPIRED:
-      return "expired"
-    default:
-      return "pending"
   }
 }
 
@@ -131,7 +113,6 @@ export function mapLeaderboardToItem(
     startDate: leaderboard.startDate.toISOString(),
     endDate: leaderboard.endDate.toISOString(),
     status: mapLeaderboardStatus(leaderboard.status),
-    badgeStatus: mapBadgeStatus(leaderboard.status),
     prize: {
       token,
       amount: formatTokenAmount(leaderboard.totalShares, leaderboard.token.decimals),
