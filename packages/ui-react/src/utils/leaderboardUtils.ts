@@ -1,12 +1,13 @@
 import {
+  type CasinoChainId,
+  FORMAT_TYPE,
+  formatRawAmount,
+  LEADERBOARD_STATUS,
   type Leaderboard,
   type LeaderboardRanking,
-  LEADERBOARD_STATUS,
-  type CasinoChainId,
-  formatRawAmount,
-  FORMAT_TYPE,
 } from "@betswirl/sdk-core"
 import { type Address } from "viem"
+import { getTokenImage } from "../lib/utils"
 import type {
   LeaderboardItem,
   LeaderboardOverviewData,
@@ -15,7 +16,6 @@ import type {
   RankingEntry,
   TokenWithImage,
 } from "../types/types"
-import { getTokenImage } from "../lib/utils"
 
 /**
  * Convert SDK leaderboard status to UI status
@@ -49,7 +49,7 @@ export function determineUserAction(
   // Check if user can claim rewards
   if (leaderboard.status === LEADERBOARD_STATUS.FINALIZED) {
     const userRanking = leaderboard.rankings?.find(
-      (r) => r.bettorAddress.toLowerCase() === userAddress.toLowerCase()
+      (r) => r.bettorAddress.toLowerCase() === userAddress.toLowerCase(),
     )
 
     // If user is in rankings and has a winning position
@@ -102,7 +102,7 @@ export function mapLeaderboardToItem(
 
   // Find user's ranking if they're in the leaderboard
   const userRanking = leaderboard.rankings?.find(
-    (r) => r.bettorAddress.toLowerCase() === userAddress?.toLowerCase()
+    (r) => r.bettorAddress.toLowerCase() === userAddress?.toLowerCase(),
   )
 
   return {
@@ -134,7 +134,7 @@ export function mapLeaderboardToOverviewData(
 
   // Find user's ranking
   const userRanking = leaderboard.rankings?.find(
-    (r) => r.bettorAddress.toLowerCase() === userAddress?.toLowerCase()
+    (r) => r.bettorAddress.toLowerCase() === userAddress?.toLowerCase(),
   )
 
   // Determine user's prize if they're a winner
@@ -164,7 +164,8 @@ export function mapLeaderboardToOverviewData(
       position: userRanking?.rank || 0,
       points: Number(userRanking?.totalPoints || 0),
       prize: userPrize,
-      contractAddress: leaderboard.leaderboardAddress || "0x0000000000000000000000000000000000000000",
+      contractAddress:
+        leaderboard.leaderboardAddress || "0x0000000000000000000000000000000000000000",
     },
     isExpired: leaderboard.status === LEADERBOARD_STATUS.EXPIRED,
   }

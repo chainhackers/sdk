@@ -4,8 +4,8 @@ import { useMemo, useState } from "react"
 import { useAccount, usePublicClient } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
-import { mapLeaderboardToItem } from "../utils/leaderboardUtils"
 import { type LeaderboardItem } from "../types/types"
+import { mapLeaderboardToItem } from "../utils/leaderboardUtils"
 
 interface UseLeaderboardsResult {
   ongoingLeaderboards: LeaderboardItem[]
@@ -45,7 +45,7 @@ export function useLeaderboards(): UseLeaderboardsResult {
         undefined,
       )
 
-      return result.leaderboards.map(lb => mapLeaderboardToItem(lb, address))
+      return result.leaderboards.map((lb) => mapLeaderboardToItem(lb, address))
     },
     refetchInterval: 30000,
     staleTime: 5 * 60 * 1000,

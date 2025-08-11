@@ -2,8 +2,8 @@ import { fetchLeaderboard } from "@betswirl/sdk-core"
 import { useQuery } from "@tanstack/react-query"
 import { useAccount, usePublicClient } from "wagmi"
 import { useChain } from "../context/chainContext"
-import { mapLeaderboardToOverviewData } from "../utils/leaderboardUtils"
 import { type LeaderboardOverviewData } from "../types/types"
+import { mapLeaderboardToOverviewData } from "../utils/leaderboardUtils"
 
 /**
  * Hook to fetch detailed leaderboard data including user stats and rules

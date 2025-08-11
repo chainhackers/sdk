@@ -1,20 +1,20 @@
+import { fetchLeaderboard } from "@betswirl/sdk-core"
 import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
-import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
+import { useAccount } from "wagmi"
 import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewards"
+import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
 import { getChainName } from "../../lib/chainIcons"
 import { getBlockExplorerUrl } from "../../lib/chainUtils"
 import { cn } from "../../lib/utils"
 import type { RankingEntry } from "../../types/types"
+import { mapRankingToEntry } from "../../utils/leaderboardUtils"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { LeaderboardRankingTab } from "./LeaderboardRankingTab"
-import { mapRankingToEntry } from "../../utils/leaderboardUtils"
-import { fetchLeaderboard } from "@betswirl/sdk-core"
-import { useAccount } from "wagmi"
 
 interface LeaderboardOverviewProps {
   leaderboardId: string
@@ -33,18 +33,14 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
       if (!leaderboardId) return
 
       try {
-        const leaderboard = await fetchLeaderboard(
-          Number(leaderboardId),
-          address,
-          false
-        )
+        const leaderboard = await fetchLeaderboard(Number(leaderboardId), address, false)
 
         if (leaderboard) {
           setFullLeaderboard(leaderboard)
 
           if (leaderboard.rankings && leaderboard.rankings.length > 0) {
             const mappedRankings = leaderboard.rankings.map((ranking: any) =>
-              mapRankingToEntry(ranking, leaderboard)
+              mapRankingToEntry(ranking, leaderboard),
             )
             setRankingData(mappedRankings)
           } else {
@@ -69,10 +65,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
   const handleClaim = useCallback(async () => {
     if (!data || !leaderboardId) return
 
-    const leaderboard = fullLeaderboard || await fetchLeaderboard(
-      Number(leaderboardId),
-      address,
-    )
+    const leaderboard = fullLeaderboard || (await fetchLeaderboard(Number(leaderboardId), address))
 
     if (!leaderboard) {
       console.error("Failed to fetch leaderboard for claiming")
@@ -84,9 +77,8 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
 
   if (!data) return null
 
-  const canClaim = data.userStats.status === "Claimable" &&
-                   data.userStats.prize.amount !== "0" &&
-                   !data.isExpired
+  const canClaim =
+    data.userStats.status === "Claimable" && data.userStats.prize.amount !== "0" && !data.isExpired
 
   const contractUrl = getBlockExplorerUrl(data.chainId, data.userStats.contractAddress)
 
@@ -161,21 +153,20 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                         "text-white font-semibold",
                         "rounded-[8px] h-[32px] px-4 py-1.5 w-fit",
                         "text-[12px] leading-[20px]",
-                        isPending && "opacity-50 cursor-not-allowed"
+                        isPending && "opacity-50 cursor-not-allowed",
                       )}
                     >
                       {isPending
                         ? "Claiming..."
-                        : `Claim ${data.userStats.prize.amount} ${data.userStats.prize.tokenSymbol}`
-                      }
+                        : `Claim ${data.userStats.prize.amount} ${data.userStats.prize.tokenSymbol}`}
                     </Button>
                   ) : (
                     <div className="text-[12px] text-muted-foreground">
                       {data.userStats.prize.amount === "0"
                         ? "No rewards to claim"
                         : data.isExpired
-                        ? "Claim period expired"
-                        : "Not claimable"}
+                          ? "Claim period expired"
+                          : "Not claimable"}
                     </div>
                   )}
                 </div>
@@ -210,14 +201,14 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                   </div>
                 </div>
                 <ul className="flex flex-col gap-2">
-                    <Alert variant="info">
-                      <AlertCircle className="h-[16px] w-[16px]" />
-                      <AlertDescription className="text-[12px] leading-[20px]">
-                        {
-                          "A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking."
-                        }
-                      </AlertDescription>
-                    </Alert>
+                  <Alert variant="info">
+                    <AlertCircle className="h-[16px] w-[16px]" />
+                    <AlertDescription className="text-[12px] leading-[20px]">
+                      {
+                        "A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking."
+                      }
+                    </AlertDescription>
+                  </Alert>
                   <ul className="flex flex-col gap-2">
                     <li className="text-[14px] leading-[22px] text-foreground">
                       <strong>The competition is scored using a point system:</strong>

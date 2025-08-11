@@ -1,5 +1,5 @@
-import { useCallback } from "react"
 import { useQueryClient } from "@tanstack/react-query"
+import { useCallback } from "react"
 import { useLeaderboards } from "../../hooks/useLeaderboards"
 import { cn } from "../../lib/utils"
 import { Switch } from "../ui/switch"

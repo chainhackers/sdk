@@ -1,10 +1,10 @@
-import { useCallback, useEffect } from "react"
 import { fetchLeaderboard } from "@betswirl/sdk-core"
+import { useCallback, useEffect } from "react"
 import { useAccount } from "wagmi"
+import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewards"
 import { cn } from "../../lib/utils"
 import type { LeaderboardItem } from "../../types/types"
 import { Button } from "../ui/button"
-import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewards"
 
 interface LeaderboardCardActionsProps {
   item: LeaderboardItem
@@ -12,7 +12,11 @@ interface LeaderboardCardActionsProps {
   onClaimSuccess?: () => void
 }
 
-export function LeaderboardCardActions({ item, onViewOverview, onClaimSuccess }: LeaderboardCardActionsProps) {
+export function LeaderboardCardActions({
+  item,
+  onViewOverview,
+  onClaimSuccess,
+}: LeaderboardCardActionsProps) {
   const { address } = useAccount()
   const { claim, isPending, isSuccess } = useClaimLeaderboardRewards()
 
@@ -52,7 +56,7 @@ export function LeaderboardCardActions({ item, onViewOverview, onClaimSuccess }:
   const ActionButton = ({
     children,
     onClick,
-    disabled = false
+    disabled = false,
   }: {
     children: React.ReactNode
     onClick?: () => void
@@ -66,7 +70,7 @@ export function LeaderboardCardActions({ item, onViewOverview, onClaimSuccess }:
         "text-white font-semibold",
         "rounded-[8px] h-[32px] flex-1",
         "text-[12px] leading-[20px]",
-        disabled && "opacity-50 cursor-not-allowed"
+        disabled && "opacity-50 cursor-not-allowed",
       )}
     >
       {children}
@@ -88,8 +92,7 @@ export function LeaderboardCardActions({ item, onViewOverview, onClaimSuccess }:
           <ActionButton onClick={handleClaim} disabled={isPending}>
             {isPending
               ? "Claiming..."
-              : `Claim ${item.userAction.amount} ${item.userAction.tokenSymbol}`
-            }
+              : `Claim ${item.userAction.amount} ${item.userAction.tokenSymbol}`}
           </ActionButton>
           <OverviewButton />
         </>

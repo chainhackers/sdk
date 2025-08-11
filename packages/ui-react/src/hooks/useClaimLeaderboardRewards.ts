@@ -1,8 +1,8 @@
 import {
-  type Leaderboard,
-  claimLeaderboardRewards,
   type BetSwirlWallet,
+  claimLeaderboardRewards,
   getClaimableAmount,
+  type Leaderboard,
 } from "@betswirl/sdk-core"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { type Address, type TransactionReceipt } from "viem"
@@ -40,63 +40,56 @@ export function useClaimLeaderboardRewards() {
   const publicClient = usePublicClient({ chainId: appChainId })
   const { data: walletClient } = useWalletClient({ chainId: appChainId })
 
-  const mutation = useMutation<
-    ClaimLeaderboardRewardsResult,
-    Error,
-    ClaimLeaderboardRewardsParams
-  >({
-    mutationFn: async ({ leaderboard, receiver }) => {
-      if (!publicClient) {
-        throw new Error("Public client not initialized")
-      }
+  const mutation = useMutation<ClaimLeaderboardRewardsResult, Error, ClaimLeaderboardRewardsParams>(
+    {
+      mutationFn: async ({ leaderboard, receiver }) => {
+        if (!publicClient) {
+          throw new Error("Public client not initialized")
+        }
 
-      if (!walletClient) {
-        throw new Error("Wallet not connected")
-      }
+        if (!walletClient) {
+          throw new Error("Wallet not connected")
+        }
 
-      if (!address && !receiver) {
-        throw new Error("No wallet connected and no receiver address provided")
-      }
+        if (!address && !receiver) {
+          throw new Error("No wallet connected and no receiver address provided")
+        }
 
-      const targetAddress = receiver || address!
+        const targetAddress = receiver || address!
 
-      const wallet = { publicClient, walletClient } as unknown as BetSwirlWallet
+        const wallet = { publicClient, walletClient } as unknown as BetSwirlWallet
 
-      const claimableAmount = await getClaimableAmount(
-        wallet,
-        leaderboard.onChainId,
-        targetAddress,
-        appChainId
-      )
+        const claimableAmount = await getClaimableAmount(
+          wallet,
+          leaderboard.onChainId,
+          targetAddress,
+          appChainId,
+        )
 
-      if (claimableAmount <= 0n) {
-        throw new Error("No rewards to claim")
-      }
+        if (claimableAmount <= 0n) {
+          throw new Error("No rewards to claim")
+        }
 
-      const result = await claimLeaderboardRewards(
-        wallet,
-        leaderboard,
-        targetAddress,
-        5000
-      )
+        const result = await claimLeaderboardRewards(wallet, leaderboard, targetAddress, 5000)
 
-      return result
+        return result
+      },
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({
+          queryKey: ["leaderboards"],
+        })
+        queryClient.invalidateQueries({
+          queryKey: ["leaderboardDetails", variables.leaderboard.id],
+        })
+        queryClient.invalidateQueries({
+          queryKey: ["balances"],
+        })
+      },
+      onError: (error) => {
+        console.error("Failed to claim leaderboard rewards:", error)
+      },
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["leaderboards"]
-      })
-      queryClient.invalidateQueries({
-        queryKey: ["leaderboardDetails", variables.leaderboard.id]
-      })
-      queryClient.invalidateQueries({
-        queryKey: ["balances"]
-      })
-    },
-    onError: (error) => {
-      console.error("Failed to claim leaderboard rewards:", error)
-    },
-  })
+  )
 
   return {
     claim: mutation.mutate,
