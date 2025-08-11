@@ -9,6 +9,7 @@ import { formatGwei, zeroAddress } from "viem"
 import { useAccount } from "wagmi"
 import { useBalanceRefresh, useBalances } from "../context/BalanceContext"
 import { useChain } from "../context/chainContext"
+import { useFreebetsContext } from "../context/FreebetsContext"
 import { useTokenContext } from "../context/tokenContext"
 import {
   BetStatus,
@@ -22,8 +23,8 @@ import {
 import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
 import { useIsGamePaused } from "./useIsGamePaused"
-
 import { usePlaceBet } from "./usePlaceBet"
+import { usePlaceFreebet } from "./usePlaceFreebet"
 import { useTokenAllowance } from "./useTokenAllowance"
 
 interface UseGameLogicProps<T extends GameChoice> {
@@ -156,6 +157,15 @@ export function useGameLogic<T extends GameChoice>({
     gasPrice,
   } = usePlaceBet(gameDefinition?.gameType, token, triggerBalanceRefresh, gameDefinition)
 
+  const { selectedFreebet, selectedFormattedFreebet } = useFreebetsContext()
+
+  const { placeFreebet, freebetStatus, resetFreebetState } = usePlaceFreebet(
+    gameDefinition?.gameType,
+    selectedFormattedFreebet ? selectedFormattedFreebet.token : token,
+    selectedFreebet,
+    gameDefinition,
+  )
+
   // Reset bet state when chain or token changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
   useEffect(() => {
@@ -212,6 +222,20 @@ export function useGameLogic<T extends GameChoice>({
   const handlePlayButtonClick = async () => {
     // Don't allow play if we're in loading state or selection is not available
     if (!gameDefinition || !selection) return
+
+    if (selectedFreebet) {
+      if (freebetStatus === "error") {
+        resetFreebetState()
+        if (isWalletConnected) {
+          placeFreebet(selection)
+        }
+      } else if (isInGameResultState) {
+        resetFreebetState()
+      } else if (isWalletConnected) {
+        placeFreebet(selection)
+      }
+      return
+    }
 
     // Reset approval error if there is one
     if (approveWriteWagmiHook.error) {

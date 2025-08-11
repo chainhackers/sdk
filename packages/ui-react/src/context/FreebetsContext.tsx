@@ -1,4 +1,4 @@
-import { fetchFreebets } from "@betswirl/sdk-core"
+import { fetchFreebets, SignedFreebet } from "@betswirl/sdk-core"
 import { useQuery } from "@tanstack/react-query"
 import {
   createContext,
@@ -18,10 +18,14 @@ import { useChain } from "./chainContext"
 import { useBettingConfig } from "./configContext"
 
 interface FreebetsContextValue {
-  freebets: FreeBet[]
-  freebetsInCurrentChain: FreeBet[]
-  selectedFreebet: FreeBet | null
-  selectFreebet: (freebet: FreeBet | null) => void
+  freebets: SignedFreebet[]
+  freebetsInCurrentChain: SignedFreebet[]
+  selectedFreebet: SignedFreebet | null
+  selectFreebet: (freebet: SignedFreebet | null) => void
+  selectFreebetById: (id: string | null) => void
+  formattedFreebets: FreeBet[]
+  formattedFreebetsInCurrentChain: FreeBet[]
+  selectedFormattedFreebet: FreeBet | null
 }
 
 const FreebetsContext = createContext<FreebetsContextValue | undefined>(undefined)
@@ -34,8 +38,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
   const { appChainId, switchAppChain, availableChainIds } = useChain()
   const { affiliate, freebetsAffiliates, withExternalBankrollFreebets } = useBettingConfig()
-  //const [freebetsInCurrentChain, setFreebetsInCurrentChain] = useState<FreeBet[]>([])
-  const [selectedFreebet, setSelectedFreebet] = useState<FreeBet | null>(null)
+  const [selectedFreebet, setSelectedFreebet] = useState<SignedFreebet | null>(null)
 
   const { data: freebets = [] } = useQuery({
     queryKey: [
@@ -61,6 +64,33 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     const filteredFreebets = freebets.filter((freebet) => freebet.chainId === appChainId)
     return filteredFreebets
   }, [freebets, appChainId])
+
+  const formatFreebet = useCallback(
+    (freebet: SignedFreebet): FreeBet => ({
+      id: freebet.id.toString(),
+      title: freebet.campaign.label,
+      amount: Number(freebet.formattedAmount),
+      token: {
+        ...freebet.token,
+        image: getTokenImage(freebet.token.symbol),
+      } as TokenWithImage,
+      chainId: freebet.chainId,
+      expiresAt: formatExpireAt(freebet.expirationDate),
+    }),
+    [],
+  )
+
+  const formattedFreebets = useMemo(() => freebets.map(formatFreebet), [freebets, formatFreebet])
+
+  const formattedFreebetsInCurrentChain = useMemo(
+    () => freebetsInCurrentChain.map(formatFreebet),
+    [freebetsInCurrentChain, formatFreebet],
+  )
+
+  const selectedFormattedFreebet = useMemo(
+    () => (selectedFreebet ? formatFreebet(selectedFreebet) : null),
+    [selectedFreebet, formatFreebet],
+  )
 
   useEffect(() => {
     const isFreebetsInCurrentChain = freebetsInCurrentChain.length > 0
@@ -96,23 +126,11 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       availableChainIds.includes(freebet.chainId),
     )
 
-    const formatedFreebets: FreeBet[] = filteredFreebetsByChains.map((freebet) => ({
-      id: freebet.id.toString(),
-      title: freebet.campaign.label,
-      amount: Number(freebet.formattedAmount),
-      token: {
-        ...freebet.token,
-        image: getTokenImage(freebet.token.symbol),
-      } as TokenWithImage,
-      chainId: freebet.chainId,
-      expiresAt: formatExpireAt(freebet.expirationDate),
-    }))
-
-    return formatedFreebets
+    return filteredFreebetsByChains
   }
 
   const selectFreebet = useCallback(
-    (freebet: FreeBet | null) => {
+    (freebet: SignedFreebet | null) => {
       console.log("selectFreebet: ", freebet)
 
       if (freebet && freebet.chainId !== appChainId) {
@@ -124,14 +142,40 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     [appChainId, switchAppChain],
   )
 
+  const selectFreebetById = useCallback(
+    (id: string | null) => {
+      if (!id) {
+        selectFreebet(null)
+        return
+      }
+
+      const freebet = freebets.find((freebet) => freebet.id.toString() === id) || null
+      selectFreebet(freebet)
+    },
+    [freebets, selectFreebet],
+  )
+
   const contextValue = useMemo(
     () => ({
       freebets,
       freebetsInCurrentChain,
       selectedFreebet,
       selectFreebet,
+      selectFreebetById,
+      formattedFreebets,
+      formattedFreebetsInCurrentChain,
+      selectedFormattedFreebet,
     }),
-    [freebets, freebetsInCurrentChain, selectedFreebet, selectFreebet],
+    [
+      freebets,
+      freebetsInCurrentChain,
+      selectedFreebet,
+      selectFreebet,
+      selectFreebetById,
+      formattedFreebets,
+      formattedFreebetsInCurrentChain,
+      selectedFormattedFreebet,
+    ],
   )
 
   return <FreebetsContext.Provider value={contextValue}>{children}</FreebetsContext.Provider>

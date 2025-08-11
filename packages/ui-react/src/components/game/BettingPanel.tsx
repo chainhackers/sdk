@@ -73,7 +73,12 @@ export function BettingPanel({
   const [isFreeBetSheetOpen, setIsFreeBetSheetOpen] = useState(false)
   const [isFreebetsHubOpen, setIsFreebetsHubOpen] = useState(false)
   const [wasFreebetsHubOpenBeforeWallet, setWasFreebetsHubOpenBeforeWallet] = useState(false)
-  const { freebets, freebetsInCurrentChain, selectedFreebet, selectFreebet } = useFreebetsContext()
+  const {
+    formattedFreebets,
+    formattedFreebetsInCurrentChain,
+    selectedFormattedFreebet,
+    selectFreebetById,
+  } = useFreebetsContext()
   //const [selectedFreeBet, setSelectedFreeBet] = useState<FreeBet | null>(freebets.length ? freebets[0] : null) // Default to first freebet
 
   // Track previous values to detect actual changes
@@ -133,17 +138,19 @@ export function BettingPanel({
     betStatus === "internal-error" ||
     !!approveError
 
+  const isFreebet = !!selectedFormattedFreebet
+
   const canInitiateBet =
     isConnected &&
     areChainsSynced &&
-    isBetAmountValid &&
-    !isTotalbetAmountExceedsBalance &&
+    (isFreebet || isBetAmountValid) &&
+    (isFreebet || !isTotalbetAmountExceedsBalance) &&
     !isWaiting &&
     !isGamePaused &&
     !isBetRequirementsLoading &&
-    isTokenAllowed &&
-    isBetCountValid &&
-    !isBetAmountExceedsMaxBetAmount &&
+    (isFreebet || isTokenAllowed) &&
+    (isFreebet || isBetCountValid) &&
+    (isFreebet || !isBetAmountExceedsMaxBetAmount) &&
     hasValidSelection
 
   const isApprovingToken = isApprovePending || isApproveConfirming
@@ -252,13 +259,13 @@ export function BettingPanel({
   }
 
   const handleFreeBetSelect = (freeBet: FreeBet) => {
-    selectFreebet(freeBet)
+    selectFreebetById(freeBet.id)
     setIsFreeBetSheetOpen(false)
     setIsFreebetsHubOpen(false)
   }
 
   const handleRemoveFreeBet = () => {
-    selectFreebet(null)
+    selectFreebetById(null)
   }
 
   const handleFreeBetClick = () => {
@@ -302,18 +309,18 @@ export function BettingPanel({
             className="w-[60px] h-[27px] bg-game-win/20 border border-free-bet-border rounded-[8px] flex items-center gap-1 hover:bg-game-win/30 transition-colors"
           >
             <Gift size={20} className="text-game-win" />
-            {freebets.length > 0 && (
+            {formattedFreebets.length > 0 && (
               <span className="text-sm font-semibold text-free-bet-border">
-                ({freebets.length})
+                ({formattedFreebets.length})
               </span>
             )}
           </Button>
         </div>
 
-        {selectedFreebet ? (
+        {selectedFormattedFreebet ? (
           <FreeBetInput
-            amount={selectedFreebet.amount}
-            token={selectedFreebet.token}
+            amount={selectedFormattedFreebet.amount}
+            token={selectedFormattedFreebet.token}
             isDisabled={isInputDisabled}
             onClick={handleFreeBetClick}
             onRemoveFreebet={handleRemoveFreeBet}
@@ -397,8 +404,8 @@ export function BettingPanel({
         {isMounted && portalContainer && (
           <FreeBetSheetPanel
             portalContainer={portalContainer}
-            freeBets={freebetsInCurrentChain}
-            selectedFreeBet={selectedFreebet}
+            freeBets={formattedFreebetsInCurrentChain}
+            selectedFreeBet={selectedFormattedFreebet}
             onSelect={handleFreeBetSelect}
           />
         )}
@@ -408,7 +415,7 @@ export function BettingPanel({
           <FreebetsHubSheetPanel
             portalContainer={portalContainer}
             isConnected={isConnected}
-            freebets={freebets}
+            freebets={formattedFreebets}
             onSelectFreebet={handleFreeBetSelect}
             onConnectWallet={() => {
               setWasFreebetsHubOpenBeforeWallet(true)
