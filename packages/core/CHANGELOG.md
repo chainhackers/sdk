@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.14
+
+### Patch Changes
+
+- Add optimism chain
+
 ## 0.1.13
 
 ### Patch Changes

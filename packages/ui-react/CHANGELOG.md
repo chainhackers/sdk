@@ -1,5 +1,13 @@
 # @betswirl/ui-react
 
+## 0.1.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.14
+  - @betswirl/wagmi-provider@0.1.14
+
 ## 0.1.9
 
 ### Patch Changes
