@@ -112,7 +112,7 @@ import type { LeaderboardItem } from "../../types/types"
 
 const mockLeaderboardItem: LeaderboardItem = {
   id: "1",
-  rank: 1,
+  userRank: 1,
   title: "Avalanche - July",
   chainId: 43114,
   startDate: "2024-07-09T00:00:00Z",
@@ -186,6 +186,25 @@ export const LeaderboardCardEnded: StoryObj<{ item: LeaderboardItem; theme?: The
       ...mockLeaderboardItem,
       status: "ended",
       userAction: { type: "overview" },
+    },
+    theme: "light",
+  },
+}
+
+export const LeaderboardCardNoUserRank: StoryObj<{ item: LeaderboardItem; theme?: Theme }> = {
+  name: "Leaderboard Card - No User Rank",
+  render: ({ item, theme = "light" }) => (
+    <StorybookProviders>
+      <div className={cn("w-[328px] p-4", theme)}>
+        <LeaderboardCard item={item} />
+      </div>
+    </StorybookProviders>
+  ),
+  args: {
+    item: {
+      ...mockLeaderboardItem,
+      userRank: null, // Пользователь не участвует в лидерборде
+      userAction: { type: "play" },
     },
     theme: "light",
   },

@@ -121,7 +121,7 @@ export interface LeaderboardPrize {
 
 export interface LeaderboardItem {
   id: string
-  rank: number
+  userRank: number | null
   title: string
   chainId: CasinoChainId
   startDate: string // ISO 8601 format

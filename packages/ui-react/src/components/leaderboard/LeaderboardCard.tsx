@@ -43,7 +43,7 @@ export function LeaderboardCard({ item, onViewOverview, onClaimSuccess }: Leader
           <div className="flex items-center gap-[4px]">
             <ChainIcon chainId={item.chainId} size={20} />
             <span className="text-foreground text-[14px] leading-[22px] font-medium">
-              #{item.rank}
+              #{item.id}
             </span>
           </div>
           {/* Vertical Separator */}

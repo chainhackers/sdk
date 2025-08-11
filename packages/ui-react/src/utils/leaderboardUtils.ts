@@ -157,7 +157,7 @@ export function mapLeaderboardToItem(
 
   return {
     id: leaderboard.id.toString(),
-    rank: userRanking?.rank || 0,
+    userRank: userRanking?.rank ?? null,
     title: leaderboard.title,
     chainId: leaderboard.chainId as CasinoChainId,
     startDate: leaderboard.startDate.toISOString(),
