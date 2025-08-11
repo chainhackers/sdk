@@ -1,4 +1,4 @@
-import type { RankingEntry } from "../../types/types"
+import type { LeaderboardDisplayStatus, RankingEntry } from "../../types/types"
 import { Button } from "../ui/button"
 import { LeaderboardRankingCard } from "./LeaderboardRankingCard"
 import { LeaderboardRankingList } from "./LeaderboardRankingList"
@@ -8,8 +8,7 @@ interface LeaderboardRankingTabProps {
   lastUpdate: string
   claimableAmount: string
   claimableTokenSymbol: string
-  leaderboardStatus?: "Finalized" | "Ongoing" | "Claimable"
-  isExpired?: boolean
+  leaderboardStatus?: LeaderboardDisplayStatus
 }
 
 export function LeaderboardRankingTab({
@@ -18,7 +17,6 @@ export function LeaderboardRankingTab({
   claimableAmount,
   claimableTokenSymbol,
   leaderboardStatus = "Ongoing",
-  isExpired = false,
 }: LeaderboardRankingTabProps) {
   // Split top 3 and remaining entries
   const topThree = rankingData.slice(0, 3)
@@ -56,7 +54,7 @@ export function LeaderboardRankingTab({
           <p className="text-[14px] text-muted-foreground mt-1">
             {leaderboardStatus === "Ongoing"
               ? "Rankings will appear once players start participating"
-              : isExpired
+              : leaderboardStatus === "Expired"
                 ? "This leaderboard has expired"
                 : leaderboardStatus === "Finalized" || leaderboardStatus === "Claimable"
                   ? "No rankings data available for this completed leaderboard"

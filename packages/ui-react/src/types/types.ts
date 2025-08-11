@@ -105,6 +105,9 @@ export interface GameDefinition<T extends GameChoice> {
 // Leaderboard types
 export type LeaderboardStatus = "ongoing" | "ended"
 
+// Unified status type for displaying leaderboard status in UI components
+export type LeaderboardDisplayStatus = "Ongoing" | "Finalized" | "Claimable" | "Expired"
+
 export type LeaderboardUserAction =
   | { type: "play" }
   | { type: "overview" }
@@ -132,7 +135,7 @@ export interface LeaderboardItem {
 
 // Additional types for detailed leaderboard overview view
 export interface LeaderboardUserStats {
-  status: "Finalized" | "Ongoing" | "Claimable"
+  status: LeaderboardDisplayStatus
   position: number
   points: number
   prize: {
@@ -145,7 +148,6 @@ export interface LeaderboardUserStats {
 
 export interface LeaderboardOverviewData extends LeaderboardItem {
   userStats: LeaderboardUserStats
-  isExpired: boolean
 }
 
 // Types for ranking tab

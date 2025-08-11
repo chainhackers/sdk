@@ -9,6 +9,7 @@ import {
 import { type Address } from "viem"
 import { getTokenImage } from "../lib/utils"
 import type {
+  LeaderboardDisplayStatus,
   LeaderboardItem,
   LeaderboardOverviewData,
   LeaderboardStatus,
@@ -32,6 +33,55 @@ export function mapLeaderboardStatus(status: LEADERBOARD_STATUS): LeaderboardSta
     default:
       return "ended"
   }
+}
+
+/**
+ * Get unified display status for leaderboard in UI components
+ * This is the single source of truth for status mapping
+ */
+export function getLeaderboardDisplayStatus(
+  leaderboard: Leaderboard,
+  userAddress?: Address,
+): LeaderboardDisplayStatus {
+  // Handle expired status first
+  if (leaderboard.status === LEADERBOARD_STATUS.EXPIRED) {
+    return "Expired"
+  }
+
+  // Handle finalized status
+  if (leaderboard.status === LEADERBOARD_STATUS.FINALIZED) {
+    // Check if user can claim rewards
+    if (userAddress) {
+      const userRanking = leaderboard.rankings?.find(
+        (r) => r.bettorAddress.toLowerCase() === userAddress.toLowerCase(),
+      )
+
+      if (
+        userRanking &&
+        leaderboard.shares &&
+        userRanking.rank <= leaderboard.shares.length &&
+        userRanking.rank > 0
+      ) {
+        const rewardAmount = leaderboard.shares[userRanking.rank - 1]
+        if (rewardAmount > 0n) {
+          return "Claimable"
+        }
+      }
+    }
+    return "Finalized"
+  }
+
+  // Handle ongoing status (PENDING, NOT_STARTED, ENDED)
+  if (
+    leaderboard.status === LEADERBOARD_STATUS.PENDING ||
+    leaderboard.status === LEADERBOARD_STATUS.NOT_STARTED ||
+    leaderboard.status === LEADERBOARD_STATUS.ENDED
+  ) {
+    return "Ongoing"
+  }
+
+  // Default fallback
+  return "Finalized"
 }
 
 /**
@@ -149,13 +199,8 @@ export function mapLeaderboardToOverviewData(
     }
   }
 
-  // Determine user stats status
-  let userStatus: LeaderboardOverviewData["userStats"]["status"] = "Ongoing"
-  if (leaderboard.status === LEADERBOARD_STATUS.FINALIZED) {
-    userStatus = userPrize.amount !== "0" ? "Claimable" : "Finalized"
-  } else if (leaderboard.status === LEADERBOARD_STATUS.EXPIRED) {
-    userStatus = "Finalized"
-  }
+  // Use the new unified status function
+  const userStatus = getLeaderboardDisplayStatus(leaderboard, userAddress)
 
   return {
     ...baseItem,
@@ -167,7 +212,6 @@ export function mapLeaderboardToOverviewData(
       contractAddress:
         leaderboard.leaderboardAddress || "0x0000000000000000000000000000000000000000",
     },
-    isExpired: leaderboard.status === LEADERBOARD_STATUS.EXPIRED,
   }
 }
 

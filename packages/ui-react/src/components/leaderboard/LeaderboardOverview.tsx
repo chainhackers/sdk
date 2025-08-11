@@ -77,8 +77,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
 
   if (!data) return null
 
-  const canClaim =
-    data.userStats.status === "Claimable" && data.userStats.prize.amount !== "0" && !data.isExpired
+  const canClaim = data.userStats.status === "Claimable" && data.userStats.prize.amount !== "0"
 
   const contractUrl = getBlockExplorerUrl(data.chainId, data.userStats.contractAddress)
 
@@ -164,7 +163,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                     <div className="text-[12px] text-muted-foreground">
                       {data.userStats.prize.amount === "0"
                         ? "No rewards to claim"
-                        : data.isExpired
+                        : data.userStats.status === "Expired"
                           ? "Claim period expired"
                           : "Not claimable"}
                     </div>
@@ -234,7 +233,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 </ul>
               </div>
 
-              {data.isExpired && (
+              {data.userStats.status === "Expired" && (
                 <Alert variant="warning">
                   <AlertCircle className="h-[16px] w-[16px]" />
                   <AlertTitle className="text-[14px] leading-[22px] font-medium">
@@ -270,7 +269,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 claimableAmount={data.userStats.prize.amount}
                 claimableTokenSymbol={data.userStats.prize.tokenSymbol}
                 leaderboardStatus={data.userStats.status}
-                isExpired={data.isExpired}
               />
             </div>
           </ScrollArea>
