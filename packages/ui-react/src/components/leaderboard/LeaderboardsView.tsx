@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useCallback } from "react"
 import { useLeaderboards } from "../../hooks/useLeaderboards"
 import { cn } from "../../lib/utils"
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Switch } from "../ui/switch"
 import { LeaderboardCard } from "./LeaderboardCard"
 
@@ -10,29 +11,12 @@ interface Props {
 }
 
 export function LeaderboardsView({ onViewOverview }: Props) {
-  const { ongoingLeaderboards, endedLeaderboards, showPartner, setShowPartner, isLoading, error } =
-    useLeaderboards()
+  const { ongoingLeaderboards, endedLeaderboards, showPartner, setShowPartner } = useLeaderboards()
   const queryClient = useQueryClient()
 
   const handleClaimSuccess = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["leaderboards"] })
   }, [queryClient])
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Loading leaderboards...</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-destructive">Error loading leaderboards</p>
-      </div>
-    )
-  }
 
   return (
     <div className="flex flex-col p-[16px]">
@@ -62,7 +46,7 @@ export function LeaderboardsView({ onViewOverview }: Props) {
       {/* Content */}
       <div className="flex flex-col gap-4">
         {/* Ongoing section - Show items directly without extra title */}
-        {ongoingLeaderboards.length > 0 && (
+        {ongoingLeaderboards.length > 0 ? (
           <div className="flex flex-col gap-2">
             {ongoingLeaderboards.map((item) => (
               <LeaderboardCard
@@ -73,10 +57,19 @@ export function LeaderboardsView({ onViewOverview }: Props) {
               />
             ))}
           </div>
+        ) : (
+          <Alert className="text-center">
+            <AlertTitle className="text-[14px] leading-[22px] font-semibold">
+              There are no ongoing leaderboards
+            </AlertTitle>
+            <AlertDescription className="text-[12px] leading-[20px] justify-items-center">
+              Come back later.
+            </AlertDescription>
+          </Alert>
         )}
 
         {/* Ended section */}
-        {endedLeaderboards.length > 0 && (
+        {endedLeaderboards.length > 0 ? (
           <>
             <h2 className="text-[16px] font-semibold text-foreground mt-2">Ended</h2>
             <div className="flex flex-col gap-2">
@@ -90,21 +83,18 @@ export function LeaderboardsView({ onViewOverview }: Props) {
               ))}
             </div>
           </>
-        )}
-
-        {/* Empty state */}
-        {ongoingLeaderboards.length === 0 && endedLeaderboards.length === 0 && (
-          <div className="flex items-center justify-center py-8">
-            <p className="text-foreground text-center">
-              No leaderboards available
-              {!showPartner && (
-                <>
-                  <br />
-                  <span className="text-sm">Try enabling partner leaderboards</span>
-                </>
-              )}
-            </p>
-          </div>
+        ) : (
+          <>
+            <h2 className="text-[16px] font-semibold text-foreground mt-2">Ended</h2>
+            <Alert className="text-center">
+              <AlertTitle className="text-[14px] leading-[22px] font-semibold">
+                There are no ended leaderboards
+              </AlertTitle>
+              <AlertDescription className="text-[12px] leading-[20px] justify-items-center">
+                Waiting a leaderboard ends.
+              </AlertDescription>
+            </Alert>
+          </>
         )}
       </div>
     </div>
