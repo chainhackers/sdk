@@ -22,12 +22,17 @@ export function LeaderboardRankingTab({
   const topThree = rankingData.slice(0, 3)
   const remainingEntries = rankingData.slice(3)
 
+  // Determine if the claim button should be shown
+  const canClaim = leaderboardStatus === "Claimable" && Number.parseFloat(claimableAmount) > 0
+
   return (
     <div className="flex flex-col gap-3">
       {/* Claim Button */}
-      <Button className="bg-primary hover:bg-primary/89 text-white font-semibold rounded-[8px] h-[32px] px-4 text-[14px] w-full">
-        Claim {claimableAmount} {claimableTokenSymbol}
-      </Button>
+      {canClaim && (
+        <Button className="bg-primary hover:bg-primary/89 text-white font-semibold rounded-[8px] h-[32px] px-4 text-[14px] w-full">
+          Claim {claimableAmount} {claimableTokenSymbol}
+        </Button>
+      )}
 
       {/* Last Update Info */}
       <div className="text-[12px] text-muted-foreground text-center">{lastUpdate}</div>
