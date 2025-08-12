@@ -5,6 +5,7 @@ import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewar
 import { cn } from "../../lib/utils"
 import type { LeaderboardItem } from "../../types/types"
 import { Button } from "../ui/button"
+import { useGameFrameContext } from "../game/GameFrame"
 
 interface LeaderboardCardActionsProps {
   item: LeaderboardItem
@@ -19,6 +20,7 @@ export function LeaderboardCardActions({
 }: LeaderboardCardActionsProps) {
   const { address } = useAccount()
   const { claim, isPending, isSuccess } = useClaimLeaderboardRewards()
+  const { setIsLeaderboardSheetOpen } = useGameFrameContext()
 
   useEffect(() => {
     if (isSuccess && onClaimSuccess) {
@@ -77,11 +79,15 @@ export function LeaderboardCardActions({
     </Button>
   )
 
+  const handlePlayNow = useCallback(() => {
+    setIsLeaderboardSheetOpen(false)
+  }, [setIsLeaderboardSheetOpen])
+
   switch (item.userAction.type) {
     case "play":
       return (
         <>
-          <ActionButton>Play now</ActionButton>
+          <ActionButton onClick={handlePlayNow}>Play now</ActionButton>
           <OverviewButton />
         </>
       )
