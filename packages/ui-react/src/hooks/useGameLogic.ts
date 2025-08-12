@@ -24,6 +24,7 @@ import { useGameHistory } from "./useGameHistory"
 import { useIsGamePaused } from "./useIsGamePaused"
 
 import { usePlaceBet } from "./usePlaceBet"
+import { useLeaderboardRefresher } from "./useLeaderboardRefresher"
 import { useTokenAllowance } from "./useTokenAllowance"
 
 interface UseGameLogicProps<T extends GameChoice> {
@@ -174,6 +175,8 @@ export function useGameLogic<T extends GameChoice>({
       formattedRolled: displayResult,
     }
   }, [rawGameResult, gameDefinition, selection])
+
+  useLeaderboardRefresher(gameResult, appChainId)
 
   const gameContractAddress = gameDefinition
     ? casinoChainById[appChainId]?.contracts.games[gameDefinition.gameType]?.address
