@@ -22,9 +22,8 @@ import {
 import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
 import { useIsGamePaused } from "./useIsGamePaused"
-
-import { usePlaceBet } from "./usePlaceBet"
 import { useLeaderboardRefresher } from "./useLeaderboardRefresher"
+import { usePlaceBet } from "./usePlaceBet"
 import { useTokenAllowance } from "./useTokenAllowance"
 
 interface UseGameLogicProps<T extends GameChoice> {

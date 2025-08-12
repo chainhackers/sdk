@@ -9,6 +9,7 @@ import {
   DiceNumber,
   KenoBall,
   KenoEncodedInput,
+  LEADERBOARD_STATUS,
   RouletteEncodedInput,
   RouletteNumber,
   type Token,
@@ -102,12 +103,6 @@ export interface GameDefinition<T extends GameChoice> {
   formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
 }
 
-// Leaderboard types
-export type LeaderboardStatus = "ongoing" | "ended"
-
-// Unified status type for displaying leaderboard status in UI components
-export type LeaderboardDisplayStatus = "Ongoing" | "Finalized" | "Claimable" | "Expired"
-
 export type LeaderboardUserAction =
   | { type: "play" }
   | { type: "overview" }
@@ -126,7 +121,7 @@ export interface LeaderboardItem {
   chainId: CasinoChainId
   startDate: string // ISO 8601 format
   endDate: string // ISO 8601 format
-  status: LeaderboardStatus
+  status: LEADERBOARD_STATUS
   prize: LeaderboardPrize
   participants: number
   isPartner: boolean
@@ -135,7 +130,7 @@ export interface LeaderboardItem {
 
 // Additional types for detailed leaderboard overview view
 export interface LeaderboardUserStats {
-  status: LeaderboardDisplayStatus
+  status: LEADERBOARD_STATUS
   position: number
   points: number
   prize: {

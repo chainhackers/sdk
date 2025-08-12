@@ -9,79 +9,18 @@ import {
 import { type Address } from "viem"
 import { getTokenImage } from "../lib/utils"
 import type {
-  LeaderboardDisplayStatus,
   LeaderboardItem,
   LeaderboardOverviewData,
-  LeaderboardStatus,
   LeaderboardUserAction,
   RankingEntry,
   TokenWithImage,
 } from "../types/types"
 
 /**
- * Convert SDK leaderboard status to UI status
+ * Format raw leaderboard status for UI badges/text
  */
-export function mapLeaderboardStatus(status: LEADERBOARD_STATUS): LeaderboardStatus {
-  switch (status) {
-    case LEADERBOARD_STATUS.NOT_STARTED:
-    case LEADERBOARD_STATUS.PENDING:
-      return "ongoing"
-    case LEADERBOARD_STATUS.ENDED:
-    case LEADERBOARD_STATUS.FINALIZED:
-    case LEADERBOARD_STATUS.EXPIRED:
-      return "ended"
-    default:
-      return "ended"
-  }
-}
-
-/**
- * Get unified display status for leaderboard in UI components
- * This is the single source of truth for status mapping
- */
-export function getLeaderboardDisplayStatus(
-  leaderboard: Leaderboard,
-  userAddress?: Address,
-): LeaderboardDisplayStatus {
-  // Handle expired status first
-  if (leaderboard.status === LEADERBOARD_STATUS.EXPIRED) {
-    return "Expired"
-  }
-
-  // Handle finalized status
-  if (leaderboard.status === LEADERBOARD_STATUS.FINALIZED) {
-    // Check if user can claim rewards
-    if (userAddress) {
-      const userRanking = leaderboard.rankings?.find(
-        (r) => r.bettorAddress.toLowerCase() === userAddress.toLowerCase(),
-      )
-
-      if (
-        userRanking &&
-        leaderboard.shares &&
-        userRanking.rank <= leaderboard.shares.length &&
-        userRanking.rank > 0
-      ) {
-        const rewardAmount = leaderboard.shares[userRanking.rank - 1]
-        if (rewardAmount > 0n) {
-          return "Claimable"
-        }
-      }
-    }
-    return "Finalized"
-  }
-
-  // Handle ongoing status (PENDING, NOT_STARTED, ENDED)
-  if (
-    leaderboard.status === LEADERBOARD_STATUS.PENDING ||
-    leaderboard.status === LEADERBOARD_STATUS.NOT_STARTED ||
-    leaderboard.status === LEADERBOARD_STATUS.ENDED
-  ) {
-    return "Ongoing"
-  }
-
-  // Default fallback
-  return "Finalized"
+export function formatLeaderboardStatus(status: LEADERBOARD_STATUS): string {
+  return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
 }
 
 /**
@@ -162,7 +101,7 @@ export function mapLeaderboardToItem(
     chainId: leaderboard.chainId as CasinoChainId,
     startDate: leaderboard.startDate.toISOString(),
     endDate: leaderboard.endDate.toISOString(),
-    status: mapLeaderboardStatus(leaderboard.status),
+    status: leaderboard.status,
     prize: {
       token,
       amount: formatTokenAmount(leaderboard.totalShares, leaderboard.token.decimals),
@@ -199,13 +138,10 @@ export function mapLeaderboardToOverviewData(
     }
   }
 
-  // Use the new unified status function
-  const userStatus = getLeaderboardDisplayStatus(leaderboard, userAddress)
-
   return {
     ...baseItem,
     userStats: {
-      status: userStatus,
+      status: leaderboard.status,
       position: userRanking?.rank || 0,
       points: Number(userRanking?.totalPoints || 0),
       prize: userPrize,

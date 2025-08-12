@@ -1,4 +1,4 @@
-import { fetchLeaderboard } from "@betswirl/sdk-core"
+import { fetchLeaderboard, LEADERBOARD_STATUS } from "@betswirl/sdk-core"
 import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import { useAccount } from "wagmi"
@@ -8,7 +8,7 @@ import { getChainName } from "../../lib/chainIcons"
 import { getBlockExplorerUrl } from "../../lib/chainUtils"
 import { cn } from "../../lib/utils"
 import type { RankingEntry } from "../../types/types"
-import { mapRankingToEntry } from "../../utils/leaderboardUtils"
+import { formatLeaderboardStatus, mapRankingToEntry } from "../../utils/leaderboardUtils"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
@@ -33,7 +33,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
       if (!leaderboardId) return
 
       try {
-        const leaderboard = await fetchLeaderboard(Number(leaderboardId), address, false)
+        const leaderboard = await fetchLeaderboard(Number(leaderboardId), address, true)
 
         if (leaderboard) {
           setFullLeaderboard(leaderboard)
@@ -77,7 +77,8 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
 
   if (!data) return null
 
-  const canClaim = data.userStats.status === "Claimable" && data.userStats.prize.amount !== "0"
+  const canClaim =
+    data.userAction.type === "claim" && data.userStats.status === LEADERBOARD_STATUS.FINALIZED
 
   const contractUrl = getBlockExplorerUrl(data.chainId, data.userStats.contractAddress)
 
@@ -112,11 +113,25 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
             <div className="pb-4 px-4 pt-1 flex flex-col gap-4">
               {/* Status and user stats card */}
               <div className="bg-free-bet-card-section-bg rounded-[12px] p-3 flex flex-col gap-3">
-                <div className="text-[12px] text-roulette-disabled-text">
-                  Status:{" "}
-                  <span className="px-2 py-0.5 rounded-[8px] border text-[11px] border-roulette-disabled-text">
-                    {data.userStats.status}
-                  </span>
+                <div className="text-[12px] text-roulette-disabled-text flex items-center gap-2">
+                  <span>Status:</span>
+                  {(() => {
+                    const isEnded =
+                      data.userStats.status === LEADERBOARD_STATUS.FINALIZED ||
+                      data.userStats.status === LEADERBOARD_STATUS.EXPIRED ||
+                      data.userStats.status === LEADERBOARD_STATUS.ENDED
+                    return (
+                      <span
+                        className={cn(
+                          "px-2 py-0.5 rounded-[8px] text-[11px] border",
+                          !isEnded && "text-primary border-primary",
+                          isEnded && "text-roulette-disabled-text border-roulette-disabled-text",
+                        )}
+                      >
+                        {formatLeaderboardStatus(data.userStats.status)}
+                      </span>
+                    )
+                  })()}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -225,7 +240,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 </ul>
               </div>
 
-              {data.userStats.status === "Expired" && (
+              {data.userStats.status === LEADERBOARD_STATUS.EXPIRED && (
                 <Alert variant="warning">
                   <AlertCircle className="h-[16px] w-[16px]" />
                   <AlertTitle className="text-[14px] leading-[22px] font-medium">

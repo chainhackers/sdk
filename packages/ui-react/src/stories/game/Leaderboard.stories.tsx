@@ -105,6 +105,7 @@ export const DarkTheme: Story = {
   },
 }
 
+import { LEADERBOARD_STATUS } from "@betswirl/sdk-core"
 // Story to show the leaderboard card component in isolation
 import { LeaderboardCard } from "../../components/leaderboard/LeaderboardCard"
 import { getTokenImage } from "../../lib/utils"
@@ -117,7 +118,7 @@ const mockLeaderboardItem: LeaderboardItem = {
   chainId: 43114,
   startDate: "2024-07-09T00:00:00Z",
   endDate: "2024-08-09T00:00:00Z",
-  status: "ongoing",
+  status: LEADERBOARD_STATUS.PENDING,
   prize: {
     token: {
       address: "0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5",
@@ -184,7 +185,7 @@ export const LeaderboardCardEnded: StoryObj<{ item: LeaderboardItem; theme?: The
   args: {
     item: {
       ...mockLeaderboardItem,
-      status: "ended",
+      status: LEADERBOARD_STATUS.FINALIZED,
       userAction: { type: "overview" },
     },
     theme: "light",

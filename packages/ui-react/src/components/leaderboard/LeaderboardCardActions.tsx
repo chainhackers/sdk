@@ -4,8 +4,8 @@ import { useAccount } from "wagmi"
 import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewards"
 import { cn } from "../../lib/utils"
 import type { LeaderboardItem } from "../../types/types"
-import { Button } from "../ui/button"
 import { useGameFrameContext } from "../game/GameFrame"
+import { Button } from "../ui/button"
 
 interface LeaderboardCardActionsProps {
   item: LeaderboardItem

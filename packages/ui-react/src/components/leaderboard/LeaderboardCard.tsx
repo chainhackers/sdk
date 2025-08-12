@@ -1,6 +1,8 @@
+import { LEADERBOARD_STATUS } from "@betswirl/sdk-core"
 import { Gift } from "lucide-react"
 import { cn } from "../../lib/utils"
 import type { LeaderboardItem } from "../../types/types"
+import { formatLeaderboardStatus } from "../../utils/leaderboardUtils"
 import { ChainIcon } from "../ui/ChainIcon"
 import { LeaderboardCardActions } from "./LeaderboardCardActions"
 
@@ -53,8 +55,12 @@ export function LeaderboardCard({ item, onViewOverview, onClaimSuccess }: Leader
           </span>
         </div>
         {(() => {
-          const isEnded = item.status === "ended"
-          const badgeText = isEnded ? "Expired" : "Pending"
+          const isEnded = [
+            LEADERBOARD_STATUS.ENDED,
+            LEADERBOARD_STATUS.FINALIZED,
+            LEADERBOARD_STATUS.EXPIRED,
+          ].includes(item.status)
+          const badgeText = formatLeaderboardStatus(item.status)
           return (
             <div
               className={cn(
@@ -80,7 +86,7 @@ export function LeaderboardCard({ item, onViewOverview, onClaimSuccess }: Leader
         <div
           className={cn(
             "flex items-center px-[8px] py-[2px] h-[24px] rounded-[8px] border transition-colors",
-            item.status === "ended"
+            [LEADERBOARD_STATUS.FINALIZED, LEADERBOARD_STATUS.EXPIRED].includes(item.status)
               ? "text-roulette-disabled-text bg-roulette-disabled-text/20 border-roulette-disabled-text"
               : "text-free-bet-border bg-free-bet-border/20 border-free-bet-border",
           )}

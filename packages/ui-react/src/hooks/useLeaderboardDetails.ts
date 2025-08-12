@@ -30,7 +30,7 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
         throw new Error("Public client not initialized")
       }
 
-      const leaderboard = await fetchLeaderboard(Number(leaderboardId), address)
+      const leaderboard = await fetchLeaderboard(Number(leaderboardId), address, true)
 
       if (!leaderboard) {
         throw new Error(`Leaderboard ${leaderboardId} not found`)

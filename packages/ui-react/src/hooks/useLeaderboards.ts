@@ -1,4 +1,4 @@
-import { fetchLeaderboards } from "@betswirl/sdk-core"
+import { fetchLeaderboards, LEADERBOARD_STATUS } from "@betswirl/sdk-core"
 import { useQuery } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
 import { useAccount, usePublicClient } from "wagmi"
@@ -43,6 +43,7 @@ export function useLeaderboards(): UseLeaderboardsResult {
         showPartner,
         "desc",
         undefined,
+        true,
       )
 
       return result.leaderboards.map((lb) => mapLeaderboardToItem(lb, address))
@@ -52,14 +53,19 @@ export function useLeaderboards(): UseLeaderboardsResult {
     enabled: !!publicClient,
   })
 
-  // Separate leaderboards by status
   const { ongoingLeaderboards, endedLeaderboards } = useMemo(() => {
     if (!data) {
       return { ongoingLeaderboards: [], endedLeaderboards: [] }
     }
 
-    const ongoing = data.filter((lb) => lb.status === "ongoing")
-    const ended = data.filter((lb) => lb.status === "ended")
+    const ongoing = data.filter((lb) =>
+      [LEADERBOARD_STATUS.PENDING, LEADERBOARD_STATUS.NOT_STARTED].includes(lb.status),
+    )
+    const ended = data.filter((lb) =>
+      [LEADERBOARD_STATUS.ENDED, LEADERBOARD_STATUS.FINALIZED, LEADERBOARD_STATUS.EXPIRED].includes(
+        lb.status,
+      ),
+    )
 
     return { ongoingLeaderboards: ongoing, endedLeaderboards: ended }
   }, [data])
