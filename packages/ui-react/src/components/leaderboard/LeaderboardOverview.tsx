@@ -143,7 +143,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                       <div className="text-[16px] font-semibold">{data.userStats.prize.amount}</div>
                     </div>
                   </div>
-                  {canClaim ? (
+                  {canClaim && (
                     <Button
                       onClick={handleClaim}
                       disabled={isPending}
@@ -159,14 +159,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                         ? "Claiming..."
                         : `Claim ${data.userStats.prize.amount} ${data.userStats.prize.tokenSymbol}`}
                     </Button>
-                  ) : (
-                    <div className="text-[12px] text-muted-foreground">
-                      {data.userStats.prize.amount === "0"
-                        ? "No rewards to claim"
-                        : data.userStats.status === "Expired"
-                          ? "Claim period expired"
-                          : "Not claimable"}
-                    </div>
                   )}
                 </div>
                 {contractUrl ? (
