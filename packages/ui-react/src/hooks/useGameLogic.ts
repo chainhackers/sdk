@@ -24,7 +24,6 @@ import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
 import { useIsGamePaused } from "./useIsGamePaused"
 import { usePlaceBet } from "./usePlaceBet"
-import { usePlaceFreebet } from "./usePlaceFreebet"
 import { useTokenAllowance } from "./useTokenAllowance"
 
 interface UseGameLogicProps<T extends GameChoice> {
@@ -149,8 +148,8 @@ export function useGameLogic<T extends GameChoice>({
 
   const {
     placeBet,
-    betStatus,
-    gameResult: rawGameResult,
+    betStatus: paidBetStatus,
+    gameResult: paidRawGameResult,
     resetBetState,
     vrfFees,
     formattedVrfFees,
@@ -159,18 +158,31 @@ export function useGameLogic<T extends GameChoice>({
 
   const { selectedFreebet, selectedFormattedFreebet } = useFreebetsContext()
 
-  const { placeFreebet, freebetStatus, resetFreebetState } = usePlaceFreebet(
+  const {
+    placeBet: placeFreebet,
+    betStatus: freebetStatus,
+    gameResult: freebetGameResult,
+    resetBetState: resetFreebetState,
+  } = usePlaceBet(
     gameDefinition?.gameType,
-    selectedFormattedFreebet ? selectedFormattedFreebet.token : token,
-    selectedFreebet,
+    selectedFormattedFreebet?.token,
+    triggerBalanceRefresh,
     gameDefinition,
+    {
+      type: "freebet",
+      freebet: selectedFreebet,
+    },
   )
+
+  const betStatus = selectedFreebet ? freebetStatus : paidBetStatus
+  const rawGameResult = selectedFreebet ? freebetGameResult : paidRawGameResult
 
   // Reset bet state when chain or token changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
   useEffect(() => {
     resetBetState()
-  }, [appChainId, token.address, resetBetState])
+    resetFreebetState()
+  }, [appChainId, token.address, resetBetState, resetFreebetState])
 
   const gameResult = useMemo((): GameResult | null => {
     if (!rawGameResult || !gameDefinition || !selection) {
@@ -227,12 +239,12 @@ export function useGameLogic<T extends GameChoice>({
       if (freebetStatus === "error") {
         resetFreebetState()
         if (isWalletConnected) {
-          placeFreebet(selection)
+          placeFreebet(selectedFreebet.amount, selection)
         }
       } else if (isInGameResultState) {
         resetFreebetState()
       } else if (isWalletConnected) {
-        placeFreebet(selection)
+        placeFreebet(selectedFreebet.amount, selection)
       }
       return
     }
@@ -305,7 +317,8 @@ export function useGameLogic<T extends GameChoice>({
     themeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
-    placeBet: (betAmount: bigint, choice: T) => placeBet(betAmount, choice),
+    placeBet: (betAmount: bigint, choice: T) =>
+      selectedFreebet ? placeFreebet(selectedFreebet.amount, choice) : placeBet(betAmount, choice),
     needsTokenApproval,
     isApprovePending: approveWriteWagmiHook.isPending,
     isApproveConfirming: approveWaitingWagmiHook.isLoading,

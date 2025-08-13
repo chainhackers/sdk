@@ -7,7 +7,9 @@ import {
   getPlaceBetEventData,
   getPlaceBetFunctionData,
   getPlacedBetFromReceipt,
+  getPlaceFreebetFunctionData,
   getRollEventData,
+  SignedFreebet,
 } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { decodeEventLog, Hex } from "viem"
@@ -16,11 +18,14 @@ import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
 import { BetStatus, GameChoice, GameDefinition, GameResult, TokenWithImage } from "../types/types"
+import { convertToAbiParameters } from "../utils/convertToAbiParameters"
 import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
 
 const logger = createLogger("usePlaceBet")
+
+type BetOptions = { type: "paid" } | { type: "freebet"; freebet: SignedFreebet | null }
 
 export interface IUsePlaceBetReturn<T extends GameChoice = GameChoice> {
   placeBet: (betAmount: bigint, choice: T) => Promise<void>
@@ -62,9 +67,10 @@ export interface IUsePlaceBetReturn<T extends GameChoice = GameChoice> {
  */
 export function usePlaceBet<T extends GameChoice>(
   game: CASINO_GAME_TYPE | undefined,
-  token: TokenWithImage,
+  token: TokenWithImage | undefined,
   refetchBalance: () => void,
   gameDefinition?: GameDefinition<T>,
+  options: BetOptions = { type: "paid" },
 ): IUsePlaceBetReturn<T> {
   const { appChainId } = useChain()
   const { affiliate } = useBettingConfig()
@@ -167,41 +173,93 @@ export function usePlaceBet<T extends GameChoice>(
         return
       }
 
-      resetBetState()
-      setCurrentBetAmount(betAmount)
-
-      const encodedInput = gameDefinition.encodeInput(choice.choice)
-
-      const betParams = {
-        game,
-        gameEncodedInput: encodedInput,
-        betAmount,
-        tokenAddress: token.address,
-      }
-
       if (!publicClient || !appChainId || !connectedAddress || !wagerWriteHook.writeContract) {
         logger.error("placeBet: Wagmi/OnchainKit clients or address are not initialized.")
         setInternalError("clients or address are not initialized")
         return
       }
-      logger.debug("placeBet: Starting bet process:", {
-        betParams,
-        connectedAddress,
-      })
+
+      if (!token) {
+        logger.error("placeBet: token is required for bets")
+        setInternalError("token is required")
+        return
+      }
+
+      resetBetState()
+
+      const encodedInput = gameDefinition.encodeInput(choice.choice)
 
       await estimateVrfFeesWagmiHook.refetch()
-
       logger.debug("placeBet: VRF cost refetched:", formattedVrfFees)
 
-      _submitBetTransaction(
-        betParams,
-        connectedAddress,
-        vrfFees,
-        gasPrice,
-        appChainId,
-        affiliate,
-        wagerWriteHook.writeContract,
-      )
+      if (options.type === "paid") {
+        setCurrentBetAmount(betAmount)
+
+        const betParams = {
+          game,
+          gameEncodedInput: encodedInput,
+          betAmount,
+          tokenAddress: token.address,
+        }
+
+        logger.debug("placeBet: Starting bet process:", {
+          betParams,
+          connectedAddress,
+        })
+
+        _submitBetTransaction(
+          betParams,
+          connectedAddress,
+          vrfFees,
+          gasPrice,
+          appChainId,
+          affiliate,
+          wagerWriteHook.writeContract,
+        )
+      } else if (options.type === "freebet") {
+        if (!options.freebet) {
+          logger.error("placeBet: freebet is required for freebet bets")
+          setInternalError("Freebet is required")
+          return
+        }
+
+        setCurrentBetAmount(betAmount)
+
+        const gameEncodedAbiParametersInput = convertToAbiParameters(game, encodedInput)
+        console.log("gameEncodedAbiParametersInput: ", gameEncodedAbiParametersInput)
+
+        if (!gameEncodedAbiParametersInput) {
+          logger.error("placeFreebet: Failed to convert input to abi parameters")
+          setInternalError("Failed to convert input to abi parameters")
+          return
+        }
+
+        const betParams = {
+          game,
+          gameEncodedAbiParametersInput,
+          freebet: options.freebet,
+        }
+
+        const placeFreebetTxData = getPlaceFreebetFunctionData(betParams, appChainId)
+
+        const wagerWriteParams = {
+          abi: placeFreebetTxData.data.abi,
+          address: placeFreebetTxData.data.to,
+          functionName: placeFreebetTxData.data.functionName,
+          args: placeFreebetTxData.data.args,
+          value: placeFreebetTxData.extraData.getValue(vrfFees),
+          gasPrice,
+          chainId: appChainId,
+        }
+        console.log("FEEBET_WRITE_PARAMS: ", wagerWriteParams)
+
+        logger.debug("placeBet: Starting freebet process:", {
+          betParams,
+          connectedAddress,
+        })
+
+        wagerWriteHook.writeContract(wagerWriteParams)
+      }
     },
     [
       game,
@@ -217,6 +275,7 @@ export function usePlaceBet<T extends GameChoice>(
       token,
       affiliate,
       gameDefinition,
+      options,
     ],
   )
 
