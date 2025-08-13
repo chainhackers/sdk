@@ -1,4 +1,4 @@
-import { fetchLeaderboard, LEADERBOARD_STATUS } from "@betswirl/sdk-core"
+import { fetchLeaderboard, LEADERBOARD_STATUS, Leaderboard } from "@betswirl/sdk-core"
 import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import { useAccount } from "wagmi"
@@ -8,6 +8,10 @@ import { getChainName } from "../../lib/chainIcons"
 import { getBlockExplorerUrl } from "../../lib/chainUtils"
 import { cn } from "../../lib/utils"
 import type { RankingEntry } from "../../types/types"
+import {
+  generateCasinoExamplesText,
+  generateCasinoRulesText,
+} from "../../utils/leaderboardRulesUtils"
 import { formatLeaderboardStatus, mapRankingToEntry } from "../../utils/leaderboardUtils"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Button } from "../ui/button"
@@ -26,7 +30,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
   const { data, refetch } = useLeaderboardDetails(leaderboardId)
   const { claim, isPending, isSuccess, error } = useClaimLeaderboardRewards()
   const [rankingData, setRankingData] = useState<RankingEntry[]>([])
-  const [fullLeaderboard, setFullLeaderboard] = useState<any>(null)
+  const [fullLeaderboard, setFullLeaderboard] = useState<Leaderboard | null>(null)
 
   useEffect(() => {
     const fetchFullLeaderboard = async () => {
@@ -39,7 +43,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
           setFullLeaderboard(leaderboard)
 
           if (leaderboard.rankings && leaderboard.rankings.length > 0) {
-            const mappedRankings = leaderboard.rankings.map((ranking: any) =>
+            const mappedRankings = leaderboard.rankings.map((ranking) =>
               mapRankingToEntry(ranking, leaderboard),
             )
             setRankingData(mappedRankings)
@@ -81,6 +85,17 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
     data.userAction.type === "claim" && data.userStats.status === LEADERBOARD_STATUS.FINALIZED
 
   const contractUrl = getBlockExplorerUrl(data.chainId, data.userStats.contractAddress)
+
+  const rulesParams = fullLeaderboard?.casinoRules
+    ? {
+        rules: fullLeaderboard.casinoRules,
+        chainId: data.chainId,
+        wageredSymbol: fullLeaderboard.wageredSymbol as string,
+        wageredDecimals: fullLeaderboard.wageredDecimals as number,
+      }
+    : null
+  const ruleItems = rulesParams ? generateCasinoRulesText(rulesParams) : []
+  const exampleItems = rulesParams ? generateCasinoExamplesText(rulesParams) : []
 
   return (
     <div className="flex flex-col h-full">
@@ -206,7 +221,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                     </span>
                   </div>
                 </div>
-                <ul className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2">
                   <Alert variant="info">
                     <AlertCircle className="h-[16px] w-[16px]" />
                     <AlertDescription className="text-[12px] leading-[20px]">
@@ -219,25 +234,31 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                     <li className="text-[14px] leading-[22px] text-foreground">
                       <strong>The competition is scored using a point system:</strong>
                     </li>
-                    <li className="text-[14px] leading-[22px] text-foreground ml-4">
-                      • You have to play on the dice or cointoss or roulette or keno or wheel games
-                      and on the chain Base
-                    </li>
-                    <li className="text-[14px] leading-[22px] text-foreground ml-4">
-                      • You have to play with BETS tokens
-                    </li>
-                    <li className="text-[14px] leading-[22px] text-foreground ml-4">
-                      • You earn 100 points per interval of 100 BETS
-                    </li>
-                    <li className="text-[14px] leading-[22px] text-foreground">
-                      <strong>Example 1:</strong> You bet 300 BETS at dice ⇒ You earn 300 points
-                    </li>
-                    <li className="text-[14px] leading-[22px] text-foreground">
-                      <strong>Example 2:</strong> You bet 1050 BETS at cointoss ⇒ You earn 1000
-                      points
-                    </li>
+                    {ruleItems.map((text, idx) => (
+                      <li
+                        // biome-ignore lint/suspicious/noArrayIndexKey: Rule items are positionally keyed; array length is fixed
+                        key={idx}
+                        className="text-[14px] leading-[22px] text-foreground ml-4"
+                      >
+                        • {text}
+                      </li>
+                    ))}
+                    {exampleItems.map((text, idx) => {
+                      const parts = text.split(": ")
+                      const title = parts[0] || `Example ${idx + 1}`
+                      const rest = parts.slice(1).join(": ")
+                      return (
+                        <li
+                          // biome-ignore lint/suspicious/noArrayIndexKey: Example items are positionally keyed; array length is fixed
+                          key={idx}
+                          className="text-[14px] leading-[22px] text-foreground"
+                        >
+                          <strong>{title}:</strong> {rest}
+                        </li>
+                      )
+                    })}
                   </ul>
-                </ul>
+                </div>
               </div>
 
               {data.userStats.status === LEADERBOARD_STATUS.EXPIRED && (
