@@ -104,7 +104,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
           <ChevronLeft size={18} />
         </Button>
         <div className="flex items-center gap-2">
-          <ChainIcon chainId={data.chainId} size={18} />
           <h2 className="text-[18px] font-semibold">{data.title}</h2>
         </div>
       </div>
