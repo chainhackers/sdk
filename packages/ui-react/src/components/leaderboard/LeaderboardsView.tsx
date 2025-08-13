@@ -8,10 +8,12 @@ import { LeaderboardCard } from "./LeaderboardCard"
 
 interface Props {
   onViewOverview?: (id: string) => void
+  showPartner: boolean
+  setShowPartner: (show: boolean) => void
 }
 
-export function LeaderboardsView({ onViewOverview }: Props) {
-  const { ongoingLeaderboards, endedLeaderboards, showPartner, setShowPartner } = useLeaderboards()
+export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }: Props) {
+  const { ongoingLeaderboards, endedLeaderboards } = useLeaderboards(showPartner)
   const queryClient = useQueryClient()
 
   const handleClaimSuccess = useCallback(() => {

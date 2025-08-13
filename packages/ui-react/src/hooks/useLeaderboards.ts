@@ -1,6 +1,6 @@
 import { fetchLeaderboards, LEADERBOARD_STATUS } from "@betswirl/sdk-core"
 import { useQuery } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import { useAccount, usePublicClient } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
@@ -10,8 +10,6 @@ import { mapLeaderboardToItem } from "../utils/leaderboardUtils"
 interface UseLeaderboardsResult {
   ongoingLeaderboards: LeaderboardItem[]
   endedLeaderboards: LeaderboardItem[]
-  showPartner: boolean
-  setShowPartner: (show: boolean) => void
   isLoading: boolean
   error: Error | null
 }
@@ -19,9 +17,9 @@ interface UseLeaderboardsResult {
 /**
  * Hook to fetch and manage leaderboards data
  * Uses TanStack Query for caching and automatic refetching
+ * @param showPartner - Whether to show partner leaderboards
  */
-export function useLeaderboards(): UseLeaderboardsResult {
-  const [showPartner, setShowPartner] = useState(false)
+export function useLeaderboards(showPartner: boolean): UseLeaderboardsResult {
   const { appChainId } = useChain()
   const { affiliate } = useBettingConfig()
   const { address } = useAccount()
@@ -73,8 +71,6 @@ export function useLeaderboards(): UseLeaderboardsResult {
   return {
     ongoingLeaderboards,
     endedLeaderboards,
-    showPartner,
-    setShowPartner,
     isLoading,
     error: error as Error | null,
   }
