@@ -80,6 +80,10 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
     data.userAction.type === "claim" &&
     data.userStats.status === LEADERBOARD_STATUS.FINALIZED &&
     (claimableHook.claimableAmount ?? 0n) > 0n
+  const isClaimed =
+    data.userAction.type === "claimed" &&
+    data.userStats.status === LEADERBOARD_STATUS.FINALIZED &&
+    (claimableHook.claimableAmount ?? 0n) === 0n
 
   const contractUrl = getBlockExplorerUrl(data.chainId, data.userStats.contractAddress)
 
@@ -169,6 +173,11 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                       <div className="text-[16px] font-semibold">{data.userStats.prize.amount}</div>
                     </div>
                   </div>
+                  {isClaimed && (
+                    <div className="text-[12px] leading-[20px] text-roulette-disabled-text flex items-center gap-1 font-bold pointer-events-none">
+                       {data.userStats.prize.amount} {data.userStats.prize.tokenSymbol} claimed
+                    </div>
+                  )}
                   {canClaim && (
                     <Button
                       onClick={handleClaim}

@@ -107,6 +107,7 @@ export type LeaderboardUserAction =
   | { type: "play" }
   | { type: "overview" }
   | { type: "claim"; amount: string; tokenSymbol: string }
+  | { type: "claimed"; amount: string; tokenSymbol: string }
   | { type: "none" }
 
 export interface LeaderboardPrize {

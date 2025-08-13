@@ -40,10 +40,6 @@ export function determineUserAction(
 
   // Check if user can claim rewards
   if (leaderboard.status === LEADERBOARD_STATUS.FINALIZED) {
-    // If claimable amount is known and zero, user already claimed
-    if (typeof claimableAmount !== "undefined" && claimableAmount <= 0n) {
-      return { type: "overview" }
-    }
     const userRanking = leaderboard.rankings?.find(
       (r) => r.bettorAddress.toLowerCase() === userAddress.toLowerCase(),
     )
@@ -55,10 +51,19 @@ export function determineUserAction(
         // The shares array already contains the reward amounts in smallest units
         // No need to calculate percentage - shares[rank-1] IS the reward amount
         const rewardAmount = leaderboard.shares[userRanking.rank - 1]
+        const formattedAmount = formatTokenAmount(rewardAmount, leaderboard.token.decimals)
+
+        if (claimableAmount) {
+          return {
+            type: "claim",
+            amount: formattedAmount,
+            tokenSymbol: leaderboard.token.symbol,
+          }
+        }
 
         return {
-          type: "claim",
-          amount: formatTokenAmount(rewardAmount, leaderboard.token.decimals),
+          type: "claimed",
+          amount: formattedAmount,
           tokenSymbol: leaderboard.token.symbol,
         }
       }

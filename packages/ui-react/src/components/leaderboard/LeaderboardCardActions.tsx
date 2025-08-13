@@ -102,6 +102,16 @@ export function LeaderboardCardActions({
         </>
       )
 
+    case "claimed":
+      return (
+        <>
+          <ActionButton disabled={true}>
+            {`Claimed ${item.userAction.amount} ${item.userAction.tokenSymbol}`}
+          </ActionButton>
+          <OverviewButton />
+        </>
+      )
+
     case "overview":
       return <OverviewButton isFullWidth />
 
