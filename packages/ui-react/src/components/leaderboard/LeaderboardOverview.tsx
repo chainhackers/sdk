@@ -3,6 +3,7 @@ import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "luci
 import { useCallback, useEffect, useState } from "react"
 import { useAccount } from "wagmi"
 import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewards"
+import { useClaimableLeaderboardAmount } from "../../hooks/useClaimableLeaderboardAmount"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
 import { getChainName } from "../../lib/chainIcons"
 import { getBlockExplorerUrl } from "../../lib/chainUtils"
@@ -66,23 +67,19 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
     }
   }, [isSuccess, refetch])
 
+  const claimableHook = useClaimableLeaderboardAmount({ leaderboard: fullLeaderboard ?? undefined })
+
   const handleClaim = useCallback(async () => {
-    if (!data || !leaderboardId) return
-
-    const leaderboard = fullLeaderboard || (await fetchLeaderboard(Number(leaderboardId), address))
-
-    if (!leaderboard) {
-      console.error("Failed to fetch leaderboard for claiming")
-      return
-    }
-
-    claim({ leaderboard })
-  }, [data, leaderboardId, address, claim, fullLeaderboard])
+    if (!fullLeaderboard) return
+    claim({ leaderboard: fullLeaderboard })
+  }, [claim, fullLeaderboard])
 
   if (!data) return null
 
   const canClaim =
-    data.userAction.type === "claim" && data.userStats.status === LEADERBOARD_STATUS.FINALIZED
+    data.userAction.type === "claim" &&
+    data.userStats.status === LEADERBOARD_STATUS.FINALIZED &&
+    (claimableHook.claimableAmount ?? 0n) > 0n
 
   const contractUrl = getBlockExplorerUrl(data.chainId, data.userStats.contractAddress)
 

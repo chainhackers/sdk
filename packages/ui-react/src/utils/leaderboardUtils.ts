@@ -29,14 +29,21 @@ export function formatLeaderboardStatus(status: LEADERBOARD_STATUS): string {
 export function determineUserAction(
   leaderboard: Leaderboard,
   userAddress?: Address,
+  options?: { claimableAmount?: bigint },
 ): LeaderboardUserAction {
   // If user is not connected, show overview
   if (!userAddress) {
     return { type: "overview" }
   }
 
+  const claimableAmount = options?.claimableAmount
+
   // Check if user can claim rewards
   if (leaderboard.status === LEADERBOARD_STATUS.FINALIZED) {
+    // If claimable amount is known and zero, user already claimed
+    if (typeof claimableAmount !== "undefined" && claimableAmount <= 0n) {
+      return { type: "overview" }
+    }
     const userRanking = leaderboard.rankings?.find(
       (r) => r.bettorAddress.toLowerCase() === userAddress.toLowerCase(),
     )
@@ -81,6 +88,7 @@ function formatTokenAmount(amount: bigint, decimals: number): string {
 export function mapLeaderboardToItem(
   leaderboard: Leaderboard,
   userAddress?: Address,
+  options?: { claimableAmount?: bigint },
 ): LeaderboardItem {
   const token: TokenWithImage = {
     address: leaderboard.token.address,
@@ -108,7 +116,7 @@ export function mapLeaderboardToItem(
     },
     participants: leaderboard.totalBettors || 0,
     isPartner: !!leaderboard.affiliateAddress,
-    userAction: determineUserAction(leaderboard, userAddress),
+    userAction: determineUserAction(leaderboard, userAddress, options),
   }
 }
 

@@ -1,32 +1,12 @@
-import {
-  type BetSwirlWallet,
-  claimLeaderboardRewards,
-  getClaimableAmount,
-  type Leaderboard,
-} from "@betswirl/sdk-core"
+import { getClaimRewardsLeaderboardFunctionData, type Leaderboard } from "@betswirl/sdk-core"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { type Address, type TransactionReceipt } from "viem"
-import { useAccount, usePublicClient, useWalletClient } from "wagmi"
+import { type Address } from "viem"
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
 
 interface ClaimLeaderboardRewardsParams {
   leaderboard: Leaderboard
   receiver?: Address
-}
-
-interface LeaderboardClaimRewardsResult {
-  claimedAmount: bigint
-  token: {
-    address: Address
-    symbol: string
-    decimals: number
-  }
-  receiver: Address
-}
-
-interface ClaimLeaderboardRewardsResult {
-  receipt: TransactionReceipt
-  result: LeaderboardClaimRewardsResult
 }
 
 /**
@@ -37,42 +17,25 @@ export function useClaimLeaderboardRewards() {
   const { address } = useAccount()
   const { appChainId } = useChain()
   const queryClient = useQueryClient()
-  const publicClient = usePublicClient({ chainId: appChainId })
-  const { data: walletClient } = useWalletClient({ chainId: appChainId })
+  const writeHook = useWriteContract()
+  const waitHook = useWaitForTransactionReceipt({ hash: writeHook.data, chainId: appChainId })
 
-  const mutation = useMutation<ClaimLeaderboardRewardsResult, Error, ClaimLeaderboardRewardsParams>(
+  const mutation = useMutation<void, Error, ClaimLeaderboardRewardsParams>(
     {
       mutationFn: async ({ leaderboard, receiver }) => {
-        if (!publicClient) {
-          throw new Error("Public client not initialized")
-        }
-
-        if (!walletClient) {
-          throw new Error("Wallet not connected")
-        }
-
         if (!address && !receiver) {
           throw new Error("No wallet connected and no receiver address provided")
         }
 
         const targetAddress = receiver || address!
-
-        const wallet = { publicClient, walletClient } as unknown as BetSwirlWallet
-
-        const claimableAmount = await getClaimableAmount(
-          wallet,
-          leaderboard.onChainId,
-          targetAddress,
-          appChainId,
-        )
-
-        if (claimableAmount <= 0n) {
-          throw new Error("No rewards to claim")
-        }
-
-        const result = await claimLeaderboardRewards(wallet, leaderboard, targetAddress, 5000)
-
-        return result
+        const functionData = getClaimRewardsLeaderboardFunctionData(leaderboard, targetAddress)
+        await writeHook.writeContractAsync({
+          abi: functionData.data.abi,
+          address: functionData.data.to,
+          functionName: functionData.data.functionName,
+          args: functionData.data.args,
+          chainId: appChainId,
+        })
       },
       onSuccess: (_, variables) => {
         queryClient.invalidateQueries({
@@ -95,10 +58,12 @@ export function useClaimLeaderboardRewards() {
     claim: mutation.mutate,
     claimAsync: mutation.mutateAsync,
     isPending: mutation.isPending,
-    isSuccess: mutation.isSuccess,
+    isSuccess: mutation.isSuccess && waitHook.isSuccess,
     isError: mutation.isError,
     error: mutation.error,
-    data: mutation.data,
+    data: undefined,
     reset: mutation.reset,
+    writeHook,
+    waitHook,
   }
 }

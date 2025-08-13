@@ -30,12 +30,10 @@ export function LeaderboardCardActions({
 
   const handleClaim = useCallback(async () => {
     const leaderboard = await fetchLeaderboard(Number(item.id), address, true)
-
     if (!leaderboard) {
       console.error("Failed to fetch leaderboard for claiming")
       return
     }
-
     claim({ leaderboard })
   }, [item.id, address, claim])
 
