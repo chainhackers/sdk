@@ -1,4 +1,4 @@
-import { fetchLeaderboards, LEADERBOARD_STATUS } from "@betswirl/sdk-core"
+import { fetchLeaderboards, LEADERBOARD_STATUS, LEADERBOARD_TYPE } from "@betswirl/sdk-core"
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { useAccount, usePublicClient } from "wagmi"
@@ -44,7 +44,11 @@ export function useLeaderboards(showPartner: boolean): UseLeaderboardsResult {
         true,
       )
 
-      return result.leaderboards.map((lb) => mapLeaderboardToItem(lb, address))
+      const casinoLeaderboards = result.leaderboards.filter(
+        (lb) => lb.type === LEADERBOARD_TYPE.CASINO,
+      )
+
+      return casinoLeaderboards.map((lb) => mapLeaderboardToItem(lb, address))
     },
     refetchInterval: 30000,
     staleTime: 5 * 60 * 1000,
