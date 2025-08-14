@@ -173,7 +173,8 @@ function KenoGameContent({
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
         isGamePaused={isGamePaused}
-        hasValidSelection={selectedNumbers.length > 0}
+        hasValidSelection={selectedNumbers.length >= 2}
+        selection={selection}
         needsTokenApproval={needsTokenApproval}
         isApprovePending={isApprovePending}
         isApproveConfirming={isApproveConfirming}
