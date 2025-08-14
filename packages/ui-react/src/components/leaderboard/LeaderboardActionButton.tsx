@@ -19,7 +19,7 @@ export function LeaderboardActionButton({
   onClaimSuccess,
   className,
 }: LeaderboardActionButtonProps) {
-  const { claim, isPending, isSuccess } = useClaimLeaderboardRewards()
+  const { claim, isPending, isSuccess, isError } = useClaimLeaderboardRewards()
   const { setIsLeaderboardSheetOpen } = useGameFrameContext()
 
   useEffect(() => {
@@ -59,7 +59,11 @@ export function LeaderboardActionButton({
           disabled={isPending}
           className={cn(buttonClassName, isPending && "opacity-50 cursor-not-allowed")}
         >
-          {isPending ? "Claiming..." : `Claim ${userAction.amount} ${userAction.tokenSymbol}`}
+          {isPending
+            ? "Claiming..."
+            : isError
+              ? "Retry claim"
+              : `Claim ${userAction.amount} ${userAction.tokenSymbol}`}
         </Button>
       )
 
