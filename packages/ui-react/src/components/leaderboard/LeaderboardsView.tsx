@@ -1,5 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query"
-import { useCallback } from "react"
+
 import { useLeaderboards } from "../../hooks/useLeaderboards"
 import { cn } from "../../lib/utils"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
@@ -14,11 +13,6 @@ interface Props {
 
 export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }: Props) {
   const { ongoingLeaderboards, endedLeaderboards } = useLeaderboards(showPartner)
-  const queryClient = useQueryClient()
-
-  const handleClaimSuccess = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ["leaderboards"] })
-  }, [queryClient])
 
   return (
     <div className="flex flex-col p-[16px]">
@@ -50,13 +44,12 @@ export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }
         {/* Ongoing section - Show items directly without extra title */}
         {ongoingLeaderboards.length > 0 ? (
           <div className="flex flex-col gap-2">
-            {ongoingLeaderboards.map((itemWithRaw) => (
+            {ongoingLeaderboards.map((itemWithEnriched) => (
               <LeaderboardCard
-                key={itemWithRaw.item.id}
-                item={itemWithRaw.item}
-                raw={itemWithRaw.raw}
+                key={itemWithEnriched.item.id}
+                item={itemWithEnriched.item}
+                raw={itemWithEnriched.enriched}
                 onViewOverview={onViewOverview}
-                onClaimSuccess={handleClaimSuccess}
               />
             ))}
           </div>
@@ -76,13 +69,12 @@ export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }
           <>
             <h2 className="text-[16px] font-semibold text-foreground mt-2">Ended</h2>
             <div className="flex flex-col gap-2">
-              {endedLeaderboards.map((itemWithRaw) => (
+              {endedLeaderboards.map((itemWithEnriched) => (
                 <LeaderboardCard
-                  key={itemWithRaw.item.id}
-                  item={itemWithRaw.item}
-                  raw={itemWithRaw.raw}
+                  key={itemWithEnriched.item.id}
+                  item={itemWithEnriched.item}
+                  raw={itemWithEnriched.enriched}
                   onViewOverview={onViewOverview}
-                  onClaimSuccess={handleClaimSuccess}
                 />
               ))}
             </div>

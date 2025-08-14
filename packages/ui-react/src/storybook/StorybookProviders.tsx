@@ -4,15 +4,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { type ReactNode } from "react"
 import { type Hex, http } from "viem"
 import { createConfig, WagmiProvider } from "wagmi"
-import { arbitrum, avalanche, base, baseSepolia, polygon } from "wagmi/chains"
+import { arbitrum, avalanche, avalancheFuji, base, baseSepolia, polygon } from "wagmi/chains"
 import { BalanceProvider } from "../context/BalanceContext"
 import { BetSwirlSDKProvider } from "../context/BetSwirlSDKProvider"
 import { TokenProvider } from "../context/tokenContext"
 import { getTokenImage } from "../lib/utils"
 import type { TokenWithImage } from "../types/types"
 
-const CHAINS = [base, arbitrum, avalanche, polygon, baseSepolia] as const
-const DEFAULT_CHAIN = baseSepolia
+const CHAINS = [base, arbitrum, avalanche, polygon, baseSepolia, avalancheFuji] as const
+const DEFAULT_CHAIN = avalancheFuji
 
 const queryClient = new QueryClient()
 
@@ -49,6 +49,8 @@ export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookPro
     import.meta.env.VITE_AVALANCHE_RPC_URL || "https://api.avax.network/ext/bc/C/rpc"
   const arbitrumRpcUrl = import.meta.env.VITE_ARBITRUM_RPC_URL || "https://arb1.arbitrum.io/rpc"
   const baseSepoliaRpcUrl = import.meta.env.VITE_BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org"
+  const avalancheFujiRpcUrl =
+    import.meta.env.VITE_AVALANCHE_FUJI_RPC_URL || "https://api.avax-test.network/ext/bc/C/rpc"
 
   const config = createConfig({
     chains: CHAINS,
@@ -58,6 +60,7 @@ export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookPro
       [avalanche.id]: http(avalancheRpcUrl),
       [polygon.id]: http(polygonRpcUrl),
       [baseSepolia.id]: http(baseSepoliaRpcUrl),
+      [avalancheFuji.id]: http(avalancheFujiRpcUrl),
     },
   })
 

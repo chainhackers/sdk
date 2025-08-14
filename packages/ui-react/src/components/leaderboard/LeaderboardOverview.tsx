@@ -1,7 +1,6 @@
-import { fetchLeaderboard, LEADERBOARD_STATUS } from "@betswirl/sdk-core"
+import { LEADERBOARD_STATUS } from "@betswirl/sdk-core"
 import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useAccount } from "wagmi"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
 import { getChainName } from "../../lib/chainIcons"
 import { getBlockExplorerUrl } from "../../lib/chainUtils"
@@ -26,49 +25,38 @@ interface LeaderboardOverviewProps {
 }
 
 export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOverviewProps) {
-  const { address } = useAccount()
   const { data, refetch } = useLeaderboardDetails(leaderboardId)
   const [rankingData, setRankingData] = useState<RankingEntry[]>([])
 
   useEffect(() => {
-    const fetchFullLeaderboard = async () => {
-      if (!leaderboardId) return
-
-      try {
-        const leaderboard = await fetchLeaderboard(Number(leaderboardId), address, true)
-
-        if (leaderboard) {
-          if (leaderboard.rankings && leaderboard.rankings.length > 0) {
-            const mappedRankings = leaderboard.rankings.map((ranking) =>
-              mapRankingToEntry(ranking, leaderboard),
-            )
-            setRankingData(mappedRankings)
-          } else {
-            setRankingData([])
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch full leaderboard:", error)
+    // Now we can get ranking data directly from the enriched leaderboard
+    if (data?.enriched) {
+      if (data.enriched.rankings && data.enriched.rankings.length > 0) {
+        const mappedRankings = data.enriched.rankings.map((ranking) =>
+          mapRankingToEntry(ranking, data.enriched),
+        )
+        setRankingData(mappedRankings)
+      } else {
         setRankingData([])
       }
+    } else {
+      setRankingData([])
     }
-
-    fetchFullLeaderboard()
-  }, [leaderboardId, address])
+  }, [data])
 
   if (!data) return null
 
   const overviewData = data.overview
-  const rawLeaderboard = data.raw
+  const enrichedLeaderboard = data.enriched
 
   const contractUrl = getBlockExplorerUrl(overviewData.chainId, overviewData.userStats.contractAddress)
 
-  const rulesParams = rawLeaderboard?.casinoRules
+  const rulesParams = enrichedLeaderboard?.casinoRules
     ? {
-        rules: rawLeaderboard.casinoRules,
+        rules: enrichedLeaderboard.casinoRules,
         chainId: overviewData.chainId,
-        wageredSymbol: rawLeaderboard.wageredSymbol as string,
-        wageredDecimals: rawLeaderboard.wageredDecimals as number,
+        wageredSymbol: enrichedLeaderboard.wageredSymbol as string,
+        wageredDecimals: enrichedLeaderboard.wageredDecimals as number,
       }
     : null
   const ruleItems = rulesParams ? generateCasinoRulesText(rulesParams) : []
@@ -150,7 +138,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                     </div>
                   </div>
                   <LeaderboardActionButton
-                    leaderboard={rawLeaderboard}
+                    leaderboard={enrichedLeaderboard}
                     userAction={overviewData.userAction}
                     onClaimSuccess={() => refetch()}
                     className="w-fit px-4 py-1.5"

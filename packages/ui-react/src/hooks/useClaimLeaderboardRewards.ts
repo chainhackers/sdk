@@ -1,5 +1,5 @@
 import { getClaimRewardsLeaderboardFunctionData, type Leaderboard } from "@betswirl/sdk-core"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { type Address } from "viem"
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -16,7 +16,6 @@ interface ClaimLeaderboardRewardsParams {
 export function useClaimLeaderboardRewards() {
   const { address } = useAccount()
   const { appChainId } = useChain()
-  const queryClient = useQueryClient()
   const writeHook = useWriteContract()
   const waitHook = useWaitForTransactionReceipt({ hash: writeHook.data, chainId: appChainId })
 
@@ -35,17 +34,6 @@ export function useClaimLeaderboardRewards() {
           functionName: functionData.data.functionName,
           args: functionData.data.args,
           chainId: appChainId,
-        })
-      },
-      onSuccess: (_, variables) => {
-        queryClient.invalidateQueries({
-          queryKey: ["leaderboards"],
-        })
-        queryClient.invalidateQueries({
-          queryKey: ["leaderboardDetails", variables.leaderboard.id],
-        })
-        queryClient.invalidateQueries({
-          queryKey: ["balances"],
         })
       },
       onError: (error) => {

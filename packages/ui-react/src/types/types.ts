@@ -18,6 +18,7 @@ import {
   type WeightedGameEncodedInput,
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
+import type { EnrichedLeaderboard } from "../data/leaderboardQueries"
 
 export type Theme = "light" | "dark" | "system"
 
@@ -159,4 +160,11 @@ export interface RankingEntry {
 export interface LeaderboardItemWithRaw {
   item: LeaderboardItem
   raw: Leaderboard
+}
+
+// Enhanced leaderboard type that includes claimable amount
+// This type is used as Single Source of Truth (SSoT) in the query cache
+export interface LeaderboardItemWithEnriched {
+  item: LeaderboardItem
+  enriched: EnrichedLeaderboard
 }
