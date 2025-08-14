@@ -1,11 +1,11 @@
 import {
+  type CasinoChainId,
   fetchLeaderboard,
   fetchLeaderboards,
   getClaimableAmountFunctionData,
   LEADERBOARD_STATUS,
   LEADERBOARD_TYPE,
   type Leaderboard,
-  type CasinoChainId,
 } from "@betswirl/sdk-core"
 import type { Address, PublicClient } from "viem"
 
@@ -43,9 +43,7 @@ export async function fetchAndEnrichLeaderboards({
     true,
   )
 
-  const casinoLeaderboards = result.leaderboards.filter(
-    (lb) => lb.type === LEADERBOARD_TYPE.CASINO,
-  )
+  const casinoLeaderboards = result.leaderboards.filter((lb) => lb.type === LEADERBOARD_TYPE.CASINO)
 
   if (!address) {
     return casinoLeaderboards
@@ -60,7 +58,11 @@ export async function fetchAndEnrichLeaderboards({
   }
 
   const calls = finalizedLeaderboards.map((lb) => {
-    const functionData = getClaimableAmountFunctionData(address, lb.onChainId, chainId as CasinoChainId)
+    const functionData = getClaimableAmountFunctionData(
+      address,
+      lb.onChainId,
+      chainId as CasinoChainId,
+    )
     return {
       address: functionData.data.to as Address,
       abi: functionData.data.abi,
@@ -103,15 +105,16 @@ export async function fetchAndEnrichSingleLeaderboard(
     throw new Error(`Leaderboard ${leaderboardId} not found`)
   }
 
-  if (
-    !address ||
-    leaderboard.status !== LEADERBOARD_STATUS.FINALIZED
-  ) {
+  if (!address || leaderboard.status !== LEADERBOARD_STATUS.FINALIZED) {
     return leaderboard
   }
 
   try {
-    const functionData = getClaimableAmountFunctionData(address, leaderboard.onChainId, chainId as CasinoChainId)
+    const functionData = getClaimableAmountFunctionData(
+      address,
+      leaderboard.onChainId,
+      chainId as CasinoChainId,
+    )
     const claimableAmount = await publicClient.readContract({
       address: functionData.data.to as Address,
       abi: functionData.data.abi,

@@ -57,23 +57,15 @@ export function LeaderboardActionButton({
         <Button
           onClick={handleClaim}
           disabled={isPending}
-          className={cn(
-            buttonClassName,
-            isPending && "opacity-50 cursor-not-allowed",
-          )}
+          className={cn(buttonClassName, isPending && "opacity-50 cursor-not-allowed")}
         >
-          {isPending
-            ? "Claiming..."
-            : `Claim ${userAction.amount} ${userAction.tokenSymbol}`}
+          {isPending ? "Claiming..." : `Claim ${userAction.amount} ${userAction.tokenSymbol}`}
         </Button>
       )
 
     case "claimed":
       return (
-        <Button
-          disabled={true}
-          className={cn(buttonClassName, "opacity-50 cursor-not-allowed")}
-        >
+        <Button disabled={true} className={cn(buttonClassName, "opacity-50 cursor-not-allowed")}>
           {`Claimed ${userAction.amount} ${userAction.tokenSymbol}`}
         </Button>
       )

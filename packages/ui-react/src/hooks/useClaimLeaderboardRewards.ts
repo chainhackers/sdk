@@ -19,28 +19,26 @@ export function useClaimLeaderboardRewards() {
   const writeHook = useWriteContract()
   const waitHook = useWaitForTransactionReceipt({ hash: writeHook.data, chainId: appChainId })
 
-  const mutation = useMutation<void, Error, ClaimLeaderboardRewardsParams>(
-    {
-      mutationFn: async ({ leaderboard, receiver }) => {
-        if (!address && !receiver) {
-          throw new Error("No wallet connected and no receiver address provided")
-        }
+  const mutation = useMutation<void, Error, ClaimLeaderboardRewardsParams>({
+    mutationFn: async ({ leaderboard, receiver }) => {
+      if (!address && !receiver) {
+        throw new Error("No wallet connected and no receiver address provided")
+      }
 
-        const targetAddress = receiver || address!
-        const functionData = getClaimRewardsLeaderboardFunctionData(leaderboard, targetAddress)
-        await writeHook.writeContractAsync({
-          abi: functionData.data.abi,
-          address: functionData.data.to,
-          functionName: functionData.data.functionName,
-          args: functionData.data.args,
-          chainId: appChainId,
-        })
-      },
-      onError: (error) => {
-        console.error("Failed to claim leaderboard rewards:", error)
-      },
+      const targetAddress = receiver || address!
+      const functionData = getClaimRewardsLeaderboardFunctionData(leaderboard, targetAddress)
+      await writeHook.writeContractAsync({
+        abi: functionData.data.abi,
+        address: functionData.data.to,
+        functionName: functionData.data.functionName,
+        args: functionData.data.args,
+        chainId: appChainId,
+      })
     },
-  )
+    onError: (error) => {
+      console.error("Failed to claim leaderboard rewards:", error)
+    },
+  })
 
   return {
     claim: mutation.mutate,

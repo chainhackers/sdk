@@ -3,12 +3,12 @@ import { useMemo } from "react"
 import { useAccount, usePublicClient } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
+import {
+  type EnrichedLeaderboard,
+  fetchAndEnrichSingleLeaderboard,
+} from "../data/leaderboardQueries"
 import { type LeaderboardOverviewData } from "../types/types"
 import { mapLeaderboardToOverviewData } from "../utils/leaderboardUtils"
-import {
-  fetchAndEnrichSingleLeaderboard,
-  type EnrichedLeaderboard
-} from "../data/leaderboardQueries"
 
 /**
  * Hook to fetch detailed leaderboard data including user stats and rules
@@ -25,7 +25,12 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
   const { address } = useAccount()
   const publicClient = usePublicClient({ chainId: appChainId })
 
-  const { data: enrichedLeaderboard, isLoading, error, refetch } = useQuery({
+  const {
+    data: enrichedLeaderboard,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["leaderboard-details", leaderboardId, appChainId, address],
     queryFn: async (): Promise<EnrichedLeaderboard | null> => {
       if (!leaderboardId || !publicClient) {
@@ -48,12 +53,14 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
 
   // Transform enriched data into UI models
   const combinedData = useMemo(() => {
-    return enrichedLeaderboard ? {
-      overview: mapLeaderboardToOverviewData(enrichedLeaderboard, address, {
-        claimableAmount: enrichedLeaderboard.claimableAmount
-      }),
-      enriched: enrichedLeaderboard
-    } : null
+    return enrichedLeaderboard
+      ? {
+          overview: mapLeaderboardToOverviewData(enrichedLeaderboard, address, {
+            claimableAmount: enrichedLeaderboard.claimableAmount,
+          }),
+          enriched: enrichedLeaderboard,
+        }
+      : null
   }, [enrichedLeaderboard, address])
 
   return {

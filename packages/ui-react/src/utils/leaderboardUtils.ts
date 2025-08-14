@@ -21,9 +21,9 @@ import type {
  */
 export function formatLeaderboardStatus(status: LEADERBOARD_STATUS): string {
   return status
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ')
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ")
 }
 
 /**

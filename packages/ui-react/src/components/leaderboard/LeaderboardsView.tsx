@@ -1,4 +1,3 @@
-
 import { useLeaderboards } from "../../hooks/useLeaderboards"
 import { cn } from "../../lib/utils"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"

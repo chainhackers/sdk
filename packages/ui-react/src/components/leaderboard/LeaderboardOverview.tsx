@@ -15,8 +15,8 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
-import { LeaderboardActionButton } from "./LeaderboardActionButton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
+import { LeaderboardActionButton } from "./LeaderboardActionButton"
 import { LeaderboardRankingTab } from "./LeaderboardRankingTab"
 
 interface LeaderboardOverviewProps {
@@ -49,7 +49,10 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
   const overviewData = data.overview
   const enrichedLeaderboard = data.enriched
 
-  const contractUrl = getBlockExplorerUrl(overviewData.chainId, overviewData.userStats.contractAddress)
+  const contractUrl = getBlockExplorerUrl(
+    overviewData.chainId,
+    overviewData.userStats.contractAddress,
+  )
 
   const rulesParams = enrichedLeaderboard?.casinoRules
     ? {
@@ -115,7 +118,9 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <div className="text-[12px] text-roulette-disabled-text">Your position:</div>
-                    <div className="text-[16px] font-semibold">#{overviewData.userStats.position}</div>
+                    <div className="text-[16px] font-semibold">
+                      #{overviewData.userStats.position}
+                    </div>
                   </div>
                   <div>
                     <div className="text-[12px] text-roulette-disabled-text">Your points:</div>
@@ -134,7 +139,9 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                         alt={overviewData.userStats.prize.tokenSymbol}
                         className="w-5 h-5"
                       />
-                      <div className="text-[16px] font-semibold">{overviewData.userStats.prize.amount}</div>
+                      <div className="text-[16px] font-semibold">
+                        {overviewData.userStats.prize.amount}
+                      </div>
                     </div>
                   </div>
                   <LeaderboardActionButton

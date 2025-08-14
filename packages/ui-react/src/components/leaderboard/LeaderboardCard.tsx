@@ -3,9 +3,9 @@ import { Gift } from "lucide-react"
 import { cn } from "../../lib/utils"
 import type { LeaderboardItem } from "../../types/types"
 import { formatLeaderboardStatus } from "../../utils/leaderboardUtils"
+import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { LeaderboardActionButton } from "./LeaderboardActionButton"
-import { Button } from "../ui/button"
 
 interface LeaderboardCardProps {
   item: LeaderboardItem
@@ -14,7 +14,12 @@ interface LeaderboardCardProps {
   onClaimSuccess?: () => void
 }
 
-export function LeaderboardCard({ item, raw, onViewOverview, onClaimSuccess }: LeaderboardCardProps) {
+export function LeaderboardCard({
+  item,
+  raw,
+  onViewOverview,
+  onClaimSuccess,
+}: LeaderboardCardProps) {
   const formatDateRange = (startDate: string, endDate: string) => {
     const start = new Date(startDate)
     const end = new Date(endDate)
