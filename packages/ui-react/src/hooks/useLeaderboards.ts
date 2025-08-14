@@ -7,12 +7,12 @@ import { useMemo } from "react"
 import { useAccount, usePublicClient } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
-import { type LeaderboardItem } from "../types/types"
+import { type LeaderboardItemWithRaw } from "../types/types"
 import { mapLeaderboardToItem } from "../utils/leaderboardUtils"
 
 interface UseLeaderboardsResult {
-  ongoingLeaderboards: LeaderboardItem[]
-  endedLeaderboards: LeaderboardItem[]
+  ongoingLeaderboards: LeaderboardItemWithRaw[]
+  endedLeaderboards: LeaderboardItemWithRaw[]
   isLoading: boolean
   error: Error | null
 }
@@ -109,19 +109,19 @@ export function useLeaderboards(showPartner: boolean): UseLeaderboardsResult {
       return { ongoingLeaderboards: [], endedLeaderboards: [] }
     }
 
-    // Map to UI items with claimable-aware userAction
-    const items = data.map((lb) =>
-      mapLeaderboardToItem(lb, address, {
+    const itemsWithRaw = data.map((lb): LeaderboardItemWithRaw => ({
+      item: mapLeaderboardToItem(lb, address, {
         claimableAmount: claimableById.get(lb.id.toString()),
       }),
-    )
+      raw: lb,
+    }))
 
-    const ongoing = items.filter((lb) =>
-      [LEADERBOARD_STATUS.PENDING, LEADERBOARD_STATUS.NOT_STARTED].includes(lb.status),
+    const ongoing = itemsWithRaw.filter((item) =>
+      [LEADERBOARD_STATUS.PENDING, LEADERBOARD_STATUS.NOT_STARTED].includes(item.item.status),
     )
-    const ended = items.filter((lb) =>
+    const ended = itemsWithRaw.filter((item) =>
       [LEADERBOARD_STATUS.ENDED, LEADERBOARD_STATUS.FINALIZED, LEADERBOARD_STATUS.EXPIRED].includes(
-        lb.status,
+        item.item.status,
       ),
     )
 

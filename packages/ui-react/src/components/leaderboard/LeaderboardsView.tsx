@@ -50,10 +50,11 @@ export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }
         {/* Ongoing section - Show items directly without extra title */}
         {ongoingLeaderboards.length > 0 ? (
           <div className="flex flex-col gap-2">
-            {ongoingLeaderboards.map((item) => (
+            {ongoingLeaderboards.map((itemWithRaw) => (
               <LeaderboardCard
-                key={item.id}
-                item={item}
+                key={itemWithRaw.item.id}
+                item={itemWithRaw.item}
+                raw={itemWithRaw.raw}
                 onViewOverview={onViewOverview}
                 onClaimSuccess={handleClaimSuccess}
               />
@@ -75,10 +76,11 @@ export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }
           <>
             <h2 className="text-[16px] font-semibold text-foreground mt-2">Ended</h2>
             <div className="flex flex-col gap-2">
-              {endedLeaderboards.map((item) => (
+              {endedLeaderboards.map((itemWithRaw) => (
                 <LeaderboardCard
-                  key={item.id}
-                  item={item}
+                  key={itemWithRaw.item.id}
+                  item={itemWithRaw.item}
+                  raw={itemWithRaw.raw}
                   onViewOverview={onViewOverview}
                   onClaimSuccess={handleClaimSuccess}
                 />

@@ -1,18 +1,20 @@
-import { LEADERBOARD_STATUS } from "@betswirl/sdk-core"
+import { LEADERBOARD_STATUS, type Leaderboard } from "@betswirl/sdk-core"
 import { Gift } from "lucide-react"
 import { cn } from "../../lib/utils"
 import type { LeaderboardItem } from "../../types/types"
 import { formatLeaderboardStatus } from "../../utils/leaderboardUtils"
 import { ChainIcon } from "../ui/ChainIcon"
-import { LeaderboardCardActions } from "./LeaderboardCardActions"
+import { LeaderboardActionButton } from "./LeaderboardActionButton"
+import { Button } from "../ui/button"
 
 interface LeaderboardCardProps {
   item: LeaderboardItem
+  raw?: Leaderboard
   onViewOverview?: (id: string) => void
   onClaimSuccess?: () => void
 }
 
-export function LeaderboardCard({ item, onViewOverview, onClaimSuccess }: LeaderboardCardProps) {
+export function LeaderboardCard({ item, raw, onViewOverview, onClaimSuccess }: LeaderboardCardProps) {
   const formatDateRange = (startDate: string, endDate: string) => {
     const start = new Date(startDate)
     const end = new Date(endDate)
@@ -108,11 +110,26 @@ export function LeaderboardCard({ item, onViewOverview, onClaimSuccess }: Leader
 
       {/* Action buttons */}
       <div className="flex gap-[10px]">
-        <LeaderboardCardActions
-          item={item}
-          onViewOverview={onViewOverview}
-          onClaimSuccess={onClaimSuccess}
-        />
+        {raw && item.userAction.type !== "overview" && (
+          <LeaderboardActionButton
+            leaderboard={raw}
+            userAction={item.userAction}
+            onClaimSuccess={onClaimSuccess}
+          />
+        )}
+        <Button
+          variant="secondary"
+          onClick={() => onViewOverview?.(item.id)}
+          className={cn(
+            "bg-button-secondary-bg",
+            "text-primary font-semibold",
+            "rounded-[8px] h-[32px]",
+            "text-[12px] leading-[20px]",
+            !raw || item.userAction.type === "overview" ? "w-full" : "flex-1",
+          )}
+        >
+          Overview
+        </Button>
       </div>
     </div>
   )

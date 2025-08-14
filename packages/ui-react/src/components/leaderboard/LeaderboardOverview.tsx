@@ -1,9 +1,7 @@
-import { fetchLeaderboard, LEADERBOARD_STATUS, Leaderboard } from "@betswirl/sdk-core"
+import { fetchLeaderboard, LEADERBOARD_STATUS } from "@betswirl/sdk-core"
 import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useAccount } from "wagmi"
-import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewards"
-import { useClaimableLeaderboardAmount } from "../../hooks/useClaimableLeaderboardAmount"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
 import { getChainName } from "../../lib/chainIcons"
 import { getBlockExplorerUrl } from "../../lib/chainUtils"
@@ -18,6 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
+import { LeaderboardActionButton } from "./LeaderboardActionButton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { LeaderboardRankingTab } from "./LeaderboardRankingTab"
 
@@ -29,9 +28,7 @@ interface LeaderboardOverviewProps {
 export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOverviewProps) {
   const { address } = useAccount()
   const { data, refetch } = useLeaderboardDetails(leaderboardId)
-  const { claim, isPending, isSuccess, error } = useClaimLeaderboardRewards()
   const [rankingData, setRankingData] = useState<RankingEntry[]>([])
-  const [fullLeaderboard, setFullLeaderboard] = useState<Leaderboard | null>(null)
 
   useEffect(() => {
     const fetchFullLeaderboard = async () => {
@@ -41,8 +38,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
         const leaderboard = await fetchLeaderboard(Number(leaderboardId), address, true)
 
         if (leaderboard) {
-          setFullLeaderboard(leaderboard)
-
           if (leaderboard.rankings && leaderboard.rankings.length > 0) {
             const mappedRankings = leaderboard.rankings.map((ranking) =>
               mapRankingToEntry(ranking, leaderboard),
@@ -61,38 +56,19 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
     fetchFullLeaderboard()
   }, [leaderboardId, address])
 
-  useEffect(() => {
-    if (isSuccess) {
-      refetch()
-    }
-  }, [isSuccess, refetch])
-
-  const claimableHook = useClaimableLeaderboardAmount({ leaderboard: fullLeaderboard ?? undefined })
-
-  const handleClaim = useCallback(async () => {
-    if (!fullLeaderboard) return
-    claim({ leaderboard: fullLeaderboard })
-  }, [claim, fullLeaderboard])
-
   if (!data) return null
 
-  const canClaim =
-    data.userAction.type === "claim" &&
-    data.userStats.status === LEADERBOARD_STATUS.FINALIZED &&
-    (claimableHook.claimableAmount ?? 0n) > 0n
-  const isClaimed =
-    data.userAction.type === "claimed" &&
-    data.userStats.status === LEADERBOARD_STATUS.FINALIZED &&
-    (claimableHook.claimableAmount ?? 0n) === 0n
+  const overviewData = data.overview
+  const rawLeaderboard = data.raw
 
-  const contractUrl = getBlockExplorerUrl(data.chainId, data.userStats.contractAddress)
+  const contractUrl = getBlockExplorerUrl(overviewData.chainId, overviewData.userStats.contractAddress)
 
-  const rulesParams = fullLeaderboard?.casinoRules
+  const rulesParams = rawLeaderboard?.casinoRules
     ? {
-        rules: fullLeaderboard.casinoRules,
-        chainId: data.chainId,
-        wageredSymbol: fullLeaderboard.wageredSymbol as string,
-        wageredDecimals: fullLeaderboard.wageredDecimals as number,
+        rules: rawLeaderboard.casinoRules,
+        chainId: overviewData.chainId,
+        wageredSymbol: rawLeaderboard.wageredSymbol as string,
+        wageredDecimals: rawLeaderboard.wageredDecimals as number,
       }
     : null
   const ruleItems = rulesParams ? generateCasinoRulesText(rulesParams) : []
@@ -105,7 +81,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
           <ChevronLeft size={18} />
         </Button>
         <div className="flex items-center gap-2">
-          <h2 className="text-[18px] font-semibold">{data.title}</h2>
+          <h2 className="text-[18px] font-semibold">{overviewData.title}</h2>
         </div>
       </div>
 
@@ -132,9 +108,9 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                   <span>Status:</span>
                   {(() => {
                     const isEnded =
-                      data.userStats.status === LEADERBOARD_STATUS.FINALIZED ||
-                      data.userStats.status === LEADERBOARD_STATUS.EXPIRED ||
-                      data.userStats.status === LEADERBOARD_STATUS.ENDED
+                      overviewData.userStats.status === LEADERBOARD_STATUS.FINALIZED ||
+                      overviewData.userStats.status === LEADERBOARD_STATUS.EXPIRED ||
+                      overviewData.userStats.status === LEADERBOARD_STATUS.ENDED
                     return (
                       <span
                         className={cn(
@@ -143,7 +119,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                           isEnded && "text-roulette-disabled-text border-roulette-disabled-text",
                         )}
                       >
-                        {formatLeaderboardStatus(data.userStats.status)}
+                        {formatLeaderboardStatus(overviewData.userStats.status)}
                       </span>
                     )
                   })()}
@@ -151,11 +127,11 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <div className="text-[12px] text-roulette-disabled-text">Your position:</div>
-                    <div className="text-[16px] font-semibold">#{data.userStats.position}</div>
+                    <div className="text-[16px] font-semibold">#{overviewData.userStats.position}</div>
                   </div>
                   <div>
                     <div className="text-[12px] text-roulette-disabled-text">Your points:</div>
-                    <div className="text-[16px] font-semibold">{data.userStats.points}</div>
+                    <div className="text-[16px] font-semibold">{overviewData.userStats.points}</div>
                   </div>
                 </div>
                 <div className="w-full h-[1px] bg-leaderboard-separator" />
@@ -166,35 +142,19 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                     </div>
                     <div className="flex items-center gap-2">
                       <img
-                        src={data.prize.token.image}
-                        alt={data.userStats.prize.tokenSymbol}
+                        src={overviewData.prize.token.image}
+                        alt={overviewData.userStats.prize.tokenSymbol}
                         className="w-5 h-5"
                       />
-                      <div className="text-[16px] font-semibold">{data.userStats.prize.amount}</div>
+                      <div className="text-[16px] font-semibold">{overviewData.userStats.prize.amount}</div>
                     </div>
                   </div>
-                  {isClaimed && (
-                    <div className="text-[12px] leading-[20px] text-roulette-disabled-text flex items-center gap-1 font-bold pointer-events-none">
-                       {data.userStats.prize.amount} {data.userStats.prize.tokenSymbol} claimed
-                    </div>
-                  )}
-                  {canClaim && (
-                    <Button
-                      onClick={handleClaim}
-                      disabled={isPending}
-                      className={cn(
-                        "bg-primary hover:bg-primary/90",
-                        "text-white font-semibold",
-                        "rounded-[8px] h-[32px] px-4 py-1.5 w-fit",
-                        "text-[12px] leading-[20px]",
-                        isPending && "opacity-50 cursor-not-allowed",
-                      )}
-                    >
-                      {isPending
-                        ? "Claiming..."
-                        : `Claim ${data.userStats.prize.amount} ${data.userStats.prize.tokenSymbol}`}
-                    </Button>
-                  )}
+                  <LeaderboardActionButton
+                    leaderboard={rawLeaderboard}
+                    userAction={overviewData.userAction}
+                    onClaimSuccess={() => refetch()}
+                    className="w-fit px-4 py-1.5"
+                  />
                 </div>
                 {contractUrl ? (
                   <a
@@ -219,10 +179,10 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 <div className="flex items-center gap-2">
                   <h3 className="text-[16px] leading-[24px] font-semibold">Rules</h3>
                   <div className="flex items-center gap-2 ml-auto">
-                    <ChainIcon chainId={data.chainId} size={18} />
+                    <ChainIcon chainId={overviewData.chainId} size={18} />
                     <span className="text-[12px] leading-[20px] text-roulette-disabled-text">
-                      {getChainName(data.chainId).charAt(0).toUpperCase() +
-                        getChainName(data.chainId).slice(1)}
+                      {getChainName(overviewData.chainId).charAt(0).toUpperCase() +
+                        getChainName(overviewData.chainId).slice(1)}
                     </span>
                   </div>
                 </div>
@@ -266,7 +226,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 </div>
               </div>
 
-              {data.userStats.status === LEADERBOARD_STATUS.EXPIRED && (
+              {overviewData.userStats.status === LEADERBOARD_STATUS.EXPIRED && (
                 <Alert variant="warning">
                   <AlertCircle className="h-[16px] w-[16px]" />
                   <AlertTitle className="text-[14px] leading-[22px] font-medium">
@@ -274,18 +234,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                   </AlertTitle>
                   <AlertDescription className="text-[12px] leading-[20px]">
                     Prizes cannot be withdrawn anymore
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-[16px] w-[16px]" />
-                  <AlertTitle className="text-[14px] leading-[22px] font-medium">
-                    Claim failed
-                  </AlertTitle>
-                  <AlertDescription className="text-[12px] leading-[20px]">
-                    {error.message}
                   </AlertDescription>
                 </Alert>
               )}
@@ -299,9 +247,9 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
               <LeaderboardRankingTab
                 rankingData={rankingData}
                 lastUpdate="Last update: recently (refreshed once per hour)"
-                claimableAmount={data.userStats.prize.amount}
-                claimableTokenSymbol={data.userStats.prize.tokenSymbol}
-                leaderboardStatus={data.userStats.status}
+                claimableAmount={overviewData.userStats.prize.amount}
+                claimableTokenSymbol={overviewData.userStats.prize.tokenSymbol}
+                leaderboardStatus={overviewData.userStats.status}
               />
             </div>
           </ScrollArea>

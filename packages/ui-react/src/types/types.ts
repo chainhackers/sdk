@@ -10,6 +10,7 @@ import {
   KenoBall,
   KenoEncodedInput,
   LEADERBOARD_STATUS,
+  type Leaderboard,
   RouletteEncodedInput,
   RouletteNumber,
   type Token,
@@ -153,4 +154,9 @@ export interface RankingEntry {
   points: number
   rewardAmount: string
   rewardToken: TokenWithImage
+}
+
+export interface LeaderboardItemWithRaw {
+  item: LeaderboardItem
+  raw: Leaderboard
 }

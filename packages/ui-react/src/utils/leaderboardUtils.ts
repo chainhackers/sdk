@@ -134,8 +134,9 @@ export function mapLeaderboardToItem(
 export function mapLeaderboardToOverviewData(
   leaderboard: Leaderboard,
   userAddress?: Address,
+  options?: { claimableAmount?: bigint },
 ): LeaderboardOverviewData {
-  const baseItem = mapLeaderboardToItem(leaderboard, userAddress)
+  const baseItem = mapLeaderboardToItem(leaderboard, userAddress, options)
 
   // Find user's ranking
   const userRanking = leaderboard.rankings?.find(
