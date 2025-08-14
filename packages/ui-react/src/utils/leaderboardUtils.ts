@@ -34,25 +34,20 @@ export function determineUserAction(
   userAddress?: Address,
   options?: { claimableAmount?: bigint },
 ): LeaderboardUserAction {
-  // If user is not connected, show overview
   if (!userAddress) {
     return { type: "overview" }
   }
 
   const claimableAmount = options?.claimableAmount
 
-  // Check if user can claim rewards
   if (leaderboard.status === LEADERBOARD_STATUS.FINALIZED) {
     const userRanking = leaderboard.rankings?.find(
       (r) => r.bettorAddress.toLowerCase() === userAddress.toLowerCase(),
     )
 
-    // If user is in rankings and has a winning position
     if (userRanking && leaderboard.shares && leaderboard.shares.length > 0) {
       const winnerCount = leaderboard.shares.length
       if (userRanking.rank <= winnerCount && userRanking.rank > 0) {
-        // The shares array already contains the reward amounts in smallest units
-        // No need to calculate percentage - shares[rank-1] IS the reward amount
         const rewardAmount = leaderboard.shares[userRanking.rank - 1]
         const formattedAmount = formatTokenAmount(rewardAmount, leaderboard.token.decimals)
 
@@ -73,12 +68,10 @@ export function determineUserAction(
     }
   }
 
-  // If leaderboard is active, show play button
   if (leaderboard.status === LEADERBOARD_STATUS.PENDING) {
     return { type: "play" }
   }
 
-  // Default to overview for ended/expired leaderboards
   return { type: "overview" }
 }
 
@@ -105,7 +98,6 @@ export function mapLeaderboardToItem(
     image: getTokenImage(leaderboard.token.symbol),
   }
 
-  // Find user's ranking if they're in the leaderboard
   const userRanking = leaderboard.rankings?.find(
     (r) => r.bettorAddress.toLowerCase() === userAddress?.toLowerCase(),
   )
@@ -138,16 +130,12 @@ export function mapLeaderboardToOverviewData(
 ): LeaderboardOverviewData {
   const baseItem = mapLeaderboardToItem(leaderboard, userAddress, options)
 
-  // Find user's ranking
   const userRanking = leaderboard.rankings?.find(
     (r) => r.bettorAddress.toLowerCase() === userAddress?.toLowerCase(),
   )
 
-  // Determine user's prize if they're a winner
   let userPrize = { amount: "0", tokenSymbol: leaderboard.token.symbol }
   if (userRanking && leaderboard.shares && userRanking.rank <= leaderboard.shares.length) {
-    // The shares array already contains the reward amounts in smallest units
-    // No need to calculate percentage - shares[rank-1] IS the reward amount
     const rewardAmount = leaderboard.shares[userRanking.rank - 1]
     userPrize = {
       amount: formatTokenAmount(rewardAmount, leaderboard.token.decimals),
@@ -182,16 +170,12 @@ export function mapRankingToEntry(
     image: getTokenImage(leaderboard.token.symbol),
   }
 
-  // Calculate reward amount based on rank and shares
   let rewardAmount = "0"
   if (leaderboard.shares && ranking.rank <= leaderboard.shares.length && ranking.rank > 0) {
-    // The shares array already contains the reward amounts in smallest units
-    // No need to calculate percentage - shares[rank-1] IS the reward amount
     const rewardValue = leaderboard.shares[ranking.rank - 1]
     rewardAmount = formatTokenAmount(rewardValue, leaderboard.token.decimals)
   }
 
-  // Format player address for display
   const playerAddress = `${ranking.bettorAddress.slice(0, 8)}...${ranking.bettorAddress.slice(-7)}`
 
   return {

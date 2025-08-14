@@ -37,7 +37,6 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
         return null
       }
 
-      // Fetch individual leaderboard with enriched data
       const fetchedLeaderboard = await fetchAndEnrichSingleLeaderboard(leaderboardId, {
         publicClient,
         chainId: appChainId,
@@ -51,7 +50,6 @@ export function useLeaderboardDetails(leaderboardId: string | null): {
     refetchInterval: 30000,
   })
 
-  // Transform enriched data into UI models
   const combinedData = useMemo(() => {
     return enrichedLeaderboard
       ? {

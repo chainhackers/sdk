@@ -29,7 +29,6 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
   const [rankingData, setRankingData] = useState<RankingEntry[]>([])
 
   useEffect(() => {
-    // Now we can get ranking data directly from the enriched leaderboard
     if (data?.enriched) {
       if (data.enriched.rankings && data.enriched.rankings.length > 0) {
         const mappedRankings = data.enriched.rankings.map((ranking) =>

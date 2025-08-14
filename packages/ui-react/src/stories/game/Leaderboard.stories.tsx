@@ -204,7 +204,7 @@ export const LeaderboardCardNoUserRank: StoryObj<{ item: LeaderboardItem; theme?
   args: {
     item: {
       ...mockLeaderboardItem,
-      userRank: null, // Пользователь не участвует в лидерборде
+      userRank: null,
       userAction: { type: "play" },
     },
     theme: "light",

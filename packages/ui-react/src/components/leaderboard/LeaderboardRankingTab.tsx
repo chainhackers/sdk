@@ -19,11 +19,22 @@ export function LeaderboardRankingTab({
   claimableTokenSymbol,
   leaderboardStatus = LEADERBOARD_STATUS.PENDING,
 }: LeaderboardRankingTabProps) {
-  // Split top 3 and remaining entries
   const topThree = rankingData.slice(0, 3)
   const remainingEntries = rankingData.slice(3)
 
-  // Determine if the claim button should be shown
+  const rankingEmptyText = (leaderboardStatus: LEADERBOARD_STATUS) => {
+    switch (leaderboardStatus) {
+      case LEADERBOARD_STATUS.PENDING:
+      case LEADERBOARD_STATUS.NOT_STARTED:
+      case LEADERBOARD_STATUS.ENDED:
+        return "Rankings will appear once players start participating"
+      case LEADERBOARD_STATUS.EXPIRED:
+        return "This leaderboard has expired"
+      case LEADERBOARD_STATUS.FINALIZED:
+        return "No rankings data available for this completed leaderboard"
+    }
+  }
+
   const canClaim =
     leaderboardStatus === LEADERBOARD_STATUS.FINALIZED && Number.parseFloat(claimableAmount) > 0
 
@@ -59,15 +70,7 @@ export function LeaderboardRankingTab({
         <div className="text-center py-8">
           <p className="text-[16px] font-semibold text-card-foreground">No rankings available</p>
           <p className="text-[14px] text-muted-foreground mt-1">
-            {leaderboardStatus === LEADERBOARD_STATUS.PENDING ||
-            leaderboardStatus === LEADERBOARD_STATUS.NOT_STARTED ||
-            leaderboardStatus === LEADERBOARD_STATUS.ENDED
-              ? "Rankings will appear once players start participating"
-              : leaderboardStatus === LEADERBOARD_STATUS.EXPIRED
-                ? "This leaderboard has expired"
-                : leaderboardStatus === LEADERBOARD_STATUS.FINALIZED
-                  ? "No rankings data available for this completed leaderboard"
-                  : "Rankings will appear once the competition starts"}
+            {rankingEmptyText(leaderboardStatus)}
           </p>
         </div>
       )}

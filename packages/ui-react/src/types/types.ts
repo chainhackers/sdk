@@ -162,8 +162,6 @@ export interface LeaderboardItemWithRaw {
   raw: Leaderboard
 }
 
-// Enhanced leaderboard type that includes claimable amount
-// This type is used as Single Source of Truth (SSoT) in the query cache
 export interface LeaderboardItemWithEnriched {
   item: LeaderboardItem
   enriched: EnrichedLeaderboard

@@ -75,7 +75,6 @@ export function LeaderboardActionButton({
       )
 
     case "overview":
-      // Overview action should not be handled by this component
       return null
 
     default:

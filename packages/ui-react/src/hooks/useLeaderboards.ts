@@ -26,8 +26,6 @@ export function useLeaderboards(showPartner: boolean): UseLeaderboardsResult {
   const { address } = useAccount()
   const publicClient = usePublicClient({ chainId: appChainId })
 
-  // Main query that fetches and enriches all leaderboards data
-  // This becomes our SSoT for leaderboards in the cache
   const {
     data: enrichedLeaderboards,
     isLoading,
@@ -51,7 +49,6 @@ export function useLeaderboards(showPartner: boolean): UseLeaderboardsResult {
     enabled: !!publicClient,
   })
 
-  // Transform enriched data into UI models and categorize
   if (!enrichedLeaderboards) {
     return {
       ongoingLeaderboards: [],
