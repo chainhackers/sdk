@@ -156,13 +156,16 @@ export function useGameLogic<T extends GameChoice>({
     gasPrice,
   } = usePlaceBet(gameDefinition?.gameType, token, triggerBalanceRefresh, gameDefinition)
 
-  const { selectedFreebet, selectedFormattedFreebet } = useFreebetsContext()
+  const { selectedFreebet, selectedFormattedFreebet, refetchFreebets } = useFreebetsContext()
 
   const {
     placeBet: placeFreebet,
     betStatus: freebetStatus,
     gameResult: freebetGameResult,
     resetBetState: resetFreebetState,
+    vrfFees: freebetVrfFees,
+    formattedVrfFees: freebetFormattedVrfFees,
+    gasPrice: freebetGasPrice,
   } = usePlaceBet(
     gameDefinition?.gameType,
     selectedFormattedFreebet?.token,
@@ -171,6 +174,7 @@ export function useGameLogic<T extends GameChoice>({
     {
       type: "freebet",
       freebet: selectedFreebet,
+      refetchFreebets,
     },
   )
 
@@ -303,11 +307,11 @@ export function useGameLogic<T extends GameChoice>({
     selection: selection || undefined,
     setSelection: setSelection,
     betStatus,
-    gameResult,
+    gameResult: selectedFreebet ? freebetGameResult : gameResult,
     resetBetState,
-    vrfFees,
-    formattedVrfFees,
-    gasPrice: formatGwei(gasPrice),
+    vrfFees: selectedFreebet ? freebetVrfFees : vrfFees,
+    formattedVrfFees: selectedFreebet ? freebetFormattedVrfFees : formattedVrfFees,
+    gasPrice: selectedFreebet ? formatGwei(freebetGasPrice) : formatGwei(gasPrice),
     targetPayoutAmount: netPayout,
     formattedNetMultiplier: formattedNetMultiplier,
     grossMultiplier,

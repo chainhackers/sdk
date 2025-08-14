@@ -26,6 +26,7 @@ interface FreebetsContextValue {
   formattedFreebets: FreeBet[]
   formattedFreebetsInCurrentChain: FreeBet[]
   selectedFormattedFreebet: FreeBet | null
+  refetchFreebets: () => void
 }
 
 const FreebetsContext = createContext<FreebetsContextValue | undefined>(undefined)
@@ -40,7 +41,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { affiliate, freebetsAffiliates, withExternalBankrollFreebets } = useBettingConfig()
   const [selectedFreebet, setSelectedFreebet] = useState<SignedFreebet | null>(null)
 
-  const { data: freebets = [] } = useQuery({
+  const { data: freebets = [], refetch: refetchFreebets } = useQuery({
     queryKey: [
       "freebets",
       accountAddress,
@@ -165,6 +166,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       formattedFreebets,
       formattedFreebetsInCurrentChain,
       selectedFormattedFreebet,
+      refetchFreebets,
     }),
     [
       freebets,
@@ -175,6 +177,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       formattedFreebets,
       formattedFreebetsInCurrentChain,
       selectedFormattedFreebet,
+      refetchFreebets,
     ],
   )
 
