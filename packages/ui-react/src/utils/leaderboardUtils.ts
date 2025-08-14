@@ -20,7 +20,10 @@ import type {
  * Format raw leaderboard status for UI badges/text
  */
 export function formatLeaderboardStatus(status: LEADERBOARD_STATUS): string {
-  return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+  return status
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
 }
 
 /**
