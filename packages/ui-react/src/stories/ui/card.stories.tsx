@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { BellRing, Check } from "lucide-react"
 import { Button } from "../../components/ui/button"
 import {
