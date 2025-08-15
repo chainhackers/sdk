@@ -22,7 +22,7 @@ import {
 import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
 import { useIsGamePaused } from "./useIsGamePaused"
-
+import { useLeaderboardRefresher } from "./useLeaderboardRefresher"
 import { usePlaceBet } from "./usePlaceBet"
 import { useTokenAllowance } from "./useTokenAllowance"
 
@@ -174,6 +174,8 @@ export function useGameLogic<T extends GameChoice>({
       formattedRolled: displayResult,
     }
   }, [rawGameResult, gameDefinition, selection])
+
+  useLeaderboardRefresher(gameResult, appChainId)
 
   const gameContractAddress = gameDefinition
     ? casinoChainById[appChainId]?.contracts.games[gameDefinition.gameType]?.address

@@ -1,62 +1,70 @@
-import { type CasinoChainId } from "@betswirl/sdk-core"
+import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
-import { type LeaderboardOverviewData, type TokenWithImage } from "../types/types"
+import { useAccount, usePublicClient } from "wagmi"
+import { useChain } from "../context/chainContext"
+import { useBettingConfig } from "../context/configContext"
+import {
+  type EnrichedLeaderboard,
+  fetchAndEnrichSingleLeaderboard,
+} from "../data/leaderboardQueries"
+import { type LeaderboardOverviewData } from "../types/types"
+import { mapLeaderboardToOverviewData } from "../utils/leaderboardUtils"
 
-// Temporary mock hook to provide leaderboard overview data
+/**
+ * Hook to fetch detailed leaderboard data including user stats and rules
+ * Uses TanStack Query for caching and automatic refetching
+ */
 export function useLeaderboardDetails(leaderboardId: string | null): {
-  data: LeaderboardOverviewData | null
+  data: { overview: LeaderboardOverviewData; enriched: EnrichedLeaderboard } | null
   isLoading: boolean
+  error: Error | null
+  refetch: () => void
 } {
-  const isLoading = false
+  const { appChainId } = useChain()
+  const { affiliate } = useBettingConfig()
+  const { address } = useAccount()
+  const publicClient = usePublicClient({ chainId: appChainId })
 
-  const data = useMemo<LeaderboardOverviewData | null>(() => {
-    if (!leaderboardId) return null
+  const {
+    data: enrichedLeaderboard,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["leaderboard-details", leaderboardId, appChainId, address],
+    queryFn: async (): Promise<EnrichedLeaderboard | null> => {
+      if (!leaderboardId || !publicClient) {
+        return null
+      }
 
-    const avaxToken: TokenWithImage = {
-      symbol: "Avax",
-      address: "0x0000000000000000000000000000000000000000",
-      decimals: 18,
-      image: "https://www.betswirl.com/img/tokens/AVAX.svg",
-    }
+      const fetchedLeaderboard = await fetchAndEnrichSingleLeaderboard(leaderboardId, {
+        publicClient,
+        chainId: appChainId,
+        address,
+        affiliate,
+      })
 
-    // Simple mocked item matching list structure and enriched for overview
-    return {
-      id: leaderboardId,
-      rank: 1,
-      title: "Avalanche - July",
-      chainId: 43114 as CasinoChainId,
-      startDate: new Date().toISOString(),
-      endDate: new Date().toISOString(),
-      status: "ended",
-      badgeStatus: "expired",
-      prize: { token: avaxToken, amount: "<0.0001" },
-      participants: 1234,
-      isPartner: false,
-      userAction: { type: "overview" },
-      userStats: {
-        status: "Finalized",
-        position: 1,
-        points: 10,
-        prize: { amount: "<0.0001", tokenSymbol: "Avax" },
-        contractAddress: "0x0000000000000000000000000000000000000000",
-      },
-      rules: [
-        {
-          text: "A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking.",
-          isHighlighted: true,
-        },
-        { text: "The competition is scored using a point system:" },
-        {
-          text: "You have to play on the dice or cointoss or roulette or keno or wheel games and on the chain Base",
-        },
-        { text: "You have to play with BETS tokens" },
-        { text: "You earn 100 points per interval of 100 BETS" },
-        { text: "Example 1: You bet 300 BETS at dice ⇒ You earn 300 points" },
-        { text: "Example 2: You bet 1050 BETS at cointoss ⇒ You earn 1000 points" },
-      ],
-      isExpired: true,
-    }
-  }, [leaderboardId])
+      return fetchedLeaderboard
+    },
+    enabled: !!leaderboardId && !!publicClient,
+    refetchInterval: 30000,
+  })
 
-  return { data, isLoading }
+  const combinedData = useMemo(() => {
+    return enrichedLeaderboard
+      ? {
+          overview: mapLeaderboardToOverviewData(enrichedLeaderboard, address, {
+            claimableAmount: enrichedLeaderboard.claimableAmount,
+          }),
+          enriched: enrichedLeaderboard,
+        }
+      : null
+  }, [enrichedLeaderboard, address])
+
+  return {
+    data: combinedData,
+    isLoading,
+    error: error as Error | null,
+    refetch,
+  }
 }

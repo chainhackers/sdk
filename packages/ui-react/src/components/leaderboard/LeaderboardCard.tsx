@@ -1,15 +1,25 @@
+import { LEADERBOARD_STATUS, type Leaderboard } from "@betswirl/sdk-core"
 import { Gift } from "lucide-react"
 import { cn } from "../../lib/utils"
 import type { LeaderboardItem } from "../../types/types"
+import { formatLeaderboardStatus } from "../../utils/leaderboardUtils"
+import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
-import { LeaderboardCardActions } from "./LeaderboardCardActions"
+import { LeaderboardActionButton } from "./LeaderboardActionButton"
 
 interface LeaderboardCardProps {
   item: LeaderboardItem
+  raw?: Leaderboard
   onViewOverview?: (id: string) => void
+  onClaimSuccess?: () => void
 }
 
-export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) {
+export function LeaderboardCard({
+  item,
+  raw,
+  onViewOverview,
+  onClaimSuccess,
+}: LeaderboardCardProps) {
   const formatDateRange = (startDate: string, endDate: string) => {
     const start = new Date(startDate)
     const end = new Date(endDate)
@@ -42,7 +52,7 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
           <div className="flex items-center gap-[4px]">
             <ChainIcon chainId={item.chainId} size={20} />
             <span className="text-foreground text-[14px] leading-[22px] font-medium">
-              #{item.rank}
+              #{item.id}
             </span>
           </div>
           {/* Vertical Separator */}
@@ -51,18 +61,26 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
             {formatDateRange(item.startDate, item.endDate)}
           </span>
         </div>
-        {item.badgeStatus && (
-          <div
-            className={cn(
-              "px-3 py-1 rounded-full text-[11px] font-medium",
-              item.badgeStatus === "pending" && "text-primary border border-primary rounded-[8px]",
-              item.badgeStatus === "expired" &&
-                "text-roulette-disabled-text border border-roulette-disabled-text rounded-[8px]",
-            )}
-          >
-            {item.badgeStatus.charAt(0).toUpperCase() + item.badgeStatus.slice(1)}
-          </div>
-        )}
+        {(() => {
+          const isEnded = [
+            LEADERBOARD_STATUS.ENDED,
+            LEADERBOARD_STATUS.FINALIZED,
+            LEADERBOARD_STATUS.EXPIRED,
+          ].includes(item.status)
+          const badgeText = formatLeaderboardStatus(item.status)
+          return (
+            <div
+              className={cn(
+                "px-3 py-1 rounded-full text-[11px] font-medium",
+                !isEnded && "text-primary border border-primary rounded-[8px]",
+                isEnded &&
+                  "text-roulette-disabled-text border border-roulette-disabled-text rounded-[8px]",
+              )}
+            >
+              {badgeText}
+            </div>
+          )
+        })()}
       </div>
 
       {/* Title with chain icon */}
@@ -75,7 +93,7 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
         <div
           className={cn(
             "flex items-center px-[8px] py-[2px] h-[24px] rounded-[8px] border transition-colors",
-            item.badgeStatus === "expired"
+            [LEADERBOARD_STATUS.FINALIZED, LEADERBOARD_STATUS.EXPIRED].includes(item.status)
               ? "text-roulette-disabled-text bg-roulette-disabled-text/20 border-roulette-disabled-text"
               : "text-free-bet-border bg-free-bet-border/20 border-free-bet-border",
           )}
@@ -97,7 +115,26 @@ export function LeaderboardCard({ item, onViewOverview }: LeaderboardCardProps) 
 
       {/* Action buttons */}
       <div className="flex gap-[10px]">
-        <LeaderboardCardActions item={item} onViewOverview={onViewOverview} />
+        {raw && item.userAction.type !== "overview" && (
+          <LeaderboardActionButton
+            leaderboard={raw}
+            userAction={item.userAction}
+            onClaimSuccess={onClaimSuccess}
+          />
+        )}
+        <Button
+          variant="secondary"
+          onClick={() => onViewOverview?.(item.id)}
+          className={cn(
+            "bg-button-secondary-bg",
+            "text-primary font-semibold",
+            "rounded-[8px] h-[32px]",
+            "text-[12px] leading-[20px]",
+            !raw || item.userAction.type === "overview" ? "w-full" : "flex-1",
+          )}
+        >
+          Overview
+        </Button>
       </div>
     </div>
   )
