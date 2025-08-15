@@ -7,7 +7,7 @@ import { LeaderboardRankingList } from "./LeaderboardRankingList"
 interface LeaderboardRankingTabProps {
   rankingData: RankingEntry[]
   lastUpdate: string
-  claimableAmount: string
+  claimableAmount: number
   claimableTokenSymbol: string
   leaderboardStatus?: LEADERBOARD_STATUS
 }
@@ -35,8 +35,7 @@ export function LeaderboardRankingTab({
     }
   }
 
-  const canClaim =
-    leaderboardStatus === LEADERBOARD_STATUS.FINALIZED && Number.parseFloat(claimableAmount) > 0
+  const canClaim = leaderboardStatus === LEADERBOARD_STATUS.FINALIZED && claimableAmount > 0
 
   return (
     <div className="flex flex-col gap-3">

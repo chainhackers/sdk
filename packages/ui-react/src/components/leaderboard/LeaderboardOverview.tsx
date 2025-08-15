@@ -241,7 +241,11 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
               <LeaderboardRankingTab
                 rankingData={rankingData}
                 lastUpdate="Last update: recently (refreshed once per hour)"
-                claimableAmount={overviewData.userStats.prize.amount}
+                claimableAmount={
+                  Number.isFinite(Number(overviewData.userStats.prize.amount))
+                    ? Number.parseFloat(overviewData.userStats.prize.amount)
+                    : 0
+                }
                 claimableTokenSymbol={overviewData.userStats.prize.tokenSymbol}
                 leaderboardStatus={overviewData.userStats.status}
               />

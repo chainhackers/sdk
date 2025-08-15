@@ -86,7 +86,7 @@ export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }
                 There are no ended leaderboards
               </AlertTitle>
               <AlertDescription className="text-[12px] leading-[20px] justify-items-center">
-                Waiting a leaderboard ends.
+                Waiting for a leaderboard to end.
               </AlertDescription>
             </Alert>
           </>

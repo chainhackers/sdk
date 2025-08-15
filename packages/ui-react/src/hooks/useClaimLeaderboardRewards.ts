@@ -44,7 +44,7 @@ export function useClaimLeaderboardRewards() {
     claim: mutation.mutate,
     claimAsync: mutation.mutateAsync,
     isPending: mutation.isPending,
-    isSuccess: mutation.isSuccess && waitHook.isSuccess && waitHook.isSuccess,
+    isSuccess: mutation.isSuccess && waitHook.isSuccess,
     isError: mutation.isError,
     error: mutation.error,
     data: waitHook.data,
