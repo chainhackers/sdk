@@ -7,6 +7,7 @@ import { createConfig, WagmiProvider } from "wagmi"
 import { arbitrum, avalanche, base, polygon } from "wagmi/chains"
 import { BalanceProvider } from "../context/BalanceContext"
 import { BetSwirlSDKProvider } from "../context/BetSwirlSDKProvider"
+import { FreebetsProvider } from "../context/FreebetsContext"
 import { TokenProvider } from "../context/tokenContext"
 import { getTokenImage } from "../lib/utils"
 import type { TokenWithImage } from "../types/types"
@@ -83,7 +84,9 @@ export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookPro
             supportedChains={CHAINS.map((c) => c.id as CasinoChainId)}
           >
             <TokenProvider>
-              <BalanceProvider>{children}</BalanceProvider>
+              <BalanceProvider>
+                <FreebetsProvider>{children}</FreebetsProvider>
+              </BalanceProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>
         </OnchainKitProvider>

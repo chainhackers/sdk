@@ -165,3 +165,12 @@ export interface RankingEntry {
   rewardAmount: string
   rewardToken: TokenWithImage
 }
+
+export interface FreeBet {
+  id: string
+  amount: number
+  token: TokenWithImage
+  chainId: CasinoChainId
+  expiresAt?: string
+  title?: string
+}

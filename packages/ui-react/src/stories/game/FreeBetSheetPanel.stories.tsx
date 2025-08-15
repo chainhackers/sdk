@@ -1,13 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Ticket } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
-import type { FreeBet } from "../../components/game/BettingPanel"
 import { FreeBetSheetPanel } from "../../components/game/FreeBetSheetPanel"
 import { Button } from "../../components/ui/button"
 import { Sheet, SheetTrigger } from "../../components/ui/sheet"
 import { cn } from "../../lib/utils"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
-import type { Theme, TokenWithImage } from "../../types/types"
+import type { FreeBet, Theme, TokenWithImage } from "../../types/types"
 
 // Mock tokens
 const ETH_TOKEN: TokenWithImage = STORYBOOK_TOKENS.ETH

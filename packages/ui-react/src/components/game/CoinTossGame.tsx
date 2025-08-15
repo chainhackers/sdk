@@ -38,7 +38,6 @@ export function CoinTossGame({
   theme = "system",
   customTheme,
   backgroundImage = coinTossBackground,
-  freeBets,
   ...props
 }: CoinTossGameProps) {
   const {
@@ -139,7 +138,6 @@ export function CoinTossGame({
         isApproveConfirming={isApproveConfirming}
         isRefetchingAllowance={isRefetchingAllowance}
         approveError={approveError}
-        freeBets={freeBets}
       />
     </GameFrame>
   )

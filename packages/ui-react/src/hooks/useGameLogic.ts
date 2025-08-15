@@ -9,6 +9,7 @@ import { formatGwei, zeroAddress } from "viem"
 import { useAccount } from "wagmi"
 import { useBalanceRefresh, useBalances } from "../context/BalanceContext"
 import { useChain } from "../context/chainContext"
+import { useFreebetsContext } from "../context/FreebetsContext"
 import { useTokenContext } from "../context/tokenContext"
 import {
   BetStatus,
@@ -22,7 +23,6 @@ import {
 import { useBetCalculations } from "./useBetCalculations"
 import { useGameHistory } from "./useGameHistory"
 import { useIsGamePaused } from "./useIsGamePaused"
-
 import { usePlaceBet } from "./usePlaceBet"
 import { useTokenAllowance } from "./useTokenAllowance"
 
@@ -148,19 +148,45 @@ export function useGameLogic<T extends GameChoice>({
 
   const {
     placeBet,
-    betStatus,
-    gameResult: rawGameResult,
+    betStatus: paidBetStatus,
+    gameResult: paidRawGameResult,
     resetBetState,
     vrfFees,
     formattedVrfFees,
     gasPrice,
   } = usePlaceBet(gameDefinition?.gameType, token, triggerBalanceRefresh, gameDefinition)
 
+  const { selectedFreebet, selectedFormattedFreebet, refetchFreebets } = useFreebetsContext()
+
+  const {
+    placeBet: placeFreebet,
+    betStatus: freebetStatus,
+    gameResult: freebetGameResult,
+    resetBetState: resetFreebetState,
+    vrfFees: freebetVrfFees,
+    formattedVrfFees: freebetFormattedVrfFees,
+    gasPrice: freebetGasPrice,
+  } = usePlaceBet(
+    gameDefinition?.gameType,
+    selectedFormattedFreebet?.token,
+    triggerBalanceRefresh,
+    gameDefinition,
+    {
+      type: "freebet",
+      freebet: selectedFreebet,
+      refetchFreebets,
+    },
+  )
+
+  const betStatus = selectedFreebet ? freebetStatus : paidBetStatus
+  const rawGameResult = selectedFreebet ? freebetGameResult : paidRawGameResult
+
   // Reset bet state when chain or token changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
   useEffect(() => {
     resetBetState()
-  }, [appChainId, token.address, resetBetState])
+    resetFreebetState()
+  }, [appChainId, token.address, resetBetState, resetFreebetState])
 
   const gameResult = useMemo((): GameResult | null => {
     if (!rawGameResult || !gameDefinition || !selection) {
@@ -212,6 +238,20 @@ export function useGameLogic<T extends GameChoice>({
   const handlePlayButtonClick = async () => {
     // Don't allow play if we're in loading state or selection is not available
     if (!gameDefinition || !selection) return
+
+    if (selectedFreebet) {
+      if (freebetStatus === "error") {
+        resetFreebetState()
+        if (isWalletConnected) {
+          placeFreebet(selectedFreebet.amount, selection)
+        }
+      } else if (isInGameResultState) {
+        resetFreebetState()
+      } else if (isWalletConnected) {
+        placeFreebet(selectedFreebet.amount, selection)
+      }
+      return
+    }
 
     // Reset approval error if there is one
     if (approveWriteWagmiHook.error) {
@@ -267,11 +307,11 @@ export function useGameLogic<T extends GameChoice>({
     selection: selection || undefined,
     setSelection: setSelection,
     betStatus,
-    gameResult,
+    gameResult: selectedFreebet ? freebetGameResult : gameResult,
     resetBetState,
-    vrfFees,
-    formattedVrfFees,
-    gasPrice: formatGwei(gasPrice),
+    vrfFees: selectedFreebet ? freebetVrfFees : vrfFees,
+    formattedVrfFees: selectedFreebet ? freebetFormattedVrfFees : formattedVrfFees,
+    gasPrice: selectedFreebet ? formatGwei(freebetGasPrice) : formatGwei(gasPrice),
     targetPayoutAmount: netPayout,
     formattedNetMultiplier: formattedNetMultiplier,
     grossMultiplier,
@@ -281,7 +321,8 @@ export function useGameLogic<T extends GameChoice>({
     themeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
-    placeBet: (betAmount: bigint, choice: T) => placeBet(betAmount, choice),
+    placeBet: (betAmount: bigint, choice: T) =>
+      selectedFreebet ? placeFreebet(selectedFreebet.amount, choice) : placeBet(betAmount, choice),
     needsTokenApproval,
     isApprovePending: approveWriteWagmiHook.isPending,
     isApproveConfirming: approveWaitingWagmiHook.isLoading,
