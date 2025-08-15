@@ -1,13 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Gift } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
-import type { FreeBet } from "../../components/game/BettingPanel"
 import { FreebetsHubSheetPanel } from "../../components/game/FreebetsHubSheetPanel"
 import { Button } from "../../components/ui/button"
 import { Sheet, SheetTrigger } from "../../components/ui/sheet"
 import { cn } from "../../lib/utils"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
-import type { Theme, TokenWithImage } from "../../types/types"
+import type { FreeBet, Theme, TokenWithImage } from "../../types/types"
 
 // Mock tokens
 const ETH_TOKEN: TokenWithImage = STORYBOOK_TOKENS.ETH
@@ -119,6 +118,10 @@ const FreebetsHubSheetWithWrapper = ({
     setClaimedCodes([...claimedCodes, code])
   }
 
+  const handleSelectFreebet = (freebet: FreeBet) => {
+    console.log("Select freebet: ", freebet)
+  }
+
   return (
     <StorybookProviders>
       <PanelStoryWrapper theme={theme}>
@@ -139,6 +142,7 @@ const FreebetsHubSheetWithWrapper = ({
               freebets={freebets}
               onConnectWallet={handleConnectWallet}
               onClaimCode={handleClaimCode}
+              onSelectFreebet={handleSelectFreebet}
             />
           </Sheet>
         )}

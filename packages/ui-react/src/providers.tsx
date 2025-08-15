@@ -51,6 +51,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
           chain={DEFAULT_CHAIN}
+          apiKey={import.meta.env.VITE_ONCHAINKIT_API_KEY}
           config={{
             wallet: {
               display: "modal",
@@ -71,9 +72,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
             withExternalBankrollFreebets={true}
           >
             <TokenProvider>
-              <FreebetsProvider>
-                <BalanceProvider>{children}</BalanceProvider>
-              </FreebetsProvider>
+              <BalanceProvider>
+                <FreebetsProvider>{children}</FreebetsProvider>
+              </BalanceProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>
         </OnchainKitProvider>
