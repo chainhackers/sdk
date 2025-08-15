@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Ticket } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { FreeBetSheetPanel } from "../../components/game/FreeBetSheetPanel"

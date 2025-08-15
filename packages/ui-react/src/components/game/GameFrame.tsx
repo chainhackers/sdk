@@ -13,8 +13,10 @@ import {
   Theme,
   TokenWithImage,
 } from "../../types/types"
+import { LeaderboardSheetPanel } from "../leaderboard/LeaderboardSheetPanel"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { LeaderboardIcon } from "../ui/LeaderboardIcon"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { BettingPanel } from "./BettingPanel"
 import { GameResultWindow } from "./GameResultWindow"
@@ -41,6 +43,8 @@ interface GameFrameContextValue {
   setIsInfoSheetOpen: (open: boolean) => void
   isHistorySheetOpen: boolean
   setIsHistorySheetOpen: (open: boolean) => void
+  isLeaderboardSheetOpen: boolean
+  setIsLeaderboardSheetOpen: (open: boolean) => void
   isMounted: boolean
 }
 
@@ -64,6 +68,7 @@ const GameFrameRoot = forwardRef<HTMLDivElement, GameFrameProps>(
   ({ themeSettings, children, variant = "default", ...props }, ref) => {
     const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
     const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
+    const [isLeaderboardSheetOpen, setIsLeaderboardSheetOpen] = useState(false)
     const cardRef = useRef<HTMLDivElement>(null)
     const [isMounted, setIsMounted] = useState(false)
     const { theme } = themeSettings
@@ -91,6 +96,8 @@ const GameFrameRoot = forwardRef<HTMLDivElement, GameFrameProps>(
       setIsInfoSheetOpen,
       isHistorySheetOpen,
       setIsHistorySheetOpen,
+      isLeaderboardSheetOpen,
+      setIsLeaderboardSheetOpen,
       isMounted,
     }
 
@@ -131,7 +138,10 @@ function Header({ title, connectWalletButton, tokenSelector }: HeaderProps) {
         <CardTitle className="text-lg text-title-color font-bold">{title}</CardTitle>
         {tokenSelector}
       </div>
-      {connectWalletButton}
+      <div className="flex items-center gap-2">
+        <LeaderboardButton />
+        {connectWalletButton}
+      </div>
     </CardHeader>
   )
 }
@@ -309,6 +319,35 @@ function BettingSection(props: BettingSectionProps) {
   return <BettingPanel {...props} portalContainer={portalContainer} isMounted={isMounted} />
 }
 
+interface LeaderboardButtonProps {
+  className?: string
+}
+
+function LeaderboardButton({ className }: LeaderboardButtonProps) {
+  const { isLeaderboardSheetOpen, setIsLeaderboardSheetOpen, portalContainer, isMounted } =
+    useGameFrameContext()
+
+  return (
+    <Sheet open={isLeaderboardSheetOpen} onOpenChange={setIsLeaderboardSheetOpen}>
+      <SheetTrigger asChild>
+        <Button
+          variant="iconTransparent"
+          size="iconRound"
+          className={cn(
+            "group",
+            "h-[40px] w-[40px]",
+            isLeaderboardSheetOpen && "border-primary",
+            className,
+          )}
+        >
+          <LeaderboardIcon />
+        </Button>
+      </SheetTrigger>
+      {isMounted && portalContainer && <LeaderboardSheetPanel portalContainer={portalContainer} />}
+    </Sheet>
+  )
+}
+
 export const GameFrame = Object.assign(GameFrameRoot, {
   Header,
   GameArea,
@@ -317,4 +356,7 @@ export const GameFrame = Object.assign(GameFrameRoot, {
   GameControls,
   ResultWindow,
   BettingSection,
+  LeaderboardButton,
 })
+
+export { useGameFrameContext }

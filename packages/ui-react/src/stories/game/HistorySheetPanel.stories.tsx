@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { History as HistoryIcon } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { HistorySheetPanel } from "../../components/game/HistorySheetPanel"

@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
+import type { FreeBet } from "../../components/game/BettingPanel"
 import { CoinTossGame, type CoinTossGameProps } from "../../components/game/CoinTossGame"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
 import { THEME_OPTIONS } from "../../types/types"
