@@ -55,7 +55,7 @@ export function LeaderboardCard({
       className={cn(
         "p-[12px] rounded-[12px]",
         "bg-free-bet-card-section-bg text-foreground",
-        "flex flex-col gap-[10px] h-[156px]",
+        "flex flex-col gap-[10px] min-h-[156px]",
       )}
     >
       {/* Header with rank, date and badge */}
