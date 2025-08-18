@@ -27,6 +27,12 @@ export function LeaderboardCard({
     const endMonth = end.toLocaleDateString("en-US", { month: "short" }).toUpperCase()
     const startDay = start.getDate()
     const endDay = end.getDate()
+    const startYear = start.getFullYear()
+    const endYear = end.getFullYear()
+
+    if (startYear !== endYear) {
+      return `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`
+    }
 
     return `${startDay} ${startMonth} - ${endDay} ${endMonth}`
   }
@@ -36,6 +42,12 @@ export function LeaderboardCard({
       return count.toLocaleString()
     }
     return count.toString()
+  }
+
+  const isDifferentYears = () => {
+    const start = new Date(item.startDate)
+    const end = new Date(item.endDate)
+    return start.getFullYear() !== end.getFullYear()
   }
 
   return (
@@ -57,7 +69,12 @@ export function LeaderboardCard({
           </div>
           {/* Vertical Separator */}
           <span aria-hidden className="block w-px h-[23px] bg-leaderboard-separator" />
-          <span className="text-roulette-disabled-text text-[12px] leading-[18px] font-regular">
+          <span
+            className={cn(
+              "text-roulette-disabled-text font-regular",
+              isDifferentYears() ? "text-[8px] leading-[12px]" : "text-[12px] leading-[18px]",
+            )}
+          >
             {formatDateRange(item.startDate, item.endDate)}
           </span>
         </div>
