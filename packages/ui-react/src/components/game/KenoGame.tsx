@@ -18,6 +18,7 @@ import { useHouseEdge } from "../../hooks/useHouseEdge"
 import { useKenoConfiguration } from "../../hooks/useKenoConfiguration"
 import { useKenoMultipliers } from "../../hooks/useKenoMultipliers"
 import { GameDefinition } from "../../types/types"
+import { Loader } from "../ui/Loader"
 import { GameFrame } from "./GameFrame"
 import { KenoGameControls } from "./KenoGameControls"
 import { GameConnectWallet } from "./shared/GameConnectWallet"
@@ -204,11 +205,7 @@ export function KenoGame({
   const { config: kenoConfig, loading: kenoConfigLoading } = useKenoConfiguration({ token })
 
   if (kenoConfigLoading || !kenoConfig) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent" />
-      </div>
-    )
+    return <Loader />
   }
 
   return (

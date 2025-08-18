@@ -25,7 +25,7 @@ interface LeaderboardOverviewProps {
 }
 
 export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOverviewProps) {
-  const { data, refetch } = useLeaderboardDetails(leaderboardId)
+  const { data, isLoading, refetch } = useLeaderboardDetails(leaderboardId)
   const [rankingData, setRankingData] = useState<RankingEntry[]>([])
 
   useEffect(() => {
@@ -42,6 +42,14 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
       setRankingData([])
     }
   }, [data])
+
+  if (isLoading) {
+    return (
+      <div className="h-[calc(70vh-32px)] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent" />
+      </div>
+    )
+  }
 
   if (!data) return null
 
