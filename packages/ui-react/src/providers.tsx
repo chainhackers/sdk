@@ -28,6 +28,7 @@ const queryClient = new QueryClient({
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
+  const freebetsAffiliates = affiliate ? [affiliate] : undefined
 
   // Get RPC URLs for each chain, fallback to public RPCs if not configured
   const baseRpcUrl = import.meta.env.VITE_BASE_RPC_URL || "https://mainnet.base.org"
@@ -43,8 +44,6 @@ export function AppProviders({ children }: { children: ReactNode }) {
       [avalanche.id]: http(avalancheRpcUrl),
     },
   })
-
-  const freebetsAffiliates = affiliate ? [affiliate] : undefined
 
   return (
     <WagmiProvider config={config}>

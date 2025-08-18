@@ -11,6 +11,7 @@ import {
 } from "react"
 import { useAccount } from "wagmi"
 import { QUERY_DEFAULTS } from "../constants/queryDefaults"
+import { createLogger } from "../lib/logger"
 import { getTokenImage } from "../lib/utils"
 import { FreeBet, TokenWithImage } from "../types/types"
 import { formatExpireAt } from "../utils/formatExpireAt"
@@ -28,6 +29,7 @@ interface FreebetsContextValue {
   formattedFreebetsInCurrentChain: FreeBet[]
   selectedFormattedFreebet: FreeBet | null
   refetchFreebets: () => void
+  freebetsError: Error | null
 }
 
 const FreebetsContext = createContext<FreebetsContextValue | undefined>(undefined)
@@ -36,13 +38,19 @@ interface FreebetsProviderProps {
   children: ReactNode
 }
 
+const logger = createLogger("useFreebetsContext")
+
 export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
   const { appChainId, switchAppChain, availableChainIds } = useChain()
   const { affiliate, freebetsAffiliates, withExternalBankrollFreebets } = useBettingConfig()
   const [selectedFreebet, setSelectedFreebet] = useState<SignedFreebet | null>(null)
 
-  const { data: freebets = [], refetch: refetchFreebets } = useQuery({
+  const {
+    data: freebets = [],
+    refetch: refetchFreebets,
+    error: freebetsError,
+  } = useQuery({
     queryKey: [
       "freebets",
       accountAddress,
@@ -57,12 +65,10 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   })
 
   const freebetsInCurrentChain = useMemo(() => {
-    console.log("appChainId: ", appChainId)
     if (!freebets.length || !appChainId) {
       return []
     }
 
-    console.log("freebets.filter")
     const filteredFreebets = freebets.filter((freebet) => freebet.chainId === appChainId)
     return filteredFreebets
   }, [freebets, appChainId])
@@ -93,6 +99,12 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     () => (selectedFreebet ? formatFreebet(selectedFreebet) : null),
     [selectedFreebet, formatFreebet],
   )
+
+  useEffect(() => {
+    if (freebetsError) {
+      logger.error("Freebets fetch error: ", freebetsError)
+    }
+  }, [freebetsError])
 
   useEffect(() => {
     const isFreebetsInCurrentChain = freebetsInCurrentChain.length > 0
@@ -132,14 +144,12 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       : affiliate
         ? [affiliate]
         : undefined
-    console.log("affiliates: ", affiliates)
 
     const allFreebets = await fetchFreebets(
       accountAddress,
       affiliates,
       withExternalBankrollFreebets,
     )
-    console.log("allFreebets: ", allFreebets)
 
     const filteredFreebetsByChains = allFreebets.filter((freebet) =>
       availableChainIds.includes(freebet.chainId),
@@ -150,7 +160,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
 
   const selectFreebet = useCallback(
     (freebet: SignedFreebet | null) => {
-      console.log("selectFreebet: ", freebet)
+      logger.info("selectFreebet: ", freebet)
 
       if (freebet && freebet.chainId !== appChainId) {
         switchAppChain(freebet.chainId)
@@ -186,6 +196,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       formattedFreebetsInCurrentChain,
       selectedFormattedFreebet,
       refetchFreebets,
+      freebetsError,
     }),
     [
       freebets,
@@ -197,6 +208,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       formattedFreebetsInCurrentChain,
       selectedFormattedFreebet,
       refetchFreebets,
+      freebetsError,
     ],
   )
 
