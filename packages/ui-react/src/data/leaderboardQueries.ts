@@ -40,7 +40,6 @@ export async function fetchAndEnrichLeaderboards({
     showPartner,
     "desc",
     undefined,
-    true,
   )
 
   const casinoLeaderboards = result.leaderboards.filter((lb) => lb.type === LEADERBOARD_TYPE.CASINO)
@@ -99,7 +98,7 @@ export async function fetchAndEnrichSingleLeaderboard(
 ): Promise<EnrichedLeaderboard> {
   const { publicClient, chainId, address } = deps
 
-  const leaderboard = await fetchLeaderboard(Number(leaderboardId), address, true)
+  const leaderboard = await fetchLeaderboard(Number(leaderboardId), address)
 
   if (!leaderboard) {
     throw new Error(`Leaderboard ${leaderboardId} not found`)

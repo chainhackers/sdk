@@ -28,12 +28,7 @@ export function useLeaderboardRefresher(
     const refresh = async () => {
       try {
         logger.debug("Refreshing leaderboards with bet", { betId, chainId })
-        const ok = await refreshLeaderboardsWithBets(
-          [betId],
-          chainId,
-          LEADERBOARD_TYPE.CASINO,
-          true,
-        )
+        const ok = await refreshLeaderboardsWithBets([betId], chainId, LEADERBOARD_TYPE.CASINO)
         if (!ok && !cancelled) {
           logger.warn("refreshLeaderboardsWithBets returned false", { betId, chainId })
         }
