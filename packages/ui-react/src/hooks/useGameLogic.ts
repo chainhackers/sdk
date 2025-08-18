@@ -4,7 +4,7 @@ import {
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { formatGwei, zeroAddress } from "viem"
 import { useAccount } from "wagmi"
 import { useBalanceRefresh, useBalances } from "../context/BalanceContext"
@@ -138,6 +138,7 @@ export function useGameLogic<T extends GameChoice>({
   const [selection, setSelection] = useState<T | undefined>(() => {
     return gameDefinition?.defaultSelection as T | undefined
   })
+  const lastFreebetGameResultRef = useRef<GameResult | null>(null)
 
   // Update selection when gameDefinition changes
   React.useEffect(() => {
@@ -175,11 +176,11 @@ export function useGameLogic<T extends GameChoice>({
     {
       type: "freebet",
       freebet: selectedFreebet,
+      refetchFreebets,
     },
   )
 
   const betStatus = isUsingFreebet ? freebetStatus : paidBetStatus
-  const rawGameResult = isUsingFreebet ? freebetGameResult : paidRawGameResult
 
   // Reset bet state when chain or token changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
@@ -189,17 +190,38 @@ export function useGameLogic<T extends GameChoice>({
   }, [appChainId, token.address, resetBetState, resetFreebetState])
 
   const gameResult = useMemo((): GameResult | null => {
-    if (!rawGameResult || !gameDefinition || !selection) {
+    if (isUsingFreebet) {
+      if (freebetGameResult && gameDefinition && selection) {
+        const displayResult = gameDefinition.formatDisplayResult(
+          freebetGameResult.rolled,
+          selection.choice,
+        )
+        const formattedGameResult = {
+          ...freebetGameResult,
+          formattedRolled: displayResult,
+        }
+        lastFreebetGameResultRef.current = formattedGameResult
+
+        return formattedGameResult
+      }
+
+      return lastFreebetGameResultRef.current
+    }
+
+    if (!paidRawGameResult || !gameDefinition || !selection) {
       return null
     }
 
-    const displayResult = gameDefinition.formatDisplayResult(rawGameResult.rolled, selection.choice)
+    const displayResult = gameDefinition.formatDisplayResult(
+      paidRawGameResult.rolled,
+      selection.choice,
+    )
 
     return {
-      ...rawGameResult,
+      ...paidRawGameResult,
       formattedRolled: displayResult,
     }
-  }, [rawGameResult, gameDefinition, selection])
+  }, [isUsingFreebet, paidRawGameResult, freebetGameResult, gameDefinition, selection])
 
   const gameContractAddress = gameDefinition
     ? casinoChainById[appChainId]?.contracts.games[gameDefinition.gameType]?.address
@@ -247,7 +269,7 @@ export function useGameLogic<T extends GameChoice>({
         }
       } else if (isInGameResultState) {
         resetFreebetState()
-        refetchFreebets()
+        lastFreebetGameResultRef.current = null
       } else if (isWalletConnected) {
         placeFreebet(selectedFreebet.amount, selection)
       }
@@ -308,7 +330,7 @@ export function useGameLogic<T extends GameChoice>({
     selection: selection || undefined,
     setSelection: setSelection,
     betStatus,
-    gameResult: isUsingFreebet ? freebetGameResult : gameResult,
+    gameResult,
     resetBetState,
     vrfFees: isUsingFreebet ? freebetVrfFees : vrfFees,
     formattedVrfFees: isUsingFreebet ? freebetFormattedVrfFees : formattedVrfFees,
