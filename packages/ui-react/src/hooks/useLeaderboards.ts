@@ -1,9 +1,13 @@
 import { LEADERBOARD_STATUS } from "@betswirl/sdk-core"
 import { useQuery } from "@tanstack/react-query"
-import { useAccount, usePublicClient } from "wagmi"
+import { createPublicClient, http } from "viem"
+import { useAccount } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
-import { type EnrichedLeaderboard, fetchAndEnrichLeaderboards } from "../data/leaderboardQueries"
+import {
+  type EnrichedLeaderboard,
+  fetchAndEnrichLeaderboardsForAllChains,
+} from "../data/leaderboardQueries"
 import { type LeaderboardItemWithEnriched } from "../types/types"
 import { mapLeaderboardToItem } from "../utils/leaderboardUtils"
 
@@ -15,38 +19,46 @@ interface UseLeaderboardsResult {
 }
 
 /**
- * Hook to fetch and manage leaderboards data
+ * Hook to fetch and manage leaderboards data from all supported chains
  * Uses TanStack Query for caching and automatic refetching
  * This hook serves as the Single Source of Truth (SSoT) for all leaderboards data
  * @param showPartner - Whether to show partner leaderboards
  */
 export function useLeaderboards(showPartner: boolean): UseLeaderboardsResult {
-  const { appChainId } = useChain()
+  const { availableChains } = useChain()
   const { affiliate } = useBettingConfig()
   const { address } = useAccount()
-  const publicClient = usePublicClient({ chainId: appChainId })
+
+  // Get supported chain IDs from available chains
+  const supportedChains = availableChains.map((chain) => chain.id)
 
   const {
     data: enrichedLeaderboards,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["leaderboards", appChainId, address, showPartner],
+    queryKey: ["leaderboards", "all-chains", address, showPartner],
     queryFn: async (): Promise<EnrichedLeaderboard[]> => {
-      if (!publicClient) {
-        throw new Error("Public client not initialized")
+      const publicClients = new Map()
+
+      for (const chain of availableChains) {
+        const publicClient = createPublicClient({
+          chain: chain.viemChain,
+          transport: http(),
+        })
+        publicClients.set(chain.id, publicClient)
       }
 
-      return fetchAndEnrichLeaderboards({
-        publicClient,
-        chainId: appChainId,
+      return fetchAndEnrichLeaderboardsForAllChains({
+        publicClients,
+        supportedChains,
         address,
         affiliate,
         showPartner,
       })
     },
     refetchInterval: 30000,
-    enabled: !!publicClient,
+    enabled: supportedChains.length > 0,
   })
 
   if (!enrichedLeaderboards) {

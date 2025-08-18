@@ -131,3 +131,71 @@ export async function fetchAndEnrichSingleLeaderboard(
     return leaderboard
   }
 }
+
+export interface FetchAllChainsLeaderboardsParams {
+  publicClients: Map<CasinoChainId, PublicClient>
+  supportedChains: CasinoChainId[]
+  address?: Address
+  affiliate?: Address
+  showPartner: boolean
+}
+
+/**
+ * Fetches and enriches leaderboards from all supported chains
+ * Uses Promise.allSettled to ensure that failure of one chain doesn't affect others
+ * Results are aggregated and sorted by status and end date
+ */
+export async function fetchAndEnrichLeaderboardsForAllChains({
+  publicClients,
+  supportedChains,
+  address,
+  affiliate,
+  showPartner,
+}: FetchAllChainsLeaderboardsParams): Promise<EnrichedLeaderboard[]> {
+  const chainPromises = supportedChains.map(async (chainId) => {
+    const publicClient = publicClients.get(chainId)
+    if (!publicClient) {
+      throw new Error(`Public client not found for chain ${chainId}`)
+    }
+
+    return fetchAndEnrichLeaderboards({
+      publicClient,
+      chainId,
+      address,
+      affiliate,
+      showPartner,
+    })
+  })
+
+  const results = await Promise.allSettled(chainPromises)
+
+  const allLeaderboards: EnrichedLeaderboard[] = []
+
+  results.forEach((result, index) => {
+    if (result.status === "fulfilled") {
+      allLeaderboards.push(...result.value)
+    } else {
+      console.warn(
+        `Failed to fetch leaderboards for chain ${supportedChains[index]}:`,
+        result.reason,
+      )
+    }
+  })
+
+  return allLeaderboards.sort((a, b) => {
+    const ongoingStatuses = [LEADERBOARD_STATUS.PENDING, LEADERBOARD_STATUS.NOT_STARTED]
+    const aIsOngoing = ongoingStatuses.includes(a.status)
+    const bIsOngoing = ongoingStatuses.includes(b.status)
+
+    if (aIsOngoing && !bIsOngoing) return -1
+    if (!aIsOngoing && bIsOngoing) return 1
+
+    const aEndTime = new Date(a.endDate).getTime()
+    const bEndTime = new Date(b.endDate).getTime()
+
+    if (aIsOngoing) {
+      return bEndTime - aEndTime
+    }
+    return aEndTime - bEndTime
+  })
+}
