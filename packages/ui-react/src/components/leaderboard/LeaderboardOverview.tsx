@@ -64,6 +64,11 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
   const ruleItems = rulesParams ? generateCasinoRulesText(rulesParams) : []
   const exampleItems = rulesParams ? generateCasinoExamplesText(rulesParams) : []
 
+  const isEnded =
+    overviewData.userStats.status === LEADERBOARD_STATUS.FINALIZED ||
+    overviewData.userStats.status === LEADERBOARD_STATUS.EXPIRED ||
+    overviewData.userStats.status === LEADERBOARD_STATUS.ENDED
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-2 p-4 pb-2">
@@ -96,23 +101,15 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
               <div className="bg-free-bet-card-section-bg rounded-[12px] p-3 flex flex-col gap-3">
                 <div className="text-[12px] text-roulette-disabled-text flex items-center gap-2">
                   <span>Status:</span>
-                  {(() => {
-                    const isEnded =
-                      overviewData.userStats.status === LEADERBOARD_STATUS.FINALIZED ||
-                      overviewData.userStats.status === LEADERBOARD_STATUS.EXPIRED ||
-                      overviewData.userStats.status === LEADERBOARD_STATUS.ENDED
-                    return (
-                      <span
-                        className={cn(
-                          "px-2 py-0.5 rounded-[8px] text-[11px] border",
-                          !isEnded && "text-primary border-primary",
-                          isEnded && "text-roulette-disabled-text border-roulette-disabled-text",
-                        )}
-                      >
-                        {formatLeaderboardStatus(overviewData.userStats.status)}
-                      </span>
-                    )
-                  })()}
+                  <span
+                    className={cn(
+                      "px-2 py-0.5 rounded-[8px] text-[11px] border",
+                      !isEnded && "text-primary border-primary",
+                      isEnded && "text-roulette-disabled-text border-roulette-disabled-text",
+                    )}
+                  >
+                    {formatLeaderboardStatus(overviewData.userStats.status)}
+                  </span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
