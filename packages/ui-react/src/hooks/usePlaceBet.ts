@@ -25,9 +25,7 @@ import { useEstimateVRFFees } from "./useEstimateVRFFees"
 
 const logger = createLogger("usePlaceBet")
 
-type BetOptions =
-  | { type: "paid" }
-  | { type: "freebet"; freebet: SignedFreebet | null; refetchFreebets?: () => void }
+type BetOptions = { type: "paid" } | { type: "freebet"; freebet: SignedFreebet | null }
 
 export interface IUsePlaceBetReturn<T extends GameChoice = GameChoice> {
   placeBet: (betAmount: bigint, choice: T) => Promise<void>
@@ -147,10 +145,6 @@ export function usePlaceBet<T extends GameChoice>(
       })
 
       refetchBalance()
-
-      if (options.type === "freebet" && options.refetchFreebets) {
-        options.refetchFreebets()
-      }
     } else if (watcherStatus === "error") {
       setInternalError("watcher error")
       logger.debug("watcher: Bet resolved: ERROR from watcher")

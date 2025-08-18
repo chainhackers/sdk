@@ -23,6 +23,7 @@ interface FreebetsContextValue {
   selectedFreebet: SignedFreebet | null
   selectFreebet: (freebet: SignedFreebet | null) => void
   selectFreebetById: (id: string | null) => void
+  isUsingFreebet: boolean
   formattedFreebets: FreeBet[]
   formattedFreebetsInCurrentChain: FreeBet[]
   selectedFormattedFreebet: FreeBet | null
@@ -97,11 +98,28 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     const isFreebetsInCurrentChain = freebetsInCurrentChain.length > 0
     const isSelectedFreebet = selectedFreebet !== null
 
+    if (!isFreebetsInCurrentChain && isSelectedFreebet) {
+      setSelectedFreebet(null)
+      return
+    }
+
     if (isFreebetsInCurrentChain && !isSelectedFreebet) {
       setSelectedFreebet(freebetsInCurrentChain[0])
-    } else if (!isFreebetsInCurrentChain && isSelectedFreebet) {
-      setSelectedFreebet(null)
+      return
     }
+
+    if (isFreebetsInCurrentChain && isSelectedFreebet) {
+      const freebet = freebetsInCurrentChain.find(
+        (freebet) => freebet.id.toString() === selectedFreebet.id.toString(),
+      )
+
+      if (freebet) {
+        setSelectedFreebet(freebet)
+      } else {
+        setSelectedFreebet(freebetsInCurrentChain[0])
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [freebetsInCurrentChain])
 
   async function fetchFreebetsTokens() {
@@ -163,6 +181,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       selectedFreebet,
       selectFreebet,
       selectFreebetById,
+      isUsingFreebet: !!selectedFreebet,
       formattedFreebets,
       formattedFreebetsInCurrentChain,
       selectedFormattedFreebet,

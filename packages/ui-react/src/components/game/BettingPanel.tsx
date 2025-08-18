@@ -86,8 +86,8 @@ export function BettingPanel({
     formattedFreebetsInCurrentChain,
     selectedFormattedFreebet,
     selectFreebetById,
+    isUsingFreebet,
   } = useFreebetsContext()
-  //const [selectedFreeBet, setSelectedFreeBet] = useState<FreeBet | null>(freebets.length ? freebets[0] : null) // Default to first freebet
 
   // Track previous values to detect actual changes
   const prevChainIdRef = useRef(appChainId)
@@ -146,19 +146,17 @@ export function BettingPanel({
     betStatus === "internal-error" ||
     !!approveError
 
-  const isFreebet = !!selectedFormattedFreebet
-
   const canInitiateBet =
     isConnected &&
     areChainsSynced &&
-    (isFreebet || isBetAmountValid) &&
-    (isFreebet || !isTotalbetAmountExceedsBalance) &&
+    (isUsingFreebet || isBetAmountValid) &&
+    (isUsingFreebet || !isTotalbetAmountExceedsBalance) &&
     !isWaiting &&
     !isGamePaused &&
     !isBetRequirementsLoading &&
-    (isFreebet || isTokenAllowed) &&
-    (isFreebet || isBetCountValid) &&
-    (isFreebet || !isBetAmountExceedsMaxBetAmount) &&
+    (isUsingFreebet || isTokenAllowed) &&
+    (isUsingFreebet || isBetCountValid) &&
+    (isUsingFreebet || !isBetAmountExceedsMaxBetAmount) &&
     hasValidSelection
 
   const isApprovingToken = isApprovePending || isApproveConfirming

@@ -156,7 +156,8 @@ export function useGameLogic<T extends GameChoice>({
     gasPrice,
   } = usePlaceBet(gameDefinition?.gameType, token, triggerBalanceRefresh, gameDefinition)
 
-  const { selectedFreebet, selectedFormattedFreebet, refetchFreebets } = useFreebetsContext()
+  const { selectedFreebet, selectedFormattedFreebet, refetchFreebets, isUsingFreebet } =
+    useFreebetsContext()
 
   const {
     placeBet: placeFreebet,
@@ -174,12 +175,11 @@ export function useGameLogic<T extends GameChoice>({
     {
       type: "freebet",
       freebet: selectedFreebet,
-      refetchFreebets,
     },
   )
 
-  const betStatus = selectedFreebet ? freebetStatus : paidBetStatus
-  const rawGameResult = selectedFreebet ? freebetGameResult : paidRawGameResult
+  const betStatus = isUsingFreebet ? freebetStatus : paidBetStatus
+  const rawGameResult = isUsingFreebet ? freebetGameResult : paidRawGameResult
 
   // Reset bet state when chain or token changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
@@ -247,6 +247,7 @@ export function useGameLogic<T extends GameChoice>({
         }
       } else if (isInGameResultState) {
         resetFreebetState()
+        refetchFreebets()
       } else if (isWalletConnected) {
         placeFreebet(selectedFreebet.amount, selection)
       }
@@ -307,11 +308,11 @@ export function useGameLogic<T extends GameChoice>({
     selection: selection || undefined,
     setSelection: setSelection,
     betStatus,
-    gameResult: selectedFreebet ? freebetGameResult : gameResult,
+    gameResult: isUsingFreebet ? freebetGameResult : gameResult,
     resetBetState,
-    vrfFees: selectedFreebet ? freebetVrfFees : vrfFees,
-    formattedVrfFees: selectedFreebet ? freebetFormattedVrfFees : formattedVrfFees,
-    gasPrice: selectedFreebet ? formatGwei(freebetGasPrice) : formatGwei(gasPrice),
+    vrfFees: isUsingFreebet ? freebetVrfFees : vrfFees,
+    formattedVrfFees: isUsingFreebet ? freebetFormattedVrfFees : formattedVrfFees,
+    gasPrice: isUsingFreebet ? formatGwei(freebetGasPrice) : formatGwei(gasPrice),
     targetPayoutAmount: netPayout,
     formattedNetMultiplier: formattedNetMultiplier,
     grossMultiplier,
