@@ -102,7 +102,9 @@ export function LeaderboardCard({
 
       {/* Title with chain icon */}
       <div className="flex items-center">
-        <h3 className="text-foreground font-semibold text-[14px] leading-[22px]">{item.title}</h3>
+        <h3 className="text-foreground font-semibold text-[14px] leading-[22px] max-w-[260px] overflow-hidden truncate">
+          {item.title}
+        </h3>
       </div>
 
       {/* Prize and participants */}
