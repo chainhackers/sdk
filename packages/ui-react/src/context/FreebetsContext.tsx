@@ -10,7 +10,6 @@ import {
   useState,
 } from "react"
 import { useAccount } from "wagmi"
-import { QUERY_DEFAULTS } from "../constants/queryDefaults"
 import { createLogger } from "../lib/logger"
 import { getTokenImage } from "../lib/utils"
 import { FreeBet, TokenWithImage } from "../types/types"
@@ -61,7 +60,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     ],
     queryFn: fetchFreebetsTokens,
     enabled: !!accountAddress,
-    staleTime: QUERY_DEFAULTS.STALE_TIME,
+    refetchInterval: 30000,
   })
 
   const freebetsInCurrentChain = useMemo(() => {
@@ -131,7 +130,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
         setSelectedFreebet(freebetsInCurrentChain[0])
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // biome-ignore lint/correctness/useExhaustiveDependencies: logic based on freebetsInCurrentChain only
   }, [freebetsInCurrentChain])
 
   async function fetchFreebetsTokens() {

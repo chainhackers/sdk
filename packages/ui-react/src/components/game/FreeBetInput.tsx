@@ -31,6 +31,7 @@ export function FreeBetInput({
           type="button"
           variant="ghost"
           onClick={onRemoveFreebet}
+          disabled={isDisabled}
           className={cn(
             "absolute right-0 bottom-full z-10",
             "flex items-center gap-1.5",

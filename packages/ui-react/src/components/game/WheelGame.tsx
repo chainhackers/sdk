@@ -194,10 +194,7 @@ export function WheelGame({
             uniqueMultipliers={uniqueMultipliers}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow
-          gameResult={isSpinning ? null : gameResult}
-          currency={token.symbol}
-        />
+        <GameFrame.ResultWindow gameResult={isSpinning ? null : gameResult} />
       </GameFrame.GameArea>
     )
 

@@ -160,7 +160,7 @@ export function usePlaceBet<T extends GameChoice>(
       setInternalError("Result timeout - please check transaction history")
       logger.debug("watcher: Bet resolved: TIMEOUT - exceeded maximum wait time")
     }
-  }, [watcherStatus, watcherGameResult, refetchBalance])
+  }, [watcherStatus, watcherGameResult, refetchBalance, options.type])
 
   const resetBetState = useCallback(() => {
     wagerWriteHook.reset()
