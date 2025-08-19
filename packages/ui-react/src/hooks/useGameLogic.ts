@@ -261,7 +261,7 @@ export function useGameLogic<T extends GameChoice>({
     // Don't allow play if we're in loading state or selection is not available
     if (!gameDefinition || !selection) return
 
-    if (selectedFreebet) {
+    if (selectedFreebet && isUsingFreebet) {
       if (freebetStatus === "error") {
         resetFreebetState()
         if (isWalletConnected) {
@@ -345,7 +345,9 @@ export function useGameLogic<T extends GameChoice>({
     handlePlayButtonClick,
     handleBetAmountChange,
     placeBet: (betAmount: bigint, choice: T) =>
-      selectedFreebet ? placeFreebet(selectedFreebet.amount, choice) : placeBet(betAmount, choice),
+      isUsingFreebet && selectedFreebet
+        ? placeFreebet(selectedFreebet.amount, choice)
+        : placeBet(betAmount, choice),
     needsTokenApproval,
     isApprovePending: approveWriteWagmiHook.isPending,
     isApproveConfirming: approveWaitingWagmiHook.isLoading,

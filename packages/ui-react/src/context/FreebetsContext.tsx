@@ -29,6 +29,7 @@ interface FreebetsContextValue {
   selectedFormattedFreebet: FreeBet | null
   refetchFreebets: () => void
   freebetsError: Error | null
+  toggleUsingFreebet: (isUsingFreebet: boolean) => void
 }
 
 const FreebetsContext = createContext<FreebetsContextValue | undefined>(undefined)
@@ -44,6 +45,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { appChainId, switchAppChain, availableChainIds } = useChain()
   const { affiliate, freebetsAffiliates, withExternalBankrollFreebets } = useBettingConfig()
   const [selectedFreebet, setSelectedFreebet] = useState<SignedFreebet | null>(null)
+  const [isUsingFreebet, setIsUsingFreebet] = useState(true)
 
   const {
     data: freebets = [],
@@ -183,6 +185,14 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     [freebets, selectFreebet],
   )
 
+  const toggleUsingFreebet = useCallback((isUsingFreebet: boolean) => {
+    setIsUsingFreebet(isUsingFreebet)
+
+    if (!isUsingFreebet) {
+      setSelectedFreebet(null)
+    }
+  }, [])
+
   const contextValue = useMemo(
     () => ({
       freebets,
@@ -190,12 +200,13 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       selectedFreebet,
       selectFreebet,
       selectFreebetById,
-      isUsingFreebet: !!selectedFreebet,
+      isUsingFreebet: isUsingFreebet && !!selectedFreebet,
       formattedFreebets,
       formattedFreebetsInCurrentChain,
       selectedFormattedFreebet,
       refetchFreebets,
       freebetsError,
+      toggleUsingFreebet,
     }),
     [
       freebets,
@@ -208,6 +219,8 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       selectedFormattedFreebet,
       refetchFreebets,
       freebetsError,
+      isUsingFreebet,
+      toggleUsingFreebet,
     ],
   )
 

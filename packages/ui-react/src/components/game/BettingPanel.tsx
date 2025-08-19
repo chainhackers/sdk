@@ -87,6 +87,7 @@ export function BettingPanel({
     selectedFormattedFreebet,
     selectFreebetById,
     isUsingFreebet,
+    toggleUsingFreebet,
   } = useFreebetsContext()
 
   // Track previous values to detect actual changes
@@ -270,12 +271,13 @@ export function BettingPanel({
 
   const handleFreeBetSelect = (freeBet: FreeBet) => {
     selectFreebetById(freeBet.id)
+    toggleUsingFreebet(true)
     setIsFreeBetSheetOpen(false)
     setIsFreebetsHubOpen(false)
   }
 
   const handleRemoveFreeBet = () => {
-    selectFreebetById(null)
+    toggleUsingFreebet(false)
   }
 
   const handleFreeBetClick = () => {
@@ -327,7 +329,7 @@ export function BettingPanel({
           </Button>
         </div>
 
-        {selectedFormattedFreebet ? (
+        {isUsingFreebet && selectedFormattedFreebet ? (
           <FreeBetInput
             amount={selectedFormattedFreebet.amount}
             token={selectedFormattedFreebet.token}
