@@ -105,6 +105,7 @@ export const DarkTheme: Story = {
   },
 }
 
+import { LEADERBOARD_STATUS } from "@betswirl/sdk-core"
 // Story to show the leaderboard card component in isolation
 import { LeaderboardCard } from "../../components/leaderboard/LeaderboardCard"
 import { getTokenImage } from "../../lib/utils"
@@ -112,13 +113,12 @@ import type { LeaderboardItem } from "../../types/types"
 
 const mockLeaderboardItem: LeaderboardItem = {
   id: "1",
-  rank: 1,
+  userRank: 1,
   title: "Avalanche - July",
   chainId: 43114,
   startDate: "2024-07-09T00:00:00Z",
   endDate: "2024-08-09T00:00:00Z",
-  status: "ongoing",
-  badgeStatus: "pending",
+  status: LEADERBOARD_STATUS.PENDING,
   prize: {
     token: {
       address: "0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5",
@@ -185,9 +185,27 @@ export const LeaderboardCardEnded: StoryObj<{ item: LeaderboardItem; theme?: The
   args: {
     item: {
       ...mockLeaderboardItem,
-      status: "ended",
-      badgeStatus: "expired",
+      status: LEADERBOARD_STATUS.FINALIZED,
       userAction: { type: "overview" },
+    },
+    theme: "light",
+  },
+}
+
+export const LeaderboardCardNoUserRank: StoryObj<{ item: LeaderboardItem; theme?: Theme }> = {
+  name: "Leaderboard Card - No User Rank",
+  render: ({ item, theme = "light" }) => (
+    <StorybookProviders>
+      <div className={cn("w-[328px] p-4", theme)}>
+        <LeaderboardCard item={item} />
+      </div>
+    </StorybookProviders>
+  ),
+  args: {
+    item: {
+      ...mockLeaderboardItem,
+      userRank: null,
+      userAction: { type: "play" },
     },
     theme: "light",
   },
