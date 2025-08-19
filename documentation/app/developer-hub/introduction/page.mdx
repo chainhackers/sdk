@@ -1,0 +1,76 @@
+import { Cards } from 'nextra/components'
+import { Sparkles, Code, BookOpen, Users } from 'lucide-react';
+import Image from 'next/image';
+import PathCard, { PathCardSection, PathCardTitle, PathCardContent } from '../../_components/PathCard';
+
+# Developer Hub 🤓
+
+## What is BetSwirl?
+
+BetSwirl is a **permissionless casino protocol** that offers multiple games, a freebet system, and leaderboards. Whether you're a developer or not, we provide all the resources you need to create your own casino application.
+
+### Key Features:
+- **Multiple Casino Games** - Dice, Roulette, Coin Toss, Plinko, Keno, and more
+- **Freebet System** - Create and distribute freebets to attract users
+- **Leaderboards** - Set up competitive tournaments and leaderboards
+- **Permissionless** - No approval needed from BetSwirl to build your app
+- **Complete Control** - Full ownership of your user experience and branding
+
+### For Everyone:
+- **Non-developers**: Fork our demos and deploy with our help
+- **Developers**: Use our SDKs to build custom applications from scratch
+
+### Revenue & Management:
+All affiliate features like revenue management, freebet creation, and leaderboard management are handled directly on [www.betswirl.com](https://www.betswirl.com/affiliate/freebets). No need to build your own admin panel!
+
+Learn more about becoming an affiliate and earning 30% of house edge revenue: [Affiliate Program](/protocol-hub/partners/affiliates)
+
+## Choose your path
+
+<PathCardSection>
+  <PathCard 
+    title="Easy Path 🚀"
+    icon={Sparkles}
+    gradient="blue"
+    iconGradient="yellow"
+    href="/developer-hub/guides/miniapp-guide"
+  >
+    <PathCardTitle>Low-code option</PathCardTitle>
+    <PathCardContent label="Prerequisites" content="Git, Node.js" />
+    <PathCardContent label="Result" content="Casino dApp or Farcaster miniapp in one day" />
+  </PathCard>
+  
+  <PathCard 
+    title="Advanced Path ⚡"
+    icon={Code}
+    gradient="purple"
+    iconGradient="purple"
+    href="/developer-hub/guides/react-guide"
+  >
+    <PathCardTitle>Moderate coding (SDKs)</PathCardTitle>
+    <PathCardContent label="Prerequisites" content="JavaScript, React, Web3 (wagmi, viem)" />
+    <PathCardContent label="Result" content="Custom casino app in several days" />
+  </PathCard>
+</PathCardSection>
+
+## SDKs
+
+| SDK | Documentation | NPM | GitHub |
+|-----|---------------|-----|--------|
+| **SDK Core** | [Documentation](/developer-hub/sdks/core) | [@betswirl/sdk-core](https://www.npmjs.com/package/@betswirl/sdk-core) | [GitHub](https://github.com/BetSwirl/sdk/tree/main/packages/core) |
+| **SDK Wagmi Provider** | [Documentation](/developer-hub/sdks/wagmi-provider) | [@betswirl/wagmi-provider](https://www.npmjs.com/package/@betswirl/wagmi-provider) | [GitHub](https://github.com/BetSwirl/sdk/tree/main/packages/providers/wagmi) |
+| **SDK UI React** | [Documentation](/developer-hub/sdks/ui-react) | [@betswirl/ui-react](https://www.npmjs.com/package/@betswirl/ui-react) | [GitHub](https://github.com/BetSwirl/sdk/tree/main/packages/ui-react) |
+
+## Demos
+
+| Demo | Guide | GitHub |
+|------|-------|--------|
+| **SDK Core Demo (Node CLI)** | [Guide](/developer-hub/guides/node-guide) | [GitHub](https://github.com/BetSwirl/node-core-demo) |
+| **UI React Demo (dApp)** | [Guide](/developer-hub/guides/react-guide) | [GitHub](https://github.com/BetSwirl/ui-react-demo) |
+| **Farcaster UI React Demo (miniapp)** | [Guide](/developer-hub/guides/farcaster-miniapp-guide) | [GitHub](https://github.com/BetSwirl/miniapp-ui-react-demo) |
+
+## Need Help?
+
+Don't know where to start? Contact us on Telegram for guidance and support:
+
+- **Telegram**: [@BetSwirl Affiliates](https://t.me/betswirl_affiliates)

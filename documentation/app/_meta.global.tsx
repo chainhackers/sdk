@@ -89,11 +89,22 @@ const meta = {
     //breadcrumb: true,
     //timestamp: true,
     items: {
+      introduction: {
+        title: "Introduction",
+      },
+      glossary: {
+        title: "Glossary",
+      },
       sdks: {
         title: "SDKs",
         items: {
           core: {
             title: "Core",
+            items: {
+              "getting-started": {
+                title: "🚀 Getting Started",
+              },
+            },
           },
         },
       },
