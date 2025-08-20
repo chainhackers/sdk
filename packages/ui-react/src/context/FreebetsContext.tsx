@@ -10,7 +10,6 @@ import {
   useState,
 } from "react"
 import { useAccount } from "wagmi"
-import { createLogger } from "../lib/logger"
 import { getTokenImage } from "../lib/utils"
 import { FreeBet, TokenWithImage } from "../types/types"
 import { formatExpireAt } from "../utils/formatExpireAt"
@@ -19,9 +18,7 @@ import { useBettingConfig } from "./configContext"
 
 interface FreebetsContextValue {
   freebets: SignedFreebet[]
-  freebetsInCurrentChain: SignedFreebet[]
   selectedFreebet: SignedFreebet | null
-  selectFreebet: (freebet: SignedFreebet | null) => void
   selectFreebetById: (id: string | null) => void
   isUsingFreebet: boolean
   formattedFreebets: FreeBet[]
@@ -38,20 +35,28 @@ interface FreebetsProviderProps {
   children: ReactNode
 }
 
-const logger = createLogger("useFreebetsContext")
+interface FreebetsData {
+  freebets: SignedFreebet[]
+  formattedFreebets: FreeBet[]
+}
+
+interface SelectedFreebet {
+  freebet: SignedFreebet
+  formattedFreebet: FreeBet
+}
 
 export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
   const { appChainId, switchAppChain, availableChainIds } = useChain()
   const { affiliate, freebetsAffiliates, withExternalBankrollFreebets } = useBettingConfig()
-  const [selectedFreebet, setSelectedFreebet] = useState<SignedFreebet | null>(null)
+  const [selectedFreebet, setSelectedFreebet] = useState<SelectedFreebet | null>(null)
   const [isUsingFreebet, setIsUsingFreebet] = useState(true)
 
   const {
-    data: freebets = [],
+    data: freebetsData = { freebets: [], formattedFreebets: [] },
     refetch: refetchFreebets,
     error: freebetsError,
-  } = useQuery({
+  } = useQuery<FreebetsData>({
     queryKey: [
       "freebets",
       accountAddress,
@@ -65,51 +70,36 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     refetchInterval: 30000,
   })
 
-  const freebetsInCurrentChain = useMemo(() => {
-    if (!freebets.length || !appChainId) {
+  const formattedFreebetsInCurrentChain = useMemo(() => {
+    if (!freebetsData.formattedFreebets.length || !appChainId) {
       return []
     }
 
-    const filteredFreebets = freebets.filter((freebet) => freebet.chainId === appChainId)
+    const filteredFreebets = freebetsData.formattedFreebets.filter(
+      (freebet) => freebet.chainId === appChainId,
+    )
+
     return filteredFreebets
-  }, [freebets, appChainId])
+  }, [freebetsData.formattedFreebets, appChainId])
 
-  const formatFreebet = useCallback(
-    (freebet: SignedFreebet): FreeBet => ({
-      id: freebet.id.toString(),
-      title: freebet.campaign.label,
-      amount: Number(freebet.formattedAmount),
-      token: {
-        ...freebet.token,
-        image: getTokenImage(freebet.token.symbol),
-      } as TokenWithImage,
-      chainId: freebet.chainId,
-      expiresAt: formatExpireAt(freebet.expirationDate),
-    }),
-    [],
-  )
-
-  const formattedFreebets = useMemo(() => freebets.map(formatFreebet), [freebets, formatFreebet])
-
-  const formattedFreebetsInCurrentChain = useMemo(
-    () => freebetsInCurrentChain.map(formatFreebet),
-    [freebetsInCurrentChain, formatFreebet],
-  )
-
-  const selectedFormattedFreebet = useMemo(
-    () => (selectedFreebet ? formatFreebet(selectedFreebet) : null),
-    [selectedFreebet, formatFreebet],
-  )
-
+  // biome-ignore lint/correctness/useExhaustiveDependencies: selectedFreebet excluded to prevent infinite loop.
   useEffect(() => {
-    if (freebetsError) {
-      logger.error("Freebets fetch error: ", freebetsError)
-    }
-  }, [freebetsError])
-
-  useEffect(() => {
-    const isFreebetsInCurrentChain = freebetsInCurrentChain.length > 0
+    const isFreebetsInCurrentChain = formattedFreebetsInCurrentChain.length > 0
     const isSelectedFreebet = selectedFreebet !== null
+
+    const getFirstFreebet = () => {
+      const freebet = freebetsData.freebets.find(
+        (freebet) => freebet.chainId === formattedFreebetsInCurrentChain[0].chainId,
+      )
+      if (!freebet) {
+        return null
+      }
+
+      return {
+        freebet,
+        formattedFreebet: formattedFreebetsInCurrentChain[0],
+      }
+    }
 
     if (!isFreebetsInCurrentChain && isSelectedFreebet) {
       setSelectedFreebet(null)
@@ -117,34 +107,27 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     }
 
     if (isFreebetsInCurrentChain && !isSelectedFreebet) {
-      setSelectedFreebet(freebetsInCurrentChain[0])
+      setSelectedFreebet(getFirstFreebet())
       return
     }
 
     if (isFreebetsInCurrentChain && isSelectedFreebet) {
-      const freebet = freebetsInCurrentChain.find(
-        (freebet) => freebet.id.toString() === selectedFreebet.id.toString(),
+      const freebet = formattedFreebetsInCurrentChain.find(
+        (freebet) => freebet.id.toString() === selectedFreebet.freebet.id.toString(),
       )
 
-      if (freebet) {
-        setSelectedFreebet(freebet)
-      } else {
-        setSelectedFreebet(freebetsInCurrentChain[0])
+      if (!freebet) {
+        setSelectedFreebet(getFirstFreebet())
       }
     }
-    // biome-ignore lint/correctness/useExhaustiveDependencies: logic based on freebetsInCurrentChain only
-  }, [freebetsInCurrentChain])
+  }, [formattedFreebetsInCurrentChain])
 
-  async function fetchFreebetsTokens() {
+  async function fetchFreebetsTokens(): Promise<FreebetsData> {
     if (!accountAddress) {
-      return []
+      return { freebets: [], formattedFreebets: [] }
     }
 
-    const affiliates = freebetsAffiliates?.length
-      ? freebetsAffiliates
-      : affiliate
-        ? [affiliate]
-        : undefined
+    const affiliates = freebetsAffiliates || (affiliate ? [affiliate] : undefined)
 
     const allFreebets = await fetchFreebets(
       accountAddress,
@@ -155,34 +138,32 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     const filteredFreebetsByChains = allFreebets.filter((freebet) =>
       availableChainIds.includes(freebet.chainId),
     )
+    const formattedFreebets = filteredFreebetsByChains.map(formatFreebet)
 
-    return filteredFreebetsByChains
+    return { freebets: filteredFreebetsByChains, formattedFreebets }
   }
 
-  const selectFreebet = useCallback(
-    (freebet: SignedFreebet | null) => {
-      logger.info("selectFreebet: ", freebet)
+  const selectFreebetById = useCallback(
+    (id: string | null) => {
+      if (!id) {
+        setSelectedFreebet(null)
+        return
+      }
+
+      const freebet = freebetsData.freebets.find((freebet) => freebet.id.toString() === id) || null
+
+      if (!freebet) {
+        setSelectedFreebet(null)
+        return
+      }
 
       if (freebet && freebet.chainId !== appChainId) {
         switchAppChain(freebet.chainId)
       }
 
-      setSelectedFreebet(freebet)
+      setSelectedFreebet({ freebet: freebet, formattedFreebet: formatFreebet(freebet) })
     },
-    [appChainId, switchAppChain],
-  )
-
-  const selectFreebetById = useCallback(
-    (id: string | null) => {
-      if (!id) {
-        selectFreebet(null)
-        return
-      }
-
-      const freebet = freebets.find((freebet) => freebet.id.toString() === id) || null
-      selectFreebet(freebet)
-    },
-    [freebets, selectFreebet],
+    [freebetsData, appChainId, switchAppChain],
   )
 
   const toggleUsingFreebet = useCallback((isUsingFreebet: boolean) => {
@@ -193,30 +174,38 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     }
   }, [])
 
+  function formatFreebet(freebet: SignedFreebet): FreeBet {
+    return {
+      id: freebet.id.toString(),
+      title: freebet.campaign.label,
+      amount: Number(freebet.formattedAmount),
+      token: {
+        ...freebet.token,
+        image: getTokenImage(freebet.token.symbol),
+      } as TokenWithImage,
+      chainId: freebet.chainId,
+      expiresAt: formatExpireAt(freebet.expirationDate),
+    }
+  }
+
   const contextValue = useMemo(
     () => ({
-      freebets,
-      freebetsInCurrentChain,
-      selectedFreebet,
-      selectFreebet,
+      freebets: freebetsData.freebets,
+      selectedFreebet: selectedFreebet?.freebet || null,
       selectFreebetById,
       isUsingFreebet: isUsingFreebet && !!selectedFreebet,
-      formattedFreebets,
+      formattedFreebets: freebetsData.formattedFreebets,
       formattedFreebetsInCurrentChain,
-      selectedFormattedFreebet,
+      selectedFormattedFreebet: selectedFreebet?.formattedFreebet || null,
       refetchFreebets,
       freebetsError,
       toggleUsingFreebet,
     }),
     [
-      freebets,
-      freebetsInCurrentChain,
-      selectedFreebet,
-      selectFreebet,
-      selectFreebetById,
-      formattedFreebets,
+      freebetsData,
       formattedFreebetsInCurrentChain,
-      selectedFormattedFreebet,
+      selectedFreebet,
+      selectFreebetById,
       refetchFreebets,
       freebetsError,
       isUsingFreebet,
