@@ -1,0 +1,197 @@
+import { Tabs, Tab } from 'nextra/components'
+import { Steps, Callout } from 'nextra/components';
+
+# Wallet connection
+
+This page guides you through connecting a wallet to your app.
+
+
+
+## Code Examples
+
+<Tabs items={['Core SDK', 'React SDK']}>
+  <Tabs.Tab>
+
+The Core SDK offers three different approaches to connect a wallet:
+
+### With Wagmi Client
+<Callout type="info">
+  Do not forget to install `@betswirl/wagmi-provider` if you're using the Wagmi approach.
+</Callout>
+<Callout type="info">
+  The Wagmi Client approach is recommended for multi-chain applications, because you can setup multiple chains in the Wagmi config.
+</Callout>
+```typescript showLineNumbers
+import { initWagmiBetSwirlClient } from "@betswirl/wagmi-provider";
+import {
+    type CasinoChain,
+    casinoChainById,
+    GAS_PRICE_TYPE,
+} from "@betswirl/sdk-core";
+import { createConfig, webSocket } from "@wagmi/core";
+import { createPublicClient, createWalletClient, type Hex, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+
+// Viem function to create viem clients from a casino chain
+function getViemClientsFromCasinoChain(casinoChain: CasinoChain) {
+    const privateKey = process.env.PRIVATE_KEY; // Your private key
+    const account = privateKeyToAccount(privateKey as Hex);
+    const rpcUrl = "your-rpc-url-for-this-chain" // Your RPC URL
+    const transport = rpcUrl?.startsWith("wss")
+        ? webSocket(rpcUrl)
+        : http(rpcUrl);
+    const walletClient = createWalletClient({
+        chain: casinoChain.viemChain,
+        transport,
+        account,
+    });
+    const publicClient = createPublicClient({
+        chain: casinoChain.viemChain,
+        transport,
+    });
+    return { walletClient, publicClient };
+}
+
+// Wagmi function to create wagmi config from viem wallet client
+export function getWagmiConfigFromCasinoChain(casinoChain: CasinoChain) {
+    return createConfig({
+        // You can add multiple chains here if needed
+        chains: [casinoChain.viemChain],
+        client: () => {
+            return getViemClientsFromCasinoChain(casinoChain).walletClient;
+        },
+    });
+}
+
+// 1. Create Wagmi config for a specific chain
+const chain = casinoChainById[8453] // Your chain ID
+const wagmiConfig = getWagmiConfigFromCasinoChain(chain);
+
+// 2. Create the BetSwirl Wagmi client with your wagmi config
+const wagmiBetSwirlClient = initWagmiBetSwirlClient(wagmiConfig, {
+    affiliate: process.env.AFFILIATE_ADDRESS as Hex, // Your affiliate address
+    gasPriceType: GAS_PRICE_TYPE.FAST, // Your gas price type
+    ... // Other options
+    api: {
+    testMode: true, // Set to true to use the staging API
+},
+});
+
+//3. Do what you want with the client
+wagmiBetSwirlClient.getCasinoGames(false, chain.id)
+...
+wagmiBetSwirlClient.playDice(77, ...)
+...
+```
+### With Viem Client
+
+```typescript showLineNumbers
+import {
+    type CasinoChain,
+    casinoChainById,
+    GAS_PRICE_TYPE,
+    initViemBetSwirlClient,
+} from "@betswirl/sdk-core";
+import { webSocket } from "@wagmi/core";
+import { createPublicClient, createWalletClient, type Hex, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+
+// Viem function to create viem clients from a casino chain
+function getViemClientsFromCasinoChain(casinoChain: CasinoChain) {
+    const privateKey = process.env.PRIVATE_KEY; // Your private key
+    const account = privateKeyToAccount(privateKey as Hex);
+    const rpcUrl = "your-rpc-url-for-this-chain" // Your RPC URL
+    const transport = rpcUrl?.startsWith("wss")
+        ? webSocket(rpcUrl)
+        : http(rpcUrl);
+    const walletClient = createWalletClient({
+        chain: casinoChain.viemChain,
+        transport,
+        account,
+    });
+    const publicClient = createPublicClient({
+        chain: casinoChain.viemChain,
+        transport,
+    });
+    return { walletClient, publicClient };
+}
+
+//1. Create Viem clients for the casino chain
+const chain = casinoChainById[8453]
+const { walletClient, publicClient } = getViemClientsFromCasinoChain(chain)
+
+
+// 2. Create the BetSwirl Viem client
+const viemBetSwirlClient = initViemBetSwirlClient(walletClient, publicClient, {
+    chainId: chain.id,
+    affiliate: process.env.AFFILIATE_ADDRESS as Hex, // Your affiliate address
+    gasPriceType: GAS_PRICE_TYPE.FAST, // Your gas price type
+    ... // Other options
+    api: {
+    testMode: true, // Set to true to use the staging API
+},
+});
+
+//3. Do what you want with the client
+viemBetSwirlClient.getCasinoGames(false)
+...
+viemBetSwirlClient.playDice(77, ...)
+...
+```
+
+### Without client (only a wallet)
+
+```typescript showLineNumbers
+
+import {
+    type CasinoChain,
+    casinoChainById,
+    getCasinoGames,
+    placeDiceBet,
+    ViemBetSwirlWallet,
+} from "@betswirl/sdk-core";
+import { webSocket } from "@wagmi/core";
+import { createPublicClient, createWalletClient, type Hex, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+
+// Viem function to create viem clients from a casino chain
+function getViemClientsFromCasinoChain(casinoChain: CasinoChain) {
+    const privateKey = process.env.PRIVATE_KEY; // Your private key
+    const account = privateKeyToAccount(privateKey as Hex);
+    const rpcUrl = "your-rpc-url-for-this-chain" // Your RPC URL
+    const transport = rpcUrl?.startsWith("wss")
+        ? webSocket(rpcUrl)
+        : http(rpcUrl);
+    const walletClient = createWalletClient({
+        chain: casinoChain.viemChain,
+        transport,
+        account,
+    });
+    const publicClient = createPublicClient({
+        chain: casinoChain.viemChain,
+        transport,
+    });
+    return { walletClient, publicClient };
+}
+
+//1. Create Viem clients for the casino chain
+const chain = casinoChainById[8453]
+const { walletClient, publicClient } = getViemClientsFromCasinoChain(chain)
+
+// 2. Create the native BetSwirl wallet
+const viemBetSwirlWallet  =  new ViemBetSwirlWallet(publicClient, walletClient)
+
+//3. Do what you want with the client
+const casinoGames = await getCasinoGames(viemBetSwirlWallet, false);
+
+placeDiceBet(viemBetSwirlWallet, 77, ...)
+...
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+  ```react showLineNumbers
+  Under development
+  ```
+  </Tabs.Tab>
+</Tabs>

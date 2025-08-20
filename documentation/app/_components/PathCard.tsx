@@ -4,8 +4,8 @@ import { LucideIcon } from 'lucide-react';
 interface PathCardProps {
   title: string;
   icon: LucideIcon;
-  gradient: 'blue' | 'purple';
-  iconGradient: 'yellow' | 'purple';
+  gradient: 'blue' | 'purple' | 'green';
+  iconGradient: 'yellow' | 'purple' | 'green';
   href: string;
   children: ReactNode;
 }
@@ -13,11 +13,13 @@ interface PathCardProps {
 const gradients = {
   blue: 'bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950/50 dark:to-indigo-900/50 border-blue-200 dark:border-blue-800',
   purple: 'bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-950/50 dark:to-pink-900/50 border-purple-200 dark:border-purple-800',
+  green: 'bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-950/50 dark:to-teal-900/50 border-emerald-200 dark:border-emerald-800',
 };
 
 const iconGradients = {
   yellow: 'bg-gradient-to-br from-yellow-400 to-orange-500',
   purple: 'bg-gradient-to-br from-purple-500 to-pink-500',
+  green: 'bg-gradient-to-br from-emerald-500 to-teal-500',
 };
 
 export default function PathCard({ title, icon: IconComponent, gradient, iconGradient, href, children }: PathCardProps) {
@@ -41,7 +43,7 @@ export default function PathCard({ title, icon: IconComponent, gradient, iconGra
 
 export function PathCardSection({ children }: { children: ReactNode }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
       {children}
     </div>
   );
