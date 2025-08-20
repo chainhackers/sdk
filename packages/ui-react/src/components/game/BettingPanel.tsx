@@ -6,13 +6,7 @@ import { useChain } from "../../context/chainContext"
 import { useFreebetsContext } from "../../context/FreebetsContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
 import { cn } from "../../lib/utils"
-import {
-  BetStatus,
-  ChainTokenPanelView,
-  FreeBet,
-  GameChoice,
-  TokenWithImage,
-} from "../../types/types"
+import { BetStatus, ChainTokenPanelView, FreeBet, TokenWithImage } from "../../types/types"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { Sheet } from "../ui/sheet"
@@ -46,7 +40,7 @@ interface BettingPanelProps {
   approveError?: any
   portalContainer: HTMLElement | null
   isMounted: boolean
-  selection?: GameChoice
+  invalidSelectionMessage?: string
 }
 
 export function BettingPanel({
@@ -72,7 +66,7 @@ export function BettingPanel({
   approveError,
   portalContainer,
   isMounted,
-  selection,
+  invalidSelectionMessage,
 }: BettingPanelProps) {
   const { appChainId, switchWalletChain } = useChain()
   const [isChainTokenSheetOpen, setIsChainTokenSheetOpen] = useState<boolean>(false)
@@ -195,11 +189,7 @@ export function BettingPanel({
   } else if (isGamePaused) {
     playButtonText = "Game paused"
   } else if (!hasValidSelection) {
-    if (selection?.game === CASINO_GAME_TYPE.KENO && selection.choice.length === 1) {
-      playButtonText = "Not enough numbers selected"
-    } else {
-      playButtonText = "Make your selection"
-    }
+    playButtonText = invalidSelectionMessage || "Make your selection"
   } else if (isBetRequirementsLoading) {
     playButtonText = "Loading..."
   } else if (!isTokenAllowed) {

@@ -7,7 +7,6 @@ import { cn } from "../../lib/utils"
 import {
   BetStatus,
   FreeBet,
-  GameChoice,
   GameResult,
   HistoryEntry,
   Theme,
@@ -311,7 +310,7 @@ interface BettingSectionProps {
   isRefetchingAllowance?: boolean
   approveError?: any
   freeBets?: FreeBet[]
-  selection?: GameChoice
+  invalidSelectionMessage?: string
 }
 
 function BettingSection(props: BettingSectionProps) {
