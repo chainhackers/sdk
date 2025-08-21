@@ -22,6 +22,8 @@ export type BetStrategyParams<T extends GameChoice = GameChoice> = {
   betAmount: bigint
   choice: T
   vrfFees: bigint
+  gasPrice: bigint
+  chainId: number
   gameDefinition: GameDefinition<T>
   game: CASINO_GAME_TYPE
 }

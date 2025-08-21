@@ -206,21 +206,15 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
       try {
         logger.debug("placeBet: Starting bet process using strategy")
 
-        // Use strategy to prepare transaction parameters
-        const transactionParams = await strategy.prepare({
+        const wagerWriteParams = await strategy.prepare({
           betAmount,
           choice,
           vrfFees,
+          gasPrice,
+          chainId: appChainId,
           gameDefinition,
           game,
         })
-
-        // Add the current gas price to the transaction
-        const wagerWriteParams = {
-          ...transactionParams,
-          gasPrice,
-          chainId: appChainId,
-        }
 
         logger.debug("placeBet: Submitting transaction", wagerWriteParams)
         wagerWriteHook.writeContract(wagerWriteParams)

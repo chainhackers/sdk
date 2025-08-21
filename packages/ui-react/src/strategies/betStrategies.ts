@@ -23,8 +23,8 @@ export class PaidBetStrategy<T extends GameChoice = GameChoice> implements IBetS
   constructor(private config: PaidBetStrategyConfig) {}
 
   async prepare(params: BetStrategyParams<T>): Promise<BetTransactionParameters> {
-    const { betAmount, choice, vrfFees, gameDefinition, game } = params
-    const { token, affiliate, connectedAddress, chainId } = this.config
+    const { betAmount, choice, vrfFees, gasPrice, chainId, gameDefinition, game } = params
+    const { token, affiliate, connectedAddress, chainId: configChainId } = this.config
 
     logger.debug("PaidBetStrategy: Preparing transaction", {
       betAmount: betAmount.toString(),
@@ -43,7 +43,7 @@ export class PaidBetStrategy<T extends GameChoice = GameChoice> implements IBetS
 
     const placeBetTxData = getPlaceBetFunctionData(
       { ...betParams, receiver: connectedAddress, affiliate },
-      chainId as CasinoChainId,
+      configChainId as CasinoChainId,
     )
 
     return {
@@ -52,7 +52,7 @@ export class PaidBetStrategy<T extends GameChoice = GameChoice> implements IBetS
       functionName: placeBetTxData.data.functionName,
       args: placeBetTxData.data.args,
       value: placeBetTxData.extraData.getValue(vrfFees),
-      gasPrice: 0n, // Will be set by the hook
+      gasPrice,
       chainId,
     }
   }
@@ -65,8 +65,8 @@ export class FreebetStrategy<T extends GameChoice = GameChoice> implements IBetS
   constructor(private config: FreebetStrategyConfig) {}
 
   async prepare(params: BetStrategyParams<T>): Promise<BetTransactionParameters> {
-    const { choice, vrfFees, gameDefinition, game } = params
-    const { freebet, chainId } = this.config
+    const { choice, vrfFees, gasPrice, chainId, gameDefinition, game } = params
+    const { freebet, chainId: configChainId } = this.config
 
     logger.debug("FreebetStrategy: Preparing transaction", {
       freebetId: freebet.id,
@@ -81,7 +81,7 @@ export class FreebetStrategy<T extends GameChoice = GameChoice> implements IBetS
       freebet,
     }
 
-    const placeFreebetTxData = getPlaceFreebetFunctionData(betParams, chainId as CasinoChainId)
+    const placeFreebetTxData = getPlaceFreebetFunctionData(betParams, configChainId as CasinoChainId)
 
     return {
       abi: placeFreebetTxData.data.abi,
@@ -89,7 +89,7 @@ export class FreebetStrategy<T extends GameChoice = GameChoice> implements IBetS
       functionName: placeFreebetTxData.data.functionName,
       args: placeFreebetTxData.data.args,
       value: placeFreebetTxData.extraData.getValue(vrfFees),
-      gasPrice: 0n, // Will be set by the hook
+      gasPrice,
       chainId,
     }
   }
