@@ -15,6 +15,7 @@ import { FreeBet, TokenWithImage } from "../types/types"
 import { formatExpireAt } from "../utils/formatExpireAt"
 import { useChain } from "./chainContext"
 import { useBettingConfig } from "./configContext"
+import { useTokenContext } from "./tokenContext"
 
 interface FreebetsContextValue {
   freebets: SignedFreebet[]
@@ -50,6 +51,7 @@ interface SelectedFreebet {
 export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
   const { appChainId, switchAppChain, availableChainIds } = useChain()
+  const { setSelectedToken } = useTokenContext()
   const { affiliate, freebetsAffiliates, withExternalBankrollFreebets } = useBettingConfig()
   const [selectedFreebet, setSelectedFreebet] = useState<SelectedFreebet | null>(null)
   const [isUsingFreebet, setIsUsingFreebet] = useState(true)
@@ -84,50 +86,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
 
     return filteredFreebets
   }, [freebetsData.formattedFreebets, appChainId])
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: selectedFreebet excluded to prevent infinite loop.
-  useEffect(() => {
-    if (isSaveLastFreebet) {
-      return
-    }
-
-    const isFreebetsInCurrentChain = formattedFreebetsInCurrentChain.length > 0
-    const isSelectedFreebet = selectedFreebet !== null
-
-    const getFirstFreebet = () => {
-      const freebet = freebetsData.freebets.find(
-        (freebet) => freebet.chainId === formattedFreebetsInCurrentChain[0].chainId,
-      )
-      if (!freebet) {
-        return null
-      }
-
-      return {
-        freebet,
-        formattedFreebet: formattedFreebetsInCurrentChain[0],
-      }
-    }
-
-    if (!isFreebetsInCurrentChain && isSelectedFreebet) {
-      setSelectedFreebet(null)
-      return
-    }
-
-    if (isFreebetsInCurrentChain && !isSelectedFreebet) {
-      setSelectedFreebet(getFirstFreebet())
-      return
-    }
-
-    if (isFreebetsInCurrentChain && isSelectedFreebet) {
-      const freebet = formattedFreebetsInCurrentChain.find(
-        (freebet) => freebet.id.toString() === selectedFreebet.freebet.id.toString(),
-      )
-
-      if (!freebet) {
-        setSelectedFreebet(getFirstFreebet())
-      }
-    }
-  }, [formattedFreebetsInCurrentChain, isSaveLastFreebet])
 
   async function fetchFreebetsTokens(): Promise<FreebetsData> {
     if (!accountAddress) {
@@ -164,14 +122,59 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
         return
       }
 
-      if (freebet && freebet.chainId !== appChainId) {
+      const formatted = formatFreebet(freebet)
+
+      if (freebet.chainId !== appChainId) {
         switchAppChain(freebet.chainId)
       }
 
-      setSelectedFreebet({ freebet: freebet, formattedFreebet: formatFreebet(freebet) })
+      setSelectedToken(formatted.token)
+
+      setSelectedFreebet({ freebet: freebet, formattedFreebet: formatted })
+      setIsUsingFreebet(true)
     },
-    [freebetsData, appChainId, switchAppChain],
+    [freebetsData, appChainId, switchAppChain, setSelectedToken],
   )
+
+  useEffect(() => {
+    if (isSaveLastFreebet) {
+      return
+    }
+
+    const isFreebetsInCurrentChain = formattedFreebetsInCurrentChain.length > 0
+    const isSelectedFreebet = selectedFreebet !== null
+
+    if (!isFreebetsInCurrentChain && isSelectedFreebet) {
+      setSelectedFreebet(null)
+      return
+    }
+
+    if (isFreebetsInCurrentChain && isUsingFreebet && !isSelectedFreebet) {
+      const firstFreebetId = formattedFreebetsInCurrentChain[0].id
+      selectFreebetById(firstFreebetId)
+      return
+    }
+
+    if (isFreebetsInCurrentChain && isSelectedFreebet) {
+      const isSelectedStillValid = formattedFreebetsInCurrentChain.some(
+        (fb) => fb.id === selectedFreebet.formattedFreebet.id,
+      )
+      if (!isSelectedStillValid) {
+        if (isUsingFreebet) {
+          const firstFreebetId = formattedFreebetsInCurrentChain[0].id
+          selectFreebetById(firstFreebetId)
+        } else {
+          setSelectedFreebet(null)
+        }
+      }
+    }
+  }, [
+    formattedFreebetsInCurrentChain,
+    isSaveLastFreebet,
+    selectedFreebet,
+    selectFreebetById,
+    isUsingFreebet,
+  ])
 
   const toggleUsingFreebet = useCallback((isUsingFreebet: boolean) => {
     setIsUsingFreebet(isUsingFreebet)

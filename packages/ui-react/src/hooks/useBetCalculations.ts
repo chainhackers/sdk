@@ -1,7 +1,6 @@
 import { CASINO_GAME_TYPE, getPayoutDetails } from "@betswirl/sdk-core"
 import { useMemo } from "react"
-import { useTokenContext } from "../context/tokenContext"
-import { GameChoice, GameDefinition } from "../types/types"
+import { GameChoice, GameDefinition, TokenWithImage } from "../types/types"
 import { useHouseEdge } from "./useHouseEdge"
 
 interface UseBetCalculationsProps<T extends GameChoice> {
@@ -9,6 +8,7 @@ interface UseBetCalculationsProps<T extends GameChoice> {
   betAmount: bigint | undefined
   betCount: number | undefined
   gameDefinition: GameDefinition<T> | undefined
+  token: TokenWithImage | undefined
 }
 
 interface UseBetCalculationsResult {
@@ -47,8 +47,8 @@ export function useBetCalculations<T extends GameChoice>({
   betAmount,
   betCount = 1,
   gameDefinition,
+  token,
 }: UseBetCalculationsProps<T>): UseBetCalculationsResult {
-  const { selectedToken: token } = useTokenContext()
   const { houseEdge } = useHouseEdge({
     game: gameDefinition?.gameType as CASINO_GAME_TYPE,
     token,

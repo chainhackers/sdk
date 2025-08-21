@@ -115,21 +115,25 @@ export function useGameLogic<T extends GameChoice>({
   const { selectedToken } = useTokenContext()
   const { getBalance, refetch: refetchBalance } = useBalances()
   const triggerBalanceRefresh = useBalanceRefresh()
+  const {
+    selectedFreebet,
+    refetchFreebets,
+    isUsingFreebet,
+    setIsSaveLastFreebet,
+  } = useFreebetsContext()
 
   const isReady = !!gameDefinition
   const isConfigurationLoading = !isReady
 
-  // Determine the effective token to use - memoize to prevent unnecessary re-renders
   const token: TokenWithImage = useMemo(() => {
     return (
       selectedToken || {
         ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
-        image: "", // Fallback for native currency - user should configure this
+        image: "",
       }
     )
   }, [selectedToken, appChainId])
 
-  // Get balance from BalanceContext
   const balance = getBalance(token.address) || 0n
   const { isPaused: isGamePaused } = useIsGamePaused({
     game: gameDefinition?.gameType as CASINO_GAME_TYPE,
@@ -141,24 +145,14 @@ export function useGameLogic<T extends GameChoice>({
     return gameDefinition?.defaultSelection as T | undefined
   })
 
-  // Update selection when gameDefinition changes
   React.useEffect(() => {
     if (gameDefinition?.defaultSelection) {
       setSelection(gameDefinition.defaultSelection as T)
     }
   }, [gameDefinition])
 
-  const {
-    selectedFreebet,
-    selectedFormattedFreebet,
-    refetchFreebets,
-    isUsingFreebet,
-    setIsSaveLastFreebet,
-  } = useFreebetsContext()
-
   const { affiliate } = useBettingConfig()
 
-  // Create betting strategy based on current state
   const betStrategy = useMemo(() => {
     if (!address) return undefined
 
@@ -187,7 +181,7 @@ export function useGameLogic<T extends GameChoice>({
     gasPrice,
   } = usePlaceBet<T>(
     gameDefinition?.gameType,
-    isUsingFreebet && selectedFormattedFreebet?.token ? selectedFormattedFreebet.token : token,
+    token,
     triggerBalanceRefresh,
     gameDefinition,
     betStrategy,
@@ -242,6 +236,7 @@ export function useGameLogic<T extends GameChoice>({
     betAmount,
     betCount: 1,
     gameDefinition,
+    token, // Pass the centralized effective token
   })
 
   const isInGameResultState = !!gameResult

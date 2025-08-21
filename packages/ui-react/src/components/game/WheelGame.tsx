@@ -9,7 +9,6 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { useAccount } from "wagmi"
 import wheelBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
-import { useFreebetsContext } from "../../context/FreebetsContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { useHouseEdge } from "../../hooks/useHouseEdge"
@@ -34,19 +33,10 @@ export function WheelGame({
 
   const { selectedToken: token } = useTokenContext()
   const { appChainId } = useChain()
-  const { selectedFormattedFreebet, isUsingFreebet } = useFreebetsContext()
-
-  const tokenHouseEdge = useMemo(() => {
-    if (isUsingFreebet && selectedFormattedFreebet?.token) {
-      return selectedFormattedFreebet.token
-    }
-
-    return token
-  }, [token, isUsingFreebet, selectedFormattedFreebet])
 
   const { houseEdge } = useHouseEdge({
     game: CASINO_GAME_TYPE.WHEEL,
-    token: tokenHouseEdge,
+    token,
   })
 
   const wheelGameDefinition = useMemo(() => {
