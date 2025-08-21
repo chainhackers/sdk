@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { useAccount } from "wagmi"
 import wheelBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
+import { useFreebetsContext } from "../../context/FreebetsContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { useHouseEdge } from "../../hooks/useHouseEdge"
@@ -32,11 +33,20 @@ export function WheelGame({
   const [isSpinning, setIsSpinning] = useState(false)
 
   const { selectedToken: token } = useTokenContext()
-  console.log({ token })
   const { appChainId } = useChain()
+  const { selectedFormattedFreebet, isUsingFreebet } = useFreebetsContext()
+
+  const tokenHouseEdge = useMemo(() => {
+    if (isUsingFreebet && selectedFormattedFreebet?.token) {
+      return selectedFormattedFreebet.token
+    }
+
+    return token
+  }, [token, isUsingFreebet, selectedFormattedFreebet])
+
   const { houseEdge } = useHouseEdge({
     game: CASINO_GAME_TYPE.WHEEL,
-    token,
+    token: tokenHouseEdge,
   })
 
   const wheelGameDefinition = useMemo(() => {
@@ -61,6 +71,10 @@ export function WheelGame({
       encodeInput: (config: WeightedGameConfiguration) => {
         if (!config) return 0
         return WeightedGame.encodeInput(config.configId)
+      },
+      encodeAbiParametersInput: (config: WeightedGameConfiguration) => {
+        if (!config) return WeightedGame.encodeAbiParametersInput(0)
+        return WeightedGame.encodeAbiParametersInput(config.configId)
       },
       getWinChancePercent: (config: WeightedGameConfiguration) => {
         if (!config?.multipliers) return []

@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useAccount } from "wagmi"
 import kenoBackground from "../../assets/game/game-background.jpg"
 import { useChain } from "../../context/chainContext"
+import { useFreebetsContext } from "../../context/FreebetsContext"
 import { useTokenContext } from "../../context/tokenContext"
 import { useGameLogic } from "../../hooks/useGameLogic"
 import { useHouseEdge } from "../../hooks/useHouseEdge"
@@ -53,6 +54,7 @@ function KenoGameContent({
         return Keno.getMultiplier(kenoConfig, choice.length, maxMultiplierHits)
       },
       encodeInput: (choice) => Keno.encodeInput(choice, kenoConfig),
+      encodeAbiParametersInput: (choice) => Keno.encodeAbiParametersInput(choice, kenoConfig),
       formatDisplayResult: (rolledResult) => {
         if (Array.isArray(rolledResult.rolled)) {
           return rolledResult.rolled.join(", ")
@@ -195,14 +197,20 @@ export function KenoGame({
 }: KenoGameProps) {
   const { selectedToken } = useTokenContext()
   const { appChainId } = useChain()
+  const { selectedFormattedFreebet, isUsingFreebet } = useFreebetsContext()
+
   const token = useMemo(() => {
+    if (isUsingFreebet && selectedFormattedFreebet?.token) {
+      return selectedFormattedFreebet.token
+    }
+
     return (
       selectedToken || {
         ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
         image: "",
       }
     )
-  }, [selectedToken, appChainId])
+  }, [selectedToken, appChainId, isUsingFreebet, selectedFormattedFreebet])
 
   const { config: kenoConfig, loading: kenoConfigLoading } = useKenoConfiguration({ token })
 

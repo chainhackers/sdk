@@ -18,7 +18,6 @@ import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
 import { BetStatus, GameChoice, GameDefinition, GameResult, TokenWithImage } from "../types/types"
-import { convertToAbiParameters } from "../utils/convertToAbiParameters"
 import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
@@ -234,14 +233,8 @@ export function usePlaceBet<T extends GameChoice>(
 
         setCurrentBetAmount(betAmount)
 
-        const gameEncodedAbiParametersInput = convertToAbiParameters(game, encodedInput)
+        const gameEncodedAbiParametersInput = gameDefinition.encodeAbiParametersInput(choice.choice)
         console.log("gameEncodedAbiParametersInput: ", gameEncodedAbiParametersInput)
-
-        if (!gameEncodedAbiParametersInput) {
-          logger.error("placeFreebet: Failed to convert input to abi parameters")
-          setInternalError("Failed to convert input to abi parameters")
-          return
-        }
 
         const betParams = {
           game,

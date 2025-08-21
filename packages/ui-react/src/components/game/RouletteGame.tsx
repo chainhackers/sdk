@@ -28,6 +28,7 @@ const rouletteGameDefinition: GameDefinition<{
   },
   getMultiplier: (choice) => Roulette.getMultiplier(choice),
   encodeInput: (choice) => Roulette.encodeInput(choice),
+  encodeAbiParametersInput: (choice) => Roulette.encodeAbiParametersInput(choice),
   getWinChancePercent: (choice) => Roulette.getWinChancePercent(choice),
   formatDisplayResult: (rolledResult) => {
     return rolledResult.rolled.toString()
