@@ -176,9 +176,7 @@ function KenoGameContent({
         areChainsSynced={areChainsSynced}
         isGamePaused={isGamePaused}
         hasValidSelection={selectedNumbers.length >= 2}
-        invalidSelectionMessage={
-          selectedNumbers.length === 1 ? "Not enough numbers selected" : undefined
-        }
+        invalidSelectionMessage={"Not enough numbers selected"}
         needsTokenApproval={needsTokenApproval}
         isApprovePending={isApprovePending}
         isApproveConfirming={isApproveConfirming}

@@ -16,6 +16,7 @@ import {
   type WeightedGameEncodedInput,
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
+import { Hex } from "viem"
 
 export type Theme = "light" | "dark" | "system"
 
@@ -98,7 +99,7 @@ export interface GameDefinition<T extends GameChoice> {
   defaultSelection: T
   getMultiplier: (choice: T["choice"]) => number
   encodeInput: (choice: T["choice"]) => GameEncodedInput["encodedInput"]
-  encodeAbiParametersInput: (choice: T["choice"]) => `0x${string}`
+  encodeAbiParametersInput: (choice: T["choice"]) => Hex
   getWinChancePercent?: (choice: T["choice"]) => number | number[]
   formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
 }
