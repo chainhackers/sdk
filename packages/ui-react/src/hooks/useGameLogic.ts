@@ -9,8 +9,10 @@ import { formatGwei, zeroAddress } from "viem"
 import { useAccount } from "wagmi"
 import { useBalanceRefresh, useBalances } from "../context/BalanceContext"
 import { useChain } from "../context/chainContext"
+import { useBettingConfig } from "../context/configContext"
 import { useFreebetsContext } from "../context/FreebetsContext"
 import { useTokenContext } from "../context/tokenContext"
+import { createFreebetStrategy, createPaidBetStrategy } from "../strategies/betStrategies"
 import {
   BetStatus,
   GameChoice,
@@ -154,6 +156,27 @@ export function useGameLogic<T extends GameChoice>({
     setIsSaveLastFreebet,
   } = useFreebetsContext()
 
+  const { affiliate } = useBettingConfig()
+
+  // Create betting strategy based on current state
+  const betStrategy = useMemo(() => {
+    if (!address) return undefined
+
+    if (isUsingFreebet && selectedFreebet) {
+      return createFreebetStrategy<T>({
+        freebet: selectedFreebet,
+        chainId: appChainId,
+      })
+    }
+
+    return createPaidBetStrategy<T>({
+      token,
+      affiliate,
+      connectedAddress: address,
+      chainId: appChainId,
+    })
+  }, [isUsingFreebet, selectedFreebet, token, affiliate, address, appChainId])
+
   const {
     placeBet,
     betStatus,
@@ -162,16 +185,12 @@ export function useGameLogic<T extends GameChoice>({
     vrfFees,
     formattedVrfFees,
     gasPrice,
-  } = usePlaceBet(
+  } = usePlaceBet<T>(
     gameDefinition?.gameType,
     isUsingFreebet && selectedFormattedFreebet?.token ? selectedFormattedFreebet.token : token,
     triggerBalanceRefresh,
     gameDefinition,
-    isUsingFreebet && selectedFreebet ? {
-      type: "freebet",
-      freebet: selectedFreebet,
-      refetchFreebets,
-    } : undefined
+    betStrategy,
   )
 
   // Reset bet state when chain or token changes
@@ -179,6 +198,13 @@ export function useGameLogic<T extends GameChoice>({
   useEffect(() => {
     resetBetState()
   }, [appChainId, token.address, resetBetState])
+
+  // Refetch freebets when a freebet is successfully used
+  useEffect(() => {
+    if (betStatus === 'success' && isUsingFreebet) {
+      refetchFreebets()
+    }
+  }, [betStatus, isUsingFreebet, refetchFreebets])
 
   const gameResult = useMemo((): GameResult | null => {
     if (!rawGameResult || !gameDefinition || !selection) {

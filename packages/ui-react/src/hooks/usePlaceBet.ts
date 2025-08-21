@@ -3,30 +3,22 @@ import {
   CASINO_GAME_TYPE,
   CasinoChainId,
   casinoChainById,
-  GenericCasinoBetParams,
   getPlaceBetEventData,
-  getPlaceBetFunctionData,
   getPlacedBetFromReceipt,
-  getPlaceFreebetFunctionData,
   getRollEventData,
-  SignedFreebet,
 } from "@betswirl/sdk-core"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { decodeEventLog, Hex } from "viem"
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
-import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
 import { BetStatus, GameChoice, GameDefinition, GameResult, TokenWithImage } from "../types/types"
+import { IBetStrategy } from "../types/betStrategy"
 import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
 
 const logger = createLogger("usePlaceBet")
-
-type BetOptions =
-  | { type: "paid" }
-  | { type: "freebet"; freebet: SignedFreebet | null; refetchFreebets?: () => void }
 
 export interface IUsePlaceBetReturn<T extends GameChoice = GameChoice> {
   placeBet: (betAmount: bigint, choice: T) => Promise<void>
@@ -47,14 +39,27 @@ export interface IUsePlaceBetReturn<T extends GameChoice = GameChoice> {
  * Manages transaction submission, VRF fee estimation, and result monitoring.
  *
  * @param game - Type of casino game being played
+ * @param token - Token being used for the bet (for display and balance purposes)
  * @param refetchBalance - Callback to refresh user balance after bet
+ * @param gameDefinition - Game-specific configuration and encoding logic
+ * @param strategy - Strategy object that handles bet transaction preparation
  * @returns Bet placement functions and state including status, VRF fees, and results
  *
  * @example
  * ```ts
+ * const strategy = createPaidBetStrategy({
+ *   token,
+ *   affiliate,
+ *   connectedAddress,
+ *   chainId
+ * })
+ *
  * const { placeBet, betStatus, gameResult } = usePlaceBet(
  *   CASINO_GAME_TYPE.DICE,
- *   refetchBalance
+ *   token,
+ *   refetchBalance,
+ *   gameDefinition,
+ *   strategy
  * )
  *
  * // Place a bet
@@ -66,15 +71,14 @@ export interface IUsePlaceBetReturn<T extends GameChoice = GameChoice> {
  * }
  * ```
  */
-export function usePlaceBet<T extends GameChoice>(
+export function usePlaceBet<T extends GameChoice = GameChoice>(
   game: CASINO_GAME_TYPE | undefined,
   token: TokenWithImage | undefined,
   refetchBalance: () => void,
   gameDefinition?: GameDefinition<T>,
-  options: BetOptions = { type: "paid" },
+  strategy?: IBetStrategy<T>,
 ): IUsePlaceBetReturn<T> {
   const { appChainId } = useChain()
-  const { affiliate } = useBettingConfig()
   const publicClient = usePublicClient({ chainId: appChainId })
   const { address: connectedAddress } = useAccount()
   const wagerWriteHook = useWriteContract()
@@ -146,10 +150,6 @@ export function usePlaceBet<T extends GameChoice>(
       })
 
       refetchBalance()
-
-      if (options.type === "freebet" && options.refetchFreebets) {
-        options.refetchFreebets()
-      }
     } else if (watcherStatus === "error") {
       setInternalError("watcher error")
       logger.debug("watcher: Bet resolved: ERROR from watcher")
@@ -158,7 +158,7 @@ export function usePlaceBet<T extends GameChoice>(
       setInternalError("Result timeout - please check transaction history")
       logger.debug("watcher: Bet resolved: TIMEOUT - exceeded maximum wait time")
     }
-  }, [watcherStatus, watcherGameResult, refetchBalance, options.type])
+  }, [watcherStatus, watcherGameResult, refetchBalance])
 
   const resetBetState = useCallback(() => {
     wagerWriteHook.reset()
@@ -190,74 +190,43 @@ export function usePlaceBet<T extends GameChoice>(
         return
       }
 
-      resetBetState()
+      if (!strategy) {
+        logger.error("placeBet: betting strategy is required")
+        setInternalError("betting strategy is required")
+        return
+      }
 
-      const encodedInput = gameDefinition.encodeInput(choice.choice)
+      resetBetState()
 
       await estimateVrfFeesWagmiHook.refetch()
       logger.debug("placeBet: VRF cost refetched:", formattedVrfFees)
 
-      if (options.type === "paid") {
-        setCurrentBetAmount(betAmount)
+      setCurrentBetAmount(betAmount)
 
-        const betParams = {
-          game,
-          gameEncodedInput: encodedInput,
+      try {
+        logger.debug("placeBet: Starting bet process using strategy")
+
+        // Use strategy to prepare transaction parameters
+        const transactionParams = await strategy.prepare({
           betAmount,
-          tokenAddress: token.address,
-        }
-
-        logger.debug("placeBet: Starting bet process:", {
-          betParams,
-          connectedAddress,
+          choice,
+          vrfFees,
+          gameDefinition,
+          game,
         })
 
-        _submitBetTransaction(
-          betParams,
-          connectedAddress,
-          vrfFees,
-          gasPrice,
-          appChainId,
-          affiliate,
-          wagerWriteHook.writeContract,
-        )
-      } else if (options.type === "freebet") {
-        if (!options.freebet) {
-          logger.error("placeBet: freebet is required for freebet bets")
-          setInternalError("Freebet is required")
-          return
-        }
-
-        setCurrentBetAmount(betAmount)
-
-        const gameEncodedAbiParametersInput = gameDefinition.encodeAbiParametersInput(choice.choice)
-        console.log("gameEncodedAbiParametersInput: ", gameEncodedAbiParametersInput)
-
-        const betParams = {
-          game,
-          gameEncodedAbiParametersInput,
-          freebet: options.freebet,
-        }
-
-        const placeFreebetTxData = getPlaceFreebetFunctionData(betParams, appChainId)
-
+        // Add the current gas price to the transaction
         const wagerWriteParams = {
-          abi: placeFreebetTxData.data.abi,
-          address: placeFreebetTxData.data.to,
-          functionName: placeFreebetTxData.data.functionName,
-          args: placeFreebetTxData.data.args,
-          value: placeFreebetTxData.extraData.getValue(vrfFees),
+          ...transactionParams,
           gasPrice,
           chainId: appChainId,
         }
-        console.log("FEEBET_WRITE_PARAMS: ", wagerWriteParams)
 
-        logger.debug("placeBet: Starting freebet process:", {
-          betParams,
-          connectedAddress,
-        })
-
+        logger.debug("placeBet: Submitting transaction", wagerWriteParams)
         wagerWriteHook.writeContract(wagerWriteParams)
+      } catch (error) {
+        logger.error("placeBet: Error preparing transaction", error)
+        setInternalError(`Transaction preparation failed: ${error}`)
       }
     },
     [
@@ -272,9 +241,8 @@ export function usePlaceBet<T extends GameChoice>(
       vrfFees,
       gasPrice,
       token,
-      affiliate,
       gameDefinition,
-      options,
+      strategy,
     ],
   )
 
@@ -367,29 +335,6 @@ export function usePlaceBet<T extends GameChoice>(
     wagerWriteHook,
     wagerWaitingHook,
   }
-}
-
-async function _submitBetTransaction(
-  betParams: GenericCasinoBetParams,
-  receiver: Hex,
-  vrfCost: bigint,
-  gasPrice: bigint,
-  chainId: CasinoChainId,
-  affiliate: Hex,
-  wagerWriteHook: ReturnType<typeof useWriteContract>["writeContract"],
-) {
-  logger.debug("_submitBetTransaction: Preparing and sending transaction...")
-  // Extract tokenAddress from token for getPlaceBetFunctionData
-  const placeBetTxData = getPlaceBetFunctionData({ ...betParams, receiver, affiliate }, chainId)
-  wagerWriteHook({
-    abi: placeBetTxData.data.abi,
-    address: placeBetTxData.data.to,
-    functionName: placeBetTxData.data.functionName,
-    args: placeBetTxData.data.args,
-    value: placeBetTxData.extraData.getValue(vrfCost),
-    gasPrice,
-    chainId,
-  })
 }
 
 // @Kinco advice. Create a retry system
