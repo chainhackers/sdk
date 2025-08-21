@@ -27,6 +27,8 @@ interface FreebetsContextValue {
   refetchFreebets: () => void
   freebetsError: Error | null
   toggleUsingFreebet: (isUsingFreebet: boolean) => void
+  isSaveLastFreebet: boolean
+  setIsSaveLastFreebet: (isSaveLastFreebet: boolean) => void
 }
 
 const FreebetsContext = createContext<FreebetsContextValue | undefined>(undefined)
@@ -51,6 +53,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { affiliate, freebetsAffiliates, withExternalBankrollFreebets } = useBettingConfig()
   const [selectedFreebet, setSelectedFreebet] = useState<SelectedFreebet | null>(null)
   const [isUsingFreebet, setIsUsingFreebet] = useState(true)
+  const [isSaveLastFreebet, setIsSaveLastFreebet] = useState(false)
 
   const {
     data: freebetsData = { freebets: [], formattedFreebets: [] },
@@ -84,6 +87,10 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: selectedFreebet excluded to prevent infinite loop.
   useEffect(() => {
+    if (isSaveLastFreebet) {
+      return
+    }
+
     const isFreebetsInCurrentChain = formattedFreebetsInCurrentChain.length > 0
     const isSelectedFreebet = selectedFreebet !== null
 
@@ -120,7 +127,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
         setSelectedFreebet(getFirstFreebet())
       }
     }
-  }, [formattedFreebetsInCurrentChain])
+  }, [formattedFreebetsInCurrentChain, isSaveLastFreebet])
 
   async function fetchFreebetsTokens(): Promise<FreebetsData> {
     if (!accountAddress) {
@@ -200,6 +207,8 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       refetchFreebets,
       freebetsError,
       toggleUsingFreebet,
+      isSaveLastFreebet,
+      setIsSaveLastFreebet,
     }),
     [
       freebetsData,
@@ -210,6 +219,8 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       freebetsError,
       isUsingFreebet,
       toggleUsingFreebet,
+      isSaveLastFreebet,
+      setIsSaveLastFreebet,
     ],
   )
 

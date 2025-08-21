@@ -4,7 +4,7 @@ import {
   chainById,
   chainNativeCurrencyToToken,
 } from "@betswirl/sdk-core"
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { formatGwei, zeroAddress } from "viem"
 import { useAccount } from "wagmi"
 import { useBalanceRefresh, useBalances } from "../context/BalanceContext"
@@ -138,7 +138,6 @@ export function useGameLogic<T extends GameChoice>({
   const [selection, setSelection] = useState<T | undefined>(() => {
     return gameDefinition?.defaultSelection as T | undefined
   })
-  const lastFreebetGameResultRef = useRef<GameResult | null>(null)
 
   // Update selection when gameDefinition changes
   React.useEffect(() => {
@@ -157,8 +156,13 @@ export function useGameLogic<T extends GameChoice>({
     gasPrice,
   } = usePlaceBet(gameDefinition?.gameType, token, triggerBalanceRefresh, gameDefinition)
 
-  const { selectedFreebet, selectedFormattedFreebet, refetchFreebets, isUsingFreebet } =
-    useFreebetsContext()
+  const {
+    selectedFreebet,
+    selectedFormattedFreebet,
+    refetchFreebets,
+    isUsingFreebet,
+    setIsSaveLastFreebet,
+  } = useFreebetsContext()
 
   const {
     placeBet: placeFreebet,
@@ -190,35 +194,16 @@ export function useGameLogic<T extends GameChoice>({
   }, [appChainId, token.address, resetBetState, resetFreebetState])
 
   const gameResult = useMemo((): GameResult | null => {
-    if (isUsingFreebet) {
-      if (freebetGameResult && gameDefinition && selection) {
-        const displayResult = gameDefinition.formatDisplayResult(
-          freebetGameResult.rolled,
-          selection.choice,
-        )
-        const formattedGameResult = {
-          ...freebetGameResult,
-          formattedRolled: displayResult,
-        }
-        lastFreebetGameResultRef.current = formattedGameResult
+    const rawGameResult = isUsingFreebet ? freebetGameResult : paidRawGameResult
 
-        return formattedGameResult
-      }
-
-      return lastFreebetGameResultRef.current
-    }
-
-    if (!paidRawGameResult || !gameDefinition || !selection) {
+    if (!rawGameResult || !gameDefinition || !selection) {
       return null
     }
 
-    const displayResult = gameDefinition.formatDisplayResult(
-      paidRawGameResult.rolled,
-      selection.choice,
-    )
+    const displayResult = gameDefinition.formatDisplayResult(rawGameResult.rolled, selection.choice)
 
     return {
-      ...paidRawGameResult,
+      ...rawGameResult,
       formattedRolled: displayResult,
     }
   }, [isUsingFreebet, paidRawGameResult, freebetGameResult, gameDefinition, selection])
@@ -269,8 +254,9 @@ export function useGameLogic<T extends GameChoice>({
         }
       } else if (isInGameResultState) {
         resetFreebetState()
-        lastFreebetGameResultRef.current = null
+        setIsSaveLastFreebet(false)
       } else if (isWalletConnected) {
+        setIsSaveLastFreebet(true)
         placeFreebet(selectedFreebet.amount, selection)
       }
       return

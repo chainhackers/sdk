@@ -11,7 +11,7 @@ import {
   getRollEventData,
   SignedFreebet,
 } from "@betswirl/sdk-core"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { decodeEventLog, Hex } from "viem"
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
@@ -99,7 +99,6 @@ export function usePlaceBet<T extends GameChoice>(
   const [currentBetAmount, setCurrentBetAmount] = useState<bigint | null>(null)
   // @Kinco advice. The goal is to never have an internal error. In the main frontend, it never happens due to retry system, etc (or maybe 1/100000)
   const [internalError, setInternalError] = useState<string | null>(null)
-  const lastBetTokenRef = useRef<TokenWithImage>(null)
 
   const betStatus: BetStatus = useMemo(() => {
     if (internalError) return "internal-error"
@@ -192,8 +191,6 @@ export function usePlaceBet<T extends GameChoice>(
       }
 
       resetBetState()
-
-      lastBetTokenRef.current = token
 
       const encodedInput = gameDefinition.encodeInput(choice.choice)
 
@@ -318,7 +315,7 @@ export function usePlaceBet<T extends GameChoice>(
           wagerWaitingHook.data!,
           game,
           appChainId,
-          lastBetTokenRef.current!,
+          token,
         )
 
         if (!placedBet) {
