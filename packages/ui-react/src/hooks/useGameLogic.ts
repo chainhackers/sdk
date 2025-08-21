@@ -147,16 +147,6 @@ export function useGameLogic<T extends GameChoice>({
   }, [gameDefinition])
 
   const {
-    placeBet,
-    betStatus: paidBetStatus,
-    gameResult: paidRawGameResult,
-    resetBetState,
-    vrfFees,
-    formattedVrfFees,
-    gasPrice,
-  } = usePlaceBet(gameDefinition?.gameType, token, triggerBalanceRefresh, gameDefinition)
-
-  const {
     selectedFreebet,
     selectedFormattedFreebet,
     refetchFreebets,
@@ -165,37 +155,32 @@ export function useGameLogic<T extends GameChoice>({
   } = useFreebetsContext()
 
   const {
-    placeBet: placeFreebet,
-    betStatus: freebetStatus,
-    gameResult: freebetGameResult,
-    resetBetState: resetFreebetState,
-    vrfFees: freebetVrfFees,
-    formattedVrfFees: freebetFormattedVrfFees,
-    gasPrice: freebetGasPrice,
+    placeBet,
+    betStatus,
+    gameResult: rawGameResult,
+    resetBetState,
+    vrfFees,
+    formattedVrfFees,
+    gasPrice,
   } = usePlaceBet(
     gameDefinition?.gameType,
-    selectedFormattedFreebet?.token,
+    isUsingFreebet && selectedFormattedFreebet?.token ? selectedFormattedFreebet.token : token,
     triggerBalanceRefresh,
     gameDefinition,
-    {
+    isUsingFreebet && selectedFreebet ? {
       type: "freebet",
       freebet: selectedFreebet,
       refetchFreebets,
-    },
+    } : undefined
   )
-
-  const betStatus = isUsingFreebet ? freebetStatus : paidBetStatus
 
   // Reset bet state when chain or token changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
   useEffect(() => {
     resetBetState()
-    resetFreebetState()
-  }, [appChainId, token.address, resetBetState, resetFreebetState])
+  }, [appChainId, token.address, resetBetState])
 
   const gameResult = useMemo((): GameResult | null => {
-    const rawGameResult = isUsingFreebet ? freebetGameResult : paidRawGameResult
-
     if (!rawGameResult || !gameDefinition || !selection) {
       return null
     }
@@ -206,7 +191,7 @@ export function useGameLogic<T extends GameChoice>({
       ...rawGameResult,
       formattedRolled: displayResult,
     }
-  }, [isUsingFreebet, paidRawGameResult, freebetGameResult, gameDefinition, selection])
+  }, [rawGameResult, gameDefinition, selection])
 
   const gameContractAddress = gameDefinition
     ? casinoChainById[appChainId]?.contracts.games[gameDefinition.gameType]?.address
@@ -246,18 +231,19 @@ export function useGameLogic<T extends GameChoice>({
     // Don't allow play if we're in loading state or selection is not available
     if (!gameDefinition || !selection) return
 
+    //TODO probably this could be removed when we deal with setIsSaveLastFreebet
     if (selectedFreebet && isUsingFreebet) {
-      if (freebetStatus === "error") {
-        resetFreebetState()
+      if (betStatus === "error") {
+        resetBetState()
         if (isWalletConnected) {
-          placeFreebet(selectedFreebet.amount, selection)
+          placeBet(selectedFreebet.amount, selection)
         }
       } else if (isInGameResultState) {
-        resetFreebetState()
+        resetBetState()
         setIsSaveLastFreebet(false)
       } else if (isWalletConnected) {
         setIsSaveLastFreebet(true)
-        placeFreebet(selectedFreebet.amount, selection)
+        placeBet(selectedFreebet.amount, selection)
       }
       return
     }
@@ -318,9 +304,9 @@ export function useGameLogic<T extends GameChoice>({
     betStatus,
     gameResult,
     resetBetState,
-    vrfFees: isUsingFreebet ? freebetVrfFees : vrfFees,
-    formattedVrfFees: isUsingFreebet ? freebetFormattedVrfFees : formattedVrfFees,
-    gasPrice: isUsingFreebet ? formatGwei(freebetGasPrice) : formatGwei(gasPrice),
+    vrfFees,
+    formattedVrfFees,
+    gasPrice: formatGwei(gasPrice),
     targetPayoutAmount: netPayout,
     formattedNetMultiplier: formattedNetMultiplier,
     grossMultiplier,
@@ -330,10 +316,7 @@ export function useGameLogic<T extends GameChoice>({
     themeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
-    placeBet: (betAmount: bigint, choice: T) =>
-      isUsingFreebet && selectedFreebet
-        ? placeFreebet(selectedFreebet.amount, choice)
-        : placeBet(betAmount, choice),
+    placeBet,
     needsTokenApproval,
     isApprovePending: approveWriteWagmiHook.isPending,
     isApproveConfirming: approveWaitingWagmiHook.isLoading,
