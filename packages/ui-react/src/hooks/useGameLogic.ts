@@ -119,7 +119,6 @@ export function useGameLogic<T extends GameChoice>({
     selectedFreebet,
     refetchFreebets,
     isUsingFreebet,
-    setIsSaveLastFreebet,
   } = useFreebetsContext()
 
   const isReady = !!gameDefinition
@@ -252,7 +251,6 @@ export function useGameLogic<T extends GameChoice>({
     // Don't allow play if we're in loading state or selection is not available
     if (!gameDefinition || !selection) return
 
-    //TODO probably this could be removed when we deal with setIsSaveLastFreebet
     if (selectedFreebet && isUsingFreebet) {
       if (betStatus === "error") {
         resetBetState()
@@ -261,9 +259,7 @@ export function useGameLogic<T extends GameChoice>({
         }
       } else if (isInGameResultState) {
         resetBetState()
-        setIsSaveLastFreebet(false)
       } else if (isWalletConnected) {
-        setIsSaveLastFreebet(true)
         placeBet(selectedFreebet.amount, selection)
       }
       return

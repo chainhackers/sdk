@@ -28,8 +28,6 @@ interface FreebetsContextValue {
   refetchFreebets: () => void
   freebetsError: Error | null
   toggleUsingFreebet: (isUsingFreebet: boolean) => void
-  isSaveLastFreebet: boolean
-  setIsSaveLastFreebet: (isSaveLastFreebet: boolean) => void
 }
 
 const FreebetsContext = createContext<FreebetsContextValue | undefined>(undefined)
@@ -55,7 +53,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { affiliate, freebetsAffiliates, withExternalBankrollFreebets } = useBettingConfig()
   const [selectedFreebet, setSelectedFreebet] = useState<SelectedFreebet | null>(null)
   const [isUsingFreebet, setIsUsingFreebet] = useState(true)
-  const [isSaveLastFreebet, setIsSaveLastFreebet] = useState(false)
 
   const {
     data: freebetsData = { freebets: [], formattedFreebets: [] },
@@ -86,6 +83,53 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
 
     return filteredFreebets
   }, [freebetsData.formattedFreebets, appChainId])
+
+  // Automatically manage freebet selection based on available freebets and user intention
+  useEffect(() => {
+    const isFreebetsInCurrentChain = formattedFreebetsInCurrentChain.length > 0
+    const isSelectedFreebet = selectedFreebet !== null
+
+    const getFirstFreebet = () => {
+      const freebet = freebetsData.freebets.find(
+        (freebet) => freebet.chainId === formattedFreebetsInCurrentChain[0].chainId,
+      )
+      if (!freebet) {
+        return null
+      }
+
+      return {
+        freebet,
+        formattedFreebet: formattedFreebetsInCurrentChain[0],
+      }
+    }
+
+    // If no freebets available in current chain, clear selection
+    if (!isFreebetsInCurrentChain && isSelectedFreebet) {
+      setSelectedFreebet(null)
+      return
+    }
+
+    // If freebets available, user wants to use freebets, but none selected - select first
+    if (isFreebetsInCurrentChain && isUsingFreebet && !isSelectedFreebet) {
+      setSelectedFreebet(getFirstFreebet())
+      return
+    }
+
+    // If selected freebet is no longer valid, try to select another one if using freebets
+    if (isFreebetsInCurrentChain && isSelectedFreebet) {
+      const isSelectedStillValid = formattedFreebetsInCurrentChain.some(
+        (freebet) => freebet.id.toString() === selectedFreebet.freebet.id.toString(),
+      )
+
+      if (!isSelectedStillValid) {
+        if (isUsingFreebet) {
+          setSelectedFreebet(getFirstFreebet())
+        } else {
+          setSelectedFreebet(null)
+        }
+      }
+    }
+  }, [formattedFreebetsInCurrentChain, isUsingFreebet, freebetsData.freebets])
 
   async function fetchFreebetsTokens(): Promise<FreebetsData> {
     if (!accountAddress) {
@@ -136,46 +180,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     [freebetsData, appChainId, switchAppChain, setSelectedToken],
   )
 
-  useEffect(() => {
-    if (isSaveLastFreebet) {
-      return
-    }
-
-    const isFreebetsInCurrentChain = formattedFreebetsInCurrentChain.length > 0
-    const isSelectedFreebet = selectedFreebet !== null
-
-    if (!isFreebetsInCurrentChain && isSelectedFreebet) {
-      setSelectedFreebet(null)
-      return
-    }
-
-    if (isFreebetsInCurrentChain && isUsingFreebet && !isSelectedFreebet) {
-      const firstFreebetId = formattedFreebetsInCurrentChain[0].id
-      selectFreebetById(firstFreebetId)
-      return
-    }
-
-    if (isFreebetsInCurrentChain && isSelectedFreebet) {
-      const isSelectedStillValid = formattedFreebetsInCurrentChain.some(
-        (fb) => fb.id === selectedFreebet.formattedFreebet.id,
-      )
-      if (!isSelectedStillValid) {
-        if (isUsingFreebet) {
-          const firstFreebetId = formattedFreebetsInCurrentChain[0].id
-          selectFreebetById(firstFreebetId)
-        } else {
-          setSelectedFreebet(null)
-        }
-      }
-    }
-  }, [
-    formattedFreebetsInCurrentChain,
-    isSaveLastFreebet,
-    selectedFreebet,
-    selectFreebetById,
-    isUsingFreebet,
-  ])
-
   const toggleUsingFreebet = useCallback((isUsingFreebet: boolean) => {
     setIsUsingFreebet(isUsingFreebet)
 
@@ -210,8 +214,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       refetchFreebets,
       freebetsError,
       toggleUsingFreebet,
-      isSaveLastFreebet,
-      setIsSaveLastFreebet,
     }),
     [
       freebetsData,
@@ -222,8 +224,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       freebetsError,
       isUsingFreebet,
       toggleUsingFreebet,
-      isSaveLastFreebet,
-      setIsSaveLastFreebet,
     ],
   )
 
