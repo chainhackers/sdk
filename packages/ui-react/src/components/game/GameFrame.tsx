@@ -332,6 +332,7 @@ function LeaderboardButton({ className }: LeaderboardButtonProps) {
         <Button
           variant="iconTransparent"
           size="iconRound"
+          aria-label="Open Leaderboard"
           className={cn(
             "group",
             "h-[40px] w-[40px]",

@@ -1,221 +1,97 @@
-import { type CasinoChainId } from "@betswirl/sdk-core"
-import { useMemo, useState } from "react"
-import { getTokenImage } from "../lib/utils"
-import { type LeaderboardItem, type TokenWithImage } from "../types/types"
+import { LEADERBOARD_STATUS } from "@betswirl/sdk-core"
+import { useQuery } from "@tanstack/react-query"
+import { createPublicClient, http } from "viem"
+import { useAccount } from "wagmi"
+import { useChain } from "../context/chainContext"
+import { useBettingConfig } from "../context/configContext"
+import {
+  type EnrichedLeaderboard,
+  fetchAndEnrichLeaderboardsForAllChains,
+} from "../data/leaderboardQueries"
+import { type LeaderboardItemWithEnriched } from "../types/types"
+import { mapLeaderboardToItem } from "../utils/leaderboardUtils"
 
 interface UseLeaderboardsResult {
-  ongoingLeaderboards: LeaderboardItem[]
-  endedLeaderboards: LeaderboardItem[]
-  showPartner: boolean
-  setShowPartner: (show: boolean) => void
+  ongoingLeaderboards: LeaderboardItemWithEnriched[]
+  endedLeaderboards: LeaderboardItemWithEnriched[]
   isLoading: boolean
   error: Error | null
 }
 
-// Mock token data
-const MOCK_BETS_TOKEN: TokenWithImage = {
-  address: "0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5",
-  symbol: "BETS",
-  decimals: 18,
-  image: getTokenImage("BETS"),
-}
+/**
+ * Hook to fetch and manage leaderboards data from all supported chains
+ * Uses TanStack Query for caching and automatic refetching
+ * This hook serves as the Single Source of Truth (SSoT) for all leaderboards data
+ * @param showPartner - Whether to show partner leaderboards
+ */
+export function useLeaderboards(showPartner: boolean): UseLeaderboardsResult {
+  const { availableChains } = useChain()
+  const { affiliate } = useBettingConfig()
+  const { address } = useAccount()
 
-// Mock leaderboard data
-const MOCK_LEADERBOARDS: LeaderboardItem[] = [
-  {
-    id: "1",
-    rank: 1,
-    title: "Avalanche - July",
-    chainId: 43114 as CasinoChainId, // Avalanche
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ongoing",
-    badgeStatus: "pending",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 175,
-    isPartner: false,
-    userAction: { type: "play" },
-  },
-  {
-    id: "2",
-    rank: 2,
-    title: "Ethereum - July",
-    chainId: 1 as CasinoChainId, // Ethereum
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ongoing",
-    badgeStatus: "pending",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 1756,
-    isPartner: false,
-    userAction: { type: "claim", amount: "0.0001", tokenSymbol: "Avax" },
-  },
-  {
-    id: "3",
-    rank: 1,
-    title: "BNB - July",
-    chainId: 56 as CasinoChainId, // BNB Smart Chain
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ongoing",
-    badgeStatus: "pending",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 175234,
-    isPartner: false,
-    userAction: { type: "play" },
-  },
-  {
-    id: "4",
-    rank: 1,
-    title: "Ethereum - July",
-    chainId: 1 as CasinoChainId, // Ethereum
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ended",
-    badgeStatus: "expired",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 17500,
-    isPartner: false,
-    userAction: { type: "overview" },
-  },
-  {
-    id: "5",
-    rank: 1,
-    title: "Avalanche - July",
-    chainId: 43114 as CasinoChainId, // Avalanche
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ended",
-    badgeStatus: "expired",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 175,
-    isPartner: false,
-    userAction: { type: "overview" },
-  },
-  {
-    id: "6",
-    rank: 1,
-    title: "BNB - July",
-    chainId: 56 as CasinoChainId, // BNB Smart Chain
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ended",
-    badgeStatus: "expired",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "5000000",
-    },
-    participants: 17,
-    isPartner: false,
-    userAction: { type: "overview" },
-  },
-  {
-    id: "7",
-    rank: 1,
-    title: "Partner Leaderboard - Special",
-    chainId: 137 as CasinoChainId, // Polygon
-    startDate: "2024-07-01T00:00:00Z",
-    endDate: "2024-07-31T00:00:00Z",
-    status: "ongoing",
-    badgeStatus: "pending",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "10000000",
-    },
-    participants: 500,
-    isPartner: true,
-    userAction: { type: "play" },
-  },
-  {
-    id: "8",
-    rank: 3,
-    title: "Arbitrum - July",
-    chainId: 42161 as CasinoChainId, // Arbitrum
-    startDate: "2024-07-09T00:00:00Z",
-    endDate: "2024-08-09T00:00:00Z",
-    status: "ongoing",
-    badgeStatus: "pending",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "3000000",
-    },
-    participants: 892,
-    isPartner: false,
-    userAction: { type: "play" },
-  },
-  {
-    id: "9",
-    rank: 1,
-    title: "Optimism - June",
-    chainId: 10 as CasinoChainId, // Optimism
-    startDate: "2024-06-01T00:00:00Z",
-    endDate: "2024-06-30T00:00:00Z",
-    status: "ended",
-    badgeStatus: "expired",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "7500000",
-    },
-    participants: 3421,
-    isPartner: false,
-    userAction: { type: "overview" },
-  },
-  {
-    id: "10",
-    rank: 2,
-    title: "Base - June",
-    chainId: 8453 as CasinoChainId, // Base
-    startDate: "2024-06-01T00:00:00Z",
-    endDate: "2024-06-30T00:00:00Z",
-    status: "ended",
-    badgeStatus: "expired",
-    prize: {
-      token: MOCK_BETS_TOKEN,
-      amount: "2500000",
-    },
-    participants: 1234,
-    isPartner: false,
-    userAction: { type: "overview" },
-  },
-]
+  // Get supported chain IDs from available chains
+  const supportedChains = availableChains.map((chain) => chain.id)
 
-export function useLeaderboards(): UseLeaderboardsResult {
-  const [showPartner, setShowPartner] = useState(false)
-  const [isLoading] = useState(false)
-  const [error] = useState<Error | null>(null)
+  const {
+    data: enrichedLeaderboards,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["leaderboards", "all-chains", address, showPartner],
+    queryFn: async (): Promise<EnrichedLeaderboard[]> => {
+      const publicClients = new Map()
 
-  const { ongoingLeaderboards, endedLeaderboards } = useMemo(() => {
-    const filteredLeaderboards = showPartner
-      ? MOCK_LEADERBOARDS
-      : MOCK_LEADERBOARDS.filter((lb) => !lb.isPartner)
+      for (const chain of availableChains) {
+        const publicClient = createPublicClient({
+          chain: chain.viemChain,
+          transport: http(),
+        })
+        publicClients.set(chain.id, publicClient)
+      }
 
-    const ongoing = filteredLeaderboards.filter((lb) => lb.status === "ongoing")
-    const ended = filteredLeaderboards.filter((lb) => lb.status === "ended")
+      return fetchAndEnrichLeaderboardsForAllChains({
+        publicClients,
+        supportedChains,
+        address,
+        affiliate,
+        showPartner,
+      })
+    },
+    refetchInterval: 30000,
+    enabled: supportedChains.length > 0,
+  })
 
-    return { ongoingLeaderboards: ongoing, endedLeaderboards: ended }
-  }, [showPartner])
+  if (!enrichedLeaderboards) {
+    return {
+      ongoingLeaderboards: [],
+      endedLeaderboards: [],
+      isLoading,
+      error: error as Error | null,
+    }
+  }
+
+  const itemsWithEnriched = enrichedLeaderboards.map(
+    (enriched): LeaderboardItemWithEnriched => ({
+      item: mapLeaderboardToItem(enriched, address, {
+        claimableAmount: enriched.claimableAmount,
+      }),
+      enriched,
+    }),
+  )
+
+  const ongoingLeaderboards = itemsWithEnriched.filter((item) =>
+    [LEADERBOARD_STATUS.PENDING, LEADERBOARD_STATUS.NOT_STARTED].includes(item.item.status),
+  )
+  const endedLeaderboards = itemsWithEnriched.filter((item) =>
+    [LEADERBOARD_STATUS.ENDED, LEADERBOARD_STATUS.FINALIZED, LEADERBOARD_STATUS.EXPIRED].includes(
+      item.item.status,
+    ),
+  )
 
   return {
     ongoingLeaderboards,
     endedLeaderboards,
-    showPartner,
-    setShowPartner,
     isLoading,
-    error,
+    error: error as Error | null,
   }
 }

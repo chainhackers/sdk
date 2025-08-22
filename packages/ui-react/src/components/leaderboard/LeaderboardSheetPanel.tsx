@@ -11,19 +11,27 @@ interface LeaderboardSheetPanelProps {
 
 export function LeaderboardSheetPanel({ portalContainer }: LeaderboardSheetPanelProps) {
   const [viewingLeaderboardId, setViewingLeaderboardId] = useState<string | null>(null)
+  const [showPartner, setShowPartner] = useState(false)
 
   return (
     <SheetPortal container={portalContainer}>
       <SheetOverlay className="!absolute !inset-0 !bg-black/60" />
       <SheetBottomPanelContent className={cn("!h-[70%]", "!max-h-full", "p-0")}>
-        <ScrollArea className="h-full w-full rounded-t-[16px] overflow-hidden">
+        <ScrollArea
+          key={viewingLeaderboardId || "list-view"}
+          className="h-full w-full rounded-t-[16px] overflow-hidden"
+        >
           {viewingLeaderboardId ? (
             <LeaderboardOverview
               leaderboardId={viewingLeaderboardId}
               onBack={() => setViewingLeaderboardId(null)}
             />
           ) : (
-            <LeaderboardsView onViewOverview={setViewingLeaderboardId} />
+            <LeaderboardsView
+              onViewOverview={setViewingLeaderboardId}
+              showPartner={showPartner}
+              setShowPartner={setShowPartner}
+            />
           )}
         </ScrollArea>
       </SheetBottomPanelContent>

@@ -1,14 +1,22 @@
+import { LEADERBOARD_STATUS } from "@betswirl/sdk-core"
 import { AlertCircle, ChevronLeft, ExternalLink, InfoIcon, StarIcon } from "lucide-react"
+import { useEffect, useState } from "react"
 import { useLeaderboardDetails } from "../../hooks/useLeaderboardDetails"
 import { getChainName } from "../../lib/chainIcons"
 import { getBlockExplorerUrl } from "../../lib/chainUtils"
 import { cn } from "../../lib/utils"
 import type { RankingEntry } from "../../types/types"
+import {
+  generateCasinoExamplesText,
+  generateCasinoRulesText,
+} from "../../utils/leaderboardRulesUtils"
+import { formatLeaderboardStatus, mapRankingToEntry } from "../../utils/leaderboardUtils"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
+import { LeaderboardActionButton } from "./LeaderboardActionButton"
 import { LeaderboardRankingTab } from "./LeaderboardRankingTab"
 
 interface LeaderboardOverviewProps {
@@ -17,71 +25,57 @@ interface LeaderboardOverviewProps {
 }
 
 export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOverviewProps) {
-  const { data } = useLeaderboardDetails(leaderboardId)
+  const { data, isLoading, refetch } = useLeaderboardDetails(leaderboardId)
+  const [rankingData, setRankingData] = useState<RankingEntry[]>([])
 
-  // Mock ranking data - replace with actual data when available
-  const avaxToken: RankingEntry["rewardToken"] = {
-    symbol: "Avax",
-    address: "0x0000000000000000000000000000000000000000",
-    decimals: 18,
-    image: "https://www.betswirl.com/img/tokens/AVAX.svg",
+  useEffect(() => {
+    if (data?.enriched) {
+      if (data.enriched.rankings && data.enriched.rankings.length > 0) {
+        const mappedRankings = data.enriched.rankings.map((ranking) =>
+          mapRankingToEntry(ranking, data.enriched),
+        )
+        setRankingData(mappedRankings)
+      } else {
+        setRankingData([])
+      }
+    } else {
+      setRankingData([])
+    }
+  }, [data])
+
+  if (isLoading) {
+    return (
+      <div className="h-[calc(70vh-32px)] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-text-on-surface-variant border-t-transparent" />
+      </div>
+    )
   }
-
-  const mockRankingData: RankingEntry[] = [
-    {
-      rank: 1,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 3657854,
-      rewardAmount: "20 000",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 2,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 3657854,
-      rewardAmount: "19886",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 3,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 3657854,
-      rewardAmount: "<0.001",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 17,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 151260,
-      rewardAmount: "1456",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 32,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 43667,
-      rewardAmount: "143",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 78,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 54432,
-      rewardAmount: "140",
-      rewardToken: avaxToken,
-    },
-    {
-      rank: 100,
-      playerAddress: "0x3Fb634...65e43EC",
-      points: 13342,
-      rewardAmount: "0",
-      rewardToken: avaxToken,
-    },
-  ]
 
   if (!data) return null
 
-  const contractUrl = getBlockExplorerUrl(data.chainId, data.userStats.contractAddress)
+  const overviewData = data.overview
+  const enrichedLeaderboard = data.enriched
+
+  const contractUrl = getBlockExplorerUrl(
+    overviewData.chainId,
+    overviewData.userStats.contractAddress,
+  )
+
+  const rulesParams = enrichedLeaderboard?.casinoRules
+    ? {
+        rules: enrichedLeaderboard.casinoRules,
+        chainId: overviewData.chainId,
+        wageredSymbol: enrichedLeaderboard.wageredSymbol as string,
+        wageredDecimals: enrichedLeaderboard.wageredDecimals as number,
+      }
+    : null
+  const ruleItems = rulesParams ? generateCasinoRulesText(rulesParams) : []
+  const exampleItems = rulesParams ? generateCasinoExamplesText(rulesParams) : []
+
+  const isEnded =
+    overviewData.userStats.status === LEADERBOARD_STATUS.FINALIZED ||
+    overviewData.userStats.status === LEADERBOARD_STATUS.EXPIRED ||
+    overviewData.userStats.status === LEADERBOARD_STATUS.ENDED
 
   return (
     <div className="flex flex-col h-full">
@@ -90,8 +84,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
           <ChevronLeft size={18} />
         </Button>
         <div className="flex items-center gap-2">
-          <ChainIcon chainId={data.chainId} size={18} />
-          <h2 className="text-[18px] font-semibold">{data.title}</h2>
+          <h2 className="text-[18px] font-semibold">{overviewData.title}</h2>
         </div>
       </div>
 
@@ -114,20 +107,28 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
             <div className="pb-4 px-4 pt-1 flex flex-col gap-4">
               {/* Status and user stats card */}
               <div className="bg-free-bet-card-section-bg rounded-[12px] p-3 flex flex-col gap-3">
-                <div className="text-[12px] text-roulette-disabled-text">
-                  Status:{" "}
-                  <span className="px-2 py-0.5 rounded-[8px] border text-[11px] border-roulette-disabled-text">
-                    {data.userStats.status}
+                <div className="text-[12px] text-roulette-disabled-text flex items-center gap-2">
+                  <span>Status:</span>
+                  <span
+                    className={cn(
+                      "px-2 py-0.5 rounded-[8px] text-[11px] border",
+                      !isEnded && "text-primary border-primary",
+                      isEnded && "text-roulette-disabled-text border-roulette-disabled-text",
+                    )}
+                  >
+                    {formatLeaderboardStatus(overviewData.userStats.status)}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <div className="text-[12px] text-roulette-disabled-text">Your position:</div>
-                    <div className="text-[16px] font-semibold">#{data.userStats.position}</div>
+                    <div className="text-[16px] font-semibold">
+                      #{overviewData.userStats.position}
+                    </div>
                   </div>
                   <div>
                     <div className="text-[12px] text-roulette-disabled-text">Your points:</div>
-                    <div className="text-[16px] font-semibold">{data.userStats.points}</div>
+                    <div className="text-[16px] font-semibold">{overviewData.userStats.points}</div>
                   </div>
                 </div>
                 <div className="w-full h-[1px] bg-leaderboard-separator" />
@@ -138,23 +139,21 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                     </div>
                     <div className="flex items-center gap-2">
                       <img
-                        src={data.prize.token.image}
-                        alt={data.userStats.prize.tokenSymbol}
+                        src={overviewData.prize.token.image}
+                        alt={overviewData.userStats.prize.tokenSymbol}
                         className="w-5 h-5"
                       />
-                      <div className="text-[16px] font-semibold">{data.userStats.prize.amount}</div>
+                      <div className="text-[16px] font-semibold">
+                        {overviewData.userStats.prize.amount}
+                      </div>
                     </div>
                   </div>
-                  <Button
-                    className={cn(
-                      "bg-primary hover:bg-primary/90",
-                      "text-white font-semibold",
-                      "rounded-[8px] h-[32px] px-4 py-1.5 w-fit",
-                      "text-[12px] leading-[20px]",
-                    )}
-                  >
-                    Claim {data.userStats.prize.amount} {data.userStats.prize.tokenSymbol}
-                  </Button>
+                  <LeaderboardActionButton
+                    leaderboard={enrichedLeaderboard}
+                    userAction={overviewData.userAction}
+                    onClaimSuccess={() => refetch()}
+                    className="w-fit px-4 py-1.5"
+                  />
                 </div>
                 {contractUrl ? (
                   <a
@@ -179,50 +178,54 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
                 <div className="flex items-center gap-2">
                   <h3 className="text-[16px] leading-[24px] font-semibold">Rules</h3>
                   <div className="flex items-center gap-2 ml-auto">
-                    <ChainIcon chainId={data.chainId} size={18} />
+                    <ChainIcon chainId={overviewData.chainId} size={18} />
                     <span className="text-[12px] leading-[20px] text-roulette-disabled-text">
-                      {getChainName(data.chainId).charAt(0).toUpperCase() +
-                        getChainName(data.chainId).slice(1)}
+                      {getChainName(overviewData.chainId).charAt(0).toUpperCase() +
+                        getChainName(overviewData.chainId).slice(1)}
                     </span>
                   </div>
                 </div>
-                <ul className="flex flex-col gap-2">
-                  {data.rules[0]?.isHighlighted && (
-                    <Alert variant="info">
-                      <AlertCircle className="h-[16px] w-[16px]" />
-                      <AlertDescription className="text-[12px] leading-[20px]">
-                        {
-                          "A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking."
-                        }
-                      </AlertDescription>
-                    </Alert>
-                  )}
+                <div className="flex flex-col gap-2">
+                  <Alert variant="info">
+                    <AlertCircle className="h-[16px] w-[16px]" />
+                    <AlertDescription className="text-[12px] leading-[20px]">
+                      {
+                        "A bet must be placed and rolled (not only placed) before end date to be taken into account in the ranking."
+                      }
+                    </AlertDescription>
+                  </Alert>
                   <ul className="flex flex-col gap-2">
                     <li className="text-[14px] leading-[22px] text-foreground">
                       <strong>The competition is scored using a point system:</strong>
                     </li>
-                    <li className="text-[14px] leading-[22px] text-foreground ml-4">
-                      • You have to play on the dice or cointoss or roulette or keno or wheel games
-                      and on the chain Base
-                    </li>
-                    <li className="text-[14px] leading-[22px] text-foreground ml-4">
-                      • You have to play with BETS tokens
-                    </li>
-                    <li className="text-[14px] leading-[22px] text-foreground ml-4">
-                      • You earn 100 points per interval of 100 BETS
-                    </li>
-                    <li className="text-[14px] leading-[22px] text-foreground">
-                      <strong>Example 1:</strong> You bet 300 BETS at dice ⇒ You earn 300 points
-                    </li>
-                    <li className="text-[14px] leading-[22px] text-foreground">
-                      <strong>Example 2:</strong> You bet 1050 BETS at cointoss ⇒ You earn 1000
-                      points
-                    </li>
+                    {ruleItems.map((text, idx) => (
+                      <li
+                        // biome-ignore lint/suspicious/noArrayIndexKey: Rule items are positionally keyed; array length is fixed
+                        key={idx}
+                        className="text-[14px] leading-[22px] text-foreground ml-4"
+                      >
+                        • {text}
+                      </li>
+                    ))}
+                    {exampleItems.map((text, idx) => {
+                      const parts = text.split(": ")
+                      const title = parts[0] || `Example ${idx + 1}`
+                      const rest = parts.slice(1).join(": ")
+                      return (
+                        <li
+                          // biome-ignore lint/suspicious/noArrayIndexKey: Example items are positionally keyed; array length is fixed
+                          key={idx}
+                          className="text-[14px] leading-[22px] text-foreground"
+                        >
+                          <strong>{title}:</strong> {rest}
+                        </li>
+                      )
+                    })}
                   </ul>
-                </ul>
+                </div>
               </div>
 
-              {data.isExpired && (
+              {overviewData.userStats.status === LEADERBOARD_STATUS.EXPIRED && (
                 <Alert variant="warning">
                   <AlertCircle className="h-[16px] w-[16px]" />
                   <AlertTitle className="text-[14px] leading-[22px] font-medium">
@@ -241,10 +244,15 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
           <ScrollArea className="h-full">
             <div className="pb-4 px-4 pt-1">
               <LeaderboardRankingTab
-                rankingData={mockRankingData}
-                lastUpdate="Last update: 21 days ago (refreshed once per hour)"
-                claimableAmount="<0.0001"
-                claimableTokenSymbol="Avax"
+                rankingData={rankingData}
+                lastUpdate="Last update: recently (refreshed once per hour)"
+                claimableAmount={
+                  Number.isFinite(Number(overviewData.userStats.prize.amount))
+                    ? Number.parseFloat(overviewData.userStats.prize.amount)
+                    : 0
+                }
+                claimableTokenSymbol={overviewData.userStats.prize.tokenSymbol}
+                leaderboardStatus={overviewData.userStats.status}
               />
             </div>
           </ScrollArea>

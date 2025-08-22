@@ -9,6 +9,8 @@ import {
   DiceNumber,
   KenoBall,
   KenoEncodedInput,
+  LEADERBOARD_STATUS,
+  type Leaderboard,
   RouletteEncodedInput,
   RouletteNumber,
   type Token,
@@ -17,6 +19,7 @@ import {
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
 import { Hex } from "viem"
+import type { EnrichedLeaderboard } from "../data/leaderboardQueries"
 
 export type Theme = "light" | "dark" | "system"
 
@@ -104,15 +107,11 @@ export interface GameDefinition<T extends GameChoice> {
   formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
 }
 
-// Leaderboard types
-export type LeaderboardStatus = "ongoing" | "ended"
-
-export type LeaderboardBadgeStatus = "pending" | "expired"
-
 export type LeaderboardUserAction =
   | { type: "play" }
   | { type: "overview" }
   | { type: "claim"; amount: string; tokenSymbol: string }
+  | { type: "claimed"; amount: string; tokenSymbol: string }
   | { type: "none" }
 
 export interface LeaderboardPrize {
@@ -122,13 +121,12 @@ export interface LeaderboardPrize {
 
 export interface LeaderboardItem {
   id: string
-  rank: number
+  userRank: number | null
   title: string
   chainId: CasinoChainId
   startDate: string // ISO 8601 format
   endDate: string // ISO 8601 format
-  status: LeaderboardStatus
-  badgeStatus?: LeaderboardBadgeStatus
+  status: LEADERBOARD_STATUS
   prize: LeaderboardPrize
   participants: number
   isPartner: boolean
@@ -137,7 +135,7 @@ export interface LeaderboardItem {
 
 // Additional types for detailed leaderboard overview view
 export interface LeaderboardUserStats {
-  status: "Finalized" | "Ongoing" | "Claimable"
+  status: LEADERBOARD_STATUS
   position: number
   points: number
   prize: {
@@ -148,15 +146,8 @@ export interface LeaderboardUserStats {
   contractAddress: string
 }
 
-export interface LeaderboardRule {
-  text: string
-  isHighlighted?: boolean
-}
-
 export interface LeaderboardOverviewData extends LeaderboardItem {
   userStats: LeaderboardUserStats
-  rules: LeaderboardRule[]
-  isExpired: boolean
 }
 
 // Types for ranking tab
@@ -175,4 +166,14 @@ export interface FreeBet {
   chainId: CasinoChainId
   expiresAt?: string
   title?: string
+}
+
+export interface LeaderboardItemWithRaw {
+  item: LeaderboardItem
+  raw: Leaderboard
+}
+
+export interface LeaderboardItemWithEnriched {
+  item: LeaderboardItem
+  enriched: EnrichedLeaderboard
 }

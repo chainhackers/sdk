@@ -67,6 +67,17 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
     return stored || validatedInitialChainId
   })
 
+  // Sync with localStorage on client-side hydration.
+  // This is necessary for SSR frameworks like Next.js where localStorage is not available on the server.
+  // The state is initialized with a default on the server, and this effect corrects it on the client.
+  useEffect(() => {
+    const storedChainId = getStoredChainId()
+
+    if (storedChainId && storedChainId !== appChainId) {
+      setAppChainId(storedChainId)
+    }
+  }, [getStoredChainId, appChainId])
+
   // Get available chain objects
   const availableChains = useMemo(
     () => availableChainIds.map((id) => casinoChainById[id]),

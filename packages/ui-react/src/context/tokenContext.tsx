@@ -83,13 +83,13 @@ export function TokenProvider({ children }: TokenProviderProps) {
       // Token is not valid for new chain, need to select a new one
     }
 
-    // Default to native token of the current chain if no stored token
+    // Default to native token of the current chain
     const nativeToken = activeTokens.find((token) => token.address === zeroAddress)
     if (!nativeToken) {
       console.warn(`No native token found for chain ${appChainId}`)
       return
     }
-    setSelectedTokenInternal(nativeToken ?? selectedToken)
+    setSelectedTokenInternal(nativeToken)
   }, [activeTokens, tokensLoading, appChainId, selectedToken])
 
   const setSelectedToken = (token: TokenWithImage) => {

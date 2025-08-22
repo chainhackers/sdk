@@ -44,7 +44,8 @@
     "test:wheel": "pnpm exec playwright test tests/wheel.spec.ts --reporter=line",
     "test:chain-switching": "pnpm exec playwright test tests/chainSwitching.spec.ts --reporter=line",
     "test:token-selection": "pnpm exec playwright test tests/tokenSelection.spec.ts --reporter=line",
-    "test:chain-token-list": "pnpm exec playwright test tests/chainTokenList.spec.ts --reporter=line"
+    "test:chain-token-list": "pnpm exec playwright test tests/chainTokenList.spec.ts --reporter=line",
+    "test:leaderboard": "pnpm exec playwright test tests/leaderboard.spec.ts --reporter=line"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
