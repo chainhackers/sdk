@@ -51,7 +51,7 @@ export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
       props.betCount,
       appChainId,
     )
-  }, [props.game, props.token?.address, props.betCount, appChainId])
+  }, [props.game, props.token, props.betCount, appChainId])
 
   const vrfEstimateQuery = useCall({
     account: wrappedGasTokenById[appChainId], // Trick to avoid insufficient funds for gas error

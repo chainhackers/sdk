@@ -75,12 +75,7 @@ export function BettingPanel({
   const [isFreeBetSheetOpen, setIsFreeBetSheetOpen] = useState(false)
   const [isFreebetsHubOpen, setIsFreebetsHubOpen] = useState(false)
   const [wasFreebetsHubOpenBeforeWallet, setWasFreebetsHubOpenBeforeWallet] = useState(false)
-  const {
-    freebets,
-    selectedFreebet,
-    selectFreebetById,
-    isUsingFreebet,
-  } = useFreebetsContext()
+  const { freebets, selectedFreebet, selectFreebetById, isUsingFreebet } = useFreebetsContext()
   const [isBetInputValid, setIsBetInputValid] = useState<boolean>(true)
 
   // Track previous values to detect actual changes
@@ -158,12 +153,13 @@ export function BettingPanel({
     !isMounted || !isConnected || isWaiting || isBetSuccess || isApprovingToken
   const isChainSwitchingDisabled = !isMounted || isWaiting || isBetSuccess || isApprovingToken
 
-  const isPlayButtonDisabled: boolean = !isBetSuccess && (
-    !isBetInputValid ||
-    isWalletConnecting ||
-    isWaiting ||
-    (!canInitiateBet && !needsTokenApproval && areChainsSynced) ||
-    isApprovingToken)
+  const isPlayButtonDisabled: boolean =
+    !isBetSuccess &&
+    (!isBetInputValid ||
+      isWalletConnecting ||
+      isWaiting ||
+      (!canInitiateBet && !needsTokenApproval && areChainsSynced) ||
+      isApprovingToken)
 
   let playButtonText: string
   if (!isBetInputValid) {

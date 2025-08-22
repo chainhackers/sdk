@@ -12,8 +12,8 @@ import { decodeEventLog, Hex } from "viem"
 import { useAccount, usePublicClient, useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { createLogger } from "../lib/logger"
-import { BetStatus, GameChoice, GameDefinition, GameResult, TokenWithImage } from "../types/types"
 import { IBetStrategy } from "../types/betStrategy"
+import { BetStatus, GameChoice, GameDefinition, GameResult, TokenWithImage } from "../types/types"
 import type { WatchTarget } from "./types"
 import { useBetResultWatcher } from "./useBetResultWatcher"
 import { useEstimateVRFFees } from "./useEstimateVRFFees"
@@ -314,6 +314,7 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
     publicClient,
     refetchBalance,
     currentBetAmount,
+    token,
   ])
 
   return {

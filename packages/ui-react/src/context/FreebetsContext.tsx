@@ -66,12 +66,40 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       return []
     }
 
-    const filteredFreebets = freebetsData.filter(
-      (freebet) => freebet.chainId === appChainId,
-    )
+    const filteredFreebets = freebetsData.filter((freebet) => freebet.chainId === appChainId)
 
     return filteredFreebets
   }, [freebetsData, appChainId])
+
+  const deselectFreebet = useCallback(() => {
+    setIsUsingFreebet(false)
+    setSelectedFreebet(null)
+  }, [])
+
+  const selectFreebetById = useCallback(
+    (id: string | null) => {
+      if (!id) {
+        deselectFreebet()
+        return
+      }
+
+      const freebet = freebetsData.find((freebet) => freebet.id.toString() === id) || null
+
+      if (!freebet) {
+        deselectFreebet()
+        return
+      }
+
+      if (freebet.chainId !== appChainId) {
+        switchAppChain(freebet.chainId)
+      }
+
+      setSelectedToken(freebet.token)
+
+      setSelectedFreebet(freebet)
+    },
+    [freebetsData, appChainId, switchAppChain, setSelectedToken, deselectFreebet],
+  )
 
   useEffect(() => {
     const isFreebetsInCurrentChain = formattedFreebetsInCurrentChain.length > 0
@@ -120,7 +148,14 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
         }
       }
     }
-  }, [formattedFreebetsInCurrentChain, isUsingFreebet, freebetsData])
+  }, [
+    formattedFreebetsInCurrentChain,
+    isUsingFreebet,
+    freebetsData,
+    selectedFreebet,
+    deselectFreebet,
+    selectFreebetById,
+  ])
 
   async function fetchFreebetsTokens(): Promise<SignedFreebet[]> {
     if (!accountAddress) {
@@ -138,31 +173,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     return allFreebets
   }
 
-  const selectFreebetById = useCallback(
-    (id: string | null) => {
-      if (!id) {
-        deselectFreebet()
-        return
-      }
-
-      const freebet = freebetsData.find((freebet) => freebet.id.toString() === id) || null
-
-      if (!freebet) {
-        deselectFreebet()
-        return
-      }
-
-      if (freebet.chainId !== appChainId) {
-        switchAppChain(freebet.chainId)
-      }
-
-      setSelectedToken(freebet.token)
-
-      setSelectedFreebet(freebet)
-    },
-    [freebetsData, appChainId, switchAppChain, setSelectedToken],
-  )
-
   function formatFreebet(freebet: SignedFreebet): FreeBet {
     return {
       id: freebet.id.toString(),
@@ -177,10 +187,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       expiresAt: formatExpireAt(freebet.expirationDate),
       signed: freebet,
     }
-  }
-  const deselectFreebet = () => {
-    setIsUsingFreebet(false)
-    setSelectedFreebet(null)
   }
 
   const contextValue = useMemo(

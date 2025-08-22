@@ -5,14 +5,14 @@ import {
   getPlaceFreebetFunctionData,
 } from "@betswirl/sdk-core"
 import { createLogger } from "../lib/logger"
-import { GameChoice } from "../types/types"
 import {
-  BetTransactionParameters,
   BetStrategyParams,
+  BetTransactionParameters,
   FreebetStrategyConfig,
   IBetStrategy,
   PaidBetStrategyConfig,
 } from "../types/betStrategy"
+import { GameChoice } from "../types/types"
 
 const logger = createLogger("BetStrategies")
 
@@ -81,7 +81,10 @@ export class FreebetStrategy<T extends GameChoice = GameChoice> implements IBetS
       freebet,
     }
 
-    const placeFreebetTxData = getPlaceFreebetFunctionData(betParams, configChainId as CasinoChainId)
+    const placeFreebetTxData = getPlaceFreebetFunctionData(
+      betParams,
+      configChainId as CasinoChainId,
+    )
 
     return {
       abi: placeFreebetTxData.data.abi,

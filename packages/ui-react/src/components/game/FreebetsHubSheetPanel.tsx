@@ -1,3 +1,4 @@
+import { formatRawAmount } from "@betswirl/sdk-core"
 import { useState } from "react"
 import { cn } from "../../lib/utils"
 import { FreeBet } from "../../types/types"
@@ -7,7 +8,6 @@ import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
 import { PromoCodeInput } from "./PromoCodeInput"
-import { formatRawAmount } from "@betswirl/sdk-core"
 
 const PANEL_HEIGHT_CONNECTED = "!h-[70%]" // Larger height for connected state
 const PANEL_HEIGHT_DISCONNECTED = "!h-[238px]" // Smaller height for disconnected state

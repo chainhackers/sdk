@@ -116,11 +116,7 @@ export function useGameLogic<T extends GameChoice>({
   const { selectedToken } = useTokenContext()
   const { getBalance, refetch: refetchBalance } = useBalances()
   const triggerBalanceRefresh = useBalanceRefresh()
-  const {
-    selectedFreebet,
-    refetchFreebets,
-    isUsingFreebet,
-  } = useFreebetsContext()
+  const { selectedFreebet, refetchFreebets, isUsingFreebet } = useFreebetsContext()
 
   const isReady = !!gameDefinition
   const isConfigurationLoading = !isReady
@@ -189,7 +185,7 @@ export function useGameLogic<T extends GameChoice>({
 
   // Refetch freebets when a freebet is successfully used
   useEffect(() => {
-    if (betStatus === 'success' && isUsingFreebet) {
+    if (betStatus === "success" && isUsingFreebet) {
       refetchFreebets()
     }
   }, [betStatus, isUsingFreebet, refetchFreebets])
