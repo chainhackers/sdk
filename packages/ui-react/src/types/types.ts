@@ -16,6 +16,7 @@ import {
   type Token,
   type WeightedGameConfiguration,
   type WeightedGameEncodedInput,
+  SignedFreebet,
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
 import { Hex } from "viem"
@@ -161,11 +162,13 @@ export interface RankingEntry {
 
 export interface FreeBet {
   id: string
-  amount: number
+  amount: bigint
+  formattedAmount: string
   token: TokenWithImage
   chainId: CasinoChainId
   expiresAt?: string
   title?: string
+  signed: SignedFreebet
 }
 
 export interface LeaderboardItemWithRaw {

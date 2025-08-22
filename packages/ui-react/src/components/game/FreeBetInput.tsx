@@ -6,7 +6,7 @@ import { Label } from "../ui/label"
 import { TokenIcon } from "../ui/TokenIcon"
 
 interface FreeBetInputProps {
-  amount: number
+  amount: string
   token: TokenWithImage
   isDisabled: boolean
   onClick: () => void
