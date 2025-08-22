@@ -186,12 +186,6 @@ export function useGameLogic<T extends GameChoice>({
     betStrategy,
   )
 
-  // Reset bet state when chain or token changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
-  useEffect(() => {
-    resetBetState()
-  }, [appChainId, token.address, resetBetState])
-
   // Refetch freebets when a freebet is successfully used
   useEffect(() => {
     if (betStatus === 'success' && isUsingFreebet) {

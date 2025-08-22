@@ -84,7 +84,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     return filteredFreebets
   }, [freebetsData.formattedFreebets, appChainId])
 
-  // Automatically manage freebet selection based on available freebets and user intention
   useEffect(() => {
     const isFreebetsInCurrentChain = formattedFreebetsInCurrentChain.length > 0
     const isSelectedFreebet = selectedFreebet !== null
@@ -111,7 +110,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
 
     // If freebets available, user wants to use freebets, but none selected - select first
     if (isFreebetsInCurrentChain && isUsingFreebet && !isSelectedFreebet) {
-      setSelectedFreebet(getFirstFreebet())
+      selectFreebetById(getFirstFreebet()?.formattedFreebet.id || null)
       return
     }
 
