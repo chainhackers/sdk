@@ -171,7 +171,11 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       withExternalBankrollFreebets,
     )
 
-    return allFreebets
+    const freebetsInAvailableChains = allFreebets.filter((freebet) =>
+      availableChainIds.includes(freebet.chainId),
+    )
+
+    return freebetsInAvailableChains
   }
 
   function formatFreebet(freebet: SignedFreebet): FreeBet {
