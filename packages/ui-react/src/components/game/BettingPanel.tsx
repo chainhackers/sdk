@@ -75,7 +75,8 @@ export function BettingPanel({
   const [isFreeBetSheetOpen, setIsFreeBetSheetOpen] = useState(false)
   const [isFreebetsHubOpen, setIsFreebetsHubOpen] = useState(false)
   const [wasFreebetsHubOpenBeforeWallet, setWasFreebetsHubOpenBeforeWallet] = useState(false)
-  const { freebets, selectedFreebet, selectFreebetById, isUsingFreebet } = useFreebetsContext()
+  const { freebets, selectedFreebet, selectFreebetById, isUsingFreebet, currentChainFreebets } =
+    useFreebetsContext()
   const [isBetInputValid, setIsBetInputValid] = useState<boolean>(true)
 
   // Track previous values to detect actual changes
@@ -280,7 +281,7 @@ export function BettingPanel({
             <Button
               variant="ghost"
               onClick={handleBalanceClick}
-              disabled={isChainSwitchingDisabled}
+              disabled={isChainSwitchingDisabled || isUsingFreebet}
               className={cn(
                 "text-sm font-medium flex items-center w-fit h-auto p-0",
                 "bg-secondary rounded-[8px] px-2 py-1",
@@ -404,7 +405,7 @@ export function BettingPanel({
         {isMounted && portalContainer && (
           <FreeBetSheetPanel
             portalContainer={portalContainer}
-            freeBets={freebets}
+            freeBets={currentChainFreebets}
             selectedFreeBet={selectedFreebet}
             onSelect={handleFreeBetSelect}
           />
