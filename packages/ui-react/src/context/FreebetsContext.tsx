@@ -9,6 +9,7 @@ import {
   useMemo,
   useState,
 } from "react"
+import { zeroAddress } from "viem"
 import { useAccount } from "wagmi"
 import { getTokenImage } from "../lib/utils"
 import { FreeBet, TokenWithImage } from "../types/types"
@@ -37,7 +38,8 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
   const { appChainId, switchAppChain, availableChainIds } = useChain()
   const { setSelectedToken } = useTokenContext()
-  const { affiliate, freebetsAffiliates, withExternalBankrollFreebets } = useBettingConfig()
+  const { affiliate, freebetsAffiliates, withExternalBankrollFreebets, filteredTokens } =
+    useBettingConfig()
   const [selectedFreebet, setSelectedFreebet] = useState<FreeBet | null>(null)
   const [isUsingFreebet, setIsUsingFreebet] = useState(true)
 
@@ -53,6 +55,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       withExternalBankrollFreebets,
       affiliate,
       freebetsAffiliates,
+      filteredTokens,
     ],
     queryFn: fetchFreebetsTokens,
     select: (data: SignedFreebet[]) => {
@@ -171,11 +174,22 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       withExternalBankrollFreebets,
     )
 
-    const freebetsInAvailableChains = allFreebets.filter((freebet) =>
-      availableChainIds.includes(freebet.chainId),
-    )
+    const filteredFreebets = allFreebets.filter((freebet) => {
+      if (!availableChainIds.includes(freebet.chainId)) {
+        return false
+      }
 
-    return freebetsInAvailableChains
+      if (filteredTokens && filteredTokens.length > 0) {
+        if (freebet.token.address === zeroAddress) {
+          return true
+        }
+        return filteredTokens.includes(freebet.token.address)
+      }
+
+      return true
+    })
+
+    return filteredFreebets
   }
 
   function formatFreebet(freebet: SignedFreebet): FreeBet {
