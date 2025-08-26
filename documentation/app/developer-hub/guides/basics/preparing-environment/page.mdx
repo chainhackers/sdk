@@ -1,49 +1,76 @@
 import { Tabs, Tab } from 'nextra/components'
-import { Steps } from 'nextra/components';
+import { Steps, Callout } from 'nextra/components';
 
-# Preparing the Environment
-TODO Kinco
-## Objective
+# Preparing the environment
 
-
-## Steps
-
-<Steps>
-
-### TODO
+This page guides you through preparing your environment to be able to prepare a bet easily.
 
 
-
-### Install Dependencies
-
-
-### TODO
-
-
-
-### TODO
-
-Verify that everything works correctly by running a simple test to connect to the BetSwirl protocol.
-
-</Steps>
 
 ## Code Examples
 
 <Tabs items={['Core SDK', 'React SDK']}>
   <Tabs.Tab>
 
+The goal is to be able to fetch all the information you need to prepare a bet (games, tokens, token/game info, user gas balance, user selected token balance)
+
+### With BetSwirl Client
 ```typescript
-// Example with Core SDK
-// Content will be added later
+// 1. Create a BetSwirl client (see the Wallet connection guide)
+const yourBetSwirlClient = initWagmiBetSwirlClient(...)
+
+const selectedChain = casinoChainById[8453]
+//2. Fetch all available games
+const casinoGames = await yourBetSwirlClient.getCasinoGames(true, selectedChain.id);
+
+//3. Fetch all available tokens
+const tokens = await yourBetSwirlClient.getCasinoTokens(true, selectedChain.id);
+
+//4. Get more info about the pair game/token you selected
+const selectedGame = casinoGames[0]
+const selectedToken = tokens[0]
+
+// gameToken contains the house edge and all other useful info.
+const gameToken = await yourBetSwirlClient.getCasinoGameToken(selectedToken, selectedGame.game);
+
+// 5 You can also fetch the user gas balance and user selected token balance 
+...
+```
+
+### Without client (only a wallet)
+
+```typescript
+import {
+    getCasinoGames,
+    getCasinoGameToken,
+    getCasinoTokens,
+} from "@betswirl/sdk-core";
+
+// 1. Create a BetSwirl wallet (see the Wallet connection guide)
+const yourBetSwirlWallet  =  new ViemBetSwirlWallet(...)
+
+//2. Fetch all available games
+const casinoGames = await getCasinoGames(yourBetSwirlWallet, true);
+
+//3. Fetch all available tokens
+const tokens = await getCasinoTokens(yourBetSwirlWallet, true);
+
+//4. Get more info about the pair game/token you selected
+const selectedGame = casinoGames[0]
+const selectedToken = tokens[0]
+
+// gameToken contains the house edge and all other useful info.
+const yourAffiliateAddress = "0xABC...123"
+const gameToken = await getCasinoGameToken(yourBetSwirlWallet, selectedToken, selectedGame.game, yourAffiliateAddress );
+
+// 5 You can also fetch the user gas balance and user selected token balance 
+...
 ```
 
   </Tabs.Tab>
   <Tabs.Tab>
-
-```typescript
-// Example with React SDK
-// Content will be added later
-```
-
+  ```react
+  Under development
+  ```
   </Tabs.Tab>
 </Tabs>

@@ -44,7 +44,7 @@ Using the SDK with an external BetSwirl client helps you reduce your codebase an
 
 The example below uses the BetSwirl Wagmi client:
 
-```typescript showLineNumbers
+```typescript
 import { createConfig } from "@wagmi/core";
 import { initWagmiBetSwirlClient} from "@betswirl/wagmi-provider";
 
@@ -69,7 +69,7 @@ wagmiBetSwirlClient.playDice(77, ...)
 
 Using the SDK with the native BetSwirl Viem client helps you reduce your codebase. The `walletClient` is optional if you only need to read data.
 
-```typescript showLineNumbers
+```typescript
 import { http, createWalletClient, createPublicClient } from "viem";
 import { initViemBetSwirlClient } from "@betswirl/sdk-core";
 
@@ -107,7 +107,7 @@ viemBetSwirlClient.playDice(77, ...)
 
 Using the SDK without a client doesn't let you centralize all your options in one place. It's more appropriate for projects using only one or two SDK functions. The example below uses the BetSwirl viem wallet, which is native to the SDK. The `walletClient` is optional if you only need to read data.
 
-```typescript showLineNumbers
+```typescript
 import { http, createWalletClient, createPublicClient } from "viem";
 import { initViemBetSwirlClient } from "@betswirl/sdk-core";
 
@@ -140,7 +140,7 @@ placeDiceBet(viemBetSwirlWallet, 77, ...)
 
 Getting function data doesn't require you to use a client or a wallet. It's particularly useful for frontend projects (React, Vue, etc) or AI agents plugins (Goat, AgentKit, Moxie, etc). The example below shows the `placeBet` function used in the Moxie BetSwirl plugin to place a bet.
 
-```typescript showLineNumbers
+```typescript
 import { MoxieWalletClient } from "@moxie-protocol/moxie-lib/src/wallet";
 import {
     CASINO_GAME_TYPE,

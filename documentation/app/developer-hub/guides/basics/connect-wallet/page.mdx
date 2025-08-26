@@ -12,7 +12,7 @@ This page guides you through connecting a wallet to your app.
 <Tabs items={['Core SDK', 'React SDK']}>
   <Tabs.Tab>
 
-The Core SDK offers three different approaches to connect a wallet:
+The Core SDK offers three different approaches to connect a wallet. Have a look on [SDK Core - Getting Started](/developer-hub/sdks/core/getting-started) before to continue.
 
 ### With Wagmi Client
 <Callout type="info">
@@ -21,7 +21,7 @@ The Core SDK offers three different approaches to connect a wallet:
 <Callout type="info">
   The Wagmi Client approach is recommended for multi-chain applications, because you can setup multiple chains in the Wagmi config.
 </Callout>
-```typescript showLineNumbers
+```typescript
 import { initWagmiBetSwirlClient } from "@betswirl/wagmi-provider";
 import {
     type CasinoChain,
@@ -85,7 +85,7 @@ wagmiBetSwirlClient.playDice(77, ...)
 ```
 ### With Viem Client
 
-```typescript showLineNumbers
+```typescript
 import {
     type CasinoChain,
     casinoChainById,
@@ -141,7 +141,7 @@ viemBetSwirlClient.playDice(77, ...)
 
 ### Without client (only a wallet)
 
-```typescript showLineNumbers
+```typescript
 
 import {
     type CasinoChain,
@@ -190,7 +190,7 @@ placeDiceBet(viemBetSwirlWallet, 77, ...)
 
   </Tabs.Tab>
   <Tabs.Tab>
-  ```react showLineNumbers
+  ```react
   Under development
   ```
   </Tabs.Tab>
