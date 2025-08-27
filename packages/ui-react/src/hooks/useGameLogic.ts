@@ -186,6 +186,11 @@ export function useGameLogic<T extends GameChoice>({
   // Refetch freebets when a freebet is successfully used
   useEffect(() => {
     if (betStatus === "success" && isUsingFreebet) {
+      console.log("🎯 [useGameLogic] Freebet bet SUCCESS - refetching freebets:", {
+        betStatus,
+        isUsingFreebet,
+        timestamp: new Date().toISOString(),
+      })
       refetchFreebets()
     }
   }, [betStatus, isUsingFreebet, refetchFreebets])

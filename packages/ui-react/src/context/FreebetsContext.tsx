@@ -59,6 +59,11 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     ],
     queryFn: fetchFreebetsTokens,
     select: (data: SignedFreebet[]) => {
+      console.log("📥 [FreebetsContext] Freebets fetched from API:", {
+        count: data.length,
+        ids: data.map((f) => f.id),
+        timestamp: new Date().toISOString(),
+      })
       return data.map(formatFreebet)
     },
     enabled: !!accountAddress,
@@ -76,12 +81,18 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   }, [freebetsData, appChainId])
 
   const deselectFreebet = useCallback(() => {
+    console.log("🚫 [FreebetsContext] deselectFreebet called")
     setIsUsingFreebet(false)
     setSelectedFreebet(null)
   }, [])
 
   const selectFreebetById = useCallback(
     (id: string | null) => {
+      console.log("📌 [FreebetsContext] selectFreebetById called:", {
+        id,
+        caller: new Error().stack?.split("\n")[2]?.trim(),
+      })
+
       if (!id) {
         deselectFreebet()
         return
@@ -90,6 +101,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       const freebet = freebetsData.find((freebet) => freebet.id.toString() === id) || null
 
       if (!freebet) {
+        console.log("❌ [FreebetsContext] Freebet not found:", id)
         deselectFreebet()
         return
       }
@@ -98,6 +110,11 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
         switchAppChain(freebet.chainId)
       }
 
+      console.log("✅ [FreebetsContext] Freebet selected:", {
+        id: freebet.id,
+        token: freebet.token.symbol,
+        amount: freebet.amount,
+      })
       setSelectedToken(freebet.token)
       setSelectedFreebet(freebet)
       setIsUsingFreebet(true)
@@ -128,7 +145,12 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
 
     // If freebets available, user wants to use freebets, but none selected - select first
     if (isFreebetsInCurrentChain && isUsingFreebet && !isSelectedFreebet) {
-      selectFreebetById(getFirstFreebet()?.id || null)
+      const firstFreebet = getFirstFreebet()
+      console.log("🔍 [FreebetsContext] No freebet selected, auto-selecting first:", {
+        firstFreebetId: firstFreebet?.id,
+        availableCount: currentChainFreebets.length,
+      })
+      selectFreebetById(firstFreebet?.id || null)
       return
     }
 
@@ -139,6 +161,12 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       )
 
       if (!isSelectedStillValid) {
+        console.log("⚠️ [FreebetsContext] Selected freebet no longer valid!", {
+          selectedId: selectedFreebet.id,
+          availableIds: currentChainFreebets.map((f) => f.id),
+          isUsingFreebet,
+        })
+
         const firstFreebet = getFirstFreebet()
         const isFirstFreebetSameTokenAndChain =
           firstFreebet &&
@@ -146,8 +174,14 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
           firstFreebet.chainId === selectedFreebet.chainId
 
         if (isUsingFreebet && firstFreebet && isFirstFreebetSameTokenAndChain) {
+          console.log("🎯 [FreebetsContext] Auto-selecting new freebet with same token:", {
+            oldId: selectedFreebet.id,
+            newId: firstFreebet.id,
+            token: firstFreebet.token.symbol,
+          })
           selectFreebetById(firstFreebet.id)
         } else {
+          console.log("❌ [FreebetsContext] Deselecting freebet - no suitable replacement")
           deselectFreebet()
         }
       }
