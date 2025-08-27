@@ -2,6 +2,7 @@ import { encodeAbiParameters, parseAbiParameters } from "viem";
 import type { EncodeAbiParametersReturnType } from "viem/_types/utils/abi/encodeAbiParameters";
 import { BP_VALUE } from "../../constants";
 import { CASINO_GAME_TYPE } from "../../data/casino";
+import type { BP } from "../../interfaces";
 import { getFormattedNetMultiplier, getNetMultiplier } from "../../utils/bet";
 import { AbstractCasinoGame, type ChoiceInput } from "./game";
 export const MIN_SELECTABLE_ROULETTE_NUMBER = 0 as RouletteNumber;
@@ -84,7 +85,7 @@ export class Roulette extends AbstractCasinoGame<
     );
   }
 
-  static getMultiplier(numbers: RouletteNumber[]): number {
+  static getMultiplier(numbers: RouletteNumber[]): BP {
     const encodedNumbers = Roulette.encodeInput(numbers);
     return encodedNumbers
       ? Number(
@@ -134,6 +135,24 @@ export class Roulette extends AbstractCasinoGame<
 
   static decodeRolled(encodedRolled: RouletteEncodedRolled | string): RouletteNumber {
     return Number(encodedRolled) as RouletteNumber;
+  }
+
+  /**
+   * Determines if a single decoded roll is a winning roll for Roulette.
+   *
+   * This method is particularly useful for multibetting scenarios where you need to:
+   * - Identify which individual rolls are winners
+   * - Color-code winning numbers in the UI
+   *
+   * @param decodedRolled - The decoded roulette number result (0-36)
+   * @param encodedInput - The player's encoded number selection
+   * @returns true if the rolled number is in the player's selection, false otherwise
+   */
+  static isSingleRolledWin(
+    decodedRolled: RouletteNumber,
+    encodedInput: RouletteEncodedInput | string,
+  ): boolean {
+    return Roulette.decodeInput(Number(encodedInput)).includes(decodedRolled);
   }
 
   static getChoiceInputs(houseEdge?: number): RouletteChoiceInput[] {
@@ -258,10 +277,7 @@ export class Roulette extends AbstractCasinoGame<
     return (Number(encodedNumbers).toString(2).match(/1/g) || []).length;
   }
 
-  static combineChoiceInputs(
-    inputs: RouletteChoiceInput[],
-    houseEdge?: number,
-  ): RouletteChoiceInput {
+  static combineChoiceInputs(inputs: RouletteChoiceInput[], houseEdge?: BP): RouletteChoiceInput {
     // 1. Combine all unique numbers from the inputs
     const combinedNumbers = [...new Set(inputs.flatMap((input) => input.value))];
     // 2. Sort the numbers

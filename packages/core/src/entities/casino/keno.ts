@@ -1,5 +1,5 @@
 import { type EncodeAbiParametersReturnType, encodeAbiParameters, parseAbiParameters } from "viem";
-import { CASINO_GAME_TYPE, getFormattedNetMultiplier, getNetMultiplier } from "../..";
+import { type BP, CASINO_GAME_TYPE, getFormattedNetMultiplier, getNetMultiplier } from "../..";
 import { BP_VALUE } from "../../constants";
 import type { KenoConfiguration } from "../../read/casino/keno";
 import { AbstractCasinoGame, type ChoiceInput } from "./game";
@@ -81,7 +81,7 @@ export class Keno extends AbstractCasinoGame<
     kenoConfig: KenoConfiguration,
     selectedBallsCount: number,
     matchedBallsCount: number,
-  ): number {
+  ): BP {
     return kenoConfig.multiplierTable[selectedBallsCount]?.[matchedBallsCount] || 0;
   }
 
@@ -131,7 +131,25 @@ export class Keno extends AbstractCasinoGame<
     return Keno.maskToBalls(Number(encodedRolled));
   }
 
-  static getChoiceInputs(kenoConfig: KenoConfiguration, houseEdge?: number): KenoChoiceInput[] {
+  /**
+   * Determines if a single decoded roll is a winning roll for Keno.
+   *
+   * This method is particularly useful for multibetting scenarios where you need to:
+   * - Identify which individual rolls are winners
+   * - Color-code winning balls in the UI
+   *
+   * @param decodedRolled - A decoded keno ball number result (1-40)
+   * @param encodedInput - The player's encoded ball selection mask
+   * @returns true if the rolled ball is in the player's selection, false otherwise
+   */
+  static isSingleRolledWin(
+    decodedRolled: KenoBall,
+    encodedInput: KenoEncodedInput | string,
+  ): boolean {
+    return Keno.decodeInput(encodedInput).includes(decodedRolled);
+  }
+
+  static getChoiceInputs(kenoConfig: KenoConfiguration, houseEdge?: BP): KenoChoiceInput[] {
     const createChoiceInput = (
       balls: KenoBall[],
       id: KenoBall[] | KENO_INPUT_BUNDLE,

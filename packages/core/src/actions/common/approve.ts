@@ -72,7 +72,6 @@ export async function approve(
   }
 }
 
-// multiplier = gross BP_VALUE
 export function getAllowanceFunctionData(
   tokenAddress: Hex,
   allower: Hex,

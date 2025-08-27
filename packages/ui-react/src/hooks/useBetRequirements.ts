@@ -1,4 +1,5 @@
 import {
+  BP,
   CASINO_GAME_TYPE,
   getBetRequirementsFunctionData,
   maxGameBetCountByType,
@@ -14,7 +15,7 @@ import { useDebounce } from "./useDebounce"
 type UseBetRequirementsProps = {
   game: CASINO_GAME_TYPE
   token: Token
-  grossMultiplier: number // BP
+  grossMultiplier: BP
 }
 
 const DEBOUNCE_DELAY = 500 // 500ms - Debounce delay for grossMultiplier updates

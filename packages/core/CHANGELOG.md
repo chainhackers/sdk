@@ -1,5 +1,13 @@
 # @betswirl/sdk-core
 
+## 0.1.15
+
+### Patch Changes
+
+- Replace gross/raw multiplier/house edge per "BP" type
+
+- Add isSingleRolledWin to entities
+
 ## 0.1.14
 
 ### Patch Changes

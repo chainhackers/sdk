@@ -5,41 +5,41 @@ import { Dice } from "../entities/casino/dice";
 import { Keno } from "../entities/casino/keno";
 import { Roulette } from "../entities/casino/roulette";
 import { WeightedGame } from "../entities/casino/weightedGame";
+import type { BP } from "../interfaces";
 import type { WeightedGameConfiguration } from "../read";
 
-//houseEdge is in BP_VALUE
-export function getBetSwirlFees(payout: bigint, houseEdge: number): bigint {
+export function getBetSwirlFees(payout: bigint, houseEdge: BP): bigint {
   return (payout * BigInt(houseEdge)) / BigInt(BP_VALUE);
 }
-export function getGrossPayout(amount: bigint, betCount: number, grossMulitplier: number): bigint {
+
+export function getGrossPayout(amount: bigint, betCount: number, grossMulitplier: BP): bigint {
   return (amount * BigInt(betCount) * BigInt(grossMulitplier)) / BigInt(BP_VALUE);
 }
-// grossMultiplier and houseEdge are in BP_VALUE
+
 export function getNetPayout(
   amount: bigint,
   betCount: number,
-  grossMultiplier: number,
-  houseEdge: number,
+  grossMultiplier: BP,
+  houseEdge: BP,
 ): bigint {
   const grossPayout = getGrossPayout(amount, betCount, grossMultiplier);
   return grossPayout - getBetSwirlFees(grossPayout, houseEdge);
 }
-// multiplier and houseEdge are in BP_VALUE
-export function getNetMultiplier(grossMulitplier: number, houseEdge: number): number {
+export function getNetMultiplier(grossMulitplier: BP, houseEdge: BP): number {
   return Math.round(
     (Number(getNetPayout(BigInt(10 ** 18), 1, grossMulitplier, houseEdge)) / 10 ** 18) * BP_VALUE,
   );
 }
-// multiplier and houseEdge are BP_VALUE
-export function getFormattedNetMultiplier(grossMulitplier: number, houseEdge: number): number {
+
+export function getFormattedNetMultiplier(grossMulitplier: BP, houseEdge: BP): number {
   return Number((getNetMultiplier(grossMulitplier, houseEdge) / BP_VALUE).toFixed(3));
 }
 
 export function getPayoutDetails(
   amount: bigint,
   betCount: number,
-  grossMultiplier: number,
-  houseEdge: number,
+  grossMultiplier: BP,
+  houseEdge: BP,
 ): {
   grossPayout: bigint;
   netPayout: bigint;
@@ -74,11 +74,10 @@ export function decodeNormalCasinoInput(encodedInput: string, game: NORMAL_CASIN
   }
 }
 
-// houseEdge is in BP_VALUE
 export function decodeWeightedCasinoInput(
   encodedInput: string,
   _weightedGameConfiguration: WeightedGameConfiguration,
-  _houseEdge = 0,
+  _houseEdge: BP = 0,
 ) {
   return WeightedGame.decodeInput(encodedInput);
 }
@@ -97,11 +96,10 @@ export function decodeNormalCasinoRolled(
       return Keno.decodeRolled(encodedRolled);
   }
 }
-// houseEdge is in BP_VALUE
 export function decodeWeightedCasinoRolled(
   encodedRolled: string,
   weightedGameConfiguration: WeightedGameConfiguration,
-  houseEdge = 0,
+  houseEdge: BP = 0,
 ): any {
   return WeightedGame.decodeRolled(encodedRolled, weightedGameConfiguration, houseEdge);
 }

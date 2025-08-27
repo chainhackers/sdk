@@ -1,5 +1,14 @@
 # @betswirl/wagmi-provider
 
+## 0.1.15
+
+### Patch Changes
+
+- Replace gross/raw multiplier/house edge per "BP" type
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.15
+
 ## 0.1.14
 
 ### Patch Changes

@@ -1,6 +1,7 @@
 import { encodeAbiParameters, parseAbiParameters } from "viem";
 import type { EncodeAbiParametersReturnType } from "viem/_types/utils/abi/encodeAbiParameters";
 import {
+  type BP,
   type CasinoChainId,
   generateRandomHexColor,
   getFormattedNetMultiplier,
@@ -47,11 +48,11 @@ export class WeightedGame extends AbstractCasinoGame<
     return (Number(weight) / Number(totalWeight)) * 100;
   }
 
-  static getMultiplier(weightedGameConfig: WeightedGameConfiguration, position: number): number {
+  static getMultiplier(weightedGameConfig: WeightedGameConfiguration, position: number): BP {
     return Number(weightedGameConfig.multipliers[position] ?? 0);
   }
 
-  protected static _formatMultiplier(multiplier: number): number {
+  protected static _formatMultiplier(multiplier: BP): number {
     return Number((multiplier / BP_VALUE).toFixed(3));
   }
 
@@ -84,10 +85,27 @@ export class WeightedGame extends AbstractCasinoGame<
     return `x${netMultiplier.toFixed(2)}`;
   }
 
+  /**
+   * Determines if a single decoded roll is a winning roll for Weighted Games (Wheel, Plinko).
+   *
+   * This method is particularly useful for multibetting scenarios where you need to:
+   * - Identify which individual rolls are winners
+   * - Color-code winning multipliers in the UI
+   *
+   * @param decodedRolled - The decoded roll result in format "multiplierx" (e.g., "2.5x", "0.5x")
+   * @returns true if the multiplier is >= 1 (win), false otherwise (loss)
+   *
+   */
+
+  static isSingleRolledWin(decodedRolled: string): boolean {
+    const multiplier = decodedRolled.split("x")[1];
+    return Number(multiplier) >= 1;
+  }
+
   static getChoiceInputs(
     chainId: CasinoChainId,
     game: WEIGHTED_CASINO_GAME_TYPE,
-    houseEdge?: number,
+    houseEdge?: BP,
     customWeightedGameConfigs?: WeightedGameConfiguration[],
   ): WeightedGameChoiceInput[] {
     const weightedGameConfigs = [
@@ -170,11 +188,11 @@ export class WeightedGame extends AbstractCasinoGame<
    */
   static getUniqueOutputs(
     weightedGameConfig: WeightedGameConfiguration,
-    houseEdge: number,
+    houseEdge: BP,
   ): {
-    multiplier: number; // BP
+    multiplier: BP;
     formattedMultiplier: number;
-    netMultiplier: number; // BP
+    netMultiplier: BP;
     formattedNetMultiplier: number;
     chanceToWin: number;
     color: string;

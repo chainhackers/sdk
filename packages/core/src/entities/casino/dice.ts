@@ -2,6 +2,7 @@ import type { EncodeAbiParametersReturnType } from "viem";
 import { encodeAbiParameters, parseAbiParameters } from "viem";
 import { BP_VALUE } from "../../constants";
 import { CASINO_GAME_TYPE } from "../../data/casino";
+import type { BP } from "../../interfaces";
 import { getFormattedNetMultiplier, getNetMultiplier } from "../../utils/bet";
 import { AbstractCasinoGame, type ChoiceInput } from "./game";
 
@@ -129,7 +130,7 @@ export class Dice extends AbstractCasinoGame<
     return Math.max(100 - Number(cap), 1);
   }
 
-  static getMultiplier(cap: DiceNumber | string): number {
+  static getMultiplier(cap: DiceNumber | string): BP {
     return Math.round((BP_VALUE * 100) / (100 - Number(cap)));
   }
 
@@ -153,7 +154,25 @@ export class Dice extends AbstractCasinoGame<
     return Number(encodedCap) as DiceRolledNumber;
   }
 
-  static getChoiceInputs(houseEdge?: number): DiceChoiceInput[] {
+  /**
+   * Determines if a single decoded roll is a winning roll for Dice.
+   *
+   * This method is particularly useful for multibetting scenarios where you need to:
+   * - Identify which individual rolls are winners
+   * - Color-code winning numbers in the UI
+   *
+   * @param decodedRolled - The decoded dice number result (1-100)
+   * @param encodedInput - The player's encoded cap choice (1-99)
+   * @returns true if the roll is a win (rolled number > cap), false otherwise
+   */
+  static isSingleRolledWin(
+    decodedRolled: DiceRolledNumber,
+    encodedInput: DiceEncodedInput | string,
+  ): boolean {
+    return Number(decodedRolled) > Number(encodedInput);
+  }
+
+  static getChoiceInputs(houseEdge?: BP): DiceChoiceInput[] {
     return Array.from({ length: 99 }, (_, i) => {
       const diceNumber = (i + 1) as DiceNumber;
       return {

@@ -1,4 +1,5 @@
 import {
+  BP,
   CASINO_GAME_TYPE,
   casinoChainById,
   chainById,
@@ -54,7 +55,7 @@ interface UseGameLogicResult<T extends GameChoice = GameChoice> {
   gasPrice: string
   targetPayoutAmount: bigint
   formattedNetMultiplier: number
-  grossMultiplier: number // BP
+  grossMultiplier: BP
   isInGameResultState: boolean
   isGamePaused: boolean
   nativeCurrencySymbol: string

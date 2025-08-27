@@ -1,4 +1,4 @@
-import type { WeightedGameConfiguration } from "../..";
+import type { BP, WeightedGameConfiguration } from "../..";
 import { getNetMultiplier } from "../..";
 import { generateRandomHexColor } from "../../utils";
 import { WeightedGame, type WeightedGameChoiceInput } from "./weightedGame";
@@ -31,9 +31,9 @@ export class Plinko extends WeightedGame {
     weightedGameConfig: WeightedGameConfiguration,
     houseEdge: number,
   ): {
-    multiplier: number; // BP
+    multiplier: BP;
     formattedMultiplier: number;
-    netMultiplier: number; // BP
+    netMultiplier: BP;
     formattedNetMultiplier: number;
     chanceToWin: number;
     color: string;

@@ -39,7 +39,7 @@ export async function getClaimableAmount(
     );
   }
 }
-// multiplier = gross BP_VALUE
+
 export function getClaimableAmountFunctionData(
   playerAddress: Address,
   leaderboardOnChainId: number | bigint,

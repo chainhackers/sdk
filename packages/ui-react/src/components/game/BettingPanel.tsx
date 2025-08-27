@@ -1,4 +1,5 @@
 import {
+  BP,
   CASINO_GAME_TYPE,
   FORMAT_TYPE,
   formatRawAmount,
@@ -28,7 +29,7 @@ interface BettingPanelProps {
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number
-  grossMultiplier: number // BP
+  grossMultiplier: BP
   vrfFees: bigint
   onBetAmountChange: (amount: bigint | undefined) => void
   onPlayBtnClick: () => void

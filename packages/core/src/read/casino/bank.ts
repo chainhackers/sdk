@@ -4,7 +4,13 @@ import type { CASINO_GAME_TYPE, CasinoChainId } from "../../data/casino";
 import { casinoChainById, maxGameBetCountByType } from "../../data/casino";
 import { ERROR_CODES } from "../../errors/codes";
 import { TransactionError } from "../../errors/types";
-import type { BetRequirements, BetSwirlFunctionData, CasinoToken, Token } from "../../interfaces";
+import type {
+  BetRequirements,
+  BetSwirlFunctionData,
+  BP,
+  CasinoToken,
+  Token,
+} from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
 import { getCasinoChainId } from "../../utils/chains";
 import { rawTokenToToken } from "../../utils/tokens";
@@ -111,7 +117,7 @@ export type RawBetRequirements = [boolean, bigint, bigint];
 export function parseRawBetRequirements(
   rawBetRequirements: RawBetRequirements,
   token: Token,
-  multiplier: number,
+  multiplier: BP,
   game: CASINO_GAME_TYPE,
   casinoChainId: CasinoChainId,
 ): BetRequirements {
@@ -128,7 +134,7 @@ export function parseRawBetRequirements(
 export async function getBetRequirements(
   wallet: BetSwirlWallet,
   token: Token,
-  multiplier: number | number[], // gross BP_VALUE
+  multiplier: BP | BP[],
   game: CASINO_GAME_TYPE,
 ): Promise<BetRequirements> {
   const casinoChainId = getCasinoChainId(wallet);
@@ -162,10 +168,9 @@ export async function getBetRequirements(
     );
   }
 }
-// multiplier = gross BP_VALUE
 export function getBetRequirementsFunctionData(
   tokenAddress: Hex,
-  multiplier: number,
+  multiplier: BP,
   casinoChainId: CasinoChainId,
 ): BetSwirlFunctionData<typeof bankAbi, "getBetRequirements", readonly [Hex, bigint]> {
   const casinoChain = casinoChainById[casinoChainId];

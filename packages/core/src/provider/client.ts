@@ -68,6 +68,7 @@ import {
 import type { SubgraphError } from "../errors";
 import type {
   BetRequirements,
+  BP,
   CasinoBet,
   CasinoGame,
   CasinoGameToken,
@@ -128,7 +129,7 @@ export abstract class BetSwirlClient {
     placedBet: WeightedCasinoPlacedBet,
     options: CasinoWaitRollOptions | undefined,
     weightedGameConfiguration: WeightedGameConfiguration,
-    houseEdge: number,
+    houseEdge: BP,
   ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
 
   abstract playCoinToss(
@@ -214,7 +215,7 @@ export abstract class BetSwirlClient {
   abstract waitWheel(
     placedBet: WheelPlacedBet,
     weightedGameConfiguration: WeightedGameConfiguration,
-    houseEdge: number,
+    houseEdge: BP,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: WheelRolledBet; receipt: TransactionReceipt }>;
 
@@ -233,7 +234,7 @@ export abstract class BetSwirlClient {
   abstract waitPlinko(
     placedBet: PlinkoPlacedBet,
     weightedGameConfiguration: WeightedGameConfiguration,
-    houseEdge: number,
+    houseEdge: BP,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: PlinkoRolledBet; receipt: TransactionReceipt }>;
 
@@ -263,7 +264,7 @@ export abstract class BetSwirlClient {
 
   abstract getBetRequirements(
     token: Token,
-    multiplier: number,
+    multiplier: BP,
     game: CASINO_GAME_TYPE,
   ): Promise<BetRequirements>;
 

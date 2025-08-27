@@ -1,4 +1,4 @@
-import { CASINO_GAME_TYPE } from "@betswirl/sdk-core"
+import { BP, CASINO_GAME_TYPE } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, forwardRef, useContext, useEffect, useRef, useState } from "react"
 import { zeroAddress } from "viem"
@@ -280,7 +280,7 @@ interface BettingSectionProps {
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number
-  grossMultiplier: number // BP
+  grossMultiplier: BP
   vrfFees: bigint
   onBetAmountChange: (amount: bigint | undefined) => void
   onPlayBtnClick: () => void
