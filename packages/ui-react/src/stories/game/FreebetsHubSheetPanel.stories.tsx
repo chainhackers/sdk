@@ -1,67 +1,83 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Gift } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
-import type { FreeBet } from "../../components/game/BettingPanel"
 import { FreebetsHubSheetPanel } from "../../components/game/FreebetsHubSheetPanel"
 import { Button } from "../../components/ui/button"
 import { Sheet, SheetTrigger } from "../../components/ui/sheet"
 import { cn } from "../../lib/utils"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
-import type { Theme, TokenWithImage } from "../../types/types"
+import type { FreeBet, Theme, TokenWithImage } from "../../types/types"
 
 // Mock tokens
 const ETH_TOKEN: TokenWithImage = STORYBOOK_TOKENS.ETH
 const DEGEN_TOKEN: TokenWithImage = STORYBOOK_TOKENS.DEGEN
 
+// Mock type for Storybook (replaces bigint with string to avoid serialization issues)
+type MockFreeBet = Omit<FreeBet, "amount"> & {
+  amount: string
+}
+
 // Mock free bets data
-const mockFreeBets: FreeBet[] = [
+const mockFreeBets: MockFreeBet[] = [
   {
     id: "1",
-    amount: 10,
+    amount: "10",
+    formattedAmount: "10",
     token: ETH_TOKEN,
     chainId: 8453,
     title: "Welcome Bonus",
     expiresAt: "24.07.2024",
+    signed: {} as any,
   },
   {
     id: "2",
-    amount: 50,
+    amount: "50",
+    formattedAmount: "50",
     token: DEGEN_TOKEN,
     chainId: 8453,
     title: "Loyalty Reward",
     expiresAt: "31.07.2024",
+    signed: {} as any,
   },
   {
     id: "3",
-    amount: 25,
+    amount: "25",
+    formattedAmount: "25",
     token: ETH_TOKEN,
     chainId: 8453,
     title: "Weekend Special",
     expiresAt: "28.07.2024",
+    signed: {} as any,
   },
   {
     id: "4",
-    amount: 100,
+    amount: "100",
+    formattedAmount: "100",
     token: DEGEN_TOKEN,
     chainId: 8453,
     title: "VIP Bonus",
     expiresAt: "15.08.2024",
+    signed: {} as any,
   },
   {
     id: "5",
-    amount: 5,
+    amount: "5",
+    formattedAmount: "5",
     token: ETH_TOKEN,
     chainId: 8453,
     title: "Daily Reward",
     expiresAt: "25.07.2024",
+    signed: {} as any,
   },
   {
     id: "6",
-    amount: 75,
+    amount: "75",
+    formattedAmount: "75",
     token: DEGEN_TOKEN,
     chainId: 8453,
     title: "Achievement Unlock",
     expiresAt: "10.08.2024",
+    signed: {} as any,
   },
 ]
 
@@ -104,19 +120,24 @@ const FreebetsHubSheetWithWrapper = ({
   theme = "light",
 }: {
   isConnected: boolean
-  freebets: FreeBet[]
+  freebets: MockFreeBet[]
   theme?: Theme
 }) => {
   const [isOpen, setIsOpen] = useState(true)
-  const [claimedCodes, setClaimedCodes] = useState<string[]>([])
+  //const [claimedCodes, setClaimedCodes] = useState<string[]>([]) // TODO: Freebets code claim
 
   const handleConnectWallet = () => {
     console.log("Connect wallet clicked")
   }
 
-  const handleClaimCode = (code: string) => {
-    console.log("Claim code:", code)
-    setClaimedCodes([...claimedCodes, code])
+  // TODO: Freebets code claim
+  // const handleClaimCode = (code: string) => {
+  //   console.log("Claim code:", code)
+  //   setClaimedCodes([...claimedCodes, code])
+  // }
+
+  const handleSelectFreebet = (freebet: MockFreeBet) => {
+    console.log("Select freebet: ", freebet)
   }
 
   return (
@@ -136,9 +157,10 @@ const FreebetsHubSheetWithWrapper = ({
             <FreebetsHubSheetPanel
               portalContainer={portalContainer}
               isConnected={isConnected}
-              freebets={freebets}
+              freebets={freebets as unknown as FreeBet[]}
               onConnectWallet={handleConnectWallet}
-              onClaimCode={handleClaimCode}
+              //onClaimCode={handleClaimCode} // TODO: Freebets code claim
+              onSelectFreebet={handleSelectFreebet as any}
             />
           </Sheet>
         )}

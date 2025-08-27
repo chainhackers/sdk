@@ -28,6 +28,7 @@ const rouletteGameDefinition: GameDefinition<{
   },
   getMultiplier: (choice) => Roulette.getMultiplier(choice),
   encodeInput: (choice) => Roulette.encodeInput(choice),
+  encodeAbiParametersInput: (choice) => Roulette.encodeAbiParametersInput(choice),
   getWinChancePercent: (choice) => Roulette.getWinChancePercent(choice),
   formatDisplayResult: (rolledResult) => {
     return rolledResult.rolled.toString()
@@ -119,7 +120,7 @@ export function RouletteGame({
             token={token}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
+        <GameFrame.ResultWindow gameResult={gameResult} />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.ROULETTE}

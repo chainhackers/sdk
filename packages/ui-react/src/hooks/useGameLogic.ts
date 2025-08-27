@@ -9,7 +9,10 @@ import { formatGwei, zeroAddress } from "viem"
 import { useAccount } from "wagmi"
 import { useBalanceRefresh, useBalances } from "../context/BalanceContext"
 import { useChain } from "../context/chainContext"
+import { useBettingConfig } from "../context/configContext"
+import { useFreebetsContext } from "../context/FreebetsContext"
 import { useTokenContext } from "../context/tokenContext"
+import { createFreebetStrategy, createPaidBetStrategy } from "../strategies/betStrategies"
 import {
   BetStatus,
   GameChoice,
@@ -113,21 +116,20 @@ export function useGameLogic<T extends GameChoice>({
   const { selectedToken } = useTokenContext()
   const { getBalance, refetch: refetchBalance } = useBalances()
   const triggerBalanceRefresh = useBalanceRefresh()
+  const { selectedFreebet, refetchFreebets, isUsingFreebet } = useFreebetsContext()
 
   const isReady = !!gameDefinition
   const isConfigurationLoading = !isReady
 
-  // Determine the effective token to use - memoize to prevent unnecessary re-renders
   const token: TokenWithImage = useMemo(() => {
     return (
       selectedToken || {
         ...chainNativeCurrencyToToken(chainById[appChainId].nativeCurrency),
-        image: "", // Fallback for native currency - user should configure this
+        image: "",
       }
     )
   }, [selectedToken, appChainId])
 
-  // Get balance from BalanceContext
   const balance = getBalance(token.address) || 0n
   const { isPaused: isGamePaused } = useIsGamePaused({
     game: gameDefinition?.gameType as CASINO_GAME_TYPE,
@@ -139,12 +141,31 @@ export function useGameLogic<T extends GameChoice>({
     return gameDefinition?.defaultSelection as T | undefined
   })
 
-  // Update selection when gameDefinition changes
   React.useEffect(() => {
     if (gameDefinition?.defaultSelection) {
       setSelection(gameDefinition.defaultSelection as T)
     }
   }, [gameDefinition])
+
+  const { affiliate } = useBettingConfig()
+
+  const betStrategy = useMemo(() => {
+    if (!address) return undefined
+
+    if (isUsingFreebet && selectedFreebet) {
+      return createFreebetStrategy<T>({
+        freebet: selectedFreebet.signed,
+        chainId: appChainId,
+      })
+    }
+
+    return createPaidBetStrategy<T>({
+      token,
+      affiliate,
+      connectedAddress: address,
+      chainId: appChainId,
+    })
+  }, [isUsingFreebet, selectedFreebet, token, affiliate, address, appChainId])
 
   const {
     placeBet,
@@ -154,13 +175,20 @@ export function useGameLogic<T extends GameChoice>({
     vrfFees,
     formattedVrfFees,
     gasPrice,
-  } = usePlaceBet(gameDefinition?.gameType, token, triggerBalanceRefresh, gameDefinition)
+  } = usePlaceBet<T>(
+    gameDefinition?.gameType,
+    token,
+    triggerBalanceRefresh,
+    gameDefinition,
+    betStrategy,
+  )
 
-  // Reset bet state when chain or token changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: We need to reset bet state when chain or token changes
+  // Refetch freebets when a freebet is successfully used
   useEffect(() => {
-    resetBetState()
-  }, [appChainId, token.address, resetBetState])
+    if (betStatus === "success" && isUsingFreebet) {
+      refetchFreebets()
+    }
+  }, [betStatus, isUsingFreebet, refetchFreebets])
 
   const gameResult = useMemo((): GameResult | null => {
     if (!rawGameResult || !gameDefinition || !selection) {
@@ -200,6 +228,7 @@ export function useGameLogic<T extends GameChoice>({
     betAmount,
     betCount: 1,
     gameDefinition,
+    token, // Pass the centralized effective token
   })
 
   const isInGameResultState = !!gameResult
@@ -214,6 +243,20 @@ export function useGameLogic<T extends GameChoice>({
   const handlePlayButtonClick = async () => {
     // Don't allow play if we're in loading state or selection is not available
     if (!gameDefinition || !selection) return
+
+    if (selectedFreebet && isUsingFreebet) {
+      if (betStatus === "error") {
+        resetBetState()
+        if (isWalletConnected) {
+          placeBet(selectedFreebet.amount, selection)
+        }
+      } else if (isInGameResultState) {
+        resetBetState()
+      } else if (isWalletConnected) {
+        placeBet(selectedFreebet.amount, selection)
+      }
+      return
+    }
 
     // Reset approval error if there is one
     if (approveWriteWagmiHook.error) {
@@ -283,7 +326,7 @@ export function useGameLogic<T extends GameChoice>({
     themeSettings,
     handlePlayButtonClick,
     handleBetAmountChange,
-    placeBet: (betAmount: bigint, choice: T) => placeBet(betAmount, choice),
+    placeBet,
     needsTokenApproval,
     isApprovePending: approveWriteWagmiHook.isPending,
     isApproveConfirming: approveWaitingWagmiHook.isLoading,

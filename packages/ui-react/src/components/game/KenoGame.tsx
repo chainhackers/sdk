@@ -62,6 +62,7 @@ export function KenoGame({
         getMultiplier: () => 0,
         encodeInput: () => 0,
         formatDisplayResult: () => "",
+        encodeAbiParametersInput: () => "0x",
       }
     }
 
@@ -77,6 +78,7 @@ export function KenoGame({
         return Keno.getMultiplier(kenoConfig, choice.length, maxMultiplierHits)
       },
       encodeInput: (choice) => Keno.encodeInput(choice, kenoConfig),
+      encodeAbiParametersInput: (choice) => Keno.encodeAbiParametersInput(choice, kenoConfig),
       formatDisplayResult: (rolledResult) => {
         if (Array.isArray(rolledResult.rolled)) {
           return rolledResult.rolled.join(", ")
@@ -212,7 +214,8 @@ export function KenoGame({
         onPlayBtnClick={handlePlayButtonClick}
         areChainsSynced={areChainsSynced}
         isGamePaused={isGamePaused}
-        hasValidSelection={selectedNumbers.length > 0}
+        hasValidSelection={selectedNumbers.length >= 2}
+        invalidSelectionMessage={"Not enough numbers selected"}
         needsTokenApproval={needsTokenApproval}
         isApprovePending={isApprovePending}
         isApproveConfirming={isApproveConfirming}

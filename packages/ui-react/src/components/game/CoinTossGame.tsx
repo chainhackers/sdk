@@ -26,6 +26,7 @@ const coinTossGameDefinition: GameDefinition<{
   },
   getMultiplier: (choice) => CoinToss.getMultiplier(choice),
   encodeInput: (choice) => CoinToss.encodeInput(choice),
+  encodeAbiParametersInput: (choice) => CoinToss.encodeAbiParametersInput(choice),
   getWinChancePercent: (choice) => CoinToss.getWinChancePercent(choice),
   formatDisplayResult: (rolledResult) => {
     return String(rolledResult.rolled)
@@ -38,7 +39,6 @@ export function CoinTossGame({
   theme = "system",
   customTheme,
   backgroundImage = coinTossBackground,
-  freeBets,
   ...props
 }: CoinTossGameProps) {
   const {
@@ -117,7 +117,7 @@ export function CoinTossGame({
             isDisabled={isControlsDisabled}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow gameResult={gameResult} currency={token.symbol} />
+        <GameFrame.ResultWindow gameResult={gameResult} />
       </GameFrame.GameArea>
       <GameFrame.BettingSection
         game={CASINO_GAME_TYPE.COINTOSS}
@@ -139,7 +139,6 @@ export function CoinTossGame({
         isApproveConfirming={isApproveConfirming}
         isRefetchingAllowance={isRefetchingAllowance}
         approveError={approveError}
-        freeBets={freeBets}
       />
     </GameFrame>
   )

@@ -1,11 +1,11 @@
 import { Info } from "lucide-react"
 import { cn } from "../../lib/utils"
+import { FreeBet } from "../../types/types"
 import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
 import { Tooltip, TooltipPrimitive, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
-import type { FreeBet } from "./BettingPanel"
 
 interface FreeBetSheetPanelProps {
   portalContainer: HTMLElement
@@ -38,7 +38,7 @@ export function FreeBetSheetPanel({
                     variant="ghost"
                     onClick={() => onSelect(freeBet)}
                     aria-pressed={selectedFreeBet?.id === freeBet.id}
-                    aria-label={`Select freebet: ${freeBet.amount} ${freeBet.token.symbol}`}
+                    aria-label={`Select freebet: ${freeBet.formattedAmount} ${freeBet.token.symbol}`}
                     className={cn(
                       "flex items-center justify-between px-4 py-3 rounded-[8px] w-full text-left h-auto",
                       "hover:bg-surface-hover transition-colors",
@@ -54,7 +54,7 @@ export function FreeBetSheetPanel({
                         <TokenIcon token={freeBet.token} size={18} />
                       </div>
                       <span className="font-medium text-foreground">
-                        {freeBet.amount} {freeBet.token.symbol}
+                        {freeBet.formattedAmount} {freeBet.token.symbol}
                       </span>
                     </div>
                     <Tooltip>

@@ -46,9 +46,6 @@ export function TokenProvider({ children }: TokenProviderProps) {
       // Chain has changed, cancel all in-flight queries and remove from cache
       queryClient.cancelQueries({ queryKey: ["casino-tokens"] })
       queryClient.removeQueries({ queryKey: ["casino-tokens"] })
-
-      // Clear selected token immediately to prevent showing old chain's token
-      setSelectedTokenInternal(getNativeToken(appChainId))
     }
     setPreviousChainId(appChainId)
   }, [appChainId, previousChainId, queryClient])

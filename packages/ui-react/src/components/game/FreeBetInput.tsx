@@ -6,7 +6,7 @@ import { Label } from "../ui/label"
 import { TokenIcon } from "../ui/TokenIcon"
 
 interface FreeBetInputProps {
-  amount: number
+  amount: string
   token: TokenWithImage
   isDisabled: boolean
   onClick: () => void
@@ -31,6 +31,7 @@ export function FreeBetInput({
           type="button"
           variant="ghost"
           onClick={onRemoveFreebet}
+          disabled={isDisabled}
           className={cn(
             "absolute right-0 bottom-full z-10",
             "flex items-center gap-1.5",
@@ -83,11 +84,13 @@ export function FreeBetInput({
           <span className="ml-8">{amount}</span>
         </Button>
         <div
+          aria-disabled={isDisabled}
           className={cn(
             "absolute right-[12px] top-1/2 -translate-y-1/2 transform",
-            "flex items-center text-foreground font-medium gap-1",
-            "h-auto w-fit p-0 bg-transparent hover:bg-transparent hover:opacity-80 transition-opacity",
-            "border-0 shadow-none outline-none focus:outline-none",
+            "flex items-center font-medium gap-1",
+            "h-auto w-fit p-0 bg-transparent border-0 shadow-none outline-none focus:outline-none",
+            "transition-opacity",
+            isDisabled ? "opacity-50 pointer-events-none" : "text-foreground hover:opacity-80",
           )}
         >
           <TokenIcon token={token} size={18} />
