@@ -152,12 +152,8 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
 
     // If freebets available, user wants to use freebets, but none selected - select first
     if (isFreebetsInCurrentChain && isUsingFreebet && !isSelectedFreebet) {
-      const firstFreebet = getFirstFreebet()
-      console.log("🔍 [FreebetsContext] No freebet selected, auto-selecting first:", {
-        firstFreebetId: firstFreebet?.id,
-        availableCount: currentChainFreebets.length,
-      })
-      selectFreebetById(firstFreebet?.id || null)
+      console.log("🔍 [FreebetsContext] No freebet selected, auto-selecting first")
+      selectFreebetById(getFirstFreebet()?.id || null)
       return
     }
 
@@ -179,7 +175,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
           availableIds: currentChainFreebets.map((f) => f.id),
           isUsingFreebet,
         })
-
         const firstFreebet = getFirstFreebet()
         const isFirstFreebetSameTokenAndChain =
           firstFreebet &&
