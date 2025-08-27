@@ -259,23 +259,21 @@ export function BettingPanel({
   }
 
   const handleFreeBetSelect = (freeBet: FreeBet) => {
-    console.log("🎯 [BettingPanel] handleFreeBetSelect called:", {
-      selectedFreebetId: freeBet.id,
-      freebetToken: freeBet.token.symbol,
-      freebetAmount: freeBet.amount,
-      timestamp: new Date().toISOString(),
-      caller: new Error().stack?.split("\n")[2]?.trim(),
-    })
+    console.log(
+      "🎯 [BettingPanel] handleFreeBetSelect called:",
+      `id=${freeBet.id}, token=${freeBet.token.symbol}, amount=${freeBet.amount}, ` +
+        `timestamp=${new Date().toISOString()}`,
+    )
     selectFreebetById(freeBet.id)
     setIsFreeBetSheetOpen(false)
     setIsFreebetsHubOpen(false)
   }
 
   const handleRemoveFreeBet = () => {
-    console.log("🚫 [BettingPanel] handleRemoveFreeBet called:", {
-      timestamp: new Date().toISOString(),
-      caller: new Error().stack?.split("\n")[2]?.trim(),
-    })
+    console.log(
+      "🚫 [BettingPanel] handleRemoveFreeBet called:",
+      `timestamp=${new Date().toISOString()}`,
+    )
     selectFreebetById(null)
   }
 

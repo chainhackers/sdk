@@ -76,6 +76,12 @@ export class FreebetStrategy<T extends GameChoice = GameChoice> implements IBetS
       timestamp: new Date().toISOString(),
     })
 
+    console.log("💰 [BetStrategies] Transaction params:", {
+      gasPrice: gasPrice.toString(),
+      vrfFeesWei: vrfFees.toString(),
+      chainId,
+    })
+
     const gameEncodedAbiParametersInput = gameDefinition.encodeAbiParametersInput(choice.choice)
 
     const betParams = {

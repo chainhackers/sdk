@@ -217,6 +217,12 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
         })
 
         logger.debug("placeBet: Submitting transaction", wagerWriteParams)
+        console.log("📤 [usePlaceBet] Final transaction details:", {
+          gasPrice: wagerWriteParams.gasPrice?.toString(),
+          value: wagerWriteParams.value?.toString(),
+          chainId: wagerWriteParams.chainId,
+          functionName: wagerWriteParams.functionName,
+        })
         wagerWriteHook.writeContract(wagerWriteParams)
       } catch (error) {
         logger.error("placeBet: Error preparing transaction", error)
