@@ -1,5 +1,4 @@
 import { formatRawAmount } from "@betswirl/sdk-core"
-import { useState } from "react"
 import { cn } from "../../lib/utils"
 import { FreeBet } from "../../types/types"
 import { Button } from "../ui/button"
@@ -7,7 +6,8 @@ import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import { TokenIcon } from "../ui/TokenIcon"
-import { PromoCodeInput } from "./PromoCodeInput"
+
+//import { PromoCodeInput } from "./PromoCodeInput" // TODO: Freebets code claim
 
 const PANEL_HEIGHT_CONNECTED = "!h-[70%]" // Larger height for connected state
 const PANEL_HEIGHT_DISCONNECTED = "!h-[238px]" // Smaller height for disconnected state
@@ -17,32 +17,33 @@ interface FreebetsHubSheetPanelProps {
   isConnected: boolean
   freebets: FreeBet[]
   onConnectWallet: () => void
-  onClaimCode: (code: string) => void
+  //onClaimCode: (code: string) => void // TODO: Freebets code claim
   onSelectFreebet: (freebet: FreeBet) => void
 }
 
-const MAX_CODE_LENGTH = 10
+//const MAX_CODE_LENGTH = 10 // TODO: Freebets code claim
 
 export function FreebetsHubSheetPanel({
   portalContainer,
   isConnected,
   freebets,
   onConnectWallet,
-  onClaimCode,
+  //onClaimCode, // TODO: Freebets code claim
   onSelectFreebet,
 }: FreebetsHubSheetPanelProps) {
-  const [codeInput, setCodeInput] = useState("")
-  const [error, setError] = useState<string | null>(null)
+  // TODO: Freebets code claim
+  // const [codeInput, setCodeInput] = useState("")
+  // const [error, setError] = useState<string | null>(null)
 
-  const handleClaimCode = () => {
-    if (codeInput.trim().length !== MAX_CODE_LENGTH) {
-      setError("Code must be 10 chars long")
-      return
-    }
-    setError(null)
-    onClaimCode(codeInput.trim())
-    setCodeInput("")
-  }
+  // const handleClaimCode = () => {
+  //   if (codeInput.trim().length !== MAX_CODE_LENGTH) {
+  //     setError("Code must be 10 chars long")
+  //     return
+  //   }
+  //   setError(null)
+  //   onClaimCode(codeInput.trim())
+  //   setCodeInput("")
+  // }
 
   const handleFreeBetClick = (freeBet: FreeBet) => {
     onSelectFreebet(freeBet)
@@ -60,7 +61,7 @@ export function FreebetsHubSheetPanel({
       >
         <ScrollArea className="h-full w-full rounded-t-[16px] overflow-hidden">
           <div className="flex flex-col p-[16px]">
-            <h2 className="text-xl font-bold mb-[12px] leading-[24px] text-[18px]">Freebets</h2>
+            {/* <h2 className="text-xl font-bold mb-[12px] leading-[24px] text-[18px]">Freebets</h2> */}
 
             {!isConnected ? (
               // Disconnected state
@@ -99,7 +100,8 @@ export function FreebetsHubSheetPanel({
             ) : (
               // Connected state
               <div className="flex flex-col gap-[12px]">
-                {/* Code claim section */}
+                {/* TODO: Freebets code claim */}
+                {/* 
                 <div
                   className={cn(
                     "rounded-[16px]",
@@ -144,6 +146,7 @@ export function FreebetsHubSheetPanel({
                     </Button>
                   </div>
                 </div>
+                */}
 
                 {/* Casino freebets section */}
                 <div className="flex flex-col gap-[8px]">
