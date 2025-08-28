@@ -3,7 +3,7 @@ import { Steps, Callout } from 'nextra/components';
 
 # Placing a bet
 
-After preparing a bet, you can finally place it. Globaly, there are 3 steps to place a bet:
+After preparing a bet, you can finally place it. Globally, there are 3 steps to place a bet:
 <Steps>
 ### 1. Approve (optional)
 The player needs to approve the bet amount to be deducted from their wallet. It is not required if the bet token is the gas token or if the remaining allowance is already set.
@@ -42,12 +42,27 @@ The resolution of the bet is waiting for the Chainlink VRF to be fulfilled (gene
   The approval step is automatically managed by the sdk, you do not need to do it manually.
 </Callout>
 <Callout type="info">
-  The code below uses a BetSwirl client, but all functions are available also with a BetSwirl wallet.
+  The code below uses a BetSwirl client, but all functions are also available with a BetSwirl wallet.
 </Callout>
 ```typescript
 import {
     placeDiceBet,
+    ApproveResult,
+    TransactionReceipt,
+    CasinoPlacedBet,
+    WeightedGameConfiguration,
+    CASINO_GAME_TYPE,
+    DiceChoiceInput,
+    CoinTossChoiceInput,
+    RouletteChoiceInput,
+    KenoChoiceInput,
+    WeightedGameChoiceInput,
+    WEIGHTED_CASINO_GAME_TYPE,
+    labelCasinoGameByType,
+    formatTxnUrl,
 } from "@betswirl/sdk-core";
+
+import {Hash, TransactionReceipt} from "viem"
 
 // 1. Get the bet amount, bet count, choice input & gameToken from previous steps
 const betAmount = ...

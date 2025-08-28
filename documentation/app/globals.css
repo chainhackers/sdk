@@ -24,3 +24,27 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Style pour les blocs de code Nextra */
+.nextra-code-block,
+.nextra-code-block *,
+.nextra-code-block pre,
+.nextra-code-block > div,
+.nextra-code-block > div * {
+  background-color: #e6f3ff !important;
+}
+
+/* Style pour les blocs de code inline */
+.nextra-code,
+.nextra-code * {
+  background-color: #e6f3ff !important;
+}
+
+/* Style spécifique pour les bordures */
+[data-theme="light"] .nextra-code-block,
+[data-theme="light"] .nextra-code-block *,
+[data-theme="light"] .nextra-code {
+  background-color: #e6f3ff !important;
+}
+
+

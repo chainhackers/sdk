@@ -3,7 +3,7 @@ import { Steps, Callout } from 'nextra/components';
 
 # Preparing a bet
 
-Before to place a bet, you need to prepare it in order to maximize the chances of it being accepted
+Before placing a bet, you need to prepare it in order to maximize the chances of it being accepted
 
 
 ## Code Examples
@@ -46,7 +46,7 @@ const selectedRouletteNumbers = [rouletteInputs[0]!, rouletteInputs[1]!]
 // You can combine multiple numbers into one input (if the same number is selected multiple times, it will automatically keep it only once)
 const selectedRouletteInput = Roulette.combineChoiceInputs(selectedRouletteNumbers, gameToken.affiliateHouseEdge);
 
-// 2.4 Keno - Get a ball of multiple balls (1 to 40 but the max number depends on the configuration)
+// 2.4 Keno - Get a ball or multiple balls (1 to 40 but the max number depends on the configuration)
 // Get the Keno configuration for the selected game/token
 const kenoConfig = await yourBetSwirlClient.getKenoConfiguration(
         gameToken,
@@ -94,7 +94,7 @@ const isAllowed = betRequirements.isAllowed
 const betRequirements = ...
 const maxBetCount = betRequirements.maxBetCount
 
-// 2. Select the wanted bet count 
+// 2. Select the desired bet count 
 const selectedBetCount = 10
 if (selectedBetCount > maxBetCount || selectedBetCount < 1) {
     throw new Error("Invalid bet count")
@@ -156,7 +156,7 @@ if (gasBalanceRemainingAfterFees < 0n) {
 // If token is gas balance, substract the fees
 const availableTokenBalance =
     casinoGameToken.address === zeroAddress ? gasBalanceRemainingAfterFees : userTokenBalance;
-// Take into consideration the max bet amount for the balance user but also max bet amount of the bet
+// Take into consideration the max bet amount for the user balance but also max bet amount of the bet
 const maxAmountPerBetFormatted = Math.min(
   Number(
     formatRawAmount(
