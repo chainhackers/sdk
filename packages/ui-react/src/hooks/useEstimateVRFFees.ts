@@ -8,7 +8,7 @@ import {
   wrappedGasTokenById,
 } from "@betswirl/sdk-core"
 import { useEffect, useMemo, useState } from "react"
-import { useCall } from "wagmi"
+import { useCall, usePublicClient } from "wagmi"
 import { CHAINLINK_VRF_FEES_BUFFER_PERCENT } from "../consts"
 import { useChain } from "../context/chainContext"
 import { useGasPrice } from "./useGasPrice"
@@ -41,8 +41,10 @@ type UseEstimateVRFFeesProps = {
  */
 export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
   const { appChainId } = useChain()
-  const { data: gasPriceData } = useGasPrice()
+  const { data: gasPriceData, refetch: refetchGasPrice } = useGasPrice()
   const [vrfFees, setVrfFees] = useState<bigint>(0n)
+  const publicClient = usePublicClient({ chainId: appChainId })
+
   const functionData = useMemo(() => {
     if (!props.game || !props.token) return null
     return getChainlinkVrfCostFunctionData(
@@ -68,11 +70,8 @@ export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
   useEffect(() => {
     // Trick to always have a value in vrfFees (because when useCall is refetched, it resets the data)
     if (vrfEstimateQuery.data?.data) {
-      const rawVrfFees = BigInt(vrfEstimateQuery.data.data)
-      const bufferMultiplier = BigInt(CHAINLINK_VRF_FEES_BUFFER_PERCENT + 100)
-
       // Add a 26% buffer to the Chainlink VRF fees to cover gas price peaks
-      setVrfFees((rawVrfFees * bufferMultiplier) / 100n)
+      setVrfFees(calculateVrfFeesWithBuffer(vrfEstimateQuery.data.data))
     }
   }, [vrfEstimateQuery.data?.data])
 
@@ -82,10 +81,50 @@ export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
     )
   }, [vrfFees, appChainId])
 
+  async function getVrfFeesAndGasPrice(): Promise<{ vrfFees: bigint; gasPrice: bigint }> {
+    if (!functionData || !publicClient) {
+      return { vrfFees, gasPrice: gasPriceData.optimalGasPrice }
+    }
+
+    try {
+      const gasPriceResult = await refetchGasPrice()
+      const freshGasPrice = gasPriceResult.data?.optimalGasPrice || gasPriceData.optimalGasPrice
+
+      if (!freshGasPrice) {
+        return { vrfFees, gasPrice: gasPriceData.optimalGasPrice }
+      }
+
+      const vrfFeesResult = await publicClient.call({
+        account: wrappedGasTokenById[appChainId],
+        to: functionData.data.to,
+        data: functionData.encodedData,
+        gasPrice: freshGasPrice,
+        gas: VRF_ESTIMATION_GAS_LIMIT,
+      })
+
+      if (vrfFeesResult.data) {
+        const freshVrfFees = calculateVrfFeesWithBuffer(vrfFeesResult.data)
+        return { vrfFees: freshVrfFees, gasPrice: freshGasPrice }
+      }
+
+      return { vrfFees, gasPrice: freshGasPrice }
+    } catch (error) {
+      console.log("getVrfFeesAndGasPrice failed: ", error)
+      return { vrfFees, gasPrice: gasPriceData.optimalGasPrice }
+    }
+  }
+
+  function calculateVrfFeesWithBuffer(rawVrfFees: string): bigint {
+    const vrfFeesBigInt = BigInt(rawVrfFees)
+    const bufferMultiplier = BigInt(CHAINLINK_VRF_FEES_BUFFER_PERCENT + 100)
+    return (vrfFeesBigInt * bufferMultiplier) / 100n
+  }
+
   return {
     wagmiHook: vrfEstimateQuery,
     vrfFees,
     gasPrice: gasPriceData.optimalGasPrice,
     formattedVrfFees,
+    getVrfFeesAndGasPrice,
   }
 }
