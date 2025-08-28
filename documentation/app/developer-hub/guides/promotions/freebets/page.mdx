@@ -1,0 +1,276 @@
+import { Tabs, Tab } from 'nextra/components'
+import { Steps, Callout } from 'nextra/components';
+
+# Freebets
+
+Freebets are a type of promotion that allows players to place bets without betting their own money. They are a great way to attract new players and keep existing ones engaged.
+
+## How to use freebets
+
+There are 4 steps to use freebets:
+<Steps>
+### Create a freebet campaign as an affiliate
+You can create a freebet campaign via the [BetSwirl affiliate panel](https://www.betswirl.com/affiliate/freebets).
+There are 2 types of freebet campaigns:
+- **User campaign**: You decide in advance which users will receive one or multiple freebets.
+- **Code campaign**: You don't precise in advance which users will receive freebets, but you create a code that can be used by the user to claim a freebet.
+
+=> In both cases, you need to be whitelisted to unlock the freebet feature. More info on our [Affiliate program](/protocol-hub/partners/affiliates)
+### Fetch the available freebets of the user
+Fetch the non-expired freebets of a user.
+
+### Wager
+The bet is placed with all the information needed (choice input, freebet id, etc.), almost in the same way you place a "normal" bet.
+
+### Wait and get the result
+The resolution of the bet is waiting for the Chainlink VRF to be fulfilled (generally few seconds), in the same way you wait a "normal" bet.
+
+</Steps>
+
+## 💡Tips & Tricks
+
+### Gas Price and VRF Fees
+
+- **VRF fees are not included in the freebet**: The user will have to pay the VRF fees to get the bet placed and resolved.
+
+- **Consistent gas pricing is crucial**: The gas price used to estimate VRF fees must match the gas price used when placing the bet. Using a higher gas price for bet placement may result in insufficient VRF fees, causing the transaction to be rejected.
+
+- **Buffer VRF fees**: Always include a buffer above the estimated VRF fees to account for gas price fluctuations. Any excess fees are automatically refunded to the user.
+
+### Resolution Time
+- **Bet resolution is not instantaneous**: Bets typically take 3-30 seconds to resolve, depending on network conditions. This delay is necessary for Chainlink VRF to generate and deliver the random number to the smart contracts.
+
+### Parameter Validation
+- **Validate all parameters before placing bets**: Ensure the token/game combination is allowed, the bet amount is within limits. In the same way you validate the parameters before placing a "normal" bet.
+
+### Max Bet Amount
+- **Max bet limits are dynamic**: The maximum bet amount is calculated based on the game's maximum payout multiplier, available bankroll, and the token's risk tolerance. Higher volatility games typically have lower maximum bet limits to manage risk exposure.
+
+### Only single bet
+- **Only single bet is allowed**: You can only place a single bet with a freebet, meaning the bet count will be always 1.
+
+### Payout
+- **Payout is 100% for the user**: If the user wins, 100% of the payout is sent to the user.
+
+### Freebet bankroll management
+- **Freebet bankroll is managed by the affiliate**: The affiliate is responsible for managing the freebet bankroll, if you don't have enough funds in your freebet bankroll, the user will not be able to place the freebet. Freebet bankroll is managed via the [BetSwirl affiliate panel](https://www.betswirl.com/base/affiliate/freebets-bankroll).
+## Code Examples
+
+<Tabs items={['Core SDK', 'React SDK']}>
+  <Tabs.Tab>
+
+### 1. Fetch the available freebets of the user
+<Callout type="info">
+  You can use the freebets created by the bankroll managers (setting true to the last parameter).
+</Callout>
+
+```typescript
+const affiliateAddress = process.env.AFFILIATE_ADDRESS;
+ // fetchFreebets returns only the non-expired freebets
+const freebets = await yourBetSwirlClient.fetchFreebets(
+  yourBetSwirlClient.betSwirlWallet.getAccount()!.address, // player address
+  affiliateAddress, // affiliate address
+  true, // include bankroll manager freebets  
+);
+
+const selectedFreebet = freebets[0];
+
+```
+### 2. Wager
+
+<Callout type="info">
+  Before placing the bet, you need to follow [Prepare environment](/developer-hub/guides/basics/preparing-environment) & [Prepare bet](/developer-hub/guides/basics/preparing-bet) steps. The main differences are the bet count must be 1 and you already know the token to use (but you still need to check if the game/token is allowed).
+</Callout>
+
+```typescript
+import {
+    placeDiceBet,
+    ApproveResult,
+    TransactionReceipt,
+    CasinoPlacedBet,
+    WeightedGameConfiguration,
+    CASINO_GAME_TYPE,
+    DiceChoiceInput,
+    CoinTossChoiceInput,
+    RouletteChoiceInput,
+    KenoChoiceInput,
+    WeightedGameChoiceInput,
+    WEIGHTED_CASINO_GAME_TYPE,
+    labelCasinoGameByType,
+    formatTxnUrl,
+} from "@betswirl/sdk-core";
+
+import {Hash, TransactionReceipt} from "viem"
+
+// 1. Get the bet amount, bet count, choice input & gameToken from previous steps
+const choiceInput = ...
+const selectedFreebet = ...
+
+// 2. Prepare the common params (params in common for all games)
+const commonParams = {
+  freebet: selectedFreebet,
+};
+
+// 3. Prepare the callbacks
+const callbacks = {
+  onBetPlacedPending: (_tx: Hash) => {
+    console.log("⌛ Waiting the freebet to be placed...");
+  },
+};
+
+// 4. Place the freebet 
+  let placedBetData: {
+    receipt: TransactionReceipt;
+    placedBet: CasinoPlacedBet;
+    weightedGameConfig?: WeightedGameConfiguration;
+  };
+
+  // 4.1 Dice
+ if (inputChoice.game === CASINO_GAME_TYPE.DICE) {
+    const diceCap = (inputChoice as DiceChoiceInput).value;
+    placedBetData = await wagmiBetSwirlClient.playFreebetDice(
+      { ...commonParams, cap: diceCap },
+      undefined,
+      callbacks,
+    );
+  } 
+  // 4.2 Coin toss
+  else if (inputChoice.game === CASINO_GAME_TYPE.COINTOSS) {
+    const coinTossFace = (inputChoice as CoinTossChoiceInput).value;
+    placedBetData = await wagmiBetSwirlClient.playFreebetCoinToss(
+      { ...commonParams, face: coinTossFace },
+      undefined,
+      callbacks,
+    );
+  } 
+  // 4.3 Roulette
+  else if (inputChoice.game === CASINO_GAME_TYPE.ROULETTE) {
+    const rouletteNumbers = (inputChoice as RouletteChoiceInput).value;
+    placedBetData = await wagmiBetSwirlClient.playFreebetRoulette(
+      { ...commonParams, numbers: rouletteNumbers },
+      undefined,
+      callbacks,
+    );
+  }
+  // 4.4 Keno
+  else if (inputChoice.game === CASINO_GAME_TYPE.KENO) {
+    const kenoChoice = inputChoice as KenoChoiceInput;
+    placedBetData = await wagmiBetSwirlClient.playFreebetKeno(
+      { ...commonParams, balls: kenoChoice.value, kenoConfig: kenoChoice.config },
+      undefined,
+      callbacks,
+    );
+  }
+  // 4.5 Wheel & Plinko (Weighted game)
+  else {
+    const weightedGameChoice = inputChoice as WeightedGameChoiceInput;
+    placedBetData = await wagmiBetSwirlClient.playFreebetWeightedGame(
+      {
+        ...commonParams,
+        weightedGameConfig: weightedGameChoice.config,
+        game: weightedGameChoice.game as WEIGHTED_CASINO_GAME_TYPE,
+      },
+      undefined,
+      callbacks,
+    );
+  }
+  console.log(
+      `✅ Your ${
+        labelCasinoGameByType[casinoGameToken.game]
+      } freeebet has been placed successfully!\n Place bet txn: ${formatTxnUrl(
+        placedBetData.receipt.transactionHash,
+        casinoGameToken.chainId,
+      )}`,
+  );
+
+const placedFreebet = placedBetData.placedFreebet;
+
+```
+### 3. Wait and get the result
+
+<Callout type="info">
+  This step is the exact same as for a ["normal" bet](/developer-hub/guides/basics/placing-bet#2-waiting-the-bet-resolution--get-the-result).
+</Callout>
+
+
+```typescript
+import {type CasinoRolledBet, formatRawAmount, formatTxnUrl, FORMAT_TYPE, getBetSwirlBetUrl, chainById, WEIGHTED_CASINO_GAME_TYPES, WeightedCasinoPlacedBet, NormalCasinoPlacedBet} from "@betswirl/sdk-core"
+import {type TransactionReceipt} from "viem"
+
+// 1. Get the placed bet data from previous step
+const placedBet = ...
+
+//2. Function to display the bet result
+function _displayRolledBet(rolledBet: CasinoRolledBet) {
+  const chain = chainById[rolledBet.chainId];
+  const commonMessage = 
+    `Payout: ${rolledBet.formattedPayout} ${
+      rolledBet.token.symbol
+    }\nTotal bet amount: ${rolledBet.formattedRollTotalBetAmount} ${rolledBet.token.symbol}\nBet count: ${rolledBet.rollBetCount}\nCharged VRF cost: ${formatRawAmount(
+      rolledBet.chargedVRFCost,
+      chain.nativeCurrency.decimals,
+      FORMAT_TYPE.PRECISE,
+    )} ${chain.nativeCurrency.symbol}\nRolled: ${JSON.stringify(
+      rolledBet.decodedRolled,
+    )}\nRoll txn: ${formatTxnUrl(rolledBet.rollTxnHash, rolledBet.chainId)}\nBetSwirl url: ${getBetSwirlBetUrl(rolledBet.id, rolledBet.game, rolledBet.chainId)}`,
+  // Win
+  if (rolledBet.isWin) {
+    console.log(
+        `🥳 Congrats you won ${rolledBet.formattedBenefit} ${rolledBet.token.symbol} (x${rolledBet.formattedPayoutMultiplier})\n`,
+        commonMessage,
+      ),
+  }
+  // Loss
+  else {
+    console.log(
+        `😔 Arf, you lost ${rolledBet.formattedBenefit} ${rolledBet.token.symbol} (x${rolledBet.formattedPayoutMultiplier})\n`,
+        commonMessage,
+    );
+  }
+}
+
+// 3.Wait for the roll
+let rolledBetData:{
+  rolledBet: CasinoRolledBet;
+  receipt: TransactionReceipt;
+}
+// 3.1 Weighted game
+console.log("⌛ Waiting the bet to be rolled...");
+if (WEIGHTED_CASINO_GAME_TYPES.includes(placedBet.game)) {
+rolledBetData = await yourBetSwirlClient.waitRolledBet(
+    placedBet as WeightedCasinoPlacedBet,
+    {
+      timeout: 120000, //2min
+      pollingInterval: 1000, // ms
+      formatType: FORMAT_TYPE.FULL_PRECISE,
+    },
+    (selectedInput as WeightedGameChoiceInput).config,
+    gameToken.affiliateHouseEdge,
+  );
+} 
+// 3.2 Normal game
+else {
+  rolledBetData = await yourBetSwirlClient.waitRolledBet(
+    placedBet as NormalCasinoPlacedBet,
+    {
+      timeout: 120000, //2min
+      pollingInterval: 1000, // ms
+      formatType: FORMAT_TYPE.FULL_PRECISE,
+    }
+  );
+}
+
+// 4. Display the bet result
+const rolledBet = rolledBetData.rolledBet;
+_displayRolledBet(rolledBet);
+
+```
+
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+  ```react
+  Under development
+  ```
+  </Tabs.Tab>
+</Tabs>

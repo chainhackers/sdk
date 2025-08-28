@@ -1,4 +1,4 @@
-import { BP_VALUE, WeightedGameConfiguration } from "@betswirl/sdk-core"
+import { BP_bigint, BP_VALUE, WeightedGameConfiguration } from "@betswirl/sdk-core"
 import { forwardRef, RefObject, useEffect, useImperativeHandle, useMemo } from "react"
 import wheelArrow from "../../assets/game/wheel-arrow.svg"
 import wheelDark from "../../assets/game/wheel-dark.svg"
@@ -62,7 +62,7 @@ interface WheelProps {
  * @param multiplier - The multiplier value as bigint
  * @returns Formatted string representation (e.g., "1.50x", "0.00x")
  */
-function formatMultiplier(multiplier: bigint): string {
+function formatMultiplier(multiplier: BP_bigint): string {
   return multiplier === 0n ? "0.00x" : `${(Number(multiplier) / BP_VALUE).toFixed(2)}x`
 }
 

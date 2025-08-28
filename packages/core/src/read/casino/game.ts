@@ -431,11 +431,9 @@ export function getGamePausedFunctionData(
       args,
     }),
   };
-}
-
-/**
+} /**
  * Raw token info data returned by the smart contract
- * [0] - houseEdge: House edge rate (BP_VALUE)
+ * [0] - houseEdge: House edge rate (BP)
  * [1] - pendingCount: Number of pending bets
  * [2] - vrfSubId: Chainlink VRF v2.5 subscription ID
  * [3] - VRFCallbackGasBase: How much gas is needed in the Chainlink VRF callback

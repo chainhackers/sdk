@@ -1,0 +1,256 @@
+import { Tabs, Tab } from 'nextra/components'
+import { Steps, Callout } from 'nextra/components';
+
+# Placing a bet
+
+After preparing a bet, you can finally place it. Globally, there are 3 steps to place a bet:
+<Steps>
+### 1. Approve (optional)
+The player needs to approve the bet amount to be deducted from their wallet. It is not required if the bet token is the gas token or if the remaining allowance is already set.
+
+### 2. Wager
+The bet is placed with all the information needed (choice input, bet count, bet amount, token, etc.).
+
+### 3. Wait and get the result
+The resolution of the bet is waiting for the Chainlink VRF to be fulfilled (generally few seconds).
+
+</Steps>
+
+## 💡Tips & Tricks
+
+### Gas Price and VRF Fees
+- **Consistent gas pricing is crucial**: The gas price used to estimate VRF fees must match the gas price used when placing the bet. Using a higher gas price for bet placement may result in insufficient VRF fees, causing the transaction to be rejected.
+
+- **Buffer VRF fees**: Always include a buffer above the estimated VRF fees to account for gas price fluctuations. Any excess fees are automatically refunded to the user.
+
+### Resolution Time
+- **Bet resolution is not instantaneous**: Bets typically take 3-30 seconds to resolve, depending on network conditions. This delay is necessary for Chainlink VRF to generate and deliver the random number to the smart contracts.
+
+### Parameter Validation
+- **Validate all parameters before placing bets**: Ensure the token/game combination is allowed, the bet amount is within limits, and the bet count doesn't exceed maximum allowed values.
+
+### Max Bet Amount
+- **Max bet limits are dynamic**: The maximum bet amount is calculated based on the game's maximum payout multiplier, available bankroll, and the token's risk tolerance. Higher volatility games typically have lower maximum bet limits to manage risk exposure.
+
+## Code Examples
+
+<Tabs items={['Core SDK', 'React SDK']}>
+  <Tabs.Tab>
+
+### 1. Approval + Wager
+<Callout type="info">
+  The approval step is automatically managed by the sdk, you do not need to do it manually.
+</Callout>
+<Callout type="info">
+  The code below uses a BetSwirl client, but all functions are also available with a BetSwirl wallet.
+</Callout>
+```typescript
+import {
+    placeDiceBet,
+    ApproveResult,
+    TransactionReceipt,
+    CasinoPlacedBet,
+    WeightedGameConfiguration,
+    CASINO_GAME_TYPE,
+    DiceChoiceInput,
+    CoinTossChoiceInput,
+    RouletteChoiceInput,
+    KenoChoiceInput,
+    WeightedGameChoiceInput,
+    WEIGHTED_CASINO_GAME_TYPE,
+    labelCasinoGameByType,
+    formatTxnUrl,
+} from "@betswirl/sdk-core";
+
+import {Hash, TransactionReceipt} from "viem"
+
+// 1. Get the bet amount, bet count, choice input & gameToken from previous steps
+const betAmount = ...
+const betCount = ...
+const choiceInput = ...
+const gameToken = ...
+
+// 2. Prepare the common params (params in common for all games)
+const commonParams = {
+  betCount,
+  betAmount,
+  tokenAddress: casinoGameToken.address,
+};
+
+// 3. Prepare the callbacks
+const callbacks = {
+  onApprovePending: (_tx: Hash, _result: ApproveResult) => {
+    console.log(`⌛ ${casinoGameToken.symbol} is approving...`);
+  },
+    onApproved: (receipt: TransactionReceipt, _result: ApproveResult) => {
+      console.log(
+        `✅ ${casinoGameToken.symbol} has been approved successfully!\nApproval txn: ${formatTxnUrl(
+          receipt.transactionHash,
+          casinoGameToken.chainId,
+        )}`,
+    );
+  },
+  onBetPlacedPending: (_tx: Hash) => {
+    console.log("⌛ Waiting the bet to be placed...");
+  },
+};
+
+// 4. Place the bet 
+  let placedBetData: {
+    receipt: TransactionReceipt;
+    placedBet: CasinoPlacedBet;
+    weightedGameConfig?: WeightedGameConfiguration;
+  };
+
+  // 4.1 Dice
+  if (inputChoice.game === CASINO_GAME_TYPE.DICE) {
+    const diceCap = (inputChoice as DiceChoiceInput).value;
+    placedBetData = await yourBetSwirlClient.playDice(
+      { ...commonParams, cap: diceCap },
+      undefined,
+      callbacks,
+      casinoGameToken.chainId,
+    );
+
+    // 4.2 CoinToss
+  } else if (inputChoice.game === CASINO_GAME_TYPE.COINTOSS) {
+    const coinTossFace = (inputChoice as CoinTossChoiceInput).value;
+    placedBetData = await yourBetSwirlClient.playCoinToss(
+      { ...commonParams, face: coinTossFace },
+      undefined,
+      callbacks,
+      casinoGameToken.chainId,
+    );
+
+    // 4.3 Roulette
+  } else if (inputChoice.game === CASINO_GAME_TYPE.ROULETTE) {
+    const rouletteNumbers = (inputChoice as RouletteChoiceInput).value;
+    placedBetData = await yourBetSwirlClient.playRoulette(
+      { ...commonParams, numbers: rouletteNumbers },
+      undefined,
+      callbacks,
+      casinoGameToken.chainId,
+    );
+
+    // 4.4 Keno
+  } else if (inputChoice.game === CASINO_GAME_TYPE.KENO) {
+    const kenoChoice = inputChoice as KenoChoiceInput;
+    placedBetData = await yourBetSwirlClient.playKeno(
+      { ...commonParams, balls: kenoChoice.value, kenoConfig: kenoChoice.config },
+      undefined,
+      callbacks,
+      casinoGameToken.chainId,
+    );
+  }
+
+  // 4.5 Wheel & Plinko (Weighted game)
+  else {
+    const weightedGameChoice = inputChoice as WeightedGameChoiceInput;
+    placedBetData = await yourBetSwirlClient.playWeightedGame(
+      {
+        ...commonParams,
+        weightedGameConfig: weightedGameChoice.config,
+        game: weightedGameChoice.game as WEIGHTED_CASINO_GAME_TYPE,
+      },
+      undefined,
+      callbacks,
+      casinoGameToken.chainId,
+    );
+  }
+
+console.log(
+    `✅ Your ${
+      labelCasinoGameByType[casinoGameToken.game]
+    } bet has been placed successfully!\n Place bet txn: ${formatTxnUrl(
+      placedBetData.receipt.transactionHash,
+      casinoGameToken.chainId,
+    )}`,
+);
+
+const placedBet =placedBetData.placedBet;
+
+```
+
+### 2. Waiting the bet resolution & get the result
+
+```typescript
+import {type CasinoRolledBet, formatRawAmount, formatTxnUrl, FORMAT_TYPE, getBetSwirlBetUrl, chainById, WEIGHTED_CASINO_GAME_TYPES, WeightedCasinoPlacedBet, NormalCasinoPlacedBet} from "@betswirl/sdk-core"
+import {type TransactionReceipt} from "viem"
+
+// 1. Get the placed bet data from previous step
+const placedBet = ...
+
+//2. Function to display the bet result
+function _displayRolledBet(rolledBet: CasinoRolledBet) {
+  const chain = chainById[rolledBet.chainId];
+  const commonMessage = 
+    `Payout: ${rolledBet.formattedPayout} ${
+      rolledBet.token.symbol
+    }\nTotal bet amount: ${rolledBet.formattedRollTotalBetAmount} ${rolledBet.token.symbol}\nBet count: ${rolledBet.rollBetCount}\nCharged VRF cost: ${formatRawAmount(
+      rolledBet.chargedVRFCost,
+      chain.nativeCurrency.decimals,
+      FORMAT_TYPE.PRECISE,
+    )} ${chain.nativeCurrency.symbol}\nRolled: ${JSON.stringify(
+      rolledBet.decodedRolled,
+    )}\nRoll txn: ${formatTxnUrl(rolledBet.rollTxnHash, rolledBet.chainId)}\nBetSwirl url: ${getBetSwirlBetUrl(rolledBet.id, rolledBet.game, rolledBet.chainId)}`,
+  // Win
+  if (rolledBet.isWin) {
+    console.log(
+        `🥳 Congrats you won ${rolledBet.formattedBenefit} ${rolledBet.token.symbol} (x${rolledBet.formattedPayoutMultiplier})\n`,
+        commonMessage,
+      ),
+  }
+  // Loss
+  else {
+    console.log(
+        `😔 Arf, you lost ${rolledBet.formattedBenefit} ${rolledBet.token.symbol} (x${rolledBet.formattedPayoutMultiplier})\n`,
+        commonMessage,
+    );
+  }
+}
+
+// 3.Wait for the roll
+let rolledBetData:{
+  rolledBet: CasinoRolledBet;
+  receipt: TransactionReceipt;
+}
+// 3.1 Weighted game
+console.log("⌛ Waiting the bet to be rolled...");
+if (WEIGHTED_CASINO_GAME_TYPES.includes(placedBet.game)) {
+rolledBetData = await yourBetSwirlClient.waitRolledBet(
+    placedBet as WeightedCasinoPlacedBet,
+    {
+      timeout: 120000, //2min
+      pollingInterval: 1000, // ms
+      formatType: FORMAT_TYPE.FULL_PRECISE,
+    },
+    (selectedInput as WeightedGameChoiceInput).config,
+    gameToken.affiliateHouseEdge,
+  );
+} 
+// 3.2 Normal game
+else {
+  rolledBetData = await yourBetSwirlClient.waitRolledBet(
+    placedBet as NormalCasinoPlacedBet,
+    {
+      timeout: 120000, //2min
+      pollingInterval: 1000, // ms
+      formatType: FORMAT_TYPE.FULL_PRECISE,
+    }
+  );
+}
+
+// 4. Display the bet result
+const rolledBet = rolledBetData.rolledBet;
+_displayRolledBet(rolledBet);
+
+```
+
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+  ```react
+  Under development
+  ```
+  </Tabs.Tab>
+</Tabs>

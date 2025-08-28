@@ -1,4 +1,4 @@
-import { CASINO_GAME_TYPE, formatRawAmount, GAS_TOKEN_ADDRESS } from "@betswirl/sdk-core"
+import { BP, CASINO_GAME_TYPE, formatRawAmount, GAS_TOKEN_ADDRESS } from "@betswirl/sdk-core"
 import { WalletModal } from "@coinbase/onchainkit/wallet"
 import { Gift } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
@@ -26,7 +26,7 @@ interface BettingPanelProps {
   betStatus: BetStatus | null
   betAmount: bigint | undefined
   betCount: number
-  grossMultiplier: number // BP
+  grossMultiplier: BP
   vrfFees: bigint
   onBetAmountChange: (amount: bigint | undefined) => void
   onPlayBtnClick: () => void

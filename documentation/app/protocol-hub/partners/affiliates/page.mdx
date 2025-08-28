@@ -47,35 +47,105 @@ Claim what you earned from house edge revenue. [Claim your earnings](https://www
 
 ## Dashboard Features
 
-### 🎁 Freebets Management
-**Access**: [Freebets Dashboard](https://www.betswirl.com/affiliate/freebets) *(Requires BetSwirl authorization)*
+import { Tabs } from 'nextra/components'
 
-Create and distribute freebets to attract new users to your platform.
-
-### 🏆 Leaderboards
-**Access**: [Leaderboards Dashboard](https://www.betswirl.com/base/affiliate/leaderboards) *(Requires BetSwirl authorization)*
-
-Set up competitive leaderboards to engage your users and create additional revenue streams through tournament-style gameplay.
-
-### 💰 Revenue Management
-**Access**: [Revenues Dashboard](https://www.betswirl.com/base/affiliate/revenues)
-
-Claim your 30% share of house edge revenue from all bets placed through your frontend. Track your earnings in real-time.
-
-### ⚙️ House Edge Configuration
-**Access**: [House Edge Dashboard](https://www.betswirl.com/base/affiliate/house-edge)
-
-Customize house edge settings for different games to optimize your revenue and user experience.
-
-### 👥 User Analytics
-**Access**: [Users Dashboard](https://www.betswirl.com/base/affiliate/affiliated-users)
-
-Monitor your user base, track engagement, and analyze betting patterns to optimize your platform.
-
-### 👨‍💼 Team Management
-**Access**: [Whitelist Management](https://www.betswirl.com/affiliate/whitelist)
-
-Manage your team members, set permissions, and control access to your affiliate features.
+<Tabs items={['🎁 Freebets', '🏆 Leaderboards', '💰 Revenue', '⚙️ House Edge', '👥 Analytics', '👨‍💼 Team']}>
+  <Tabs.Tab>
+    ### 🎁 Freebets Management
+    **Access**: [Freebets Dashboard](https://www.betswirl.com/affiliate/freebets) *(Requires BetSwirl authorization)*
+    
+    Create and distribute freebets to attract new users to your platform.
+    
+    <Image 
+      src="/img/dashboard/freebets.png" 
+      alt="Freebets Management Dashboard" 
+      width={0}
+      height={0}
+      sizes="100vw"
+      className="rounded-lg border mt-4 w-full h-auto"
+    />
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ### 🏆 Leaderboards
+    **Access**: [Leaderboards Dashboard](https://www.betswirl.com/base/affiliate/leaderboards) *(Requires BetSwirl authorization)*
+    
+    Set up competitive leaderboards to engage your users and create additional revenue streams through tournament-style gameplay.
+    
+    <Image 
+      src="/img/dashboard/leaderboards.png" 
+      alt="Leaderboards Dashboard" 
+      width={0}
+      height={0}
+      sizes="100vw"
+      className="rounded-lg border mt-4 w-full h-auto"
+    />
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ### 💰 Revenue Management
+    **Access**: [Revenues Dashboard](https://www.betswirl.com/base/affiliate/revenues)
+    
+    Claim your 30% share of house edge revenue from all bets placed through your frontend. Track your earnings in real-time.
+    
+    <Image 
+      src="/img/dashboard/revenue.png" 
+      alt="Revenue Management Dashboard" 
+      width={0}
+      height={0}
+      sizes="100vw"
+      className="rounded-lg border mt-4 w-full h-auto"
+    />
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ### ⚙️ House Edge Configuration
+    **Access**: [House Edge Dashboard](https://www.betswirl.com/base/affiliate/house-edge)
+    
+    Customize house edge settings for different games to optimize your revenue and user experience.
+    
+    <Image 
+      src="/img/dashboard/house-edge.png" 
+      alt="House Edge Configuration Dashboard" 
+      width={0}
+      height={0}
+      sizes="100vw"
+      className="rounded-lg border mt-4 w-full h-auto"
+    />
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ### 👥 User Analytics
+    **Access**: [Users Dashboard](https://www.betswirl.com/base/affiliate/affiliated-users)
+    
+    Monitor your user base, track engagement, and analyze betting patterns to optimize your platform.
+    
+    <Image 
+      src="/img/dashboard/analytics.png" 
+      alt="User Analytics Dashboard" 
+      width={0}
+      height={0}
+      sizes="100vw"
+      className="rounded-lg border mt-4 w-full h-auto"
+    />
+  </Tabs.Tab>
+  
+  <Tabs.Tab>
+    ### 👨‍💼 Team Management
+    **Access**: [Whitelist Management](https://www.betswirl.com/affiliate/whitelist)
+    
+    Manage your team members, set permissions, and control access to your affiliate features.
+    
+    <Image 
+      src="/img/dashboard/team.png" 
+      alt="Team Management Dashboard" 
+      width={0}
+      height={0}
+      sizes="100vw"
+      className="rounded-lg border mt-4 w-full h-auto"
+    />
+  </Tabs.Tab>
+</Tabs>
 
 <Callout type="info">
   **Permissionless vs Authorized Features**: While building your frontend is completely permissionless, the **Freebets** and **Leaderboards** features require explicit authorization from BetSwirl. Contact us to request access to these premium features.

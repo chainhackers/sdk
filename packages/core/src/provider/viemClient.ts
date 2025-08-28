@@ -2,6 +2,7 @@ import type { Address, Hash, Hex, PublicClient, TransactionReceipt, WalletClient
 import {
   type BetRequirements,
   type BetSwirlClientOptions,
+  type BP,
   type CasinoGameToken,
   type CasinoPlaceBetOptions,
   type CasinoPlacedBet,
@@ -112,14 +113,14 @@ export class ViemBetSwirlClient extends BetSwirlClient {
     placedBet: WeightedCasinoPlacedBet,
     options: CasinoWaitRollOptions | undefined,
     weightedGameConfiguration: WeightedGameConfiguration,
-    houseEdge: number,
+    houseEdge: BP,
   ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
 
   async waitRolledBet(
     placedBet: CasinoPlacedBet,
     options?: CasinoWaitRollOptions,
     weightedGameConfiguration?: WeightedGameConfiguration,
-    houseEdge?: number,
+    houseEdge?: BP,
   ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }> {
     const isWeighted = WEIGHTED_CASINO_GAME_TYPES.includes(placedBet.game);
     if (isWeighted) {
@@ -340,7 +341,7 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   async waitWheel(
     placedBet: WheelPlacedBet,
     weightedGameConfiguration: WeightedGameConfiguration,
-    houseEdge: number,
+    houseEdge: BP,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: WheelRolledBet; receipt: TransactionReceipt }> {
     return waitWheelRolledBet(
@@ -390,7 +391,7 @@ export class ViemBetSwirlClient extends BetSwirlClient {
   async waitPlinko(
     placedBet: PlinkoPlacedBet,
     weightedGameConfiguration: WeightedGameConfiguration,
-    houseEdge: number,
+    houseEdge: BP,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: PlinkoRolledBet; receipt: TransactionReceipt }> {
     return waitPlinkoRolledBet(
@@ -463,7 +464,7 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   async getBetRequirements(
     token: Token,
-    multiplier: number | number[],
+    multiplier: BP | BP[],
     game: CASINO_GAME_TYPE,
   ): Promise<BetRequirements> {
     return getBetRequirements(this.betSwirlWallet, token, multiplier, game);

@@ -1,6 +1,7 @@
 import type {
   BetRequirements,
   BetSwirlClientOptions,
+  BP,
   CASINO_GAME_TYPE,
   CasinoChainId,
   CasinoGameToken,
@@ -106,14 +107,14 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
     placedBet: WeightedCasinoPlacedBet,
     options: CasinoWaitRollOptions | undefined,
     weightedGameConfiguration: WeightedGameConfiguration,
-    houseEdge: number,
+    houseEdge: BP,
   ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }>;
 
   async waitRolledBet(
     placedBet: CasinoPlacedBet,
     options?: CasinoWaitRollOptions,
     weightedGameConfiguration?: WeightedGameConfiguration,
-    houseEdge?: number,
+    houseEdge?: BP,
   ): Promise<{ rolledBet: CasinoRolledBet; receipt: TransactionReceipt }> {
     await this._switchChain(placedBet.chainId);
     const isWeighted = WEIGHTED_CASINO_GAME_TYPES.includes(placedBet.game);
@@ -357,7 +358,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   async waitWheel(
     placedBet: WheelPlacedBet,
     weightedGameConfiguration: WeightedGameConfiguration,
-    houseEdge: number,
+    houseEdge: BP,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: WheelRolledBet; receipt: TransactionReceipt }> {
     await this._switchChain(placedBet.chainId);
@@ -411,7 +412,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
   async waitPlinko(
     placedBet: PlinkoPlacedBet,
     weightedGameConfiguration: WeightedGameConfiguration,
-    houseEdge: number,
+    houseEdge: BP,
     options?: CasinoWaitRollOptions,
   ): Promise<{ rolledBet: PlinkoRolledBet; receipt: TransactionReceipt }> {
     await this._switchChain(placedBet.chainId);
@@ -491,7 +492,7 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
 
   async getBetRequirements(
     token: Token,
-    multiplier: number | number[],
+    multiplier: BP | BP[],
     game: CASINO_GAME_TYPE,
     chainId?: CasinoChainId,
   ): Promise<BetRequirements> {

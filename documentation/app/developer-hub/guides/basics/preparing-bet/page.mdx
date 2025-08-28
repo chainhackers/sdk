@@ -1,0 +1,203 @@
+import { Tabs, Tab } from 'nextra/components'
+import { Steps, Callout } from 'nextra/components';
+
+# Preparing a bet
+
+Before placing a bet, you need to prepare it in order to maximize the chances of it being accepted
+
+
+## Code Examples
+
+<Tabs items={['Core SDK', 'React SDK']}>
+  <Tabs.Tab>
+
+The preparation of a bet is divided into four steps: the user's choice of input, fetching the requirements, the user's choice of bet count, and the bet amount.
+
+### 1. User input choice
+<Callout type="info">
+  It is an optional step, if you already know the exact input you want to use, you can skip it. 
+</Callout>
+```typescript
+import {
+    CoinToss,
+    Dice,
+    getKenoConfiguration,
+    Keno,
+    Roulette,
+    WeightedGame,
+} from "@betswirl/sdk-core";
+
+// 1. Get token/game info (see the Preparing environment guide)
+const gameToken = await getCasinoGameToken(yourBetSwirlWallet, selectedToken, selectedGame.game, yourAffiliateAddress);
+
+// 2. Get the different possible inputs
+
+// 2.1 Dice - Get a number from 1 to 99
+const choiceInputs = Dice.getChoiceInputs(gameToken.affiliateHouseEdge)
+const selectedDiceInput = choiceInputs[0]
+
+// 2.2 CoinToss - Get the face (head/tails)
+const cointossInputs = CoinToss.getChoiceInputs(gameToken.affiliateHouseEdge)
+const selectedCoinTossInput = cointossInputs[0]
+
+// 2.3 Roulette - Get a number or multiple numbers (0 to 36)
+const rouletteInputs = Roulette.getChoiceInputs(gameToken.affiliateHouseEdge)
+const selectedRouletteNumbers = [rouletteInputs[0]!, rouletteInputs[1]!]
+// You can combine multiple numbers into one input (if the same number is selected multiple times, it will automatically keep it only once)
+const selectedRouletteInput = Roulette.combineChoiceInputs(selectedRouletteNumbers, gameToken.affiliateHouseEdge);
+
+// 2.4 Keno - Get a ball or multiple balls (1 to 40 but the max number depends on the configuration)
+// Get the Keno configuration for the selected game/token
+const kenoConfig = await yourBetSwirlClient.getKenoConfiguration(
+        gameToken,
+        gameToken.chainId,
+); // You can also use getKenoConfiguration using your BetSwirl wallet
+
+// Keno.getChoiceInputs gives you only a small part of all the possible combinations.
+const kenoInputs = Keno.getChoiceInputs(kenoConfig, gameToken.affiliateHouseEdge)
+const selectedKenoInput = kenoInputs[0]
+
+// 2.5 Wheel/Plinko - Get the game configuration
+// You could bring your own configurations here by passing customConfigurations in getChoiceInputs
+const weightedGameInputs = WeightedGame.getChoiceInputs(
+    gameToken.chainId,
+    gameToken.game as WEIGHTED_CASINO_GAME_TYPE,
+    gameToken.affiliateHouseEdge,
+  )
+const selectedWeightedGameInput = weightedGameInputs[0]
+
+```
+
+### 2. Get the bet requirements
+
+```typescript
+// 1. Get the choice input (see step 1)
+const choiceInput = ...
+
+// 2. Get the bet requirements
+const betRequirements = await yourBetSwirlClient.getBetRequirements(
+    gameToken,
+    choiceInput.multiplier,
+    choiceInput.game,
+  );
+
+// 3. You can now know the requirements
+const maxBetAmount = betRequirements.maxBetAmount
+const maxBetCount = betRequirements.maxBetCount
+const isAllowed = betRequirements.isAllowed
+```
+
+### 3. User bet count
+
+```typescript
+// 1. Get the bet requirements (see step 2)
+const betRequirements = ...
+const maxBetCount = betRequirements.maxBetCount
+
+// 2. Select the desired bet count 
+const selectedBetCount = 10
+if (selectedBetCount > maxBetCount || selectedBetCount < 1) {
+    throw new Error("Invalid bet count")
+}
+```
+
+### 4. User bet amount
+
+```typescript
+import {
+    FORMAT_TYPE,
+    formatRawAmount,
+} from "@betswirl/sdk-core";
+import { parseUnits, zeroAddress } from "viem";
+
+// 1. Get the bet requirements (see step 2)
+const betRequirements = ...
+const maxBetCount = betRequirements.maxBetCount
+
+// 2. Get the user bet count (see step 3)
+const selectedBetCount = ...
+
+// 3. Get the user balances (see the Preparing environment guide)
+const userGasBalance = ...
+const userSelectedTokenBalance = ...
+
+// 4. Estimate VRF fees
+const chainlinkVrfCostEstimation = await yourBetSwirlClient.getChainlinkVrfCost(
+  gameToken.game,
+  gameToken.address,
+  betCount,
+  undefined, // We let the SDK manage the gas price itself
+  undefined, // We already define the gas price type in the client options
+  gameToken.chainId,
+  );
+
+const userAddress = yourBetSwirlClient.betSwirlWallet.getAccount()!.address;
+const chain = chainById[casinoGameToken.chainId];
+const gasDecimals = chain.nativeCurrency.decimals;
+const gasSymbol = chain.nativeCurrency.symbol;
+
+// 5. Check if user has enough gas to pay VRF and gas fees
+const gasBalanceRemainingAfterFees = userGasBalance - chainlinkVrfCostEstimation;
+
+// User needs to have at least 0 gwei after substracting gas fees. For production apps,
+// it's better to keep a buffer because VRF can change AND txn gas fee is not taken into account.
+if (gasBalanceRemainingAfterFees < 0n) {
+  throw Error(
+    `You don't have enough gas to pay VRF and gas fees, please send at least ${formatRawAmount(
+    -gasBalanceRemainingAfterFees,
+    gasDecimals,
+    FORMAT_TYPE.FULL_PRECISE,
+    )} ${gasSymbol} to ${userAddress}`,
+  );
+}
+
+// 6. Check if user has enough token to place the bet (the token can also be the gas token)
+
+// If token is gas balance, substract the fees
+const availableTokenBalance =
+    casinoGameToken.address === zeroAddress ? gasBalanceRemainingAfterFees : userTokenBalance;
+// Take into consideration the max bet amount for the user balance but also max bet amount of the bet
+const maxAmountPerBetFormatted = Math.min(
+  Number(
+    formatRawAmount(
+    availableTokenBalance / BigInt(betCount),
+    casinoGameToken.decimals,
+    FORMAT_TYPE.FULL_PRECISE,
+    ),
+  ),
+  Number(
+    formatRawAmount(
+    betRequirements.maxBetAmount,
+    casinoGameToken.decimals,
+    FORMAT_TYPE.FULL_PRECISE,
+    ),
+  ),
+);
+
+// User needs to have at least 1 gwei of token for each betCount.
+if (maxAmountPerBetFormatted <= betCount) {
+  throw Error(
+    `You don't have enough token to place the bet, please send at least ${formatRawAmount(
+    BigInt(betCount) - availableTokenBalance,
+    casinoGameToken.decimals,
+    FORMAT_TYPE.FULL_PRECISE,
+    )} ${casinoGameToken.symbol} to ${userAddress}`,
+  );
+}
+
+const selectedBetAmount = 0.1
+if(selectedBetAmount <= 0 || selectedBetAmount > maxAmountPerBetFormatted) {
+  throw new Error("Invalid bet amount")
+}
+
+const selectedRawBetAmount = parseUnits(selectedBetAmount.toString(), gameToken.decimals);
+
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+  ```react
+  Under development
+  ```
+  </Tabs.Tab>
+</Tabs>

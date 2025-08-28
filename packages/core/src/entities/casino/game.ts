@@ -1,4 +1,5 @@
 import { CASINO_GAME_TYPE, type WEIGHTED_CASINO_GAME_TYPE } from "../../data/casino";
+import type { BP } from "../../interfaces";
 import type {
   CoinTossChoiceInput,
   DiceChoiceInput,
@@ -42,7 +43,7 @@ export abstract class AbstractCasinoGame<TInput, TEncodedInput, TRolled, TEncode
   decodeInput(_encodedInput: TEncodedInput | string): TInput {
     throw new Error("Not implemented");
   }
-  getMultiplier(_input: TInput | string): number {
+  getMultiplier(_input: TInput | string): BP {
     throw new Error("Not implemented");
   }
   getFormattedMultiplier(_input: TInput | string): number {

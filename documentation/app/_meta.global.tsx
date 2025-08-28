@@ -89,16 +89,102 @@ const meta = {
     //breadcrumb: true,
     //timestamp: true,
     items: {
-      sdks: {
-        title: "SDKs",
+      introduction: {
+        title: "👋 Introduction",
+      },
+      glossary: {
+        title: "📖 Glossary",
+      },
+      "quick-starts": {
+        title: "⏱️ Quick Starts",
         items: {
-          core: {
-            title: "Core",
+          miniapp: {
+            title: "Your MiniApp in 1h",
+          },
+          react: {
+            title: "Your React App in 1h",
           },
         },
       },
       guides: {
-        title: "Guides",
+        title: "📚 Guides & Tutorials",
+        items: {
+          basics: {
+            title: "Basic operations",
+            items: {
+              "connect-wallet": {
+                title: "Wallet connection",
+              },
+              "preparing-environment": {
+                title: "Preparing environment",
+              },
+              "preparing-bet": {
+                title: "Preparing a bet",
+              },
+              "placing-bet": {
+                title: "Placing a bet & getting the results",
+              },
+              "my-bets": {
+                title: "Bet history",
+              },
+            },
+          },
+          promotions: {
+            title: "Promotion features",
+            items: {
+              freebets: {
+                title: "Freebets",
+              },
+              leaderboards: {
+                title: "Leaderboards",
+              },
+            },
+          },
+        },
+      },
+      sdks: {
+        title: "⚙️ SDKs",
+        items: {
+          core: {
+            title: "Core",
+            items: {
+              "getting-started": {
+                title: "🚀 Getting Started",
+              },
+              "client-functions": {
+                title: "Client functions",
+              },
+              "wallet-functions": {
+                title: "Wallet functions",
+              },
+              utilities: {
+                title: "Utilities",
+              },
+            },
+          },
+          "wagmi-provider": {
+            title: "Wagmi Provider",
+            items: {
+              "getting-started": {
+                title: "🚀 Getting Started",
+              },
+              "client-functions": {
+                title: "Client functions",
+              },
+            },
+          },
+        },
+      },
+      demos: {
+        title: "▶️ Demos",
+        items: {
+          miniapp: {
+            title: "MiniApp",
+          },
+          "node-cli": {
+            title: "Node CLI",
+          },
+        },
       },
     },
   },

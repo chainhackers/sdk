@@ -1,6 +1,7 @@
 import { type EncodeAbiParametersReturnType, encodeAbiParameters, parseAbiParameters } from "viem";
 import { BP_VALUE } from "../../constants";
 import { CASINO_GAME_TYPE } from "../../data/casino";
+import type { BP } from "../../interfaces";
 import { getFormattedNetMultiplier, getNetMultiplier } from "../../utils/bet";
 import { AbstractCasinoGame, type ChoiceInput } from "./game";
 
@@ -27,7 +28,7 @@ export class CoinToss extends AbstractCasinoGame<
     return 50;
   }
 
-  static getMultiplier(_face: COINTOSS_FACE | string): number {
+  static getMultiplier(_face: COINTOSS_FACE | string): BP {
     return 20000;
   }
 
@@ -56,8 +57,27 @@ export class CoinToss extends AbstractCasinoGame<
   static decodeRolled(encodedFace: CoinTossEncodedRolled | string): COINTOSS_FACE {
     return CoinToss.decodeInput(encodedFace);
   }
+
+  /**
+   * Determines if a single decoded roll is a winning roll for CoinToss.
+   *
+   * This method is particularly useful for multibetting scenarios where you need to:
+   * - Identify which individual rolls are winners
+   * - Color-code winning faces in the UI
+   *
+   * @param decodedRolled - The decoded face result (HEADS or TAILS)
+   * @param encodedInput - The player's encoded choice (true for HEADS, false for TAILS)
+   * @returns true if the roll is a win, false otherwise
+   */
+  static isSingleRolledWin(
+    decodedRolled: COINTOSS_FACE,
+    encodedInput: CoinTossEncodedInput | string,
+  ): boolean {
+    return CoinToss.decodeInput(encodedInput) === decodedRolled;
+  }
+
   // houseEdge is a number between 0 and 10000
-  static getChoiceInputs(houseEdge?: number): CoinTossChoiceInput[] {
+  static getChoiceInputs(houseEdge?: BP): CoinTossChoiceInput[] {
     const multiplier = CoinToss.getMultiplier(COINTOSS_FACE.TAILS);
     const formattedMultiplier = CoinToss.getFormattedMultiplier(COINTOSS_FACE.TAILS);
     const netMultiplier = houseEdge ? getNetMultiplier(multiplier, houseEdge) : undefined;

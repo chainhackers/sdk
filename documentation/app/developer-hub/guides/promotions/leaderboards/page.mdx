@@ -1,0 +1,162 @@
+import { Tabs, Tab } from 'nextra/components'
+import { Steps, Callout } from 'nextra/components';
+
+# Leaderboards
+
+Leaderboards are a type of promotion that allows players to compete with each other for a prize.
+
+## How to use leaderboards
+
+There are 5 steps to use leaderboards:
+<Steps>
+### Create a leaderboard as an affiliate
+You can create a leaderboard via the [BetSwirl affiliate panel](https://www.betswirl.com/base/affiliate/leaderboards-create).
+There are 3 sections to fill:
+- **General**: Global info about the leaderboard like the chain, the title, the description, the dates, etc.
+- **Casino Rules**: Rules of the leaderboard like the tokens which have to be used, the point calculation, minimum value to bet, etc. 
+- **Prizes**: Rewards of the leaderboard for each position, and the expiration time.
+
+=> You need to be whitelisted to unlock the leaderboard feature. More info on our [Affiliate program](/protocol-hub/partners/affiliates)
+### Fetch the leaderboards
+Fetch the leaderboards to show to users.
+
+### Update the user's leaderboard position (optional)
+Leaderboards are refreshed automatically every hour. But you can update the user's leaderboard position manually by sending new bets to our API.
+
+### Let the users claim their rewards
+Once the leaderboard is finalized (automatically), the users can claim their rewards. 
+
+### Get the non-claimed rewards once the leaderboard is expired, as an affiliate
+Once the leaderboard is expired, you can get the non-claimed rewards via the [BetSwirl affiliate panel](https://www.betswirl.com/base/affiliate/leaderboards).
+
+
+</Steps>
+
+## 💡Tips & Tricks
+
+### Statuses
+A leaderboard can have 5 different statuses:
+- **Not started**: The leaderboard is not active yet, users can't generate points.
+- **Pending**: The leaderboard is active and the users can generate points.
+- **Ended**: The leaderboard is ended, users can't generate points anymore.
+- **Finalized**: The leaderboard is finalized, winners can claim their rewards.
+- **Expired**: The leaderboard is expired, users can't claim their rewards anymore. The affiliate can get back the non-claimed rewards.
+
+### Staging environment
+You can create leaderboards on the [staging website](https://www.testnet.betswirl.com). There are three things to keep in mind if you create some leaderboards on staging environment
+- Staging leaderboards are not automatically refreshed or finalized, but you can still refresh them manually and ask us to finalize them.
+- To fetch staging leaderboards, do not forget to set `testMode` to true in your BetSwirl client.
+- You can create staging leaderboards on testnets.
+
+### Leaderboard points calculation
+Every bet wagered on your frontend is not especially counted for a leaderboard. A bet is taken into account in a leaderboard only if:
+- The affiliate address used to place the bet is the same as the affiliate address of the leaderboard (except for leaderboards created by bankroll managers).
+- The bet must respect all the requirements (min value, max value, token used, game and interval )
+- The bet must be placed/wagered (depends on the source you select) between the start and end dates of the leaderboard.
+
+### Refreshing
+- All leaderboards are refreshed automatically every hour.
+- When you call the `refreshLeaderboardsWithBets` function, only the bets you pass to the function will be taken into account, it won't refresh entirely all the leaderboards.
+
+### Finalizing
+ - Leaderboards are finalized automatically.
+ - Once a leaderboard is ended, it takes on average 30mins to be finalized.
+ - The winners can claim their prizes once the leaderboard is finalized and before it becomes expired.
+
+### Freebets
+Freebets are taken into account for leaderboards.
+
+## Code Examples
+
+<Tabs items={['Core SDK', 'React SDK']}>
+  <Tabs.Tab>
+
+### 1. Fetch the leaderboards
+<Callout type="info">
+  Your users can generate points for leaderboards created by the bankroll managers even if they use your affiliate address to place the bet (you can fetch them setting `true` to `withExternalBankrollLeaderboards` parameter).
+</Callout>
+
+```typescript
+const affiliateAddress = process.env.AFFILIATE_ADDRESS;
+// This example fetches all the first 10 leaderboards for the specified affiliate from all chains, sorted by end date (desc)
+const leadderboards = yourBetSwirlClient.fetchLeaderboards(
+ 10, // limit
+ 0, // offset
+ yourBetSwirlClient.betSwirlWallet.getAccount()!.address, // player address
+ affiliateAddress, // affiliate address
+ undefined, // Chain ID
+ true, // include bankroll manager leaderboards
+ "desc", // sort order
+ undefined // statuses
+)
+```
+### 2. Update the user's leaderboard position (optional)
+
+```typescript
+// 1. Place a bet & wait for the bet to be resolved
+const placedBet = ...
+const chainId = 8453
+
+// 2. Update the user's leaderboard position
+const isSuccess = await wagmiBetSwirlClient.refreshLeaderboardsWithBets([placedBet.id],chainId,LEADERBOARD_TYPE.CASINO)
+if(isSuccess){
+  console.log("✅ Leaderboards successfully updated")
+}else{
+  console.log("❌ An error occurred while updating the leaderboards")
+}
+
+```
+### 3. Claim rewards
+<Callout type="info">
+  The users can claim their rewards only once the leaderboard is finalized and before it becomes expired.
+</Callout>
+```typescript
+
+// 1. Fetch the leaderboards from step 1
+const selectedLeaderboard = ...
+
+// 2. Check the claimable amount of the leaderboard
+const claimableRawAmount = await yourBetSwirlClient.getClaimableAmount(selectedLeaderboard.onChainId, playerAddress, selectedLeaderboard.chainId)
+
+
+// 3. Claim the rewards
+if(claimableRawAmount > 0n){
+  const claimableAmount = formatUnits(claimableRawAmount, selectedLeaderboard.token.decimals)
+  console.log(`💰 You can claim ${claimableAmount} ${selectedLeaderboard.token.symbol}`)
+
+  // 3.1 Prepare the callback
+  const callbacks = {
+    onClaimPending: (tx: Hash, result: LeaderboardClaimRewardsResult) => {
+      console.log(`⌛ Claiming ${claimableAmount} ${selectedLeaderboard.token.symbol}...`);
+    },
+  };
+
+  // 3.2. Calling claim function
+  try {
+    const claimData = await yourBetSwirlClient.claimLeaderboardRewards(
+      selectedLeaderboard,
+      yourBetSwirlClient.betSwirlWallet.getAccount()!.address,
+      callbacks
+    );
+
+    console.log(`✅ Successfully claimed ${claimableAmount} ${selectedLeaderboard.token.symbol}!`);
+    console.log(`Claim transaction: ${formatTxnUrl(claimData.receipt.transactionHash, selectedLeaderboard.chainId)}`);
+  } catch (error) {
+    console.error(`❌ Failed to claim rewards: ${error}`);
+    throw error;
+  }
+
+}else{
+  console.log("❌ No rewards to claim")
+}
+
+```
+
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+  ```react
+  Under development
+  ```
+  </Tabs.Tab>
+</Tabs>

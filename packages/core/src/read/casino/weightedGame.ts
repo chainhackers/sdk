@@ -8,7 +8,7 @@ import {
   type WEIGHTED_CASINO_GAME_TYPE,
 } from "../../data/casino";
 import { ChainError, ERROR_CODES, TransactionError } from "../../errors";
-import type { BetSwirlFunctionData } from "../../interfaces";
+import type { BetSwirlFunctionData, BP_bigint } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider/wallet";
 import { getCasinoChainId } from "../../utils/chains";
 import type { CasinoRolledBet } from "./game";
@@ -173,8 +173,8 @@ export const gameIdByWeightedGameId = {
  */
 export type RawWeightedGameConfiguration = {
   weightRanges: bigint[];
-  multipliers: bigint[];
-  maxMultiplier: bigint;
+  multipliers: BP_bigint[];
+  maxMultiplier: BP_bigint;
   gameId: number;
 };
 
@@ -199,8 +199,8 @@ export interface WeightedGameConfiguration {
   configId: number;
   game: CASINO_GAME_TYPE;
   chainId: CasinoChainId;
-  weights: bigint[]; // BP
-  multipliers: bigint[]; // BP
+  weights: BP_bigint[];
+  multipliers: BP_bigint[];
   colors?: string[];
   label?: string;
 }

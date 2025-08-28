@@ -1,0 +1,124 @@
+import { Tabs, Tab } from 'nextra/components'
+import { Steps, Callout } from 'nextra/components';
+
+# My Bets
+
+Most applications require a "My Bets" section to display the user's betting history. This page is dedicated to showing you how to implement this essential feature using the BetSwirl SDKs.
+
+## Code Examples
+
+<Tabs items={['Core SDK', 'React SDK']}>
+  <Tabs.Tab>
+
+The preparation of a bet is divided into four steps: the user's choice of input, fetching the requirements, the user's choice of bet count, and the bet amount.
+
+### 1. Fetch bets
+<Callout type="info">
+  Bets are fetched from the BetSwirl subgraphs. Several seconds of delay may therefore occur.
+</Callout>
+<Callout type="info">
+  If you want to display only the bets from your app, you can use the `affiliates` filter.
+</Callout>
+```typescript
+import { casinoChainById, Bet_OrderBy, OrderDirection } from "@betswirl/sdk-core";
+const chain = casinoChainById[8583];
+const { bets, error } = await yourBetSwirlClient.fetchBets(
+  chain.id,
+  {
+    bettor: yourBetSwirlClient.betSwirlWallet.getAccount()?.address,
+    // game: // filter by game
+    // token:  // filter by token
+    // status:  // filter by bet status
+    // affiliates: ["0xABC...123"], // filter by affiliate
+  },
+  1, // page (useful for pagination)
+  count, // items (useful for pagination)
+  { key: Bet_OrderBy.BetTimestamp, order: OrderDirection.Desc }, // order by bet timestamp
+);
+
+if (error) throw error;
+
+```
+
+### 2. Display bets
+
+```typescript
+import { CasinoBet, formatTxnUrl, chainById, WEIGHTED_CASINO_GAME_TYPES, WeightedGame, labelCasinoGameByType, getBetSwirlBetUrl } from "@betswirl/sdk-core";
+// 1. Fetch bets from previous step
+const bets = ...
+
+// 2. Loop through bets and display them
+if (bets.length) {
+console.log(`==== Your last ${bets.length} bets ====\n`);
+for (const bet of bets) {
+    _showBet(bet);
+ }
+}
+  // User has never placed any bets
+  else {
+    console.log("You have never placed any bets with this account");
+  }
+
+// 3. Display the bet details
+function _showBet(bet: CasinoBet) {
+  // Id
+  console.log(`=== ID ${bet.id.toString()} ===`);
+  // Common place bet info
+  const placeBetInfo = `Game: ${labelCasinoGameByType[bet.game]}\nInput: ${
+    WEIGHTED_CASINO_GAME_TYPES.includes(bet.game)
+      ? WeightedGame.getWeightedGameConfigLabel(bet.decodedInput, bet.chainId)
+      : bet.decodedInput
+  }\nBet amount: ${bet.formattedBetAmount} ${bet.token.symbol}\nBet count: ${bet.betCount}\n${
+    bet.betCount > 1 ? `Total bet amount ${bet.formattedTotalBetAmount} ${bet.token.symbol}\n` : ""
+  }Bet date: ${bet.betDate.toLocaleString()}\nBet txn: ${formatTxnUrl(bet.betTxnHash, bet.chainId)}\n`;
+  // Pending state
+  if (!bet.isResolved) {
+    console.log("Status:", "Pending");
+    console.log(placeBetInfo);
+  } else {
+    // Refunded state
+    if (bet.isRefunded) {
+      console.log("Status:", "Refunded");
+      console.log(placeBetInfo);
+    } else {
+      const benefitInfo = `${bet.formattedBenefit} ${bet.token.symbol}`;
+      const rollBetInfo = `Payout: ${bet.formattedPayout} ${
+        bet.token.symbol
+      }\nMultiplier: x${bet.formattedPayoutMultiplier}\nResult: ${
+        bet.isWin ? `+${benefitInfo}` : benefitInfo
+      }\nRolled: ${bet.decodedRolled}\nRoll date: ${bet.rollDate?.toLocaleString()}\nRoll txn: ${formatTxnUrl(
+        bet.rollTxnHash!,
+        bet.chainId,
+      )}\nBetSwirl url: ${getBetSwirlBetUrl(bet.id, bet.game, bet.chainId)}\n${
+        bet.isStopGainTriggered || bet.isStopLossTriggered
+          ? 
+              `\n=> Only ${bet.rollBetCount}/${bet.betCount} have been rolled because stop ${
+                bet.isStopGainTriggered ? "gain" : "loss"
+              } has been triggered`,
+          : ""
+      }`;
+      // Won state
+      if (bet.isWin) {
+        console.log("Status:", "Won");
+        console.log(placeBetInfo);
+        console.log(rollBetInfo);
+      }
+      // Lost state
+      else {
+        console.log("Status:", "Lost");
+        console.log(placeBetInfo);
+        console.log(rollBetInfo);
+      }
+    }
+  }
+}
+```
+
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+  ```react
+  Under development
+  ```
+  </Tabs.Tab>
+</Tabs>

@@ -4,7 +4,7 @@ import type { KenoPlacedBet } from "../../actions/casino/keno";
 import { CASINO_GAME_TYPE, type CasinoChainId, casinoChainById } from "../../data/casino";
 import { Keno, type KenoBall } from "../../entities/casino/keno";
 import { ChainError, ERROR_CODES, TransactionError } from "../../errors";
-import type { BetSwirlFunctionData, Token } from "../../interfaces";
+import type { BetSwirlFunctionData, BP, Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
 import { getCasinoChainId } from "../../utils";
 import type { CasinoRolledBet, CasinoWaitRollOptions } from "./game";
@@ -61,7 +61,7 @@ export interface KenoConfiguration {
   chainId: CasinoChainId;
   biggestSelectableBall: number;
   maxSelectableBalls: number;
-  multiplierTable: number[][]; // BP
+  multiplierTable: BP[][];
 }
 
 export async function getKenoConfiguration(

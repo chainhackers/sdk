@@ -10,6 +10,8 @@ import {
   type Chain,
   gnosis,
   mainnet,
+  optimism,
+  optimismSepolia,
   polygon,
   polygonAmoy,
   sepolia,
@@ -32,6 +34,8 @@ export const chainByKey = {
   base,
   baseSepolia,
   gnosis,
+  optimism,
+  optimismSepolia,
 } as const;
 
 export const chains = Object.values(chainByKey) as unknown as readonly [Chain, ...Chain[]];
@@ -50,6 +54,8 @@ export const chainById = {
   [base.id]: base,
   [baseSepolia.id]: baseSepolia,
   [gnosis.id]: gnosis,
+  [optimism.id]: optimism,
+  [optimismSepolia.id]: optimismSepolia,
 } as const;
 
 export const slugById = {
@@ -66,6 +72,8 @@ export const slugById = {
   [base.id as number]: "base",
   [baseSepolia.id as number]: "base-sepolia",
   [gnosis.id as number]: "gnosis",
+  [optimism.id as number]: "optimism",
+  [optimismSepolia.id as number]: "optimism-sepolia",
 } as const;
 
 export const wrappedGasTokenById: Record<number, Token["address"]> = {
@@ -82,4 +90,6 @@ export const wrappedGasTokenById: Record<number, Token["address"]> = {
   [base.id]: "0x4200000000000000000000000000000000000006",
   [baseSepolia.id]: "0x4200000000000000000000000000000000000006",
   [gnosis.id]: "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1",
+  [optimism.id]: "0x4200000000000000000000000000000000000006",
+  [optimismSepolia.id]: "0x4200000000000000000000000000000000000006",
 };

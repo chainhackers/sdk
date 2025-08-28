@@ -5,6 +5,27 @@ export type GameAbi<T extends CASINO_GAME_TYPE> = NonNullable<
   CasinoChain["contracts"]["games"][T]
 >["abi"];
 
+/**
+ * Type representing a percentage in basis points (BP).
+ *
+ * Basis points are a unit of measurement for percentages where 1 BP = 0.01%.
+ * This notation is commonly used in DeFi contracts and financial applications.
+ * In the context of multipliers, 10,000 BP = x1.
+ *
+ * @range 0 to 10,000 (10,000 = 100%)
+ */
+export type BP = number;
+
+/**
+ * Type representing a percentage in basis points (BP) as bigint.
+ *
+ * Bigint version of the BP type, used for calculations requiring high precision
+ * or to avoid overflow issues with large numbers.
+ *
+ * @range 0n to 10,000n (10,000n = 100%)
+ */
+export type BP_bigint = bigint;
+
 export interface BetSwirlFunctionData<
   TAbi extends Abi,
   TFunctionName extends ContractFunctionName<TAbi>,
@@ -129,7 +150,7 @@ export interface CasinoBet {
   formattedStopLoss: string;
   stopGain: bigint;
   formattedStopGain: string;
-  houseEdge: number; // BP
+  houseEdge: BP;
   betTimestampSecs: number; // secs
   betDate: Date;
   chargedVRFFees: bigint;
