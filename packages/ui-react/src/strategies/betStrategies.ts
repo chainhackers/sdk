@@ -70,7 +70,16 @@ export class FreebetStrategy<T extends GameChoice = GameChoice> implements IBetS
 
     logger.debug("FreebetStrategy: Preparing transaction", {
       freebetId: freebet.id,
+      freebetToken: freebet.token.symbol,
+      freebetAmount: freebet.amount,
       game,
+      timestamp: new Date().toISOString(),
+    })
+
+    console.log("💰 [BetStrategies] Transaction params:", {
+      gasPrice: gasPrice.toString(),
+      vrfFeesWei: vrfFees.toString(),
+      chainId,
     })
 
     const gameEncodedAbiParametersInput = gameDefinition.encodeAbiParametersInput(choice.choice)
