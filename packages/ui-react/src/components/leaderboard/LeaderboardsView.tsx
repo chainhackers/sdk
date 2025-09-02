@@ -22,9 +22,7 @@ export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }
       <div className="flex items-center justify-between mb-4">
         <span className="text-[16px] font-semibold text-foreground">Ongoing</span>
         <label htmlFor="partner-toggle" className="flex items-center gap-2 cursor-pointer">
-          <span className="text-[12px] leading-[18px] text-foreground">
-            Show partner leaderboards
-          </span>
+          <span className="text-[12px] leading-[18px] text-foreground">Sponsored leaderboards</span>
           <Switch
             id="partner-toggle"
             checked={showPartner}
