@@ -18,7 +18,7 @@ import {
   type WeightedGameEncodedInput,
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
-import { Hex } from "viem"
+import { type Address, Hex } from "viem"
 import type { EnrichedLeaderboard } from "../data/leaderboardQueries"
 
 export type Theme = "light" | "dark" | "system"
@@ -153,7 +153,7 @@ export interface LeaderboardOverviewData extends LeaderboardItem {
 // Types for ranking tab
 export interface RankingEntry {
   rank: number
-  playerAddress: string
+  playerAddress: Address
   points: number
   rewardAmount: string
   rewardToken: TokenWithImage

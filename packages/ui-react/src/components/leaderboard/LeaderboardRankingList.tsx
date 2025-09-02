@@ -1,17 +1,15 @@
+import { type Address } from "viem"
 import type { RankingEntry } from "../../types/types"
+import { formatAddress } from "../../utils/leaderboardUtils"
 import { TokenIcon } from "../ui/TokenIcon"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
 
 interface LeaderboardRankingListProps {
   entries: RankingEntry[]
+  userAddress?: Address
 }
 
-function formatAddress(address: string): string {
-  if (address.length <= 10) return address
-  return `${address.slice(0, 6)}...${address.slice(-6)}`
-}
-
-export function LeaderboardRankingList({ entries }: LeaderboardRankingListProps) {
+export function LeaderboardRankingList({ entries, userAddress }: LeaderboardRankingListProps) {
   if (entries.length === 0) {
     return (
       <div className="text-center py-8">
@@ -31,30 +29,42 @@ export function LeaderboardRankingList({ entries }: LeaderboardRankingListProps)
           </TableRow>
         </TableHeader>
         <TableBody>
-          {entries.map((entry) => (
-            <TableRow
-              key={`${entry.rank}-${entry.playerAddress}`}
-              className="border-b border-table-separator last:border-b-0 align-middle text-[12px] leading-[20px]"
-            >
-              <TableCell>
-                <div className="flex gap-2">
-                  <span className="text-roulette-disabled-text font-medium">#{entry.rank}</span>
-                  <span className="font-medium text-foreground">
-                    {formatAddress(entry.playerAddress)}
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="text-right text-table-text">
-                <span className="font-medium">{entry.points.toLocaleString()}</span>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center justify-end gap-1">
-                  <span className="font-medium text-table-text">{entry.rewardAmount}</span>
-                  <TokenIcon token={entry.rewardToken} size={16} />
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+          {entries.map((entry) => {
+            const isCurrentUser =
+              userAddress && entry.playerAddress.toLowerCase() === userAddress.toLowerCase()
+            return (
+              <TableRow
+                key={`${entry.rank}-${entry.playerAddress}`}
+                className={`border-b border-table-separator last:border-b-0 align-middle text-[12px] leading-[20px] ${
+                  isCurrentUser ? "bg-primary/5" : ""
+                }`}
+              >
+                <TableCell>
+                  <div className="flex gap-2">
+                    <span
+                      className={`font-medium ${isCurrentUser ? "text-primary" : "text-roulette-disabled-text"}`}
+                    >
+                      #{entry.rank}
+                    </span>
+                    <span
+                      className={`font-medium ${isCurrentUser ? "text-primary" : "text-foreground"}`}
+                    >
+                      {formatAddress(entry.playerAddress)}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-right text-table-text">
+                  <span className="font-medium">{entry.points.toLocaleString()}</span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-end gap-1">
+                    <span className="font-medium text-table-text">{entry.rewardAmount}</span>
+                    <TokenIcon token={entry.rewardToken} size={16} />
+                  </div>
+                </TableCell>
+              </TableRow>
+            )
+          })}
         </TableBody>
       </Table>
     </div>
