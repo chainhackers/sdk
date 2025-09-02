@@ -101,7 +101,7 @@ export function FreebetsHubSheetPanel({
               // Connected state
               <div className="flex flex-col gap-[12px]">
                 {/* TODO: Freebets code claim */}
-                {/* 
+                {/*
                 <div
                   className={cn(
                     "rounded-[16px]",
@@ -152,7 +152,7 @@ export function FreebetsHubSheetPanel({
                 <div className="flex flex-col gap-[8px]">
                   <h3 className="font-bold text-[16px] leading-[24px]">Casino freebets</h3>
 
-                  {freebets.length > 0 && (
+                  {freebets.length > 0 ? (
                     <div className="flex flex-col gap-2">
                       {freebets.map((freeBet) => (
                         <Button
@@ -187,6 +187,18 @@ export function FreebetsHubSheetPanel({
                           </div>
                         </Button>
                       ))}
+                    </div>
+                  ) : (
+                    <div
+                      className={cn(
+                        "w-full p-6 rounded-[12px]",
+                        "bg-free-bet-card-section-bg",
+                        "flex items-center justify-center",
+                      )}
+                    >
+                      <p className="text-[14px] text-text-on-surface-variant">
+                        You currently have no freebets.
+                      </p>
                     </div>
                   )}
 
