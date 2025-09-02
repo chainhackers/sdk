@@ -58,8 +58,8 @@ import {
   getCasinoGameToken,
   getCasinoTokens,
   getChainlinkVrfCost,
-  getClaimableAmount,
   getKenoConfiguration,
+  getLeaderboardClaimableAmount,
   getWeightedGameConfiguration,
   placeCoinTossBet,
   placeCoinTossFreebet,
@@ -534,13 +534,18 @@ export class WagmiBetSwirlClient extends BetSwirlClient {
 
   /* Leaderboard utilities */
 
-  async getClaimableAmount(
+  async getLeaderboardClaimableAmount(
     leaderboardOnChainId: number | bigint,
     playerAddress: Address,
     chainId: ChainId,
   ): Promise<bigint> {
     await this._switchChain(chainId);
-    return getClaimableAmount(this.betSwirlWallet, leaderboardOnChainId, playerAddress, chainId);
+    return getLeaderboardClaimableAmount(
+      this.betSwirlWallet,
+      leaderboardOnChainId,
+      playerAddress,
+      chainId,
+    );
   }
 
   async claimLeaderboardRewards(

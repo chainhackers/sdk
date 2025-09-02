@@ -154,9 +154,6 @@ const meta = {
               "client-functions": {
                 title: "Client functions",
               },
-              "wallet-functions": {
-                title: "Wallet functions",
-              },
               utilities: {
                 title: "Utilities",
               },

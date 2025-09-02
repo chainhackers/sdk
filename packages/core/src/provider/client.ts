@@ -284,7 +284,7 @@ export abstract class BetSwirlClient {
 
   /* Leaderboard utilities */
 
-  abstract getClaimableAmount(
+  abstract getLeaderboardClaimableAmount(
     leaderboardOnChainId: number | bigint,
     playerAddress: Address,
     chainId?: ChainId,

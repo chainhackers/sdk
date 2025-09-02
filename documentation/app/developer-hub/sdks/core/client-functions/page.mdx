@@ -1,1 +1,498 @@
-# TODO Kinco
+import { Callout } from 'nextra/components';
+
+# Client Functions
+
+This page lists all functions accessible from a BetSwirl client. These functions are particularly useful if you're using one of the two available clients:
+
+- **[External BetSwirl Client](/developer-hub/sdks/core/getting-started#1-with-an-external-betswirl-client)** - For multi-chain applications with Wagmi
+- **[Native BetSwirl Client (Viem)](/developer-hub/sdks/core/getting-started#2-with-the-native-betswirl-client-viem)** - For simple applications with Viem
+
+<Callout type="info">
+  100% of the functions below are also available without using a client.
+</Callout>
+---
+
+{(() => {
+  const functionData = {
+    betReadFunctions: [
+      {
+        name: "getCasinoGames",
+        description: "Retrieves the list of available casino games on a specific chain.",
+        tips: "Use this function to display available games in your user interface. Pass \"true\" to get only the active games.",
+        code: `
+const games = await wagmiBetSwirlClient.getCasinoGames(true, 137);`
+      },
+      {
+        name: "getCasinoTokens",
+        description: "Retrieves the list of available tokens for betting on a specific chain.",
+        tips: "Pass \"true\" to get only the active tokens. (inactive token means you can't bet with it for the moment)",
+        code: `// Get all tokens
+const tokens = await client.getCasinoTokens(false);
+
+// Get only active tokens
+const activeTokens = await client.getCasinoTokens(true);`
+      },
+      {
+        name: "getCasinoGameToken",
+        description: "Retrieves specific token information for a game, including house edge and affiliate settings.",
+        tips: "\"affiliateHouseEdge\" is particularly useful to get the possible choice inputs for the game (it allows to calculate the net multipliers).",
+        code: `// Get token info for a specific game
+const gameToken = await client.getCasinoGameToken(
+  casinoToken,
+  CASINO_GAME_TYPE.DICE,
+  affiliateAddress
+);`
+      },
+            {
+        name: "getBetRequirements",
+        description: "Retrieves betting requirements for a specific token and game.",
+        tips: "Use this function to validate bet parameters before placing a bet.",
+        code: `// Get bet requirements
+const requirements = await client.getBetRequirements(
+  token,
+  multiplier,
+  CASINO_GAME_TYPE.DICE
+);`
+      },
+            {
+        name: "getChainlinkVrfCost",
+        description: "Calculates the Chainlink VRF cost for a particular bet.",
+        tips: "We highly recommend you multiply this value by x1.1 - x1.2 (buffer) to reduce the number of failed txns due to gas price peaks.",
+        code: `// Calculate VRF cost
+const vrfCost = await client.getChainlinkVrfCost(
+  CASINO_GAME_TYPE.DICE,
+  tokenAddress,
+  betCount
+);`
+      },
+            {
+        name: "getKenoConfiguration",
+        description: "Retrieves the keno configuration for a specific token.",
+        tips: "Each token has its own keno configuration, it's important to get the correct configuration for the token you're betting with.",
+        code: `// Get keno configuration
+const kenoConfig = await client.getKenoConfiguration(token);`
+      },
+            {
+        name: "getWeightedGameConfiguration",
+        description: "Retrieves weighted game configuration by ID.",
+        tips: "Use this function to get configuration for wheel, plinko, or custom weighted games.",
+        code: `// Get weighted game configuration
+const config = await client.getWeighedGameConfiguration(configId);`
+      }
+    ],
+    actionFunctions: [
+      {
+        name: "playDice",
+        description: "Places a bet on the dice game with specified parameters.",
+        tips: "Make sure to validate parameters before calling this function. If an approval is needed, it will be automatically handled by the SDK.",
+        code: `// Place dice bet
+const result = await client.playDice({
+  cap: 50,
+  betAmount: parseEther("0.1"),
+  betToken: "0x...",
+  receiver: userAddress,
+});`
+      },
+      {
+        name: "playCoinToss",
+        description: "Places a bet on the coin toss game with specified parameters.",
+        tips: "Make sure to validate parameters before calling this function. If an approval is needed, it will be automatically handled by the SDK.",
+        code: `// Place coin toss bet
+const result = await client.playCoinToss({
+  face: COINTOSS_FACE.HEADS,
+  betAmount: parseEther("0.1"),
+  betToken: "0x...",
+  receiver: userAddress,
+});`
+      },
+      {
+        name: "playRoulette",
+        description: "Places a bet on the roulette game with specified parameters.",
+        tips: "Make sure to validate parameters before calling this function. If an approval is needed, it will be automatically handled by the SDK.",
+        code: `// Place roulette bet
+const result = await client.playRoulette({
+  numbers: [1, 2, 3],
+  betAmount: parseEther("0.1"),
+  betToken: "0x...",
+  receiver: userAddress
+});`
+      },
+      {
+        name: "playKeno",
+        description: "Places a bet on the keno game with specified parameters.",
+        tips: "Make sure to validate parameters before calling this function. If an approval is needed, it will be automatically handled by the SDK. You can get the keno configuration with the \"getKenoConfiguration\" function.",
+        code: `// Place keno bet
+const result = await client.playKeno({
+  balls: [1, 5, 12, 23, 45],
+  kenoConfig: kenoConfiguration,
+  betAmount: parseEther("0.1"),
+  betToken: "0x...",
+  receiver: userAddress
+});`
+      },
+      {
+        name: "playWheel",
+        description: "Places a bet on the wheel game with specified parameters.",
+        tips: "Make sure to validate parameters before calling this function. If an approval is needed, it will be automatically handled by the SDK. You can get the weighted game configuration with the \"getWeightedGameConfiguration\" function.",
+        code: `// Place wheel bet
+const result = await client.playWheel({
+  weightedGameConfig: wheelConfig,
+  betAmount: parseEther("0.1"),
+  betToken: "0x...",
+  receiver: userAddress
+});`
+      },
+      {
+        name: "playPlinko",
+        description: "Places a bet on the plinko game with specified parameters.",
+        tips: "Make sure to validate parameters before calling this function. If an approval is needed, it will be automatically handled by the SDK. You can get the weighted game configuration with the \"getWeightedGameConfiguration\" function.",
+        code: `// Place plinko bet
+const result = await client.playPlinko({
+  weightedGameConfig: plinkoConfig,
+  betAmount: parseEther("0.1"),
+  betToken: "0x...",
+  receiver: userAddress
+});`
+      },
+      {
+        name: "playWeightedGame",
+        description: "Places a bet on a custom weighted game with specified parameters.",
+        tips: "Use this for custom games not in the list of weighted games. You can also use it for Wheel & Plinko.",
+        code: `// Place weighted game bet
+const result = await client.playWeightedGame({
+  weightedGameConfig: customConfig,
+  game: CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME,
+  betAmount: parseEther("0.1"),
+  betToken: "0x...",
+  receiver: userAddress
+});`
+      },
+      {
+        name: "waitDice",
+        description: "Waits for a dice bet to be rolled and returns the result.",
+        tips: "Use this function to wait for the bet result after placing a bet. It generally takes 3 to 15 seconds for a bet to be rolled.",
+        code: `// Wait for dice result
+const { rolledBet, receipt } = await client.waitDice(
+  placedBet,
+  { pollingInterval: 1000 }
+);`
+      },
+      {
+        name: "waitCoinToss",
+        description: "Waits for a coin toss bet to be rolled and returns the result.",
+        tips: "Use this function to wait for the bet result after placing a bet. It generally takes 3 to 15 seconds for a bet to be rolled.",
+        code: `// Wait for coin toss result
+const { rolledBet, receipt } = await client.waitCoinToss(
+  placedBet,
+  { pollingInterval: 1000 }
+);`
+      },
+      {
+        name: "waitRoulette",
+        description: "Waits for a roulette bet to be rolled and returns the result.",
+        tips: "Use this function to wait for the bet result after placing a bet. It generally takes 3 to 15 seconds for a bet to be rolled.",
+        code: `// Wait for roulette result
+const { rolledBet, receipt } = await client.waitRoulette(
+  placedBet,
+  { pollingInterval: 1000 }
+);`
+      },
+      {
+        name: "waitKeno",
+        description: "Waits for a keno bet to be rolled and returns the result.",
+        tips: "Use this function to wait for the bet result after placing a bet. It generally takes 3 to 15 seconds for a bet to be rolled.",
+        code: `// Wait for keno result
+const { rolledBet, receipt } = await client.waitKeno(
+  placedBet,
+  { pollingInterval: 1000 }
+);`
+      },
+      {
+        name: "waitWheel",
+        description: "Waits for a wheel bet to be rolled and returns the result.",
+        tips: "Use this function to wait for the bet result after placing a bet. It generally takes 3 to 15 seconds for a bet to be rolled.",
+        code: `// Wait for wheel result
+const { rolledBet, receipt } = await client.waitWheel(
+  placedBet,
+  weightedGameConfig,
+  houseEdge,
+  { pollingInterval: 1000 }
+);`
+      },
+      {
+        name: "waitPlinko",
+        description: "Waits for a plinko bet to be rolled and returns the result.",
+        tips: "Use this function to wait for the bet result after placing a bet. It generally takes 3 to 15 seconds for a bet to be rolled.",
+        code: `// Wait for plinko result
+const { rolledBet, receipt } = await client.waitPlinko(
+  placedBet,
+  weightedGameConfig,
+  houseEdge,
+  { pollingInterval: 1000 }
+);`
+      }
+    ],
+    betHistoryFunctions: [      {
+        name: "fetchBets",
+        description: "Retrieves betting history with filtering and pagination options.",
+        tips: "Perfect for displaying betting history in a user dashboard with advanced filtering.",
+        code: `// Get user bets with filters
+const { bets, error } = await client.fetchBets(137, {
+  bettor: userAddress,
+  game: CASINO_GAME_TYPE.DICE,
+  status: "completed"
+}, 1, 10);`
+      },
+      {
+        name: "fetchBet",
+        description: "Retrieves a specific bet by its ID.",
+        code: `// Get specific bet
+const { bet, error } = await client.fetchBet("123", 137);`
+      },
+      {
+        name: "fetchBetByHash",
+        description: "Retrieves a specific bet by its transaction hash.",
+        code: `// Get bet by transaction hash
+const { bet, error } = await client.fetchBetByHash(
+  "0x123...",
+  137
+);`
+      }],
+    freebetFunctions: [
+            {
+        name: "fetchFreebets",
+        description: "Retrieves available (non-expired) freebets for a player.",
+        tips: "Pass \"withExternalBankrollFreebets\" as true to also get the \"sponsored\" freebets (freebets created by the bankroll managers).",
+        code: `// Get user freebets
+const freebets = await client.fetchFreebets(
+  userAddress,
+  [affiliateAddress],
+  false
+);`
+      },
+      {
+        name: "fetchFreebetCampaigns",
+        description: "Retrieves freebet campaigns with filtering and pagination.",
+        tips: "This function is for admin purposes only. There is a good chance you don't need to use it.",
+        code: `// Get freebet campaigns
+const { campaigns, total } = await client.fetchFreebetCampaigns(
+  10, 0, FREEBET_CAMPAIGN_STATUS.PENDING, affiliateAddress, 137
+);`
+      },
+      {
+        name: "fetchFreebetCampaign",
+        description: "Retrieves a specific freebet campaign by its ID.",
+        tips: "This function is for admin purposes only. There is a good chance you don't need to use it",
+        code: `// Get specific freebet campaign
+const campaign = await client.fetchFreebetCampaign(123);`
+      },
+      {
+        name: "fetchFreebetCodeCampaigns",
+        description: "Retrieves freebet code campaigns with filtering and pagination.",
+        tips: "This function is for admin purposes only. There is a good chance you don't need to use it.",
+        code: `// Get freebet code campaigns
+const { campaigns, total } = await client.fetchFreebetCodeCampaigns(
+  10, 0, FREEBET_CAMPAIGN_STATUS.PENDING, affiliateAddress, 137
+);`
+      },
+      {
+        name: "fetchFreebetCodeCampaign",
+        description: "Retrieves a specific freebet code campaign by its ID.",
+        tips: "This function is for admin purposes only. There is a good chance you don't need to use it",
+        code: `// Get specific freebet code campaign
+const campaign = await client.fetchFreebetCodeCampaign(123);`
+      },
+      {
+        name: "playFreebetDice",
+        description: "Places a freebet on the dice game.",
+        tips: "Use this function to place a bet using a freebet instead of user tokens. Only a single bet (betCount = 1) can be placed with a freebet.",
+        code: `// Place freebet dice
+const result = await client.playFreebetDice({
+  freebet: signedFreebet,
+  cap: 50,
+});`
+      },
+      {
+        name: "playFreebetCoinToss",
+        description: "Places a freebet on the coin toss game.",
+        tips: "Use this function to place a bet using a freebet instead of user tokens. Only a single bet (betCount = 1) can be placed with a freebet.",
+        code: `// Place freebet coin toss
+const result = await client.playFreebetCoinToss({
+  freebet: signedFreebet,
+  face: COINTOSS_FACE.HEADS,
+});`
+      },
+      {
+        name: "playFreebetRoulette",
+        description: "Places a freebet on the roulette game.",
+        tips: "Use this function to place a bet using a freebet instead of user tokens. Only a single bet (betCount = 1) can be placed with a freebet.",
+        code: `// Place freebet roulette
+const result = await client.playFreebetRoulette({
+  freebet: signedFreebet,
+  numbers: [1, 2, 3],
+});`
+      },
+      {
+        name: "playFreebetKeno",
+        description: "Places a freebet on the keno game.",
+        tips: "Use this function to place a bet using a freebet instead of user tokens. Only a single bet (betCount = 1) can be placed with a freebet.",
+        code: `// Place freebet keno
+const result = await client.playFreebetKeno({
+  freebet: signedFreebet,
+  balls: [1, 5, 12, 23, 45],
+  kenoConfig: kenoConfiguration,
+});`
+      },
+      {
+        name: "playFreebetWheel",
+        description: "Places a freebet on the wheel game.",
+        tips: "Use this function to place a bet using a freebet instead of user tokens. Only a single bet (betCount = 1) can be placed with a freebet.",
+        code: `// Place freebet wheel
+const result = await client.playFreebetWheel({
+  freebet: signedFreebet,
+  weightedGameConfig: wheelConfig,
+});`
+      },
+      {
+        name: "playFreebetPlinko",
+        description: "Places a freebet on the plinko game.",
+        tips: "Use this function to place a bet using a freebet instead of user tokens. Only a single bet (betCount = 1) can be placed with a freebet.",
+        code: `// Place freebet plinko
+const result = await client.playFreebetPlinko({
+  freebet: signedFreebet,
+  weightedGameConfig: plinkoConfig,
+});`
+      },
+      {
+        name: "playFreebetWeightedGame",
+        description: "Places a freebet on a custom weighted game.",
+        tips: "Use this function to place a bet using a freebet instead of user tokens. Only a single bet (betCount = 1) can be placed with a freebet. You can use it for Wheel & Plinko.",
+        code: `// Place freebet weighted game
+const result = await client.playFreebetWeightedGame({
+  freebet: signedFreebet,
+  weightedGameConfig: customConfig,
+  game: CASINO_GAME_TYPE.CUSTOM_WEIGHTED_GAME,
+});`
+      }
+    ],
+    leaderboardFunctions: [      {
+        name: "fetchLeaderboards",
+        description: "Retrieves available leaderboards and tournaments with filtering options.",
+        tips: "By passing playerAddress, you can get the leaderboard ranking of the specific player.",
+        code: `// Get leaderboards
+const { leaderboards, total } = await client.fetchLeaderboards(
+  10, 0, playerAddress, affiliateAddress, 137
+);`
+      },
+      {
+        name: "fetchLeaderboard",
+        description: "Retrieves a specific leaderboard by its ID.",
+        tips: "By passing playerAddress, you can get the leaderboard ranking of the specific player.",
+        code: `// Get specific leaderboard
+const leaderboard = await client.fetchLeaderboard(123, playerAddress);`
+      },
+            {
+        name: "getLeaderboardClaimableAmount",
+        description: "Retrieves the claimable amount for a player on a specific leaderboard.",
+        tips: "Use this function to check if a player has rewards to claim (to save resources, only call it if the leaderboard is finalized AND the player is in the winners list of the leaderboard).",
+        code: `// Get claimable amount
+const claimableAmount = await client.getLeaderboardClaimableAmount(
+  leaderboardOnChainId, // on-chain ID
+  playerAddress,
+  chainId
+);`
+      },
+            {
+        name: "claimLeaderboardRewards",
+        description: "Claims rewards from a leaderboard for a specific receiver address.",
+        tips: "The rewards can be claimed only if the leaderboard status is \"finalized\".",
+        code: `// Claim leaderboard rewards
+const { receipt, result } = await client.claimLeaderboardRewards(
+  leaderboard,
+  receiverAddress,
+  (tx, result) => console.log("Claim pending:", tx)
+);`
+            },
+            {
+        name: "refreshLeaderboardsWithBets",
+        description: "Refreshes leaderboards with new bet data.",
+        tips: "Use this function to update leaderboard data after placing bets.",
+        code: `// Refresh leaderboards
+const success = await client.refreshLeaderboardsWithBets(
+  betIds,
+  chainId,
+  LEADERBOARD_TYPE.CASINO
+);`
+      },
+      {
+        name: "fetchAffiliateLeaderboards",
+        description: "Retrieves leaderboards for a specific affiliate with filtering options.",
+        tips: "This function is for admin purposes only. There is a good chance you don't need to use it.",
+        code: `// Get affiliate leaderboards
+const { leaderboards, total } = await client.fetchAffiliateLeaderboards(
+  affiliateAddress,
+  10, 0, 137
+);`
+      },
+      {
+        name: "fetchAffiliateLeaderboard",
+        description: "Retrieves a specific affiliate leaderboard by its ID.",
+        tips: "this function is for admin purposes only. There is a good chance you don't need to use it.",
+        code: `// Get specific affiliate leaderboard
+const leaderboard = await client.fetchAffiliateLeaderboard(123);`
+      }
+    ],
+    analyticsFunctions: [      {
+        name: "fetchTokens",
+        description: "Retrieves token information from the subgraph with pagination.",
+        tips: "Use this function to get comprehensive token data from the blockchain.",
+        code: `// Get tokens with pagination
+const { tokens, error } = await client.fetchTokens(137, 1, 20);`
+      },
+      {
+        name: "fetchToken",
+        description: "Retrieves specific token information by address.",
+        tips: "Use this function to get detailed information about a specific token.",
+        code: `// Get specific token
+const { token, error } = await client.fetchToken(
+  "0x123...",
+  137
+);`
+      }]
+  };
+
+  return (
+    <>
+      <FunctionSection 
+        title="Bet Read Functions" 
+        functions={functionData.betReadFunctions} 
+        category="bet-read"
+      />
+      <FunctionSection 
+        title="Bet Action Functions" 
+        functions={functionData.actionFunctions} 
+        category="bet-action"
+      />
+      <FunctionSection 
+        title="Bet History Functions" 
+        functions={functionData.betHistoryFunctions} 
+        category="bet-history"
+      />
+      <FunctionSection 
+        title="Freebet Functions" 
+        functions={functionData.freebetFunctions} 
+        category="freebet"
+      />
+      <FunctionSection 
+        title="Leaderboard Functions" 
+        functions={functionData.leaderboardFunctions} 
+        category="leaderboard"
+      />
+      <FunctionSection 
+        title="Analytics Functions" 
+        functions={functionData.analyticsFunctions} 
+        category="analytics"
+      />
+    </>
+  );
+})()}
