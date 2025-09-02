@@ -56,7 +56,19 @@ export async function fetchAndEnrichLeaderboards({
     return casinoLeaderboards
   }
 
-  const calls = finalizedLeaderboards.map((lb) => {
+  // Filter to only include leaderboards where the user is a winner
+  const claimableLeaderboards = finalizedLeaderboards.filter((lb) => {
+    const userRanking = lb.rankings?.find(
+      (r) => r.bettorAddress.toLowerCase() === address.toLowerCase(),
+    )
+    return userRanking && lb.shares && userRanking.rank > 0 && userRanking.rank <= lb.shares.length
+  })
+
+  if (claimableLeaderboards.length === 0) {
+    return casinoLeaderboards
+  }
+
+  const calls = claimableLeaderboards.map((lb) => {
     const functionData = getClaimableAmountFunctionData(
       address,
       lb.onChainId,
@@ -75,14 +87,14 @@ export async function fetchAndEnrichLeaderboards({
   })
 
   const enrichedLeaderboards: EnrichedLeaderboard[] = casinoLeaderboards.map((lb) => {
-    const finalizedIndex = finalizedLeaderboards.findIndex(
-      (finalizedLb) => finalizedLb.id === lb.id,
+    const claimableIndex = claimableLeaderboards.findIndex(
+      (claimableLb) => claimableLb.id === lb.id,
     )
 
-    if (finalizedIndex >= 0 && results[finalizedIndex]?.status === "success") {
+    if (claimableIndex >= 0 && results[claimableIndex]?.status === "success") {
       return {
         ...lb,
-        claimableAmount: results[finalizedIndex].result as bigint,
+        claimableAmount: results[claimableIndex].result as bigint,
       }
     }
 
@@ -105,6 +117,21 @@ export async function fetchAndEnrichSingleLeaderboard(
   }
 
   if (!address || leaderboard.status !== LEADERBOARD_STATUS.FINALIZED) {
+    return leaderboard
+  }
+
+  // Check if the user is a winner before fetching the claimable amount
+  const userRanking = leaderboard.rankings?.find(
+    (r) => r.bettorAddress.toLowerCase() === address.toLowerCase(),
+  )
+
+  const isWinner =
+    userRanking &&
+    leaderboard.shares &&
+    userRanking.rank > 0 &&
+    userRanking.rank <= leaderboard.shares.length
+
+  if (!isWinner) {
     return leaderboard
   }
 
