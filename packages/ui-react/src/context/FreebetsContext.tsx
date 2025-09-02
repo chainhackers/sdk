@@ -12,17 +12,15 @@ import {
 import { zeroAddress } from "viem"
 import { useAccount } from "wagmi"
 import { getTokenImage } from "../lib/utils"
-import { FreeBet, TokenWithImage } from "../types/types"
-import { formatExpireAt } from "../utils/formatExpireAt"
 import { useChain } from "./chainContext"
 import { useBettingConfig } from "./configContext"
 import { useTokenContext } from "./tokenContext"
 
 interface FreebetsContextValue {
-  freebets: FreeBet[]
-  selectedFreebet: FreeBet | null
-  selectFreebetById: (id: string | null) => void
-  currentChainFreebets: FreeBet[]
+  freebets: SignedFreebet[]
+  selectedFreebet: SignedFreebet | null
+  selectFreebetById: (id: number | null) => void
+  currentChainFreebets: SignedFreebet[]
   isUsingFreebet: boolean
   refetchFreebets: () => void
   freebetsError: Error | null
@@ -40,14 +38,14 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { setSelectedToken } = useTokenContext()
   const { affiliate, freebetsAffiliates, withExternalBankrollFreebets, filteredTokens } =
     useBettingConfig()
-  const [selectedFreebet, setSelectedFreebet] = useState<FreeBet | null>(null)
+  const [selectedFreebet, setSelectedFreebet] = useState<SignedFreebet | null>(null)
   const [isUsingFreebet, setIsUsingFreebet] = useState(true)
 
   const {
     data: freebetsData = [],
     refetch: refetchFreebets,
     error: freebetsError,
-  } = useQuery<SignedFreebet[], Error, FreeBet[]>({
+  } = useQuery<SignedFreebet[], Error, SignedFreebet[]>({
     queryKey: [
       "freebets",
       accountAddress,
@@ -58,9 +56,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       filteredTokens,
     ],
     queryFn: fetchFreebetsTokens,
-    select: (data: SignedFreebet[]) => {
-      return data.map(formatFreebet)
-    },
     enabled: !!accountAddress,
     refetchInterval: 30000,
   })
@@ -81,13 +76,13 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   }, [])
 
   const selectFreebetById = useCallback(
-    (id: string | null) => {
+    (id: number | null) => {
       if (!id) {
         deselectFreebet()
         return
       }
 
-      const freebet = freebetsData.find((freebet) => freebet.id.toString() === id) || null
+      const freebet = freebetsData.find((freebet) => freebet.id === id) || null
 
       if (!freebet) {
         deselectFreebet()
@@ -98,7 +93,10 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
         switchAppChain(freebet.chainId)
       }
 
-      setSelectedToken(freebet.token)
+      setSelectedToken({
+        ...freebet.token,
+        image: getTokenImage(freebet.token.symbol),
+      })
       setSelectedFreebet(freebet)
       setIsUsingFreebet(true)
     },
@@ -190,22 +188,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     })
 
     return filteredFreebets
-  }
-
-  function formatFreebet(freebet: SignedFreebet): FreeBet {
-    return {
-      id: freebet.id.toString(),
-      title: freebet.campaign.label,
-      amount: freebet.amount,
-      formattedAmount: freebet.formattedAmount,
-      token: {
-        ...freebet.token,
-        image: getTokenImage(freebet.token.symbol),
-      } as TokenWithImage,
-      chainId: freebet.chainId,
-      expiresAt: formatExpireAt(freebet.expirationDate),
-      signed: freebet,
-    }
   }
 
   const contextValue = useMemo(

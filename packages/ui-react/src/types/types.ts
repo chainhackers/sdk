@@ -13,7 +13,6 @@ import {
   type Leaderboard,
   RouletteEncodedInput,
   RouletteNumber,
-  SignedFreebet,
   type Token,
   type WeightedGameConfiguration,
   type WeightedGameEncodedInput,
@@ -158,17 +157,6 @@ export interface RankingEntry {
   points: number
   rewardAmount: string
   rewardToken: TokenWithImage
-}
-
-export interface FreeBet {
-  id: string
-  amount: bigint
-  formattedAmount: string
-  token: TokenWithImage
-  chainId: CasinoChainId
-  expiresAt?: string
-  title?: string
-  signed: SignedFreebet
 }
 
 export interface LeaderboardItemWithRaw {

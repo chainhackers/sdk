@@ -1,6 +1,6 @@
-import { formatRawAmount } from "@betswirl/sdk-core"
-import { cn } from "../../lib/utils"
-import { FreeBet } from "../../types/types"
+import { formatRawAmount, SignedFreebet } from "@betswirl/sdk-core"
+import { cn, getTokenImage } from "../../lib/utils"
+import { formatExpireAt } from "../../utils/formatExpireAt"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { ScrollArea } from "../ui/scroll-area"
@@ -15,10 +15,10 @@ const PANEL_HEIGHT_DISCONNECTED = "!h-[238px]" // Smaller height for disconnecte
 interface FreebetsHubSheetPanelProps {
   portalContainer: HTMLElement
   isConnected: boolean
-  freebets: FreeBet[]
+  freebets: SignedFreebet[]
   onConnectWallet: () => void
   //onClaimCode: (code: string) => void // TODO: Freebets code claim
-  onSelectFreebet: (freebet: FreeBet) => void
+  onSelectFreebet: (freebet: SignedFreebet) => void
 }
 
 //const MAX_CODE_LENGTH = 10 // TODO: Freebets code claim
@@ -45,7 +45,7 @@ export function FreebetsHubSheetPanel({
   //   setCodeInput("")
   // }
 
-  const handleFreeBetClick = (freeBet: FreeBet) => {
+  const handleFreeBetClick = (freeBet: SignedFreebet) => {
     onSelectFreebet(freeBet)
   }
 
@@ -170,10 +170,16 @@ export function FreebetsHubSheetPanel({
                         >
                           <div className="flex items-center justify-between w-full">
                             <h4 className="font-semibold text-sm max-w-[150px] overflow-hidden text-ellipsis">
-                              {freeBet.title}
+                              {freeBet.campaign.label}
                             </h4>
                             <div className="flex items-center gap-2">
-                              <TokenIcon token={freeBet.token} size={20} />
+                              <TokenIcon
+                                token={{
+                                  ...freeBet.token,
+                                  image: getTokenImage(freeBet.token.symbol),
+                                }}
+                                size={20}
+                              />
                               <span className="font-bold text-[12px] leading-[20px]">
                                 {formatRawAmount(freeBet.amount)} {freeBet.token.symbol}
                               </span>
@@ -182,7 +188,7 @@ export function FreebetsHubSheetPanel({
                           <div className="flex items-center justify-between w-full">
                             <ChainIcon chainId={freeBet.chainId} size={18} className="" />
                             <p className="text-[12px] leading-[18px] text-text-on-surface-variant text-right break-words">
-                              Expire: {freeBet.expiresAt}
+                              Expire: {formatExpireAt(freeBet.expirationDate)}
                             </p>
                           </div>
                         </Button>

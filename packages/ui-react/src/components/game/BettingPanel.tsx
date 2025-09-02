@@ -1,12 +1,18 @@
-import { BP, CASINO_GAME_TYPE, formatRawAmount, GAS_TOKEN_ADDRESS } from "@betswirl/sdk-core"
+import {
+  BP,
+  CASINO_GAME_TYPE,
+  formatRawAmount,
+  GAS_TOKEN_ADDRESS,
+  SignedFreebet,
+} from "@betswirl/sdk-core"
 import { WalletModal } from "@coinbase/onchainkit/wallet"
 import { Gift } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useChain } from "../../context/chainContext"
 import { useFreebetsContext } from "../../context/FreebetsContext"
 import { useBetRequirements } from "../../hooks/useBetRequirements"
-import { cn } from "../../lib/utils"
-import { BetStatus, ChainTokenPanelView, FreeBet, TokenWithImage } from "../../types/types"
+import { cn, getTokenImage } from "../../lib/utils"
+import { BetStatus, ChainTokenPanelView, TokenWithImage } from "../../types/types"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
 import { Sheet } from "../ui/sheet"
@@ -258,7 +264,7 @@ export function BettingPanel({
     }
   }
 
-  const handleFreeBetSelect = (freeBet: FreeBet) => {
+  const handleFreeBetSelect = (freeBet: SignedFreebet) => {
     selectFreebetById(freeBet.id)
     setIsFreeBetSheetOpen(false)
     setIsFreebetsHubOpen(false)
@@ -320,7 +326,10 @@ export function BettingPanel({
         {isUsingFreebet && selectedFreebet ? (
           <FreeBetInput
             amount={selectedFreebet.formattedAmount}
-            token={selectedFreebet.token}
+            token={{
+              ...selectedFreebet.token,
+              image: getTokenImage(selectedFreebet.token.symbol),
+            }}
             isDisabled={isInputDisabled}
             onClick={handleFreeBetClick}
             onRemoveFreebet={handleRemoveFreeBet}

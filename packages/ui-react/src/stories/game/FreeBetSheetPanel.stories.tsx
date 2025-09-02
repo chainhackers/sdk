@@ -1,3 +1,4 @@
+import { SignedFreebet } from "@betswirl/sdk-core"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Ticket } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
@@ -6,77 +7,141 @@ import { Button } from "../../components/ui/button"
 import { Sheet, SheetTrigger } from "../../components/ui/sheet"
 import { cn } from "../../lib/utils"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
-import type { FreeBet, Theme, TokenWithImage } from "../../types/types"
+import type { Theme, TokenWithImage } from "../../types/types"
 
 // Mock tokens
 const ETH_TOKEN: TokenWithImage = STORYBOOK_TOKENS.ETH
 const DEGEN_TOKEN: TokenWithImage = STORYBOOK_TOKENS.DEGEN
 
 // Mock free bets data
-const mockFreeBets: FreeBet[] = [
+const mockFreeBets: SignedFreebet[] = [
   {
-    id: "1",
-    amount: 10,
+    id: 1,
+    playerAddress: "0x1234567890123456789012345678901234567890",
+    affiliateAddress: "0x0000000000000000000000000000000000000000",
+    freebetAddress: "0x0000000000000000000000000000000000000000",
+    amount: 10n,
+    formattedAmount: "10",
     token: ETH_TOKEN,
     chainId: 8453,
-    title: "Welcome Bonus",
-    expiresAt: "24.07.2024",
+    campaign: {
+      id: 1,
+      label: "Welcome Bonus",
+    },
+    expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+    signature: "0x",
   },
   {
-    id: "2",
-    amount: 50,
+    id: 2,
+    playerAddress: "0x1234567890123456789012345678901234567890",
+    affiliateAddress: "0x0000000000000000000000000000000000000000",
+    freebetAddress: "0x0000000000000000000000000000000000000000",
+    amount: 50n,
+    formattedAmount: "50",
     token: DEGEN_TOKEN,
     chainId: 8453,
-    title: "Loyalty Reward",
-    expiresAt: "31.07.2024",
+    campaign: {
+      id: 2,
+      label: "Daily Bonus",
+    },
+    expirationDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+    signature: "0x",
   },
   {
-    id: "3",
-    amount: 25,
+    id: 3,
+    playerAddress: "0x1234567890123456789012345678901234567890",
+    affiliateAddress: "0x0000000000000000000000000000000000000000",
+    freebetAddress: "0x0000000000000000000000000000000000000000",
+    amount: 25n,
+    formattedAmount: "25",
     token: ETH_TOKEN,
     chainId: 8453,
-    title: "Weekend Special",
-    expiresAt: "28.07.2024",
+    campaign: {
+      id: 3,
+      label: "Weekend Special",
+    },
+    expirationDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+    signature: "0x",
   },
   {
-    id: "4",
-    amount: 100,
+    id: 4,
+    playerAddress: "0x1234567890123456789012345678901234567890",
+    affiliateAddress: "0x0000000000000000000000000000000000000000",
+    freebetAddress: "0x0000000000000000000000000000000000000000",
+    amount: 100n,
+    formattedAmount: "100",
     token: DEGEN_TOKEN,
     chainId: 8453,
-    title: "VIP Bonus",
-    expiresAt: "15.08.2024",
+    campaign: {
+      id: 4,
+      label: "High Roller Bonus",
+    },
+    expirationDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+    signature: "0x",
   },
   {
-    id: "5",
-    amount: 5,
+    id: 5,
+    playerAddress: "0x1234567890123456789012345678901234567890",
+    affiliateAddress: "0x0000000000000000000000000000000000000000",
+    freebetAddress: "0x0000000000000000000000000000000000000000",
+    amount: 5n,
+    formattedAmount: "5",
     token: ETH_TOKEN,
     chainId: 8453,
-    title: "Daily Reward",
-    expiresAt: "25.07.2024",
+    campaign: {
+      id: 5,
+      label: "Starter Bonus",
+    },
+    expirationDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
+    signature: "0x",
   },
   {
-    id: "6",
-    amount: 75,
+    id: 6,
+    playerAddress: "0x1234567890123456789012345678901234567890",
+    affiliateAddress: "0x0000000000000000000000000000000000000000",
+    freebetAddress: "0x0000000000000000000000000000000000000000",
+    amount: 75n,
+    formattedAmount: "75",
     token: DEGEN_TOKEN,
     chainId: 8453,
-    title: "Achievement Unlock",
-    expiresAt: "10.08.2024",
+    campaign: {
+      id: 6,
+      label: "Lucky Bonus",
+    },
+    expirationDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+    signature: "0x",
   },
   {
-    id: "7",
-    amount: 20,
+    id: 7,
+    playerAddress: "0x1234567890123456789012345678901234567890",
+    affiliateAddress: "0x0000000000000000000000000000000000000000",
+    freebetAddress: "0x0000000000000000000000000000000000000000",
+    amount: 20n,
+    formattedAmount: "20",
     token: ETH_TOKEN,
     chainId: 8453,
-    title: "Referral Bonus",
-    expiresAt: "05.08.2024",
+    campaign: {
+      id: 7,
+      label: "Loyalty Reward",
+    },
+    expirationDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000), // 6 days from now
+    signature: "0x",
   },
   {
-    id: "8",
-    amount: 150,
+    id: 8,
+    playerAddress: "0x1234567890123456789012345678901234567890",
+    affiliateAddress: "0x0000000000000000000000000000000000000000",
+    freebetAddress: "0x0000000000000000000000000000000000000000",
+    amount: 150n,
+    formattedAmount: "150",
     token: DEGEN_TOKEN,
     chainId: 8453,
-    title: "Monthly Cashback",
-    expiresAt: "30.08.2024",
+    campaign: {
+      id: 8,
+      label: "VIP Bonus",
+    },
+    expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+    signature: "0x",
   },
 ]
 
@@ -118,14 +183,14 @@ const FreeBetSheetWithWrapper = ({
   selectedFreeBet,
   theme = "light",
 }: {
-  freeBets: FreeBet[]
-  selectedFreeBet: FreeBet | null
+  freeBets: SignedFreebet[]
+  selectedFreeBet: SignedFreebet | null
   theme?: Theme
 }) => {
   const [isOpen, setIsOpen] = useState(true)
-  const [selected, setSelected] = useState<FreeBet | null>(selectedFreeBet)
+  const [selected, setSelected] = useState<SignedFreebet | null>(selectedFreeBet)
 
-  const handleSelect = (freeBet: FreeBet) => {
+  const handleSelect = (freeBet: SignedFreebet) => {
     setSelected(freeBet)
     console.log("FreeBet selected:", freeBet)
   }

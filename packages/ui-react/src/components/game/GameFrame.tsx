@@ -1,17 +1,10 @@
-import { BP, CASINO_GAME_TYPE } from "@betswirl/sdk-core"
+import { BP, CASINO_GAME_TYPE, SignedFreebet } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, forwardRef, useContext, useEffect, useRef, useState } from "react"
 import { zeroAddress } from "viem"
 
 import { cn } from "../../lib/utils"
-import {
-  BetStatus,
-  FreeBet,
-  GameResult,
-  HistoryEntry,
-  Theme,
-  TokenWithImage,
-} from "../../types/types"
+import { BetStatus, GameResult, HistoryEntry, Theme, TokenWithImage } from "../../types/types"
 import { LeaderboardSheetPanel } from "../leaderboard/LeaderboardSheetPanel"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
@@ -309,7 +302,7 @@ interface BettingSectionProps {
   hasValidSelection?: boolean
   isRefetchingAllowance?: boolean
   approveError?: any
-  freeBets?: FreeBet[]
+  freeBets?: SignedFreebet[]
   invalidSelectionMessage?: string
 }
 
