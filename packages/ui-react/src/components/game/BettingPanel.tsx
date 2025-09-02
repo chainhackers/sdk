@@ -124,13 +124,15 @@ export function BettingPanel({
     grossMultiplier,
   })
 
+  const effectiveBetAmount = isUsingFreebet && selectedFreebet ? selectedFreebet.amount : betAmount
+
   const isBetAmountValid = betAmount && betAmount > 0n
 
   const effectiveBalance = token.address === GAS_TOKEN_ADDRESS ? balance - vrfFees : balance
   const isTotalbetAmountExceedsBalance =
     betAmount && BigInt(betCount) * betAmount > effectiveBalance
   const isBetCountValid = betCount > 0 && betCount <= maxBetCount
-  const isBetAmountExceedsMaxBetAmount = betAmount && betAmount > maxBetAmount
+  const isBetAmountExceedsMaxBetAmount = effectiveBetAmount && effectiveBetAmount > maxBetAmount
 
   const formattedBalance = formatRawAmount(balance, token.decimals)
 
@@ -150,9 +152,9 @@ export function BettingPanel({
     !isWaiting &&
     !isGamePaused &&
     !isBetRequirementsLoading &&
-    (isUsingFreebet || isTokenAllowed) &&
-    (isUsingFreebet || isBetCountValid) &&
-    (isUsingFreebet || !isBetAmountExceedsMaxBetAmount) &&
+    isTokenAllowed &&
+    isBetCountValid &&
+    !isBetAmountExceedsMaxBetAmount &&
     hasValidSelection
 
   const isApprovingToken = isApprovePending || isApproveConfirming
