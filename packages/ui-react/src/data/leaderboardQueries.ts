@@ -18,6 +18,7 @@ export interface LeaderboardQueryDeps {
   chainId: CasinoChainId
   address?: Address
   affiliate?: Address
+  testMode: boolean
 }
 
 export interface FetchLeaderboardsParams extends LeaderboardQueryDeps {
@@ -30,6 +31,7 @@ export async function fetchAndEnrichLeaderboards({
   address,
   affiliate,
   showPartner,
+  testMode,
 }: FetchLeaderboardsParams): Promise<EnrichedLeaderboard[]> {
   const result = await fetchLeaderboards(
     100,
@@ -40,6 +42,7 @@ export async function fetchAndEnrichLeaderboards({
     showPartner,
     "desc",
     undefined,
+    testMode,
   )
 
   const casinoLeaderboards = result.leaderboards.filter((lb) => lb.type === LEADERBOARD_TYPE.CASINO)
@@ -108,9 +111,9 @@ export async function fetchAndEnrichSingleLeaderboard(
   leaderboardId: string,
   deps: LeaderboardQueryDeps,
 ): Promise<EnrichedLeaderboard> {
-  const { publicClient, chainId, address } = deps
+  const { publicClient, chainId, address, testMode } = deps
 
-  const leaderboard = await fetchLeaderboard(Number(leaderboardId), address)
+  const leaderboard = await fetchLeaderboard(Number(leaderboardId), address, testMode)
 
   if (!leaderboard) {
     throw new Error(`Leaderboard ${leaderboardId} not found`)
@@ -164,6 +167,7 @@ export interface FetchAllChainsLeaderboardsParams {
   address?: Address
   affiliate?: Address
   showPartner: boolean
+  testMode: boolean
 }
 
 /**
@@ -177,6 +181,7 @@ export async function fetchAndEnrichLeaderboardsForAllChains({
   address,
   affiliate,
   showPartner,
+  testMode,
 }: FetchAllChainsLeaderboardsParams): Promise<EnrichedLeaderboard[]> {
   const chainPromises = supportedChains.map(async (chainId) => {
     const publicClient = publicClients.get(chainId)
@@ -190,6 +195,7 @@ export async function fetchAndEnrichLeaderboardsForAllChains({
       address,
       affiliate,
       showPartner,
+      testMode,
     })
   })
 

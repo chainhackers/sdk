@@ -85,6 +85,7 @@ export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookPro
             supportedChains={CHAINS.map((c) => c.id as CasinoChainId)}
             freebetsAffiliates={freebetsAffiliates}
             withExternalBankrollFreebets={true}
+            testMode={false}
           >
             <TokenProvider>
               <BalanceProvider>

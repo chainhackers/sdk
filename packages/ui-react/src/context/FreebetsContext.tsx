@@ -36,7 +36,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
   const { appChainId, switchAppChain, availableChainIds } = useChain()
   const { setSelectedToken } = useTokenContext()
-  const { affiliate, freebetsAffiliates, withExternalBankrollFreebets, filteredTokens } =
+  const { affiliate, freebetsAffiliates, withExternalBankrollFreebets, filteredTokens, testMode } =
     useBettingConfig()
   const [selectedFreebet, setSelectedFreebet] = useState<SignedFreebet | null>(null)
   const [isUsingFreebet, setIsUsingFreebet] = useState(true)
@@ -170,6 +170,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       accountAddress,
       affiliates,
       withExternalBankrollFreebets,
+      testMode,
     )
 
     const filteredFreebets = allFreebets.filter((freebet) => {
