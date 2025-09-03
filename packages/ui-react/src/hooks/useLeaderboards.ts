@@ -24,6 +24,9 @@ interface UseLeaderboardsResult {
  * This hook serves as the Single Source of Truth (SSoT) for all leaderboards data
  * @param showPartner - Whether to show partner leaderboards
  */
+// TODO: This hook will be moved to the React SDK in the future and needs to be refactored
+// to accept additional parameters like chainId, statuses, etc. for better flexibility
+// instead of relying only on the current use case parameters
 export function useLeaderboards(showPartner: boolean): UseLeaderboardsResult {
   const { availableChains } = useChain()
   const { affiliate } = useBettingConfig()

@@ -22,24 +22,7 @@ export interface RulesTextGeneratorParams {
 }
 
 function formatGameName(game: LEADERBOARD_CASINO_RULES_GAME): string {
-  switch (game) {
-    case LEADERBOARD_CASINO_RULES_GAME.DICE:
-      return "dice"
-    case LEADERBOARD_CASINO_RULES_GAME.COINTOSS:
-      return "cointoss"
-    case LEADERBOARD_CASINO_RULES_GAME.ROULETTE:
-      return "roulette"
-    case LEADERBOARD_CASINO_RULES_GAME.KENO:
-      return "keno"
-    case LEADERBOARD_CASINO_RULES_GAME.WHEEL:
-      return "wheel"
-    case LEADERBOARD_CASINO_RULES_GAME.PLINKO:
-      return "plinko"
-    case LEADERBOARD_CASINO_RULES_GAME.ALL:
-      return "all"
-    default:
-      return String(game).toLowerCase()
-  }
+  return String(game).toLowerCase()
 }
 
 function formatGamesList(games: LEADERBOARD_CASINO_RULES_GAME[]): string {
