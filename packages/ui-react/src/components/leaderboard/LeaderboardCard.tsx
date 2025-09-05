@@ -1,7 +1,7 @@
 import { LEADERBOARD_STATUS, type Leaderboard } from "@betswirl/sdk-core"
 import { Gift } from "lucide-react"
 import { cn } from "../../lib/utils"
-import type { LeaderboardItem } from "../../types/types"
+import type { LeaderboardItem, PlayNowEvent } from "../../types/types"
 import { formatLeaderboardStatus } from "../../utils/leaderboardUtils"
 import { Button } from "../ui/button"
 import { ChainIcon } from "../ui/ChainIcon"
@@ -12,6 +12,7 @@ interface LeaderboardCardProps {
   raw?: Leaderboard
   onViewOverview?: (id: string) => void
   onClaimSuccess?: () => void
+  onPlayNow?: (event: PlayNowEvent) => void
 }
 
 export function LeaderboardCard({
@@ -19,6 +20,7 @@ export function LeaderboardCard({
   raw,
   onViewOverview,
   onClaimSuccess,
+  onPlayNow,
 }: LeaderboardCardProps) {
   const formatDateRange = (startDate: string, endDate: string) => {
     const start = new Date(startDate)
@@ -139,6 +141,7 @@ export function LeaderboardCard({
             leaderboard={raw}
             userAction={item.userAction}
             onClaimSuccess={onClaimSuccess}
+            onPlayNow={onPlayNow}
           />
         )}
         <Button

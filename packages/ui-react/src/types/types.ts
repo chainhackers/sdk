@@ -9,6 +9,7 @@ import {
   DiceNumber,
   KenoBall,
   KenoEncodedInput,
+  LEADERBOARD_CASINO_RULES_GAME,
   LEADERBOARD_STATUS,
   type Leaderboard,
   RouletteEncodedInput,
@@ -105,6 +106,12 @@ export interface GameDefinition<T extends GameChoice> {
   encodeAbiParametersInput: (choice: T["choice"]) => Hex
   getWinChancePercent?: (choice: T["choice"]) => number | number[]
   formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
+}
+
+export type PlayNowEvent = {
+  chainId: CasinoChainId
+  games: LEADERBOARD_CASINO_RULES_GAME[]
+  tokens: Token[]
 }
 
 export type LeaderboardUserAction =

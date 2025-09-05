@@ -128,16 +128,36 @@ This code uses default public RPCs from wagmi. No environment variables needed.
 In `src/App.tsx`:
 
 ```tsx
-import { CoinTossGame, DiceGame, RouletteGame, KenoGame, WheelGame } from '@betswirl/ui-react'
+import { useState } from 'react'
+import { CASINO_GAME_TYPE } from '@betswirl/sdk-core'
+import { CoinTossGame, DiceGame, type PlayNowEvent } from '@betswirl/ui-react'
 
-// Add component (choose one or multiple)
-<div style={{ margin: '2rem 0' }}>
-  <CoinTossGame />
-  {/* <DiceGame /> */}
-  {/* <RouletteGame /> */}
-  {/* <KenoGame /> */}
-  {/* <WheelGame /> */}
-</div>
+function App() {
+  const [currentGame, setCurrentGame] = useState(CASINO_GAME_TYPE.COINTOSS)
+
+  // Optional: Handle "Play now" button clicks from leaderboards
+  const handlePlayNow = (event: PlayNowEvent) => {
+    // Switch to the appropriate game
+    if (event.games.includes('COINTOSS')) {
+      setCurrentGame(CASINO_GAME_TYPE.COINTOSS)
+    } else if (event.games.includes('DICE')) {
+      setCurrentGame(CASINO_GAME_TYPE.DICE)
+    }
+    // You can also handle chain/token switching here
+  }
+
+  return (
+    <div>
+      {/* Render games with onPlayNow callback */}
+      {currentGame === CASINO_GAME_TYPE.COINTOSS && (
+        <CoinTossGame onPlayNow={handlePlayNow} />
+      )}
+      {currentGame === CASINO_GAME_TYPE.DICE && (
+        <DiceGame onPlayNow={handlePlayNow} />
+      )}
+    </div>
+  )
+}
 ```
 
 ### Run
@@ -165,6 +185,24 @@ git commit -m "Add BetSwirl casino game"
 * Select your repository
 * Click "Import" → "Deploy"
 * Get public URL after ~2 minutes
+
+## Leaderboard Integration
+
+### onPlayNow Callback
+
+The `onPlayNow` callback allows your app to respond when users click "Play now" in leaderboard components. It receives a `PlayNowEvent` with leaderboard details:
+
+```tsx
+type PlayNowEvent = {
+  chainId: CasinoChainId           // Required network for the leaderboard
+  games: LEADERBOARD_CASINO_RULES_GAME[]  // Allowed games
+  tokens: Token[]                  // Accepted tokens
+}
+```
+
+**Usage:** Pass the callback to any game component to enable automatic game switching from leaderboards.
+
+**Note:** The callback is optional. Without it, "Play now" only closes the leaderboard panel.
 
 ## Configuration
 

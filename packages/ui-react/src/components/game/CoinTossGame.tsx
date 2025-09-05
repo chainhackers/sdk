@@ -39,6 +39,7 @@ export function CoinTossGame({
   theme = "system",
   customTheme,
   backgroundImage = coinTossBackground,
+  onPlayNow,
   ...props
 }: CoinTossGameProps) {
   const {
@@ -97,7 +98,7 @@ export function CoinTossGame({
   }
 
   return (
-    <GameFrame themeSettings={themeSettings} {...props}>
+    <GameFrame themeSettings={themeSettings} onPlayNow={onPlayNow} {...props}>
       <GameFrame.Header title="CoinToss" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton
