@@ -7,7 +7,7 @@ import {
   Token,
   wrappedGasTokenById,
 } from "@betswirl/sdk-core"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useCall } from "wagmi"
 import { CHAINLINK_VRF_FEES_BUFFER_PERCENT } from "../consts"
 import { useChain } from "../context/chainContext"
@@ -41,7 +41,7 @@ type UseEstimateVRFFeesProps = {
  */
 export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
   const { appChainId } = useChain()
-  const { data: gasPriceData } = useGasPrice()
+  const { data: gasPriceData, refetch: refetchGasPrice } = useGasPrice()
   const [vrfFees, setVrfFees] = useState<bigint>(0n)
   const functionData = useMemo(() => {
     if (!props.game || !props.token) return null
@@ -82,8 +82,13 @@ export function useEstimateVRFFees(props: UseEstimateVRFFeesProps) {
     )
   }, [vrfFees, appChainId])
 
+  const refetch = useCallback(async () => {
+    await refetchGasPrice()
+    await vrfEstimateQuery.refetch()
+  }, [vrfEstimateQuery, refetchGasPrice])
+
   return {
-    wagmiHook: vrfEstimateQuery,
+    refetch,
     vrfFees,
     gasPrice: gasPriceData.optimalGasPrice,
     formattedVrfFees,

@@ -89,7 +89,7 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
   })
   const {
     vrfFees,
-    wagmiHook: estimateVrfFeesWagmiHook,
+    refetch: fetchVrfFees,
     formattedVrfFees,
     gasPrice,
   } = useEstimateVRFFees({
@@ -198,13 +198,14 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
 
       resetBetState()
 
-      await estimateVrfFeesWagmiHook.refetch()
-      logger.debug("placeBet: VRF cost refetched:", formattedVrfFees)
+      await fetchVrfFees()
 
       setCurrentBetAmount(betAmount)
 
       try {
         logger.debug("placeBet: Starting bet process using strategy")
+        logger.debug("placeBet: VRF cost:", vrfFees)
+        logger.debug("placeBet: Gas price:", gasPrice)
 
         const wagerWriteParams = await strategy.prepare({
           betAmount,
@@ -230,7 +231,7 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
       appChainId,
       connectedAddress,
       wagerWriteHook.writeContract,
-      estimateVrfFeesWagmiHook.refetch,
+      fetchVrfFees,
       formattedVrfFees,
       vrfFees,
       gasPrice,
