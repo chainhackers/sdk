@@ -2,6 +2,7 @@ import { BP, CASINO_GAME_TYPE, SignedFreebet } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, forwardRef, useContext, useEffect, useRef, useState } from "react"
 import { zeroAddress } from "viem"
+import { useLeaderboards } from "../../hooks/useLeaderboards"
 
 import { cn } from "../../lib/utils"
 import {
@@ -334,6 +335,9 @@ function LeaderboardButton({ className }: LeaderboardButtonProps) {
     onPlayNow,
   } = useGameFrameContext()
 
+  const { ongoingLeaderboards } = useLeaderboards(false)
+  const count = ongoingLeaderboards.length
+
   return (
     <Sheet open={isLeaderboardSheetOpen} onOpenChange={setIsLeaderboardSheetOpen}>
       <SheetTrigger asChild>
@@ -348,7 +352,7 @@ function LeaderboardButton({ className }: LeaderboardButtonProps) {
             className,
           )}
         >
-          <LeaderboardIcon />
+          <LeaderboardIcon count={count} />
         </Button>
       </SheetTrigger>
       {isMounted && portalContainer && (
