@@ -1,5 +1,5 @@
 import React from "react"
-import { Theme } from "../../../types/types"
+import { PlayNowEvent, Theme } from "../../../types/types"
 
 export interface BaseGameProps extends React.HTMLAttributes<HTMLDivElement> {
   theme?: Theme
@@ -10,6 +10,7 @@ export interface BaseGameProps extends React.HTMLAttributes<HTMLDivElement> {
     "--game-window-overlay"?: string
   } & React.CSSProperties
   backgroundImage?: string
+  onPlayNow?: (event: PlayNowEvent) => void
 }
 
 export interface GameControlsProps {

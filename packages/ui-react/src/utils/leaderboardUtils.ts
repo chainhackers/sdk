@@ -176,13 +176,20 @@ export function mapRankingToEntry(
     rewardAmount = formatTokenAmount(rewardValue, leaderboard.token.decimals)
   }
 
-  const playerAddress = `${ranking.bettorAddress.slice(0, 8)}...${ranking.bettorAddress.slice(-7)}`
-
   return {
     rank: ranking.rank,
-    playerAddress,
+    playerAddress: ranking.bettorAddress,
     points: Number(ranking.totalPoints),
     rewardAmount,
     rewardToken: token,
   }
+}
+
+/**
+ * Format address for UI display with ellipsis
+ */
+export function formatAddress(address: Address): string {
+  const addressStr = address.toLowerCase()
+  if (addressStr.length <= 10) return addressStr
+  return `${addressStr.slice(0, 6)}...${addressStr.slice(-6)}`
 }

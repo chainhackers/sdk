@@ -41,6 +41,7 @@ export function RouletteGame({
   theme = "system",
   customTheme,
   backgroundImage = rouletteBackground,
+  onPlayNow,
   ...props
 }: RouletteGameProps) {
   const {
@@ -99,7 +100,7 @@ export function RouletteGame({
   }
 
   return (
-    <GameFrame themeSettings={themeSettings} variant="roulette" {...props}>
+    <GameFrame themeSettings={themeSettings} variant="roulette" onPlayNow={onPlayNow} {...props}>
       <GameFrame.Header title="Roulette" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea variant="roulette">
         <GameFrame.InfoButton

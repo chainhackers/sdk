@@ -1,5 +1,6 @@
 import { useLeaderboards } from "../../hooks/useLeaderboards"
 import { cn } from "../../lib/utils"
+import type { PlayNowEvent } from "../../types/types"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Switch } from "../ui/switch"
 import { LeaderboardCard } from "./LeaderboardCard"
@@ -8,9 +9,15 @@ interface Props {
   onViewOverview?: (id: string) => void
   showPartner: boolean
   setShowPartner: (show: boolean) => void
+  onPlayNow?: (event: PlayNowEvent) => void
 }
 
-export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }: Props) {
+export function LeaderboardsView({
+  onViewOverview,
+  showPartner,
+  setShowPartner,
+  onPlayNow,
+}: Props) {
   const { ongoingLeaderboards, endedLeaderboards } = useLeaderboards(showPartner)
 
   return (
@@ -22,9 +29,7 @@ export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }
       <div className="flex items-center justify-between mb-4">
         <span className="text-[16px] font-semibold text-foreground">Ongoing</span>
         <label htmlFor="partner-toggle" className="flex items-center gap-2 cursor-pointer">
-          <span className="text-[12px] leading-[18px] text-foreground">
-            Show partner leaderboards
-          </span>
+          <span className="text-[12px] leading-[18px] text-foreground">Sponsored leaderboards</span>
           <Switch
             id="partner-toggle"
             checked={showPartner}
@@ -49,6 +54,7 @@ export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }
                 item={itemWithEnriched.item}
                 raw={itemWithEnriched.enriched}
                 onViewOverview={onViewOverview}
+                onPlayNow={onPlayNow}
               />
             ))}
           </div>
@@ -74,6 +80,7 @@ export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }
                   item={itemWithEnriched.item}
                   raw={itemWithEnriched.enriched}
                   onViewOverview={onViewOverview}
+                  onPlayNow={onPlayNow}
                 />
               ))}
             </div>

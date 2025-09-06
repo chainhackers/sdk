@@ -245,7 +245,7 @@ export function LeaderboardOverview({ leaderboardId, onBack }: LeaderboardOvervi
             <div className="pb-4 px-4 pt-1">
               <LeaderboardRankingTab
                 rankingData={rankingData}
-                lastUpdate="Last update: recently (refreshed once per hour)"
+                lastUpdate={`Last update: ${enrichedLeaderboard.lastRefreshDate?.toString() ?? "recently"}`}
                 claimableAmount={
                   Number.isFinite(Number(overviewData.userStats.prize.amount))
                     ? Number.parseFloat(overviewData.userStats.prize.amount)

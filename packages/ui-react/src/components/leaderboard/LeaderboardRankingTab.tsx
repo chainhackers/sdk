@@ -1,4 +1,5 @@
 import { LEADERBOARD_STATUS } from "@betswirl/sdk-core"
+import { useAccount } from "wagmi"
 import type { RankingEntry } from "../../types/types"
 import { Button } from "../ui/button"
 import { LeaderboardRankingCard } from "./LeaderboardRankingCard"
@@ -19,6 +20,7 @@ export function LeaderboardRankingTab({
   claimableTokenSymbol,
   leaderboardStatus = LEADERBOARD_STATUS.PENDING,
 }: LeaderboardRankingTabProps) {
+  const { address: userAddress } = useAccount()
   const topThree = rankingData.slice(0, 3)
   const remainingEntries = rankingData.slice(3)
 
@@ -52,17 +54,24 @@ export function LeaderboardRankingTab({
       {/* Top 3 Cards */}
       {topThree.length > 0 && (
         <div className="flex flex-col gap-3">
-          {topThree.map((entry) => (
-            <LeaderboardRankingCard
-              key={`top-${entry.rank}-${entry.playerAddress}`}
-              entry={entry}
-            />
-          ))}
+          {topThree.map((entry) => {
+            const isCurrentUser =
+              userAddress && entry.playerAddress.toLowerCase() === userAddress.toLowerCase()
+            return (
+              <LeaderboardRankingCard
+                key={`top-${entry.rank}-${entry.playerAddress}`}
+                entry={entry}
+                isCurrentUser={isCurrentUser}
+              />
+            )
+          })}
         </div>
       )}
 
       {/* Remaining Rankings Table */}
-      {remainingEntries.length > 0 && <LeaderboardRankingList entries={remainingEntries} />}
+      {remainingEntries.length > 0 && (
+        <LeaderboardRankingList entries={remainingEntries} userAddress={userAddress} />
+      )}
 
       {/* Empty State */}
       {rankingData.length === 0 && (

@@ -1,14 +1,17 @@
-import { CasinoToken } from "@betswirl/sdk-core"
-import { initWagmiBetSwirlClient } from "@betswirl/wagmi-provider"
-import { useQuery } from "@tanstack/react-query"
+import {
+  type CasinoToken,
+  getCasinoTokensFunctionData,
+  parseRawCasinoToken,
+  type RawCasinoToken,
+} from "@betswirl/sdk-core"
 import { useMemo } from "react"
 import { type Address } from "viem"
-import { useConfig } from "wagmi"
+import { useReadContract } from "wagmi"
 import { useChain } from "../context/chainContext"
 import { useBettingConfig } from "../context/configContext"
 import { createLogger, type Logger } from "../lib/logger"
 import { getTokenImage } from "../lib/utils"
-import { CasinoTokenWithImage, QueryParameter, TokenWithImage } from "../types/types"
+import { type CasinoTokenWithImage, type QueryParameter } from "../types/types"
 import { type FilterTokensResult, filterTokensByAllowed } from "../utils/tokenUtils"
 
 const logger = createLogger("useTokens")
@@ -18,7 +21,7 @@ const logger = createLogger("useTokens")
  * @param tokens - Array of tokens to format
  * @returns Array of objects with symbol and address for logging
  */
-function formatTokensForLogging(tokens: TokenWithImage[]) {
+function formatTokensForLogging(tokens: CasinoTokenWithImage[]) {
   return tokens.map((token) => ({ symbol: token.symbol, address: token.address }))
 }
 
@@ -31,7 +34,7 @@ function formatTokensForLogging(tokens: TokenWithImage[]) {
  */
 function validateTokenFiltering(
   filterResult: FilterTokensResult,
-  availableTokens: TokenWithImage[],
+  availableTokens: CasinoTokenWithImage[],
   filteredTokenAddresses: Address[],
   logger: Logger,
 ): void {
@@ -48,7 +51,7 @@ function validateTokenFiltering(
   }
 
   // Warn if filtering resulted in empty list when tokens are available
-  if (filterResult.filtered.length === 0) {
+  if (filterResult.filtered.length === 0 && availableTokens.length > 0) {
     logger.warn(
       "Token filtering resulted in empty list. Check if filteredTokens configuration is correct.",
       {
@@ -78,79 +81,70 @@ type UseTokensResult = {
  * @param props.onlyActive - Only return active (non-paused) tokens
  * @param props.query - Optional query parameters for React Query
  * @returns Object containing tokens array, loading state, and error
- *
- * The hook now includes enhanced validation for filteredTokens configuration:
- * - Warns when token addresses in filteredTokens are not found in available tokens
- * - Warns when filtering results in an empty list despite available tokens
- *
- * @example
- * ```ts
- * const { tokens, loading, error } = useTokens({
- *   onlyActive: true
- * })
- * ```
- *
- * @example
- * ```ts
- * // With filteredTokens in BettingConfig context:
- * // If filteredTokens contains non-existent addresses, warnings will be logged
- * const { tokens } = useTokens() // Automatically uses filteredTokens from context
- * ```
  */
 export function useTokens(props: UseTokensProps = {}): UseTokensResult {
   const { onlyActive = true, query } = props
   const { appChainId } = useChain()
   const { filteredTokens } = useBettingConfig()
-  const wagmiConfig = useConfig()
 
-  const tokensQuery = useQuery({
-    queryKey: ["casino-tokens", appChainId, onlyActive],
-    queryFn: async () => {
-      // Create a modified wallet that uses the app chain ID
-      const wagmiClient = initWagmiBetSwirlClient(wagmiConfig)
-      try {
-        const casinoTokens = await wagmiClient.getCasinoTokens(onlyActive, appChainId)
-        return casinoTokens
-      } finally {
-        // Restore original method
-      }
+  const functionData = useMemo(() => {
+    if (!appChainId) return null
+    return getCasinoTokensFunctionData(appChainId)
+  }, [appChainId])
+
+  const {
+    data: rawTokens,
+    isLoading,
+    error,
+  } = useReadContract({
+    abi: functionData?.data.abi,
+    address: functionData?.data.to,
+    functionName: functionData?.data.functionName,
+    args: functionData?.data.args,
+    chainId: appChainId,
+    query: {
+      enabled: !!appChainId && !!functionData,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes cache
+      ...(query as any), // Cast to any to avoid type conflicts with the generic query param
     },
-    enabled: !!appChainId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes cache
-    ...query,
   })
 
-  const tokens: CasinoTokenWithImage[] = useMemo(
+  const casinoTokens = useMemo(() => {
+    if (!rawTokens) return []
+    return (rawTokens as RawCasinoToken[])
+      .map((rawToken) => parseRawCasinoToken(rawToken, appChainId))
+      .filter((token) => (onlyActive ? !token.paused : true))
+  }, [rawTokens, appChainId, onlyActive])
+
+  const tokensWithImage: CasinoTokenWithImage[] = useMemo(
     () =>
-      tokensQuery.data?.map((token) => ({
+      casinoTokens.map((token) => ({
         ...token,
         image: getTokenImage(token.symbol),
-      })) || [],
-    [tokensQuery.data],
+      })),
+    [casinoTokens],
   )
 
   // Apply filtering if filteredTokens is provided
   const finalTokens = useMemo(() => {
     if (!filteredTokens) {
-      return tokens
+      return tokensWithImage
     }
 
-    const filterResult = filterTokensByAllowed(tokens, filteredTokens)
+    const filterResult = filterTokensByAllowed(tokensWithImage, filteredTokens)
 
-    // Only validate and show warnings if tokens have been loaded and query is successful
-    // (to avoid false positives during loading or when there are errors)
-    const shouldValidate = tokens.length > 0 && !tokensQuery.isLoading && !tokensQuery.error
+    const shouldValidate = tokensWithImage.length > 0 && !isLoading && !error
     if (shouldValidate) {
-      validateTokenFiltering(filterResult, tokens, filteredTokens, logger)
+      validateTokenFiltering(filterResult, tokensWithImage, filteredTokens, logger)
     }
 
     return filterResult.filtered
-  }, [tokens, filteredTokens, tokensQuery.isLoading, tokensQuery.error])
+  }, [tokensWithImage, filteredTokens, isLoading, error])
 
   return {
     tokens: finalTokens,
-    loading: tokensQuery.isLoading,
-    error: tokensQuery.error,
+    loading: isLoading,
+    error: error as Error | null,
   }
 }

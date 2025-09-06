@@ -1,10 +1,12 @@
 import { cn } from "../../lib/utils"
 import type { RankingEntry } from "../../types/types"
+import { formatAddress } from "../../utils/leaderboardUtils"
 import { TokenIcon } from "../ui/TokenIcon"
 import { RankIcon } from "./RankIcon"
 
 interface LeaderboardRankingCardProps {
   entry: RankingEntry
+  isCurrentUser?: boolean
 }
 
 function getGradientClasses(rank: number) {
@@ -21,19 +23,19 @@ function getGradientClasses(rank: number) {
   }
 }
 
-function formatAddress(address: string): string {
-  if (address.length <= 10) return address
-  return `${address.slice(0, 6)}...${address.slice(-6)}`
-}
-
-export function LeaderboardRankingCard({ entry }: LeaderboardRankingCardProps) {
+export function LeaderboardRankingCard({
+  entry,
+  isCurrentUser = false,
+}: LeaderboardRankingCardProps) {
   const { rank, playerAddress, points, rewardAmount, rewardToken } = entry
 
   const CardContent = () => (
     <div className="flex items-start gap-4">
       <RankIcon rank={rank} />
       <div className="flex-1 text-[14px] leading-[22px]">
-        <div className="font-semibold text-foreground">{formatAddress(playerAddress)}</div>
+        <div className={cn("font-semibold", isCurrentUser ? "text-primary" : "text-foreground")}>
+          {formatAddress(playerAddress)}
+        </div>
         <div>{points.toLocaleString()} points</div>
         <div className="flex items-center gap-1">
           <TokenIcon token={rewardToken} size={20} />

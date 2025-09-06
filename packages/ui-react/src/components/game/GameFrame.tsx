@@ -1,14 +1,15 @@
-import { BP, CASINO_GAME_TYPE } from "@betswirl/sdk-core"
+import { BP, CASINO_GAME_TYPE, SignedFreebet } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, forwardRef, useContext, useEffect, useRef, useState } from "react"
 import { zeroAddress } from "viem"
+import { useLeaderboards } from "../../hooks/useLeaderboards"
 
 import { cn } from "../../lib/utils"
 import {
   BetStatus,
-  FreeBet,
   GameResult,
   HistoryEntry,
+  PlayNowEvent,
   Theme,
   TokenWithImage,
 } from "../../types/types"
@@ -45,6 +46,7 @@ interface GameFrameContextValue {
   isLeaderboardSheetOpen: boolean
   setIsLeaderboardSheetOpen: (open: boolean) => void
   isMounted: boolean
+  onPlayNow?: (event: PlayNowEvent) => void
 }
 
 const GameFrameContext = createContext<GameFrameContextValue | null>(null)
@@ -61,10 +63,11 @@ interface GameFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   themeSettings: ThemeSettings
   children: React.ReactNode
   variant?: GameVariant
+  onPlayNow?: (event: PlayNowEvent) => void
 }
 
 const GameFrameRoot = forwardRef<HTMLDivElement, GameFrameProps>(
-  ({ themeSettings, children, variant = "default", ...props }, ref) => {
+  ({ themeSettings, children, variant = "default", onPlayNow, ...props }, ref) => {
     const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
     const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
     const [isLeaderboardSheetOpen, setIsLeaderboardSheetOpen] = useState(false)
@@ -98,6 +101,7 @@ const GameFrameRoot = forwardRef<HTMLDivElement, GameFrameProps>(
       isLeaderboardSheetOpen,
       setIsLeaderboardSheetOpen,
       isMounted,
+      onPlayNow,
     }
 
     return (
@@ -309,7 +313,7 @@ interface BettingSectionProps {
   hasValidSelection?: boolean
   isRefetchingAllowance?: boolean
   approveError?: any
-  freeBets?: FreeBet[]
+  freeBets?: SignedFreebet[]
   invalidSelectionMessage?: string
 }
 
@@ -323,8 +327,16 @@ interface LeaderboardButtonProps {
 }
 
 function LeaderboardButton({ className }: LeaderboardButtonProps) {
-  const { isLeaderboardSheetOpen, setIsLeaderboardSheetOpen, portalContainer, isMounted } =
-    useGameFrameContext()
+  const {
+    isLeaderboardSheetOpen,
+    setIsLeaderboardSheetOpen,
+    portalContainer,
+    isMounted,
+    onPlayNow,
+  } = useGameFrameContext()
+
+  const { ongoingLeaderboards } = useLeaderboards(false)
+  const count = ongoingLeaderboards.length
 
   return (
     <Sheet open={isLeaderboardSheetOpen} onOpenChange={setIsLeaderboardSheetOpen}>
@@ -340,10 +352,12 @@ function LeaderboardButton({ className }: LeaderboardButtonProps) {
             className,
           )}
         >
-          <LeaderboardIcon />
+          <LeaderboardIcon count={count} />
         </Button>
       </SheetTrigger>
-      {isMounted && portalContainer && <LeaderboardSheetPanel portalContainer={portalContainer} />}
+      {isMounted && portalContainer && (
+        <LeaderboardSheetPanel portalContainer={portalContainer} onPlayNow={onPlayNow} />
+      )}
     </Sheet>
   )
 }

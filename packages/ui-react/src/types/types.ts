@@ -9,17 +9,17 @@ import {
   DiceNumber,
   KenoBall,
   KenoEncodedInput,
+  LEADERBOARD_CASINO_RULES_GAME,
   LEADERBOARD_STATUS,
   type Leaderboard,
   RouletteEncodedInput,
   RouletteNumber,
-  SignedFreebet,
   type Token,
   type WeightedGameConfiguration,
   type WeightedGameEncodedInput,
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
-import { Hex } from "viem"
+import { type Address, Hex } from "viem"
 import type { EnrichedLeaderboard } from "../data/leaderboardQueries"
 
 export type Theme = "light" | "dark" | "system"
@@ -108,6 +108,12 @@ export interface GameDefinition<T extends GameChoice> {
   formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
 }
 
+export type PlayNowEvent = {
+  chainId: CasinoChainId
+  games: LEADERBOARD_CASINO_RULES_GAME[]
+  tokens: Token[]
+}
+
 export type LeaderboardUserAction =
   | { type: "play" }
   | { type: "overview" }
@@ -154,21 +160,10 @@ export interface LeaderboardOverviewData extends LeaderboardItem {
 // Types for ranking tab
 export interface RankingEntry {
   rank: number
-  playerAddress: string
+  playerAddress: Address
   points: number
   rewardAmount: string
   rewardToken: TokenWithImage
-}
-
-export interface FreeBet {
-  id: string
-  amount: bigint
-  formattedAmount: string
-  token: TokenWithImage
-  chainId: CasinoChainId
-  expiresAt?: string
-  title?: string
-  signed: SignedFreebet
 }
 
 export interface LeaderboardItemWithRaw {

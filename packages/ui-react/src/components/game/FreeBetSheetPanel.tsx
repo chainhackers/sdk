@@ -1,6 +1,7 @@
+import { SignedFreebet } from "@betswirl/sdk-core"
 import { Info } from "lucide-react"
-import { cn } from "../../lib/utils"
-import { FreeBet } from "../../types/types"
+import { cn, getTokenImage } from "../../lib/utils"
+import { formatExpireAt } from "../../utils/formatExpireAt"
 import { Button } from "../ui/button"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
@@ -9,9 +10,9 @@ import { Tooltip, TooltipPrimitive, TooltipProvider, TooltipTrigger } from "../u
 
 interface FreeBetSheetPanelProps {
   portalContainer: HTMLElement
-  freeBets: FreeBet[]
-  selectedFreeBet: FreeBet | null
-  onSelect: (freeBet: FreeBet) => void
+  freeBets: SignedFreebet[]
+  selectedFreeBet: SignedFreebet | null
+  onSelect: (freeBet: SignedFreebet) => void
 }
 
 export function FreeBetSheetPanel({
@@ -51,7 +52,13 @@ export function FreeBetSheetPanel({
                         aria-label={`${freeBet.token.symbol} token icon`}
                         title={`${freeBet.token.symbol} token`}
                       >
-                        <TokenIcon token={freeBet.token} size={18} />
+                        <TokenIcon
+                          token={{
+                            ...freeBet.token,
+                            image: getTokenImage(freeBet.token.symbol),
+                          }}
+                          size={18}
+                        />
                       </div>
                       <span className="font-medium text-foreground">
                         {freeBet.formattedAmount} {freeBet.token.symbol}
@@ -69,8 +76,8 @@ export function FreeBetSheetPanel({
                         className="h-auto max-w-[160px] px-2 py-1 text-[10px] font-medium rounded-[3px] bg-keno-multiplier-tooltip-bg text-keno-multiplier-tooltip-text border-none shadow-none flex items-center justify-center z-50 whitespace-normal"
                       >
                         <p className="text-sm">
-                          {freeBet.expiresAt
-                            ? `Expires ${freeBet.expiresAt}`
+                          {formatExpireAt(freeBet.expirationDate)
+                            ? `Expires ${formatExpireAt(freeBet.expirationDate)}`
                             : "No expiration date"}
                         </p>
                         <TooltipPrimitive.Arrow

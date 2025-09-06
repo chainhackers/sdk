@@ -4,6 +4,7 @@ import {
   refreshLeaderboardsWithBets,
 } from "@betswirl/sdk-core"
 import { useEffect } from "react"
+import { useBettingConfig } from "../context/configContext"
 import { createLogger } from "../lib/logger"
 import type { GameResult } from "../types/types"
 
@@ -17,6 +18,8 @@ export function useLeaderboardRefresher(
   gameResult: GameResult | null,
   chainId: CasinoChainId,
 ): void {
+  const { testMode } = useBettingConfig()
+
   useEffect(() => {
     if (!gameResult) return
 
@@ -28,7 +31,12 @@ export function useLeaderboardRefresher(
     const refresh = async () => {
       try {
         logger.debug("Refreshing leaderboards with bet", { betId, chainId })
-        const ok = await refreshLeaderboardsWithBets([betId], chainId, LEADERBOARD_TYPE.CASINO)
+        const ok = await refreshLeaderboardsWithBets(
+          [betId],
+          chainId,
+          LEADERBOARD_TYPE.CASINO,
+          testMode,
+        )
         if (!ok && !cancelled) {
           logger.warn("refreshLeaderboardsWithBets returned false", { betId, chainId })
         }
@@ -45,5 +53,5 @@ export function useLeaderboardRefresher(
     return () => {
       cancelled = true
     }
-  }, [gameResult, chainId])
+  }, [gameResult, chainId, testMode])
 }
