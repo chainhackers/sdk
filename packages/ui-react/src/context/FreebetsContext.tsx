@@ -40,6 +40,8 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     useBettingConfig()
   const [selectedFreebet, setSelectedFreebet] = useState<SignedFreebet | null>(null)
   const [isUsingFreebet, setIsUsingFreebet] = useState(true)
+  // Track pending freebet selection for chain switches
+  const [pendingFreebetId, setPendingFreebetId] = useState<number | null>(null)
 
   const {
     data: freebetsData = [],
@@ -73,12 +75,14 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const deselectFreebet = useCallback(() => {
     setIsUsingFreebet(false)
     setSelectedFreebet(null)
+    setPendingFreebetId(null) // Clear any pending selection
   }, [])
 
   const selectFreebetById = useCallback(
     (id: number | null) => {
       if (!id) {
         deselectFreebet()
+        setPendingFreebetId(null)
         return
       }
 
@@ -86,24 +90,58 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
 
       if (!freebet) {
         deselectFreebet()
+        setPendingFreebetId(null)
         return
       }
 
+      // If freebet is on different chain, switch chain and defer selection
       if (freebet.chainId !== appChainId) {
-        switchAppChain(freebet.chainId)
+        console.log(`Switching chain from ${appChainId} to ${freebet.chainId} for freebet ${id}`)
+        setPendingFreebetId(id) // Store pending selection
+        switchAppChain(freebet.chainId) // This will trigger re-render with new appChainId
+        // Don't set token/freebet yet - wait for chain to actually switch
+        return
       }
 
+      // Chain is correct, safe to select immediately
       setSelectedToken({
         ...freebet.token,
         image: getTokenImage(freebet.token.symbol),
       })
       setSelectedFreebet(freebet)
       setIsUsingFreebet(true)
+      setPendingFreebetId(null) // Clear any pending selection
     },
     [freebetsData, appChainId, switchAppChain, setSelectedToken, deselectFreebet],
   )
 
+  // Handle pending freebet selection after chain switch
   useEffect(() => {
+    if (pendingFreebetId && appChainId) {
+      const freebet = freebetsData.find((fb) => fb.id === pendingFreebetId)
+
+      if (freebet && freebet.chainId === appChainId) {
+        // Chain has switched successfully, now select the freebet
+        console.log(
+          `Chain switched to ${appChainId}, selecting pending freebet ${pendingFreebetId}`,
+        )
+        setSelectedToken({
+          ...freebet.token,
+          image: getTokenImage(freebet.token.symbol),
+        })
+        setSelectedFreebet(freebet)
+        setIsUsingFreebet(true)
+        setPendingFreebetId(null) // Clear pending selection
+      }
+    }
+  }, [appChainId, pendingFreebetId, freebetsData, setSelectedToken])
+
+  useEffect(() => {
+    // Skip auto-selection if there's a pending freebet waiting for chain switch
+    if (pendingFreebetId) {
+      return
+    }
+
     const isFreebetsInCurrentChain = currentChainFreebets.length > 0
     const isSelectedFreebet = selectedFreebet !== null
 
@@ -157,6 +195,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     selectedFreebet,
     deselectFreebet,
     selectFreebetById,
+    pendingFreebetId, // Add to dependencies
   ])
 
   async function fetchFreebetsTokens(): Promise<SignedFreebet[]> {
