@@ -17,10 +17,10 @@ export function LeaderboardIcon({ className, count }: LeaderboardIconProps) {
       />
       {count !== undefined && count > 0 && (
         <Badge
-          variant="destructive"
-          className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full p-0 text-xs font-bold min-w-[20px]"
+          variant="default"
+          className="absolute -bottom-0.5 -right-0.5 h-4 min-w-[16px] rounded-full flex items-center justify-center text-[9px] leading-none font-bold px-1 py-0 text-play-btn-font"
         >
-          {count}
+          <span className="relative top-[0.5px]">{count}</span>
         </Badge>
       )}
     </div>
