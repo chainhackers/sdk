@@ -1,0 +1,4 @@
+# Debug tests - not for CI
+debug/
+*.debug.spec.ts
+*-debug.spec.ts

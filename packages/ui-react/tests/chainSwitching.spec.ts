@@ -3,7 +3,7 @@ import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright"
 import {
   closeAllDialogs,
   extractBalance,
-  UNIFIED_TEST_BET_AMOUNT,
+  TEST_BET_AMOUNT,
   verifyCanPlayAgain,
   waitForBettingStates,
 } from "../test/helpers/testHelpers"
@@ -82,7 +82,15 @@ test.describe("Chain Switching Tests", () => {
       console.log("Found chain switch button, clicking it")
       await switchChainBtn.click()
 
-      // Wait for MetaMask to handle the switch
+      // Handle MetaMask network switch confirmation
+      console.log("Waiting for MetaMask network switch confirmation...")
+      await page.waitForTimeout(1000) // Give MetaMask time to show the popup
+
+      // Approve the network switch in MetaMask
+      await metamask.approveNewNetwork()
+      console.log("Approved network switch in MetaMask")
+
+      // Wait for the switch to complete
       await page.waitForTimeout(2000)
     } else {
       console.log("No chain switch button found, app might have auto-switched")
@@ -128,8 +136,8 @@ test.describe("Chain Switching Tests", () => {
     const betAmountInput = page.locator("#betAmount")
     await expect(betAmountInput).toBeVisible()
     await betAmountInput.clear()
-    await betAmountInput.fill(UNIFIED_TEST_BET_AMOUNT)
-    console.log(`Bet amount: ${UNIFIED_TEST_BET_AMOUNT} MATIC`)
+    await betAmountInput.fill(TEST_BET_AMOUNT)
+    console.log(`Bet amount: ${TEST_BET_AMOUNT} MATIC`)
 
     // Select heads
     const coinButton = page.locator('button[aria-label*="Select"][aria-label*="side"]')
@@ -145,10 +153,18 @@ test.describe("Chain Switching Tests", () => {
       console.log("Heads already selected")
     }
 
-    // Click play button
+    // Wait for betting panel to be ready after chain switch
+    console.log("Waiting for betting panel to update after chain switch...")
+
+    // Give UI time to stabilize after chain switch
+    await page.waitForTimeout(2000)
+
+    // Wait for play button
     const playButton = page.locator('button:has-text("Place Bet"), button:has-text("Try again")')
-    await expect(playButton).toBeVisible({ timeout: 10000 })
-    await expect(playButton).toBeEnabled()
+    console.log("Looking for play button...")
+
+    await expect(playButton).toBeVisible({ timeout: 15000 })
+    await expect(playButton).toBeEnabled({ timeout: 5000 })
 
     await playButton.click()
     console.log("Clicked Place Bet button")
