@@ -8,6 +8,7 @@ import { arbitrum, avalanche, base, polygon } from "wagmi/chains"
 import { BalanceProvider } from "../context/BalanceContext"
 import { BetSwirlSDKProvider } from "../context/BetSwirlSDKProvider"
 import { FreebetsProvider } from "../context/FreebetsContext"
+import { LeaderboardProvider } from "../context/LeaderboardContext"
 import { TokenProvider } from "../context/tokenContext"
 import { getTokenImage } from "../lib/utils"
 import type { TokenWithImage } from "../types/types"
@@ -89,7 +90,9 @@ export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookPro
           >
             <TokenProvider>
               <BalanceProvider>
-                <FreebetsProvider>{children}</FreebetsProvider>
+                <FreebetsProvider>
+                  <LeaderboardProvider>{children}</LeaderboardProvider>
+                </FreebetsProvider>
               </BalanceProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>

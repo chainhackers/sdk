@@ -2,7 +2,7 @@ import { BP, CASINO_GAME_TYPE, SignedFreebet } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, forwardRef, useContext, useEffect, useRef, useState } from "react"
 import { zeroAddress } from "viem"
-import { useLeaderboards } from "../../hooks/useLeaderboards"
+import { useLeaderboardContext } from "../../context/LeaderboardContext"
 
 import { cn } from "../../lib/utils"
 import { BetStatus, GameResult, HistoryEntry, Theme, TokenWithImage } from "../../types/types"
@@ -320,7 +320,7 @@ function LeaderboardButton({ className }: LeaderboardButtonProps) {
   const { isLeaderboardSheetOpen, setIsLeaderboardSheetOpen, portalContainer, isMounted } =
     useGameFrameContext()
 
-  const { ongoingLeaderboards } = useLeaderboards(false)
+  const { ongoingLeaderboards } = useLeaderboardContext()
   const count = ongoingLeaderboards.length
 
   return (

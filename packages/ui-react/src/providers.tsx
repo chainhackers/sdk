@@ -18,7 +18,14 @@ import { QUERY_DEFAULTS } from "./constants/queryDefaults"
 import { BalanceProvider } from "./context/BalanceContext"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
 import { FreebetsProvider } from "./context/FreebetsContext"
+import { LeaderboardProvider } from "./context/LeaderboardContext"
 import { TokenProvider } from "./context/tokenContext"
+import { PlayNowEvent } from "./types/types"
+
+interface AppProvidersProps {
+  children: ReactNode
+  onLeaderboardPlayNow?: (event: PlayNowEvent) => void
+}
 
 // Define supported chains lists
 const MAINNET_CHAINS = [base, polygon, avalanche] as const
@@ -36,7 +43,7 @@ const queryClient = new QueryClient({
   },
 })
 
-export function AppProviders({ children }: { children: ReactNode }) {
+export function AppProviders({ children, onLeaderboardPlayNow }: AppProvidersProps) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
   const freebetsAffiliates = affiliate ? [affiliate] : undefined
   const testMode = import.meta.env.VITE_TEST_MODE === "true"
@@ -102,7 +109,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
           >
             <TokenProvider>
               <BalanceProvider>
-                <FreebetsProvider>{children}</FreebetsProvider>
+                <FreebetsProvider>
+                  <LeaderboardProvider onPlayNow={onLeaderboardPlayNow}>
+                    {children}
+                  </LeaderboardProvider>
+                </FreebetsProvider>
               </BalanceProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>

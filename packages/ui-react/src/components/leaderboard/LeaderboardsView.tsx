@@ -1,4 +1,4 @@
-import { useLeaderboards } from "../../hooks/useLeaderboards"
+import { useLeaderboardContext } from "../../context/LeaderboardContext"
 import { cn } from "../../lib/utils"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Switch } from "../ui/switch"
@@ -6,12 +6,11 @@ import { LeaderboardCard } from "./LeaderboardCard"
 
 interface Props {
   onViewOverview?: (id: string) => void
-  showPartner: boolean
-  setShowPartner: (show: boolean) => void
 }
 
-export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }: Props) {
-  const { ongoingLeaderboards, endedLeaderboards } = useLeaderboards(showPartner)
+export function LeaderboardsView({ onViewOverview }: Props) {
+  const { ongoingLeaderboards, endedLeaderboards, showPartner, setShowPartner } =
+    useLeaderboardContext()
 
   return (
     <div className="flex flex-col p-[16px]">

@@ -11,7 +11,6 @@ interface LeaderboardSheetPanelProps {
 
 export function LeaderboardSheetPanel({ portalContainer }: LeaderboardSheetPanelProps) {
   const [viewingLeaderboardId, setViewingLeaderboardId] = useState<string | null>(null)
-  const [showPartner, setShowPartner] = useState(false)
 
   return (
     <SheetPortal container={portalContainer}>
@@ -27,11 +26,7 @@ export function LeaderboardSheetPanel({ portalContainer }: LeaderboardSheetPanel
               onBack={() => setViewingLeaderboardId(null)}
             />
           ) : (
-            <LeaderboardsView
-              onViewOverview={setViewingLeaderboardId}
-              showPartner={showPartner}
-              setShowPartner={setShowPartner}
-            />
+            <LeaderboardsView onViewOverview={setViewingLeaderboardId} />
           )}
         </ScrollArea>
       </SheetBottomPanelContent>
