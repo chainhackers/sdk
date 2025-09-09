@@ -131,7 +131,8 @@ export function BettingPanel({
   const effectiveBalance = token.address === GAS_TOKEN_ADDRESS ? balance - vrfFees : balance
   const isTotalbetAmountExceedsBalance =
     betAmount && BigInt(betCount) * betAmount > effectiveBalance
-  const isBetCountValid = betCount > 0 && betCount <= maxBetCount
+  const effectiveBetCount = isUsingFreebet ? 1 : betCount
+  const isBetCountValid = effectiveBetCount > 0 && effectiveBetCount <= maxBetCount
   const isBetAmountExceedsMaxBetAmount = effectiveBetAmount && effectiveBetAmount > maxBetAmount
 
   const formattedBalance = formatRawAmount(balance, token.decimals)

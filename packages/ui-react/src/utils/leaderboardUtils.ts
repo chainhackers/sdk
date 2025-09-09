@@ -5,6 +5,7 @@ import {
   LEADERBOARD_STATUS,
   type Leaderboard,
   type LeaderboardRanking,
+  truncate,
 } from "@betswirl/sdk-core"
 import { type Address } from "viem"
 import { getTokenImage } from "../lib/utils"
@@ -189,7 +190,5 @@ export function mapRankingToEntry(
  * Format address for UI display with ellipsis
  */
 export function formatAddress(address: Address): string {
-  const addressStr = address.toLowerCase()
-  if (addressStr.length <= 10) return addressStr
-  return `${addressStr.slice(0, 6)}...${addressStr.slice(-6)}`
+  return truncate(address.toLowerCase(), 12)
 }
