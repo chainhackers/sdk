@@ -1,6 +1,5 @@
 import { useLeaderboards } from "../../hooks/useLeaderboards"
 import { cn } from "../../lib/utils"
-import type { PlayNowEvent } from "../../types/types"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Switch } from "../ui/switch"
 import { LeaderboardCard } from "./LeaderboardCard"
@@ -9,15 +8,9 @@ interface Props {
   onViewOverview?: (id: string) => void
   showPartner: boolean
   setShowPartner: (show: boolean) => void
-  onPlayNow?: (event: PlayNowEvent) => void
 }
 
-export function LeaderboardsView({
-  onViewOverview,
-  showPartner,
-  setShowPartner,
-  onPlayNow,
-}: Props) {
+export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }: Props) {
   const { ongoingLeaderboards, endedLeaderboards } = useLeaderboards(showPartner)
 
   return (
@@ -54,7 +47,6 @@ export function LeaderboardsView({
                 item={itemWithEnriched.item}
                 raw={itemWithEnriched.enriched}
                 onViewOverview={onViewOverview}
-                onPlayNow={onPlayNow}
               />
             ))}
           </div>
@@ -80,7 +72,6 @@ export function LeaderboardsView({
                   item={itemWithEnriched.item}
                   raw={itemWithEnriched.enriched}
                   onViewOverview={onViewOverview}
-                  onPlayNow={onPlayNow}
                 />
               ))}
             </div>

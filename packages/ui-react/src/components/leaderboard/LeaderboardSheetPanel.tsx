@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { cn } from "../../lib/utils"
-import type { PlayNowEvent } from "../../types/types"
 import { ScrollArea } from "../ui/scroll-area"
 import { SheetBottomPanelContent, SheetOverlay, SheetPortal } from "../ui/sheet"
 import { LeaderboardOverview } from "./LeaderboardOverview"
@@ -8,10 +7,9 @@ import { LeaderboardsView } from "./LeaderboardsView"
 
 interface LeaderboardSheetPanelProps {
   portalContainer: HTMLElement
-  onPlayNow?: (event: PlayNowEvent) => void
 }
 
-export function LeaderboardSheetPanel({ portalContainer, onPlayNow }: LeaderboardSheetPanelProps) {
+export function LeaderboardSheetPanel({ portalContainer }: LeaderboardSheetPanelProps) {
   const [viewingLeaderboardId, setViewingLeaderboardId] = useState<string | null>(null)
   const [showPartner, setShowPartner] = useState(false)
 
@@ -33,7 +31,6 @@ export function LeaderboardSheetPanel({ portalContainer, onPlayNow }: Leaderboar
               onViewOverview={setViewingLeaderboardId}
               showPartner={showPartner}
               setShowPartner={setShowPartner}
-              onPlayNow={onPlayNow}
             />
           )}
         </ScrollArea>

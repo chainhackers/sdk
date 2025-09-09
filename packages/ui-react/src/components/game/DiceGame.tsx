@@ -38,7 +38,6 @@ export function DiceGame({
   theme = "system",
   customTheme,
   backgroundImage = diceBackground,
-  onPlayNow,
   ...props
 }: DiceGameProps) {
   const {
@@ -96,7 +95,7 @@ export function DiceGame({
   }
 
   return (
-    <GameFrame themeSettings={themeSettings} onPlayNow={onPlayNow} {...props}>
+    <GameFrame themeSettings={themeSettings} {...props}>
       <GameFrame.Header title="Dice" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea>
         <GameFrame.InfoButton

@@ -1,5 +1,6 @@
 import type { CasinoChainId, Leaderboard } from "@betswirl/sdk-core"
 import { useCallback, useEffect } from "react"
+import { useLeaderboardContext } from "../../context/LeaderboardContext"
 import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewards"
 import { cn } from "../../lib/utils"
 import type { LeaderboardUserAction, PlayNowEvent } from "../../types/types"
@@ -10,7 +11,6 @@ interface LeaderboardActionButtonProps {
   leaderboard: Leaderboard
   userAction: LeaderboardUserAction
   onClaimSuccess?: () => void
-  onPlayNow?: (event: PlayNowEvent) => void
   className?: string
 }
 
@@ -18,11 +18,11 @@ export function LeaderboardActionButton({
   leaderboard,
   userAction,
   onClaimSuccess,
-  onPlayNow,
   className,
 }: LeaderboardActionButtonProps) {
   const { claim, isPending, isSuccess, isError } = useClaimLeaderboardRewards()
   const { setIsLeaderboardSheetOpen } = useGameFrameContext()
+  const { onPlayNow } = useLeaderboardContext()
 
   useEffect(() => {
     if (isSuccess && onClaimSuccess) {

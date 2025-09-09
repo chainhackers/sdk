@@ -25,7 +25,6 @@ export function WheelGame({
   theme = "system",
   customTheme,
   backgroundImage = wheelBackground,
-  onPlayNow,
   ...props
 }: WheelGameProps) {
   const gameFrameRef = useRef<HTMLDivElement>(null)
@@ -204,13 +203,7 @@ export function WheelGame({
     )
 
   return (
-    <GameFrame
-      ref={gameFrameRef}
-      themeSettings={themeSettings}
-      onPlayNow={onPlayNow}
-      {...props}
-      variant="wheel"
-    >
+    <GameFrame ref={gameFrameRef} themeSettings={themeSettings} {...props} variant="wheel">
       <GameFrame.Header title="Wheel" connectWalletButton={<GameConnectWallet />} />
       {gameArea}
       <GameFrame.BettingSection

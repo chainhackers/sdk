@@ -31,7 +31,6 @@ export function KenoGame({
   theme = "system",
   customTheme,
   backgroundImage = kenoBackground,
-  onPlayNow,
   ...props
 }: KenoGameProps) {
   const [lastWinningNumbers, setLastWinningNumbers] = useState<KenoBall[]>([])
@@ -164,7 +163,7 @@ export function KenoGame({
   const isConfigurationLoading = kenoConfigLoading || !kenoConfig
 
   return (
-    <GameFrame themeSettings={themeSettings} variant="keno" onPlayNow={onPlayNow} {...props}>
+    <GameFrame themeSettings={themeSettings} variant="keno" {...props}>
       <GameFrame.Header title="Keno" connectWalletButton={<GameConnectWallet />} />
       <GameFrame.GameArea variant="keno">
         {isConfigurationLoading ? (
