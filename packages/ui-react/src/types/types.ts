@@ -1,5 +1,6 @@
 import {
   CASINO_GAME_TYPE,
+  type CasinoChainId,
   type CasinoRolledBet,
   CasinoToken,
   COINTOSS_FACE,
@@ -8,6 +9,9 @@ import {
   DiceNumber,
   KenoBall,
   KenoEncodedInput,
+  LEADERBOARD_CASINO_RULES_GAME,
+  LEADERBOARD_STATUS,
+  type Leaderboard,
   RouletteEncodedInput,
   RouletteNumber,
   type Token,
@@ -15,6 +19,8 @@ import {
   type WeightedGameEncodedInput,
 } from "@betswirl/sdk-core"
 import { type DefaultError, type QueryKey, type UseQueryOptions } from "@tanstack/react-query"
+import { type Address, Hex } from "viem"
+import type { EnrichedLeaderboard } from "../data/leaderboardQueries"
 
 export type Theme = "light" | "dark" | "system"
 
@@ -97,6 +103,75 @@ export interface GameDefinition<T extends GameChoice> {
   defaultSelection: T
   getMultiplier: (choice: T["choice"]) => number
   encodeInput: (choice: T["choice"]) => GameEncodedInput["encodedInput"]
+  encodeAbiParametersInput: (choice: T["choice"]) => Hex
   getWinChancePercent?: (choice: T["choice"]) => number | number[]
   formatDisplayResult: (rolled: GameRolledResult, choice: T["choice"]) => string
+}
+
+export type PlayNowEvent = {
+  chainId: CasinoChainId
+  games: LEADERBOARD_CASINO_RULES_GAME[]
+  tokens: Token[]
+}
+
+export type LeaderboardUserAction =
+  | { type: "play" }
+  | { type: "overview" }
+  | { type: "claim"; amount: string; tokenSymbol: string }
+  | { type: "claimed"; amount: string; tokenSymbol: string }
+  | { type: "none" }
+
+export interface LeaderboardPrize {
+  token: TokenWithImage
+  amount: string
+}
+
+export interface LeaderboardItem {
+  id: string
+  userRank: number | null
+  title: string
+  chainId: CasinoChainId
+  startDate: string // ISO 8601 format
+  endDate: string // ISO 8601 format
+  status: LEADERBOARD_STATUS
+  prize: LeaderboardPrize
+  participants: number
+  isPartner: boolean
+  userAction: LeaderboardUserAction
+}
+
+// Additional types for detailed leaderboard overview view
+export interface LeaderboardUserStats {
+  status: LEADERBOARD_STATUS
+  position: number
+  points: number
+  prize: {
+    amount: string
+    tokenSymbol: string
+    tokenIconUrl?: string
+  }
+  contractAddress: string
+}
+
+export interface LeaderboardOverviewData extends LeaderboardItem {
+  userStats: LeaderboardUserStats
+}
+
+// Types for ranking tab
+export interface RankingEntry {
+  rank: number
+  playerAddress: Address
+  points: number
+  rewardAmount: string
+  rewardToken: TokenWithImage
+}
+
+export interface LeaderboardItemWithRaw {
+  item: LeaderboardItem
+  raw: Leaderboard
+}
+
+export interface LeaderboardItemWithEnriched {
+  item: LeaderboardItem
+  enriched: EnrichedLeaderboard
 }

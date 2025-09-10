@@ -40,6 +40,8 @@ export function GameResultWindow({ result, currency, className }: GameResultWind
   const resultType = result?.isWin ? "win" : "loss"
   const currentImages = images[resultType]
 
+  const betToken = result?.token?.symbol || currency
+
   return (
     <div
       role="alert"
@@ -66,11 +68,11 @@ export function GameResultWindow({ result, currency, className }: GameResultWind
             <p className="text-[16px] leading-[150%] font-bold">
               {result.isWin && "+"}
               {result.formattedBenefit}
-              <span className="uppercase"> {currency}</span>
+              <span className="uppercase"> {betToken}</span>
             </p>
             <p className="text-[14px] leading-[157%] font-semibold">
               Payout: {result.formattedPayout}
-              <span className="uppercase"> {currency}</span>
+              <span className="uppercase"> {betToken}</span>
             </p>
             <p data-testid="rolled" className="text-[12px] leading-[167%] font-medium uppercase">
               Draw: {result.formattedRolled}
