@@ -170,6 +170,14 @@ const meta = {
               },
             },
           },
+          "react": {
+            title: "React",
+            items: {
+              "getting-started": {
+                title: "🚀 Getting Started",
+              },
+            },
+          }
         },
       },
       demos: {
@@ -181,6 +189,9 @@ const meta = {
           "node-cli": {
             title: "Node CLI",
           },
+          react: {
+            title: "React dApp"
+          }
         },
       },
     },
