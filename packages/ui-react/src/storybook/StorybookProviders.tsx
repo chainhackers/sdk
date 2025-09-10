@@ -7,6 +7,8 @@ import { createConfig, WagmiProvider } from "wagmi"
 import { arbitrum, avalanche, base, polygon } from "wagmi/chains"
 import { BalanceProvider } from "../context/BalanceContext"
 import { BetSwirlSDKProvider } from "../context/BetSwirlSDKProvider"
+import { FreebetsProvider } from "../context/FreebetsContext"
+import { LeaderboardProvider } from "../context/LeaderboardContext"
 import { TokenProvider } from "../context/tokenContext"
 import { getTokenImage } from "../lib/utils"
 import type { TokenWithImage } from "../types/types"
@@ -41,6 +43,7 @@ interface StorybookProvidersProps {
 
 export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookProvidersProps) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
+  const freebetsAffiliates = affiliate ? [affiliate] : undefined
 
   // Get RPC URLs for each chain, fallback to public RPCs if not configured
   const baseRpcUrl = import.meta.env.VITE_BASE_RPC_URL || "https://mainnet.base.org"
@@ -81,9 +84,16 @@ export function StorybookProviders({ children, token = ETH_TOKEN }: StorybookPro
             affiliate={affiliate}
             bankrollToken={token}
             supportedChains={CHAINS.map((c) => c.id as CasinoChainId)}
+            freebetsAffiliates={freebetsAffiliates}
+            withExternalBankrollFreebets={true}
+            testMode={false}
           >
             <TokenProvider>
-              <BalanceProvider>{children}</BalanceProvider>
+              <BalanceProvider>
+                <FreebetsProvider>
+                  <LeaderboardProvider>{children}</LeaderboardProvider>
+                </FreebetsProvider>
+              </BalanceProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>
         </OnchainKitProvider>

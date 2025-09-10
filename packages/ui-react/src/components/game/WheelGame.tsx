@@ -32,8 +32,8 @@ export function WheelGame({
   const [isSpinning, setIsSpinning] = useState(false)
 
   const { selectedToken: token } = useTokenContext()
-  console.log({ token })
   const { appChainId } = useChain()
+
   const { houseEdge } = useHouseEdge({
     game: CASINO_GAME_TYPE.WHEEL,
     token,
@@ -61,6 +61,10 @@ export function WheelGame({
       encodeInput: (config: WeightedGameConfiguration) => {
         if (!config) return 0
         return WeightedGame.encodeInput(config.configId)
+      },
+      encodeAbiParametersInput: (config: WeightedGameConfiguration) => {
+        if (!config) return WeightedGame.encodeAbiParametersInput(0)
+        return WeightedGame.encodeAbiParametersInput(config.configId)
       },
       getWinChancePercent: (config: WeightedGameConfiguration) => {
         if (!config?.multipliers) return []
@@ -194,10 +198,7 @@ export function WheelGame({
             uniqueMultipliers={uniqueMultipliers}
           />
         </GameFrame.GameControls>
-        <GameFrame.ResultWindow
-          gameResult={isSpinning ? null : gameResult}
-          currency={token.symbol}
-        />
+        <GameFrame.ResultWindow gameResult={isSpinning ? null : gameResult} />
       </GameFrame.GameArea>
     )
 

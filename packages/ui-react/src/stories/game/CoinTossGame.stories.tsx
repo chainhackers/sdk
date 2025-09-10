@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { CoinTossGame, type CoinTossGameProps } from "../../components/game/CoinTossGame"
 import { STORYBOOK_TOKENS, StorybookProviders } from "../../storybook/StorybookProviders"
 import { THEME_OPTIONS } from "../../types/types"
@@ -98,6 +98,26 @@ export const DarkTheme: Story = {
   },
 }
 
+export const LightThemeWithFreebets: Story = {
+  ...Template,
+  args: {
+    theme: "light",
+    token: "ETH",
+  },
+}
+
+export const DarkThemeWithFreebets: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    token: "ETH",
+    backgroundImage: gameBg2,
+  },
+  parameters: {
+    backgrounds: { default: "dark" },
+  },
+}
+
 export const SystemTheme: Story = {
   ...Template,
   args: {
@@ -127,6 +147,22 @@ export const SheepsLightTheme: Story = {
 }
 
 export const ChickletLightTheme: Story = {
+  ...Template,
+  args: {
+    theme: "light",
+    token: "DEGEN",
+    customTheme: {
+      "--primary": "rgb(239 185 1)",
+      "--play-btn-font": "#ffffff",
+    } as React.CSSProperties,
+    backgroundImage: gameBg3,
+  },
+  parameters: {
+    chromatic: { disable: true },
+  },
+}
+
+export const ChickletLightThemeWithFreebets: Story = {
   ...Template,
   args: {
     theme: "light",
@@ -175,6 +211,22 @@ export const LightfishDarkTheme: Story = {
 }
 
 export const MarticoinDarkTheme: Story = {
+  ...Template,
+  args: {
+    theme: "dark",
+    token: "ETH",
+    customTheme: {
+      "--primary": "hsl(13.9deg 83.1% 41.76%)",
+      "--play-btn-font": "#ffffff",
+    } as React.CSSProperties,
+    backgroundImage: gameBg7,
+  },
+  parameters: {
+    chromatic: { disable: true },
+  },
+}
+
+export const MarticoinDarkThemeWithFreebets: Story = {
   ...Template,
   args: {
     theme: "dark",

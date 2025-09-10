@@ -22,10 +22,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           data-slot="input"
           className={cn(
             "flex h-full w-full rounded-[12px] border-0",
-            "bg-neutral-background text-foreground font-semibold",
+            "bg-neutral-background text-foreground font-normal",
             "px-4 py-2",
             hasTokenInfo ? "pr-16 md:pr-20" : "",
-            "text-base placeholder:text-muted-foreground",
+            "placeholder:text-muted-foreground",
             "ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary",
             "disabled:cursor-not-allowed disabled:opacity-50",
           )}

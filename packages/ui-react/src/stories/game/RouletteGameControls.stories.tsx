@@ -1,5 +1,5 @@
 import { RouletteNumber } from "@betswirl/sdk-core"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { useState } from "react"
 import { RouletteGameControls } from "../../components/game/RouletteGameControls"
 import { TokenWithImage } from "../../types/types"

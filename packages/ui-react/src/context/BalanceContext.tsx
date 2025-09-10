@@ -110,13 +110,6 @@ export function BalanceProvider({ children }: BalanceProviderProps) {
     enabled: !!address && tokens.length > 0 && !nativeLoading && !erc20Loading && !!balanceChainId,
   })
 
-  // Clear balances when app chain switches since we're fetching from app chain
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need appChainId to trigger when chain switches
-  useEffect(() => {
-    queryClient.removeQueries({ queryKey: ["balances"] })
-    // Don't immediately refetch - let the query re-enable naturally when dependencies are ready
-  }, [appChainId, queryClient])
-
   // Refetch balances when wallet connects/disconnects
   useEffect(() => {
     if (address) {

@@ -12,6 +12,7 @@ export type ChainContextValue = {
   walletChainId: number | undefined
   areChainsSynced: boolean
   availableChains: CasinoChain[]
+  availableChainIds: CasinoChainId[]
   switchAppChain: (chainId: CasinoChainId) => void
   switchWalletChain: (chainId: CasinoChainId) => void
 }
@@ -65,6 +66,17 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
     const stored = getStoredChainId()
     return stored || validatedInitialChainId
   })
+
+  // Sync with localStorage on client-side hydration.
+  // This is necessary for SSR frameworks like Next.js where localStorage is not available on the server.
+  // The state is initialized with a default on the server, and this effect corrects it on the client.
+  useEffect(() => {
+    const storedChainId = getStoredChainId()
+
+    if (storedChainId && storedChainId !== appChainId) {
+      setAppChainId(storedChainId)
+    }
+  }, [getStoredChainId, appChainId])
 
   // Get available chain objects
   const availableChains = useMemo(
@@ -133,6 +145,7 @@ export const ChainProvider: React.FC<ChainProviderProps> = (props) => {
     walletChainId,
     areChainsSynced,
     availableChains,
+    availableChainIds,
     switchAppChain,
     switchWalletChain: (chainId: CasinoChainId) => switchWalletChain({ chainId }),
   }

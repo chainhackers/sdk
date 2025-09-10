@@ -45,7 +45,13 @@ import { type ReactNode, useState } from "react";
 import { http } from "viem";
 import { WagmiProvider, createConfig } from "wagmi";
 import { base, arbitrum, avalanche, polygon } from "wagmi/chains";
-import { BetSwirlSDKProvider, TokenProvider, BalanceProvider } from "@betswirl/ui-react";
+import { 
+  BetSwirlSDKProvider, 
+  TokenProvider, 
+  BalanceProvider, 
+  FreebetsProvider, 
+  LeaderboardProvider 
+} from "@betswirl/ui-react";
 
 const CHAINS = [base, polygon, arbitrum, avalanche] as const;
 const SUPPORTED_CHAIN_IDS = CHAINS.map((chain) => chain.id);
@@ -88,7 +94,11 @@ export function Providers(props: { children: ReactNode }) {
           >
             <TokenProvider>
               <BalanceProvider>
-                {props.children}
+                <FreebetsProvider>
+                  <LeaderboardProvider>
+                    {props.children}
+                  </LeaderboardProvider>
+                </FreebetsProvider>
               </BalanceProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>

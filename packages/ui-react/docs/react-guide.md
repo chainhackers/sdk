@@ -40,7 +40,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, type Hex } from 'viem'
 import { WagmiProvider, createConfig } from 'wagmi'
 import { base, polygon, arbitrum } from 'wagmi/chains'
-import { BalanceProvider, BetSwirlSDKProvider, TokenProvider, type TokenWithImage } from '@betswirl/ui-react'
+import { 
+  BalanceProvider, 
+  BetSwirlSDKProvider, 
+  FreebetsProvider, 
+  TokenProvider, 
+  type TokenWithImage 
+} from '@betswirl/ui-react'
 import './index.css'
 import '@betswirl/ui-react/styles.css'
 import App from './App.tsx'
@@ -110,7 +116,9 @@ createRoot(document.getElementById('root')!).render(
           >
             <TokenProvider>
               <BalanceProvider>
-                <App />
+                <FreebetsProvider>
+                  <App />
+                </FreebetsProvider>
               </BalanceProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>
@@ -128,16 +136,37 @@ This code uses default public RPCs from wagmi. No environment variables needed.
 In `src/App.tsx`:
 
 ```tsx
-import { CoinTossGame, DiceGame, RouletteGame, KenoGame, WheelGame } from '@betswirl/ui-react'
+import { useState } from 'react'
+import { CASINO_GAME_TYPE, LEADERBOARD_CASINO_RULES_GAME } from '@betswirl/sdk-core'
+import { CoinTossGame, DiceGame, LeaderboardProvider, type PlayNowEvent } from '@betswirl/ui-react'
 
-// Add component (choose one or multiple)
-<div style={{ margin: '2rem 0' }}>
-  <CoinTossGame />
-  {/* <DiceGame /> */}
-  {/* <RouletteGame /> */}
-  {/* <KenoGame /> */}
-  {/* <WheelGame /> */}
-</div>
+export default function App() {
+  const [currentGame, setCurrentGame] = useState(CASINO_GAME_TYPE.COINTOSS)
+
+  // Optional: Handle "Play now" button clicks from leaderboards
+  const handlePlayNow = (event: PlayNowEvent) => {
+    // Switch to the appropriate game
+    if (event.games.includes(LEADERBOARD_CASINO_RULES_GAME.COINTOSS)) {
+      setCurrentGame(CASINO_GAME_TYPE.COINTOSS)
+    } else if (event.games.includes(LEADERBOARD_CASINO_RULES_GAME.DICE)) {
+      setCurrentGame(CASINO_GAME_TYPE.DICE)
+    }
+    // You can also handle chain/token switching here
+  }
+
+  return (
+    <LeaderboardProvider onPlayNow={handlePlayNow}>
+      <div>
+        {currentGame === CASINO_GAME_TYPE.COINTOSS && (
+          <CoinTossGame />
+        )}
+        {currentGame === CASINO_GAME_TYPE.DICE && (
+          <DiceGame />
+        )}
+      </div>
+    </LeaderboardProvider>
+  )
+}
 ```
 
 ### Run
@@ -165,6 +194,24 @@ git commit -m "Add BetSwirl casino game"
 * Select your repository
 * Click "Import" → "Deploy"
 * Get public URL after ~2 minutes
+
+## Leaderboard Integration
+
+### onPlayNow Callback
+
+The `onPlayNow` callback allows your app to respond when users click "Play now" in leaderboard components. It receives a `PlayNowEvent` with leaderboard details:
+
+```tsx
+type PlayNowEvent = {
+  chainId: CasinoChainId           // Required network for the leaderboard
+  games: LEADERBOARD_CASINO_RULES_GAME[]  // Allowed games
+  tokens: Token[]                  // Accepted tokens
+}
+```
+
+**Usage:** Pass the callback to any game component to enable automatic game switching from leaderboards.
+
+**Note:** The callback is optional. Without it, "Play now" only closes the leaderboard panel.
 
 ## Configuration
 

@@ -1,12 +1,15 @@
-import { BP, CASINO_GAME_TYPE } from "@betswirl/sdk-core"
+import { BP, CASINO_GAME_TYPE, SignedFreebet } from "@betswirl/sdk-core"
 import { History, Info } from "lucide-react"
 import React, { createContext, forwardRef, useContext, useEffect, useRef, useState } from "react"
 import { zeroAddress } from "viem"
+import { useLeaderboardContext } from "../../context/LeaderboardContext"
 
 import { cn } from "../../lib/utils"
 import { BetStatus, GameResult, HistoryEntry, Theme, TokenWithImage } from "../../types/types"
+import { LeaderboardSheetPanel } from "../leaderboard/LeaderboardSheetPanel"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import { LeaderboardIcon } from "../ui/LeaderboardIcon"
 import { Sheet, SheetTrigger } from "../ui/sheet"
 import { BettingPanel } from "./BettingPanel"
 import { GameResultWindow } from "./GameResultWindow"
@@ -33,6 +36,8 @@ interface GameFrameContextValue {
   setIsInfoSheetOpen: (open: boolean) => void
   isHistorySheetOpen: boolean
   setIsHistorySheetOpen: (open: boolean) => void
+  isLeaderboardSheetOpen: boolean
+  setIsLeaderboardSheetOpen: (open: boolean) => void
   isMounted: boolean
 }
 
@@ -56,6 +61,7 @@ const GameFrameRoot = forwardRef<HTMLDivElement, GameFrameProps>(
   ({ themeSettings, children, variant = "default", ...props }, ref) => {
     const [isInfoSheetOpen, setIsInfoSheetOpen] = useState(false)
     const [isHistorySheetOpen, setIsHistorySheetOpen] = useState(false)
+    const [isLeaderboardSheetOpen, setIsLeaderboardSheetOpen] = useState(false)
     const cardRef = useRef<HTMLDivElement>(null)
     const [isMounted, setIsMounted] = useState(false)
     const { theme } = themeSettings
@@ -83,6 +89,8 @@ const GameFrameRoot = forwardRef<HTMLDivElement, GameFrameProps>(
       setIsInfoSheetOpen,
       isHistorySheetOpen,
       setIsHistorySheetOpen,
+      isLeaderboardSheetOpen,
+      setIsLeaderboardSheetOpen,
       isMounted,
     }
 
@@ -123,7 +131,10 @@ function Header({ title, connectWalletButton, tokenSelector }: HeaderProps) {
         <CardTitle className="text-lg text-title-color font-bold">{title}</CardTitle>
         {tokenSelector}
       </div>
-      {connectWalletButton}
+      <div className="flex items-center gap-2">
+        <LeaderboardButton />
+        {connectWalletButton}
+      </div>
     </CardHeader>
   )
 }
@@ -292,11 +303,46 @@ interface BettingSectionProps {
   hasValidSelection?: boolean
   isRefetchingAllowance?: boolean
   approveError?: any
+  freeBets?: SignedFreebet[]
+  invalidSelectionMessage?: string
 }
 
 function BettingSection(props: BettingSectionProps) {
   const { portalContainer, isMounted } = useGameFrameContext()
   return <BettingPanel {...props} portalContainer={portalContainer} isMounted={isMounted} />
+}
+
+interface LeaderboardButtonProps {
+  className?: string
+}
+
+function LeaderboardButton({ className }: LeaderboardButtonProps) {
+  const { isLeaderboardSheetOpen, setIsLeaderboardSheetOpen, portalContainer, isMounted } =
+    useGameFrameContext()
+
+  const { ongoingLeaderboards } = useLeaderboardContext()
+  const count = ongoingLeaderboards.length
+
+  return (
+    <Sheet open={isLeaderboardSheetOpen} onOpenChange={setIsLeaderboardSheetOpen}>
+      <SheetTrigger asChild>
+        <Button
+          variant="iconTransparent"
+          size="iconRound"
+          aria-label="Open Leaderboard"
+          className={cn(
+            "group",
+            "h-[40px] w-[40px]",
+            isLeaderboardSheetOpen && "border-primary",
+            className,
+          )}
+        >
+          <LeaderboardIcon count={count} />
+        </Button>
+      </SheetTrigger>
+      {isMounted && portalContainer && <LeaderboardSheetPanel portalContainer={portalContainer} />}
+    </Sheet>
+  )
 }
 
 export const GameFrame = Object.assign(GameFrameRoot, {
@@ -307,4 +353,7 @@ export const GameFrame = Object.assign(GameFrameRoot, {
   GameControls,
   ResultWindow,
   BettingSection,
+  LeaderboardButton,
 })
+
+export { useGameFrameContext }
