@@ -48,11 +48,11 @@ The example below uses the BetSwirl Wagmi client:
 import { createConfig } from "@wagmi/core";
 import { initWagmiBetSwirlClient} from "@betswirl/wagmi-provider";
 
-/* Init Wagmi BetSwirl client */
+/* Create the Wagmi config */
 const wagmiConfig = createConfig(...)
 
+/* Init Wagmi BetSwirl client */
 const wagmiBetSwirlClient = initWagmiBetSwirlClient(wagmiConfig, {
-  chainId: 137,
   affiliate: "0x...",
   gasPriceType: GAS_PRICE_TYPE.FAST,
   ...
