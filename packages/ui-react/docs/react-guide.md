@@ -40,7 +40,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, type Hex } from 'viem'
 import { WagmiProvider, createConfig } from 'wagmi'
 import { base, polygon, arbitrum } from 'wagmi/chains'
-import { BalanceProvider, BetSwirlSDKProvider, TokenProvider, type TokenWithImage } from '@betswirl/ui-react'
+import { 
+  BalanceProvider, 
+  BetSwirlSDKProvider, 
+  FreebetsProvider, 
+  TokenProvider, 
+  type TokenWithImage 
+} from '@betswirl/ui-react'
 import './index.css'
 import '@betswirl/ui-react/styles.css'
 import App from './App.tsx'
@@ -110,7 +116,9 @@ createRoot(document.getElementById('root')!).render(
           >
             <TokenProvider>
               <BalanceProvider>
-                <App />
+                <FreebetsProvider>
+                  <App />
+                </FreebetsProvider>
               </BalanceProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>
@@ -129,33 +137,34 @@ In `src/App.tsx`:
 
 ```tsx
 import { useState } from 'react'
-import { CASINO_GAME_TYPE } from '@betswirl/sdk-core'
-import { CoinTossGame, DiceGame, type PlayNowEvent } from '@betswirl/ui-react'
+import { CASINO_GAME_TYPE, LEADERBOARD_CASINO_RULES_GAME } from '@betswirl/sdk-core'
+import { CoinTossGame, DiceGame, LeaderboardProvider, type PlayNowEvent } from '@betswirl/ui-react'
 
-function App() {
+export default function App() {
   const [currentGame, setCurrentGame] = useState(CASINO_GAME_TYPE.COINTOSS)
 
   // Optional: Handle "Play now" button clicks from leaderboards
   const handlePlayNow = (event: PlayNowEvent) => {
     // Switch to the appropriate game
-    if (event.games.includes('COINTOSS')) {
+    if (event.games.includes(LEADERBOARD_CASINO_RULES_GAME.COINTOSS)) {
       setCurrentGame(CASINO_GAME_TYPE.COINTOSS)
-    } else if (event.games.includes('DICE')) {
+    } else if (event.games.includes(LEADERBOARD_CASINO_RULES_GAME.DICE)) {
       setCurrentGame(CASINO_GAME_TYPE.DICE)
     }
     // You can also handle chain/token switching here
   }
 
   return (
-    <div>
-      {/* Render games with onPlayNow callback */}
-      {currentGame === CASINO_GAME_TYPE.COINTOSS && (
-        <CoinTossGame onPlayNow={handlePlayNow} />
-      )}
-      {currentGame === CASINO_GAME_TYPE.DICE && (
-        <DiceGame onPlayNow={handlePlayNow} />
-      )}
-    </div>
+    <LeaderboardProvider onPlayNow={handlePlayNow}>
+      <div>
+        {currentGame === CASINO_GAME_TYPE.COINTOSS && (
+          <CoinTossGame />
+        )}
+        {currentGame === CASINO_GAME_TYPE.DICE && (
+          <DiceGame />
+        )}
+      </div>
+    </LeaderboardProvider>
   )
 }
 ```
