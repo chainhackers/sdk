@@ -1,4 +1,4 @@
-import { useLeaderboards } from "../../hooks/useLeaderboards"
+import { useLeaderboardContext } from "../../context/LeaderboardContext"
 import { cn } from "../../lib/utils"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { Switch } from "../ui/switch"
@@ -6,12 +6,11 @@ import { LeaderboardCard } from "./LeaderboardCard"
 
 interface Props {
   onViewOverview?: (id: string) => void
-  showPartner: boolean
-  setShowPartner: (show: boolean) => void
 }
 
-export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }: Props) {
-  const { ongoingLeaderboards, endedLeaderboards } = useLeaderboards(showPartner)
+export function LeaderboardsView({ onViewOverview }: Props) {
+  const { ongoingLeaderboards, endedLeaderboards, showPartner, setShowPartner } =
+    useLeaderboardContext()
 
   return (
     <div className="flex flex-col p-[16px]">
@@ -22,9 +21,7 @@ export function LeaderboardsView({ onViewOverview, showPartner, setShowPartner }
       <div className="flex items-center justify-between mb-4">
         <span className="text-[16px] font-semibold text-foreground">Ongoing</span>
         <label htmlFor="partner-toggle" className="flex items-center gap-2 cursor-pointer">
-          <span className="text-[12px] leading-[18px] text-foreground">
-            Show partner leaderboards
-          </span>
+          <span className="text-[12px] leading-[18px] text-foreground">Sponsored leaderboards</span>
           <Switch
             id="partner-toggle"
             checked={showPartner}

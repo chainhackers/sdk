@@ -155,7 +155,7 @@ export function useGameLogic<T extends GameChoice>({
 
     if (isUsingFreebet && selectedFreebet) {
       return createFreebetStrategy<T>({
-        freebet: selectedFreebet.signed,
+        freebet: selectedFreebet,
         chainId: appChainId,
       })
     }

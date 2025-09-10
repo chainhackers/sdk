@@ -3,16 +3,33 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { type ReactNode } from "react"
 import { type Hex, http } from "viem"
 import { createConfig, WagmiProvider } from "wagmi"
-import { avalanche, base, polygon } from "wagmi/chains"
+// Import mainnet chains
+// Import testnet chains
+import {
+  arbitrumSepolia,
+  avalanche,
+  avalancheFuji,
+  base,
+  baseSepolia,
+  polygon,
+  polygonAmoy,
+} from "wagmi/chains"
 import { QUERY_DEFAULTS } from "./constants/queryDefaults"
 import { BalanceProvider } from "./context/BalanceContext"
 import { BetSwirlSDKProvider } from "./context/BetSwirlSDKProvider"
 import { FreebetsProvider } from "./context/FreebetsContext"
+import { LeaderboardProvider } from "./context/LeaderboardContext"
 import { TokenProvider } from "./context/tokenContext"
+import { PlayNowEvent } from "./types/types"
 
-// Define supported chains in one place
-const SUPPORTED_CHAINS = [base, polygon, avalanche] as const
-const DEFAULT_CHAIN = base
+interface AppProvidersProps {
+  children: ReactNode
+  onLeaderboardPlayNow?: (event: PlayNowEvent) => void
+}
+
+// Define supported chains lists
+const MAINNET_CHAINS = [base, polygon, avalanche] as const
+const TESTNET_CHAINS = [baseSepolia, polygonAmoy, avalancheFuji, arbitrumSepolia] as const
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,30 +43,49 @@ const queryClient = new QueryClient({
   },
 })
 
-export function AppProviders({ children }: { children: ReactNode }) {
+export function AppProviders({ children, onLeaderboardPlayNow }: AppProvidersProps) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
   const freebetsAffiliates = affiliate ? [affiliate] : undefined
+  const testMode = import.meta.env.VITE_TEST_MODE === "true"
 
-  // Get RPC URLs for each chain, fallback to public RPCs if not configured
-  const baseRpcUrl = import.meta.env.VITE_BASE_RPC_URL || "https://mainnet.base.org"
-  const polygonRpcUrl = import.meta.env.VITE_POLYGON_RPC_URL || "https://polygon-rpc.com"
-  const avalancheRpcUrl =
-    import.meta.env.VITE_AVALANCHE_RPC_URL || "https://api.avax.network/ext/bc/C/rpc"
+  // --- Dynamic network configuration ---
 
+  // 1. Choose active chains and default chain based on testMode
+  const activeChains = testMode ? TESTNET_CHAINS : MAINNET_CHAINS
+  const defaultChain = testMode ? baseSepolia : base
+
+  // 2. Define transports for all possible chains
+  const transports = {
+    // Mainnet chains
+    [base.id]: http(import.meta.env.VITE_BASE_RPC_URL || "https://mainnet.base.org"),
+    [polygon.id]: http(import.meta.env.VITE_POLYGON_RPC_URL || "https://polygon-rpc.com"),
+    [avalanche.id]: http(
+      import.meta.env.VITE_AVALANCHE_RPC_URL || "https://api.avax.network/ext/bc/C/rpc",
+    ),
+    // Testnet chains
+    [baseSepolia.id]: http(import.meta.env.VITE_BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org"),
+    [polygonAmoy.id]: http(
+      import.meta.env.VITE_POLYGON_AMOY_RPC_URL || "https://rpc-amoy.polygon.technology/",
+    ),
+    [avalancheFuji.id]: http(
+      import.meta.env.VITE_AVALANCHE_FUJI_RPC_URL || "https://api.avax-test.network/ext/bc/C/rpc",
+    ),
+    [arbitrumSepolia.id]: http(
+      import.meta.env.VITE_ARBITRUM_SEPOLIA_RPC_URL || "https://sepolia-rollup.arbitrum.io/rpc",
+    ),
+  }
+
+  // 3. Create Wagmi config with dynamic chains
   const config = createConfig({
-    chains: SUPPORTED_CHAINS,
-    transports: {
-      [base.id]: http(baseRpcUrl),
-      [polygon.id]: http(polygonRpcUrl),
-      [avalanche.id]: http(avalancheRpcUrl),
-    },
+    chains: activeChains,
+    transports: transports,
   })
 
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
-          chain={DEFAULT_CHAIN}
+          chain={defaultChain}
           apiKey={import.meta.env.VITE_ONCHAINKIT_API_KEY}
           config={{
             wallet: {
@@ -64,15 +100,20 @@ export function AppProviders({ children }: { children: ReactNode }) {
           }}
         >
           <BetSwirlSDKProvider
-            initialChainId={DEFAULT_CHAIN.id}
+            initialChainId={defaultChain.id}
             affiliate={affiliate}
-            supportedChains={SUPPORTED_CHAINS.map((chain) => chain.id)}
+            supportedChains={activeChains.map((chain) => chain.id)}
             freebetsAffiliates={freebetsAffiliates}
             withExternalBankrollFreebets={true}
+            testMode={testMode}
           >
             <TokenProvider>
               <BalanceProvider>
-                <FreebetsProvider>{children}</FreebetsProvider>
+                <FreebetsProvider>
+                  <LeaderboardProvider onPlayNow={onLeaderboardPlayNow}>
+                    {children}
+                  </LeaderboardProvider>
+                </FreebetsProvider>
               </BalanceProvider>
             </TokenProvider>
           </BetSwirlSDKProvider>

@@ -5,6 +5,7 @@ import {
   LEADERBOARD_STATUS,
   type Leaderboard,
   type LeaderboardRanking,
+  truncate,
 } from "@betswirl/sdk-core"
 import { type Address } from "viem"
 import { getTokenImage } from "../lib/utils"
@@ -176,13 +177,18 @@ export function mapRankingToEntry(
     rewardAmount = formatTokenAmount(rewardValue, leaderboard.token.decimals)
   }
 
-  const playerAddress = `${ranking.bettorAddress.slice(0, 8)}...${ranking.bettorAddress.slice(-7)}`
-
   return {
     rank: ranking.rank,
-    playerAddress,
+    playerAddress: ranking.bettorAddress,
     points: Number(ranking.totalPoints),
     rewardAmount,
     rewardToken: token,
   }
+}
+
+/**
+ * Format address for UI display with ellipsis
+ */
+export function formatAddress(address: Address): string {
+  return truncate(address.toLowerCase(), 12)
 }

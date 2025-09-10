@@ -18,6 +18,7 @@ export interface LeaderboardQueryDeps {
   chainId: CasinoChainId
   address?: Address
   affiliate?: Address
+  testMode: boolean
 }
 
 export interface FetchLeaderboardsParams extends LeaderboardQueryDeps {
@@ -30,6 +31,7 @@ export async function fetchAndEnrichLeaderboards({
   address,
   affiliate,
   showPartner,
+  testMode,
 }: FetchLeaderboardsParams): Promise<EnrichedLeaderboard[]> {
   const result = await fetchLeaderboards(
     100,
@@ -40,6 +42,7 @@ export async function fetchAndEnrichLeaderboards({
     showPartner,
     "desc",
     undefined,
+    testMode,
   )
 
   const casinoLeaderboards = result.leaderboards.filter((lb) => lb.type === LEADERBOARD_TYPE.CASINO)
@@ -56,7 +59,19 @@ export async function fetchAndEnrichLeaderboards({
     return casinoLeaderboards
   }
 
-  const calls = finalizedLeaderboards.map((lb) => {
+  // Filter to only include leaderboards where the user is a winner
+  const claimableLeaderboards = finalizedLeaderboards.filter((lb) => {
+    const userRanking = lb.rankings?.find(
+      (r) => r.bettorAddress.toLowerCase() === address.toLowerCase(),
+    )
+    return userRanking && lb.shares && userRanking.rank > 0 && userRanking.rank <= lb.shares.length
+  })
+
+  if (claimableLeaderboards.length === 0) {
+    return casinoLeaderboards
+  }
+
+  const calls = claimableLeaderboards.map((lb) => {
     const functionData = getClaimableAmountFunctionData(
       address,
       lb.onChainId,
@@ -75,14 +90,14 @@ export async function fetchAndEnrichLeaderboards({
   })
 
   const enrichedLeaderboards: EnrichedLeaderboard[] = casinoLeaderboards.map((lb) => {
-    const finalizedIndex = finalizedLeaderboards.findIndex(
-      (finalizedLb) => finalizedLb.id === lb.id,
+    const claimableIndex = claimableLeaderboards.findIndex(
+      (claimableLb) => claimableLb.id === lb.id,
     )
 
-    if (finalizedIndex >= 0 && results[finalizedIndex]?.status === "success") {
+    if (claimableIndex >= 0 && results[claimableIndex]?.status === "success") {
       return {
         ...lb,
-        claimableAmount: results[finalizedIndex].result as bigint,
+        claimableAmount: results[claimableIndex].result as bigint,
       }
     }
 
@@ -96,15 +111,30 @@ export async function fetchAndEnrichSingleLeaderboard(
   leaderboardId: string,
   deps: LeaderboardQueryDeps,
 ): Promise<EnrichedLeaderboard> {
-  const { publicClient, chainId, address } = deps
+  const { publicClient, chainId, address, testMode } = deps
 
-  const leaderboard = await fetchLeaderboard(Number(leaderboardId), address)
+  const leaderboard = await fetchLeaderboard(Number(leaderboardId), address, testMode)
 
   if (!leaderboard) {
     throw new Error(`Leaderboard ${leaderboardId} not found`)
   }
 
   if (!address || leaderboard.status !== LEADERBOARD_STATUS.FINALIZED) {
+    return leaderboard
+  }
+
+  // Check if the user is a winner before fetching the claimable amount
+  const userRanking = leaderboard.rankings?.find(
+    (r) => r.bettorAddress.toLowerCase() === address.toLowerCase(),
+  )
+
+  const isWinner =
+    userRanking &&
+    leaderboard.shares &&
+    userRanking.rank > 0 &&
+    userRanking.rank <= leaderboard.shares.length
+
+  if (!isWinner) {
     return leaderboard
   }
 
@@ -137,6 +167,7 @@ export interface FetchAllChainsLeaderboardsParams {
   address?: Address
   affiliate?: Address
   showPartner: boolean
+  testMode: boolean
 }
 
 /**
@@ -150,6 +181,7 @@ export async function fetchAndEnrichLeaderboardsForAllChains({
   address,
   affiliate,
   showPartner,
+  testMode,
 }: FetchAllChainsLeaderboardsParams): Promise<EnrichedLeaderboard[]> {
   const chainPromises = supportedChains.map(async (chainId) => {
     const publicClient = publicClients.get(chainId)
@@ -163,6 +195,7 @@ export async function fetchAndEnrichLeaderboardsForAllChains({
       address,
       affiliate,
       showPartner,
+      testMode,
     })
   })
 

@@ -1,5 +1,4 @@
 import { chainById, chainNativeCurrencyToToken } from "@betswirl/sdk-core"
-import { useQueryClient } from "@tanstack/react-query"
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
 import { zeroAddress } from "viem"
 import { useTokens } from "../hooks/useTokens"
@@ -34,21 +33,9 @@ function getNativeToken(chainId: number): TokenWithImage {
 
 export function TokenProvider({ children }: TokenProviderProps) {
   const { appChainId } = useChain()
-  const queryClient = useQueryClient()
   const [selectedToken, setSelectedTokenInternal] = useState<TokenWithImage>(() => {
     return getNativeToken(appChainId)
   })
-  const [previousChainId, setPreviousChainId] = useState<number | undefined>(appChainId)
-
-  // Cancel and remove token queries when chain changes
-  useEffect(() => {
-    if (previousChainId !== undefined && previousChainId !== appChainId) {
-      // Chain has changed, cancel all in-flight queries and remove from cache
-      queryClient.cancelQueries({ queryKey: ["casino-tokens"] })
-      queryClient.removeQueries({ queryKey: ["casino-tokens"] })
-    }
-    setPreviousChainId(appChainId)
-  }, [appChainId, previousChainId, queryClient])
 
   const {
     tokens: allTokens,
@@ -57,6 +44,7 @@ export function TokenProvider({ children }: TokenProviderProps) {
   } = useTokens({ onlyActive: false })
 
   const activeTokens = allTokens.filter((token) => !token.paused)
+  console.log("activeTokens", activeTokens)
 
   useEffect(() => {
     if (tokensLoading || activeTokens.length === 0) {

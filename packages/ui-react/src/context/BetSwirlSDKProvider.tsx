@@ -6,6 +6,7 @@ import { ConfigProvider, ConfigProviderProps } from "./configContext"
 type BetSwirlSDKProviderProps = ChainProviderProps &
   ConfigProviderProps & {
     supportedChains: CasinoChainId[]
+    testMode?: boolean
   }
 
 export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) => {
@@ -18,6 +19,7 @@ export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) =
     supportedChains,
     freebetsAffiliates,
     withExternalBankrollFreebets,
+    testMode = false,
   } = props
 
   return (
@@ -28,6 +30,7 @@ export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) =
         filteredTokens={filteredTokens}
         freebetsAffiliates={freebetsAffiliates}
         withExternalBankrollFreebets={withExternalBankrollFreebets}
+        testMode={testMode}
       >
         {children}
       </ConfigProvider>

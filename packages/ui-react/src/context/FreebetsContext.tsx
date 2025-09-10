@@ -12,17 +12,15 @@ import {
 import { zeroAddress } from "viem"
 import { useAccount } from "wagmi"
 import { getTokenImage } from "../lib/utils"
-import { FreeBet, TokenWithImage } from "../types/types"
-import { formatExpireAt } from "../utils/formatExpireAt"
 import { useChain } from "./chainContext"
 import { useBettingConfig } from "./configContext"
 import { useTokenContext } from "./tokenContext"
 
 interface FreebetsContextValue {
-  freebets: FreeBet[]
-  selectedFreebet: FreeBet | null
-  selectFreebetById: (id: string | null) => void
-  currentChainFreebets: FreeBet[]
+  freebets: SignedFreebet[]
+  selectedFreebet: SignedFreebet | null
+  selectFreebetById: (id: number | null) => void
+  currentChainFreebets: SignedFreebet[]
   isUsingFreebet: boolean
   refetchFreebets: () => void
   freebetsError: Error | null
@@ -38,16 +36,18 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const { address: accountAddress } = useAccount()
   const { appChainId, switchAppChain, availableChainIds } = useChain()
   const { setSelectedToken } = useTokenContext()
-  const { affiliate, freebetsAffiliates, withExternalBankrollFreebets, filteredTokens } =
+  const { affiliate, freebetsAffiliates, withExternalBankrollFreebets, filteredTokens, testMode } =
     useBettingConfig()
-  const [selectedFreebet, setSelectedFreebet] = useState<FreeBet | null>(null)
+  const [selectedFreebet, setSelectedFreebet] = useState<SignedFreebet | null>(null)
   const [isUsingFreebet, setIsUsingFreebet] = useState(true)
+  // Track pending freebet selection for chain switches
+  const [pendingFreebetId, setPendingFreebetId] = useState<number | null>(null)
 
   const {
     data: freebetsData = [],
     refetch: refetchFreebets,
     error: freebetsError,
-  } = useQuery<SignedFreebet[], Error, FreeBet[]>({
+  } = useQuery<SignedFreebet[], Error, SignedFreebet[]>({
     queryKey: [
       "freebets",
       accountAddress,
@@ -58,9 +58,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       filteredTokens,
     ],
     queryFn: fetchFreebetsTokens,
-    select: (data: SignedFreebet[]) => {
-      return data.map(formatFreebet)
-    },
     enabled: !!accountAddress,
     refetchInterval: 30000,
   })
@@ -78,34 +75,73 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
   const deselectFreebet = useCallback(() => {
     setIsUsingFreebet(false)
     setSelectedFreebet(null)
+    setPendingFreebetId(null) // Clear any pending selection
   }, [])
 
   const selectFreebetById = useCallback(
-    (id: string | null) => {
+    (id: number | null) => {
       if (!id) {
         deselectFreebet()
+        setPendingFreebetId(null)
         return
       }
 
-      const freebet = freebetsData.find((freebet) => freebet.id.toString() === id) || null
+      const freebet = freebetsData.find((freebet) => freebet.id === id) || null
 
       if (!freebet) {
         deselectFreebet()
+        setPendingFreebetId(null)
         return
       }
 
+      // If freebet is on different chain, switch chain and defer selection
       if (freebet.chainId !== appChainId) {
-        switchAppChain(freebet.chainId)
+        console.log(`Switching chain from ${appChainId} to ${freebet.chainId} for freebet ${id}`)
+        setPendingFreebetId(id) // Store pending selection
+        switchAppChain(freebet.chainId) // This will trigger re-render with new appChainId
+        // Don't set token/freebet yet - wait for chain to actually switch
+        return
       }
 
-      setSelectedToken(freebet.token)
+      // Chain is correct, safe to select immediately
+      setSelectedToken({
+        ...freebet.token,
+        image: getTokenImage(freebet.token.symbol),
+      })
       setSelectedFreebet(freebet)
       setIsUsingFreebet(true)
+      setPendingFreebetId(null) // Clear any pending selection
     },
     [freebetsData, appChainId, switchAppChain, setSelectedToken, deselectFreebet],
   )
 
+  // Handle pending freebet selection after chain switch
   useEffect(() => {
+    if (pendingFreebetId && appChainId) {
+      const freebet = freebetsData.find((fb) => fb.id === pendingFreebetId)
+
+      if (freebet && freebet.chainId === appChainId) {
+        // Chain has switched successfully, now select the freebet
+        console.log(
+          `Chain switched to ${appChainId}, selecting pending freebet ${pendingFreebetId}`,
+        )
+        setSelectedToken({
+          ...freebet.token,
+          image: getTokenImage(freebet.token.symbol),
+        })
+        setSelectedFreebet(freebet)
+        setIsUsingFreebet(true)
+        setPendingFreebetId(null) // Clear pending selection
+      }
+    }
+  }, [appChainId, pendingFreebetId, freebetsData, setSelectedToken])
+
+  useEffect(() => {
+    // Skip auto-selection if there's a pending freebet waiting for chain switch
+    if (pendingFreebetId) {
+      return
+    }
+
     const isFreebetsInCurrentChain = currentChainFreebets.length > 0
     const isSelectedFreebet = selectedFreebet !== null
 
@@ -159,6 +195,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     selectedFreebet,
     deselectFreebet,
     selectFreebetById,
+    pendingFreebetId, // Add to dependencies
   ])
 
   async function fetchFreebetsTokens(): Promise<SignedFreebet[]> {
@@ -172,6 +209,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       accountAddress,
       affiliates,
       withExternalBankrollFreebets,
+      testMode,
     )
 
     const filteredFreebets = allFreebets.filter((freebet) => {
@@ -190,22 +228,6 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     })
 
     return filteredFreebets
-  }
-
-  function formatFreebet(freebet: SignedFreebet): FreeBet {
-    return {
-      id: freebet.id.toString(),
-      title: freebet.campaign.label,
-      amount: freebet.amount,
-      formattedAmount: freebet.formattedAmount,
-      token: {
-        ...freebet.token,
-        image: getTokenImage(freebet.token.symbol),
-      } as TokenWithImage,
-      chainId: freebet.chainId,
-      expiresAt: formatExpireAt(freebet.expirationDate),
-      signed: freebet,
-    }
   }
 
   const contextValue = useMemo(

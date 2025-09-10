@@ -1,8 +1,9 @@
-import type { Leaderboard } from "@betswirl/sdk-core"
+import type { CasinoChainId, Leaderboard } from "@betswirl/sdk-core"
 import { useCallback, useEffect } from "react"
+import { useLeaderboardContext } from "../../context/LeaderboardContext"
 import { useClaimLeaderboardRewards } from "../../hooks/useClaimLeaderboardRewards"
 import { cn } from "../../lib/utils"
-import type { LeaderboardUserAction } from "../../types/types"
+import type { LeaderboardUserAction, PlayNowEvent } from "../../types/types"
 import { useGameFrameContext } from "../game/GameFrame"
 import { Button } from "../ui/button"
 
@@ -21,6 +22,7 @@ export function LeaderboardActionButton({
 }: LeaderboardActionButtonProps) {
   const { claim, isPending, isSuccess, isError } = useClaimLeaderboardRewards()
   const { setIsLeaderboardSheetOpen } = useGameFrameContext()
+  const { onPlayNow } = useLeaderboardContext()
 
   useEffect(() => {
     if (isSuccess && onClaimSuccess) {
@@ -33,8 +35,16 @@ export function LeaderboardActionButton({
   }, [claim, leaderboard])
 
   const handlePlayNow = useCallback(() => {
+    if (leaderboard.casinoRules && onPlayNow) {
+      const playNowEvent: PlayNowEvent = {
+        chainId: leaderboard.chainId as CasinoChainId,
+        games: leaderboard.casinoRules.games,
+        tokens: leaderboard.casinoRules.tokens,
+      }
+      onPlayNow(playNowEvent)
+    }
     setIsLeaderboardSheetOpen(false)
-  }, [setIsLeaderboardSheetOpen])
+  }, [leaderboard, onPlayNow, setIsLeaderboardSheetOpen])
 
   const buttonClassName = cn(
     "bg-primary hover:bg-primary/90",
