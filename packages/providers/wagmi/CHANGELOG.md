@@ -1,5 +1,14 @@
 # @betswirl/wagmi-provider
 
+## 0.1.16
+
+### Patch Changes
+
+- bc3a247: Rename getClaimableAmount => getLeaderboardClaimableAmount
+- Updated dependencies
+- Updated dependencies [bc3a247]
+  - @betswirl/sdk-core@0.1.16
+
 ## 0.1.15
 
 ### Patch Changes

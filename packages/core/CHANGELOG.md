@@ -1,5 +1,12 @@
 # @betswirl/sdk-core
 
+## 0.1.16
+
+### Patch Changes
+
+- Add volatile Plinko configuration
+- bc3a247: Rename getClaimableAmount => getLeaderboardClaimableAmount
+
 ## 0.1.15
 
 ### Patch Changes
