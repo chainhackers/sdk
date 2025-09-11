@@ -27,7 +27,7 @@ export type ConfigProviderProps = {
   filteredTokens?: Address[]
   freebetsAffiliates?: Address[]
   withExternalBankrollFreebets?: boolean
-  testMode: boolean
+  testMode?: boolean
 }
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
@@ -38,7 +38,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
     filteredTokens,
     freebetsAffiliates,
     withExternalBankrollFreebets = false,
-    testMode,
+    testMode = false,
   } = props
   const { appChain } = useChain()
 
