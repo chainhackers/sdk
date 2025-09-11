@@ -1,5 +1,11 @@
 # @betswirl/ui-react
 
+## 0.2.2
+
+### Patch Changes
+
+- Make testMode prop optional with default false value
+
 ## 0.2.0
 
 ### Minor Changes
