@@ -1,5 +1,11 @@
 # @betswirl/ui-react
 
+## 0.2.0
+
+### Minor Changes
+
+- Added leaderboards with user rankings and freebet rewards system
+
 ## 0.1.11
 
 ### Patch Changes
