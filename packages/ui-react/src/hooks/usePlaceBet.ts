@@ -247,7 +247,7 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
   }, [wagerWaitingHook.error])
 
   useEffect(() => {
-    if (wagerWaitingHook.isSuccess && game) {
+    if (wagerWaitingHook.isSuccess && betStatus !== "success" && game) {
       setIsRolling(true)
       const handleBetResult = async () => {
         const betId = await _extractBetIdFromReceipt(
@@ -309,6 +309,7 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
     refetchBalance,
     currentBetAmount,
     token,
+    betStatus,
   ])
 
   return {
