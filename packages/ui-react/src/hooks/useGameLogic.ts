@@ -148,7 +148,7 @@ export function useGameLogic<T extends GameChoice>({
     }
   }, [gameDefinition])
 
-  const { affiliate } = useBettingConfig()
+  const { affiliates } = useBettingConfig()
 
   const betStrategy = useMemo(() => {
     if (!address) return undefined
@@ -162,11 +162,11 @@ export function useGameLogic<T extends GameChoice>({
 
     return createPaidBetStrategy<T>({
       token,
-      affiliate,
+      affiliate: affiliates[0],
       connectedAddress: address,
       chainId: appChainId,
     })
-  }, [isUsingFreebet, selectedFreebet, token, affiliate, address, appChainId])
+  }, [isUsingFreebet, selectedFreebet, token, affiliates, address, appChainId])
 
   const {
     placeBet,

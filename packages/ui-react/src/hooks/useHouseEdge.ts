@@ -32,15 +32,20 @@ type UseHouseEdgeProps = {
  */
 export function useHouseEdge(props: UseHouseEdgeProps) {
   const { appChainId } = useChain()
-  const { affiliate } = useBettingConfig()
+  const { affiliates } = useBettingConfig()
   const isEnabled = props.query?.enabled ?? true
 
   const functionData = useMemo(() => {
     if (!isEnabled || !props.game || !props.token) {
       return null
     }
-    return getAffiliateHouseEdgeFunctionData(props.game, props.token.address, affiliate, appChainId)
-  }, [props.game, props.token, affiliate, appChainId, isEnabled])
+    return getAffiliateHouseEdgeFunctionData(
+      props.game,
+      props.token.address,
+      affiliates[0],
+      appChainId,
+    )
+  }, [props.game, props.token, affiliates, appChainId, isEnabled])
 
   const wagmiHook = useReadContract({
     abi: functionData?.data.abi,

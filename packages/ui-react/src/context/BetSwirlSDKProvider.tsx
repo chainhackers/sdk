@@ -12,11 +12,10 @@ export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) =
   const {
     children,
     initialChainId,
-    affiliate,
+    affiliates,
     bankrollToken,
     filteredTokens,
     supportedChains,
-    freebetsAffiliates,
     withExternalBankrollFreebets,
     testMode,
   } = props
@@ -24,10 +23,9 @@ export const BetSwirlSDKProvider: React.FC<BetSwirlSDKProviderProps> = (props) =
   return (
     <ChainProvider initialChainId={initialChainId} supportedChains={supportedChains}>
       <ConfigProvider
-        affiliate={affiliate}
+        affiliates={affiliates}
         bankrollToken={bankrollToken}
         filteredTokens={filteredTokens}
-        freebetsAffiliates={freebetsAffiliates}
         withExternalBankrollFreebets={withExternalBankrollFreebets}
         testMode={testMode}
       >

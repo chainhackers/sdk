@@ -87,13 +87,7 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
     hash: wagerWriteHook.data,
     chainId: appChainId,
   })
-  const {
-    vrfFees,
-    wagmiHook: estimateVrfFeesWagmiHook,
-    formattedVrfFees,
-    gasPrice,
-    getVrfFeesAndGasPrice,
-  } = useEstimateVRFFees({
+  const { vrfFees, formattedVrfFees, gasPrice, getVrfFeesAndGasPrice } = useEstimateVRFFees({
     game,
     token,
     betCount: 1, // TODO make this number dynamic when multi betting is integrated
@@ -233,13 +227,10 @@ export function usePlaceBet<T extends GameChoice = GameChoice>(
       appChainId,
       connectedAddress,
       wagerWriteHook.writeContract,
-      estimateVrfFeesWagmiHook.refetch,
-      formattedVrfFees,
-      vrfFees,
-      gasPrice,
       token,
       gameDefinition,
       strategy,
+      getVrfFeesAndGasPrice,
     ],
   )
 

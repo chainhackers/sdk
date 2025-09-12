@@ -5,11 +5,9 @@ import type { TokenWithImage } from "../types/types"
 import { useChain } from "./chainContext"
 
 export type ConfigContextValue = {
-  affiliate: Address
   affiliates: Address[]
   bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
-  freebetsAffiliates?: Address[]
   withExternalBankrollFreebets?: boolean
   testMode: boolean
 }
@@ -24,10 +22,9 @@ export const useBettingConfig = () => {
 
 export type ConfigProviderProps = {
   children: React.ReactNode
-  affiliate?: Address
+  affiliates?: Address[]
   bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
-  freebetsAffiliates?: Address[]
   withExternalBankrollFreebets?: boolean
   testMode?: boolean
 }
@@ -35,47 +32,31 @@ export type ConfigProviderProps = {
 export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
   const {
     children,
-    affiliate: initialAffiliate,
+    affiliates: userAffiliates,
     bankrollToken,
     filteredTokens,
-    freebetsAffiliates,
     withExternalBankrollFreebets = false,
     testMode = false,
   } = props
-  const { appChain, availableChainIds } = useChain()
-
-  const affiliate = useMemo(
-    () => initialAffiliate ?? appChain.defaultAffiliate,
-    [initialAffiliate, appChain],
-  )
+  const { availableChainIds } = useChain()
 
   const affiliates = useMemo(() => {
-    if (freebetsAffiliates) {
-      return freebetsAffiliates
+    if (userAffiliates) {
+      return userAffiliates
     }
     const defaultAffiliates = availableChainIds.map((id) => casinoChainById[id].defaultAffiliate)
     return Array.from(new Set(defaultAffiliates))
-  }, [freebetsAffiliates, availableChainIds])
+  }, [userAffiliates, availableChainIds])
 
   const context: ConfigContextValue = useMemo(
     () => ({
-      affiliate,
       affiliates,
       bankrollToken,
       filteredTokens,
-      freebetsAffiliates,
       withExternalBankrollFreebets,
       testMode,
     }),
-    [
-      affiliate,
-      affiliates,
-      bankrollToken,
-      filteredTokens,
-      freebetsAffiliates,
-      withExternalBankrollFreebets,
-      testMode,
-    ],
+    [affiliates, bankrollToken, filteredTokens, withExternalBankrollFreebets, testMode],
   )
 
   return <ConfigContext.Provider value={context}>{children}</ConfigContext.Provider>
