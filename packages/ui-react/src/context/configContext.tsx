@@ -1,3 +1,4 @@
+import { casinoChainById } from "@betswirl/sdk-core"
 import { createContext, useContext, useMemo } from "react"
 import { Address } from "viem"
 import type { TokenWithImage } from "../types/types"
@@ -5,6 +6,7 @@ import { useChain } from "./chainContext"
 
 export type ConfigContextValue = {
   affiliate: Address
+  affiliates: Address[]
   bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
   freebetsAffiliates?: Address[]
@@ -40,17 +42,25 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
     withExternalBankrollFreebets = false,
     testMode = false,
   } = props
-  const { appChain } = useChain()
+  const { appChain, availableChainIds } = useChain()
 
-  // Use the initial affiliate if provided, otherwise use the default affiliate for the app chain
   const affiliate = useMemo(
     () => initialAffiliate ?? appChain.defaultAffiliate,
     [initialAffiliate, appChain],
   )
 
+  const affiliates = useMemo(() => {
+    if (freebetsAffiliates) {
+      return freebetsAffiliates
+    }
+    const defaultAffiliates = availableChainIds.map((id) => casinoChainById[id].defaultAffiliate)
+    return Array.from(new Set(defaultAffiliates))
+  }, [freebetsAffiliates, availableChainIds])
+
   const context: ConfigContextValue = useMemo(
     () => ({
       affiliate,
+      affiliates,
       bankrollToken,
       filteredTokens,
       freebetsAffiliates,
@@ -59,6 +69,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
     }),
     [
       affiliate,
+      affiliates,
       bankrollToken,
       filteredTokens,
       freebetsAffiliates,
