@@ -154,9 +154,6 @@ const meta = {
               "client-functions": {
                 title: "Client functions",
               },
-              "wallet-functions": {
-                title: "Wallet functions",
-              },
               utilities: {
                 title: "Utilities",
               },
@@ -173,6 +170,14 @@ const meta = {
               },
             },
           },
+          "react": {
+            title: "React",
+            items: {
+              "getting-started": {
+                title: "🚀 Getting Started",
+              },
+            },
+          }
         },
       },
       demos: {
@@ -184,6 +189,9 @@ const meta = {
           "node-cli": {
             title: "Node CLI",
           },
+          react: {
+            title: "React dApp"
+          }
         },
       },
     },

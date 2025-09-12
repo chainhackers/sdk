@@ -21,8 +21,8 @@ import {
   getCasinoGameToken,
   getCasinoTokens,
   getChainlinkVrfCost,
-  getClaimableAmount,
   getKenoConfiguration,
+  getLeaderboardClaimableAmount,
   type KenoConfiguration,
   type KenoRolledBet,
   type NormalCasinoPlacedBet,
@@ -497,12 +497,17 @@ export class ViemBetSwirlClient extends BetSwirlClient {
 
   /* Leaderboard utilities */
 
-  async getClaimableAmount(
+  async getLeaderboardClaimableAmount(
     leaderboardOnChainId: number | bigint,
     playerAddress: Address,
     chainId: ChainId,
   ): Promise<bigint> {
-    return getClaimableAmount(this.betSwirlWallet, leaderboardOnChainId, playerAddress, chainId);
+    return getLeaderboardClaimableAmount(
+      this.betSwirlWallet,
+      leaderboardOnChainId,
+      playerAddress,
+      chainId,
+    );
   }
 
   async claimLeaderboardRewards(

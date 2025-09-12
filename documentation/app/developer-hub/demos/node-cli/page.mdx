@@ -1,1 +1,88 @@
-# TODO Kinco, explain it uses wagmi provider
+import { Callout } from 'nextra/components';
+
+# Node CLI Demo
+
+The **Node CLI Demo** is an excellent starting point for developers who want to dive into the BetSwirl ecosystem. This demo showcases the practical usage of both **@betswirl/sdk-core** and **@betswirl/wagmi-provider** packages in a real-world Node.js application.
+
+## What the Demo Does
+
+This interactive CLI application demonstrates the core BetSwirl functionalities:
+
+- **Place bets** - Execute betting transactions on supported networks
+- **Place freebets** - Use freebet tokens for betting without spending your own funds
+- **View bet history** - Retrieve and display your betting activity and results
+- **Multi-chain support** - Work across different blockchain networks seamlessly
+
+## Demo in Action
+
+![Node CLI Demo](/gif/node-cli-demo.gif)
+
+## Repository
+
+The complete source code is available on GitHub:
+
+**[→ BetSwirl Node CLI Demo](https://github.com/BetSwirl/node-core-demo/tree/main)**
+
+## Setup Instructions
+
+### 1. Install Dependencies
+
+```bash
+pnpm i
+```
+
+### 2. Configure Environment Variables
+
+Create a `.env` file in the project root and set the following variables:
+
+```env
+# Required: Your wallet private key used to sign transactions
+PRIVATE_KEY="0x...""
+
+# Optional: Your affiliate address (you can leave it empty if you don't use freebets functionality)
+AFFILIATE_ADDRESS="0x..."
+
+# Optional: Enable test mode for freebets (you need to send freebets to your wallet using the same affiliate address in the dev environment)
+TEST_MODE="true"
+
+# RPC URLs for different chains (set the ones you want to use)
+# Polygon
+137_RPC_URL="https://your-rpc-url"
+
+# Arbitrum
+42161_RPC_URL="https://your-rpc-url"
+
+# Base
+8453_RPC_URL="https://your-rpc-url"
+
+# Base Sepolia
+84532_RPC_URL="https://your-rpc-url"
+
+# Other chains
+..._RPC_URL="https://your-rpc-url"
+
+```
+
+<Callout type="info">
+  You only need to set the RPC URLs for the chains you want to use.
+</Callout>
+
+### 3. Run the Demo
+
+```bash
+pnpm start
+```
+
+## What You'll Learn
+
+This demo is perfect for understanding:
+
+- **Multi-chain configuration** - How to set up Wagmi for multiple networks
+- **Client initialization** - Proper setup of the wagmi-provider client
+- **Betting workflows** - Complete betting process from validation to execution
+- **Freebet mechanics** - How to use freebet tokens effectively
+- **Data fetching** - Retrieving bet history and game information
+
+<Callout type="info">
+  This demo serves as both a learning tool and a reference implementation for BetSwirl integrations. Feel free to fork it and adapt it to your specific needs!
+</Callout>

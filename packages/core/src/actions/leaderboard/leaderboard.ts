@@ -11,7 +11,7 @@ import { ERROR_CODES } from "../../errors/codes";
 import { TransactionError } from "../../errors/types";
 import type { BetSwirlFunctionData, Token } from "../../interfaces";
 import type { BetSwirlWallet } from "../../provider";
-import { getClaimableAmount } from "../../read";
+import { getLeaderboardClaimableAmount } from "../../read";
 
 export interface LeaderboardClaimRewardsResult {
   claimedAmount: bigint;
@@ -31,7 +31,7 @@ export async function claimLeaderboardRewards(
     if (!playerAddress) {
       throw new TransactionError("Account missing", ERROR_CODES.WALLET.ACCOUNT_MISSING);
     }
-    const claimableAmount = await getClaimableAmount(
+    const claimableAmount = await getLeaderboardClaimableAmount(
       wallet,
       leaderboard.onChainId,
       playerAddress,

@@ -18,7 +18,7 @@ The **@betswirl/sdk-core** is a VanillaJS library that provides direct access to
 - **Utilities** - Helper functions for formatting, etc
 - **Chains & data** - Access to supported networks and protocol data
 
-> **Note**: For betting processes, consider using the [@betswirl/ui-react](/protocol-hub/sdks/react/getting-started) SDK as an additional package. It provides a full React-based solution that would save you a lot of time, but you'll still need the core SDK as a dependency.
+> **Note**: For betting processes, consider using the [@betswirl/ui-react](/developer-hub/sdks/react/getting-started) SDK as an additional package. It provides a full React-based solution that would save you a lot of time, but you'll still need the core SDK as a dependency.
 
 
 ### As an agent
@@ -48,11 +48,11 @@ The example below uses the BetSwirl Wagmi client:
 import { createConfig } from "@wagmi/core";
 import { initWagmiBetSwirlClient} from "@betswirl/wagmi-provider";
 
-/* Init Wagmi BetSwirl client */
+/* Create the Wagmi config */
 const wagmiConfig = createConfig(...)
 
+/* Init Wagmi BetSwirl client */
 const wagmiBetSwirlClient = initWagmiBetSwirlClient(wagmiConfig, {
-  chainId: 137,
   affiliate: "0x...",
   gasPriceType: GAS_PRICE_TYPE.FAST,
   ...

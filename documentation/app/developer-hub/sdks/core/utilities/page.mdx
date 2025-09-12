@@ -1,1 +1,446 @@
-# TODO Kinco
+import { Callout } from 'nextra/components';
+
+# Utility Functions
+
+This page lists all utility functions available in the BetSwirl SDK core. These functions provide helper utilities for formatting, calculations, and common operations.
+
+<Callout type="info">
+  These utility functions are standalone and don't require a BetSwirl client instance.
+</Callout>
+
+---
+
+{(() => {
+  const functionData = {
+    formattingFunctions: [
+      {
+        name: "formatAmount",
+        description: "Formats a number or string representation of a number into a readable string format.",
+        tips: "Supports large numbers with suffixes (M, B, T) and predefined format types.",
+        code: `// Format large numbers
+const large = formatAmount(123456789, FORMAT_TYPE.STANDARD); // "123.4568M"
+
+// Use predefined format types
+const minify = formatAmount(123.456, FORMAT_TYPE.MINIFY); // "123.46"
+const standard = formatAmount(123.456, FORMAT_TYPE.STANDARD); // "123.456"
+const precise = formatAmount(123.456, FORMAT_TYPE.PRECISE); // "123.456"
+const precise2 = formatAmount(123.45678999111, FORMAT_TYPE.PRECISE); // "123.456789991"
+const full = formatAmount(123.456, FORMAT_TYPE.FULL_PRECISE); // "123.456"
+const precise2 = formatAmount(123.45678999111, FORMAT_TYPE.PRECISE); // "123.45678999111"
+
+// Format small numbers
+const small = formatAmount(0.000004, FORMAT_TYPE.STANDARD); // "<0.0001"
+`
+
+      },
+      {
+        name: "formatRawAmount",
+        description: "Formats a raw bigint amount with specified decimals into a readable string.",
+        tips: "Perfect for formatting blockchain amounts from wei to human-readable values. See \"formatAmount\" code examples for more details.",
+        code: `// Format wei to ETH
+const formatted = formatRawAmount(
+  parseEther("1.55555"), 
+  18, 
+  FORMAT_TYPE.STANDARD
+); // "1.5556"
+
+// Format with custom decimals
+const custom = formatRawAmount(
+  BigInt("1500000000000000000"), 
+  18, 
+  FORMAT_TYPE.MINIFY
+); // "1.5"`
+      },
+      {
+        name: "truncate",
+        description: "Truncates a string to a specified length with a separator in the middle.",
+        tips: "Useful for displaying long addresses or hashes in a compact format.",
+        code: `// Truncate address
+const short = truncate("0x1234567890abcdef1234567890abcdef12345678", 10);
+// "0x123...45678"
+`
+      },
+      {
+        name: "formatAccountUrl",
+        description: "Generates a blockchain explorer URL for a given account address.",
+        tips: "Useful for creating links to view account details on block explorers.",
+        code: `// Generate account URL
+const url = formatAccountUrl(
+  "0x1234567890abcdef1234567890abcdef12345678", 
+  137
+); // "https://polygonscan.com/address/0x1234..."`
+      },
+      {
+        name: "formatTxnUrl",
+        description: "Generates a blockchain explorer URL for a given transaction hash.",
+        tips: "Useful for creating links to view transaction details on block explorers.",
+        code: `// Generate transaction URL
+const url = formatTxnUrl(
+  "0xabcd...", 
+  137
+); // "https://polygonscan.com/tx/0xabcd..."`
+      },
+      {
+        name: "getBetSwirlBetUrl",
+        description: "Generates a BetSwirl bet URL for viewing bet details.",
+        tips: "Useful for creating links to view bet information directly on the BetSwirl platform.",
+        code: `// Generate bet URL
+const url = getBetSwirlBetUrl(
+  "123", 
+  CASINO_GAME_TYPE.DICE,
+  137
+); // "https://betswirl.com/polygon/casino/dice/123"`
+      }
+    ],
+    calculationFunctions: [
+      {
+        name: "getBetSwirlFees",
+        description: "Calculates the BetSwirl fees (affiliate + dividends + treasury + team + bankroll fees) for a given payout amount and house edge.",
+        code: `// Calculate fees
+const fees = getBetSwirlFees(
+  parseEther("2"), // payout amount
+  400 // house edge (4%)
+); // Returns fees in wei (800000000000000000n)`
+      },
+      {
+        name: "getGrossPayout",
+        description: "Calculates the gross payout amount for a bet with given parameters.",
+        tips: "This is the payout before house edge is applied.",
+        code: `// Calculate gross payout
+const grossPayout = getGrossPayout(
+  parseEther("2"), // bet amount
+  2, // bet count
+  20000 // gross multiplier (2x)
+); // Returns gross payout in wei (4000000000000000000n)`
+      },
+      {
+        name: "getNetMultiplier",
+        description: "Calculates the net multiplier after applying house edge.",
+        tips: "Use this to show players the actual multiplier they'll receive after fees.",
+        code: `// Calculate net multiplier
+const netMultiplier = getNetMultiplier(
+  20000, // gross multiplier (2x)
+  400 // house edge (4%)
+); // Returns net multiplier in basis points (19200)`
+      },
+      {
+        name: "getFormattedNetMultiplier",
+        description: "Calculates and formats the net multiplier as a decimal number.",
+        tips: "Perfect for displaying multipliers in user interfaces.",
+        code: `// Get formatted net multiplier
+const formatted = getFormattedNetMultiplier(
+  20000, // gross multiplier (2x)
+  400 // house edge (4%)
+); // Returns 1.92`
+      }
+    ],
+    gameUtilityFunctions: [
+      {
+        name: "Game.getMultiplier",
+        description: "Calculates the multiplier for a bet based on the selected number.",
+        tips: "All games have these functions.",
+        code: `// Get dice multiplier
+const multiplier = Dice.getMultiplier(35); // Returns gross multiplier in basis points (15385)
+
+// Get formatted multiplier
+const formatted = Roulette.getFormattedMultiplier([1,25,14]); // Returns gross multiplier in decimal (12.333)`
+      },
+      {
+        name: "Game.getWinChancePercent",
+        description: "Calculates the win chance percentage for a bet.",
+        tips: "Use this to display win probabilities to players. All games have this function.",
+          code: `// Get win chance
+const diceChance = Dice.getWinChancePercent(75); // Returns percentage (25)
+const rouletteChance = Roulette.getWinChancePercent([1,14,25,26,27,28]) // Returns percentage (16.2)`
+      },
+      {
+        name: "WeightedGame.getUniqueOutputs",
+        description: "Gets unique outputs for a weighted game configuration with house edge applied.",
+        tips: "Perfect for displaying wheel/plinko segments with their probabilities. It is particularly useful because often, configurations have multiple segments with the same multiplier.",
+        code: `// Get unique outputs
+const outputs = WeightedGame.getUniqueOutputs(
+  wheelConfig, // wheel configuration
+  400 // house edge (4%)
+); // Returns array of unique multipliers with probabilities`
+      },
+      {
+        name: "Plinko.getSortedPlinkoOutputs",
+        description: "Gets plinko outputs sorted in a bell-shaped order for optimal UI display.",
+        tips: "Creates a visually appealing bell curve layout for plinko game segments.",
+        code: `// Get sorted plinko outputs
+const outputs = Plinko.getSortedPlinkoOutputs(
+  plinkoConfig, // plinko configuration
+  400 // house edge (4%)
+); // Returns bell-shaped sorted outputs`
+      }
+    ],
+    encodingDecodingFunctions: [
+      {
+        name: "Game.encodeInput",
+        description: "Encodes bet input for smart contract interaction.",
+        tips: "All games have these functions. Use this to prepare bet data before calling the smart contract.",
+        code: `// Encode dice input
+const diceEncoded = Dice.encodeInput(50); // Returns encoded input for contract
+
+// Encode roulette input
+const rouletteEncoded = Roulette.encodeInput([1, 2, 3]); // Returns encoded input for numbers`
+      },
+      {
+        name: "Game.decodeInput",
+        description: "Decodes bet input from smart contract data.",
+        tips: "All games have these functions. Use this to interpret bet data returned from smart contracts.",
+        code: `// Decode dice input
+const diceDecoded = Dice.decodeInput(encodedInput); // Returns dice number
+
+// Decode roulette input
+const rouletteDecoded = Roulette.decodeInput(encodedInput); // Returns array of numbers`
+      },
+      {
+        name: "Game.decodeRolled",
+        description: "Decodes the rolled result from smart contract data.",
+        tips: "All games have these functions. Use this to interpret the actual result returned from smart contracts.",
+        code: `// Decode dice result
+const diceResult = Dice.decodeRolled(encodedResult); // Returns rolled dice number
+
+// Decode roulette result
+const rouletteResult = Roulette.decodeRolled(encodedResult); // Returns winning number`
+      }
+    ],
+    tokenUtilityFunctions: [
+      {
+        name: "getTokenMetadata",
+        description: "Retrieves token metadata (symbol, decimals) from the blockchain.",
+        tips: "Use this to get token information without relying on external APIs.",
+        code: `// Get token metadata
+const metadata = await getTokenMetadata(
+  wallet,
+  "0x1234...", // token address
+  137 // chain ID
+); // Returns { symbol, decimals, address }`
+      },
+      {
+        name: "chainNativeCurrencyToToken",
+        description: "Converts a chain's native currency to a Token object.",
+        tips: "Useful for handling native tokens like ETH, MATIC, etc.",
+        code: `// Get native currency token
+const nativeToken = chainNativeCurrencyToToken(
+  chainById[137].nativeCurrency // polygon native currency
+); // Returns Token object for MATIC`
+      },
+      {
+        name: "getGasPrices",
+        description: "Retrieves current gas prices for a specific chain.",
+        tips: "Use this to get real-time gas price information for transaction optimization.",
+        code: `// Get gas prices
+const gasPrices = await getGasPrices(
+  wallet,
+  137, // chain ID
+); // Returns gas prices in wei (normal, fast, instant)`
+      },
+    ],
+    functionDataFunctions: [
+      {
+        name: "getBetRequirementsFunctionData",
+        description: "Generates function data for checking bet requirements.",
+        tips: "Use this to prepare contract calls for checking betting restrictions. Use the biggest raw multiplier for games like Keno or Wheel where you have multiple different possible outputs.",
+        code: `// Get function data
+const functionData = getBetRequirementsFunctionData(
+  "0x1234...", // token address
+  20000, // raw multiplier
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getAffiliateHouseEdgeFunctionData",
+        description: "Generates function data for getting affiliate house edge.",
+        tips: "Use this to prepare contract calls for affiliate house edge information.",
+        code: `// Get function data
+const functionData = getAffiliateHouseEdgeFunctionData(
+  CASINO_GAME_TYPE.DICE, // game type
+  "0x1234...", // token address
+  "0xabcd...", // affiliate address
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getKenoConfigurationFunctionData",
+        description: "Generates function data for getting keno configuration.",
+        tips: "Use this to prepare contract calls for keno game settings.",
+        code: `// Get function data
+const functionData = getKenoConfigurationFunctionData(
+  "0x1234...", // token address
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getWeightedGameConfigurationFunctionData",
+        description: "Generates function data for getting weighted game configuration.",
+        tips: "Use this to prepare contract calls for wheel/plinko configurations.",
+        code: `// Get function data
+const functionData = getWeightedGameConfigurationFunctionData(
+  "0x1234...", // contract address
+  1, // config ID
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getGamePausedFunctionData",
+        description: "Generates function data for checking if a game is paused.",
+        tips: "Use this to prepare contract calls for checking game status.",
+        code: `// Get function data
+const functionData = getGamePausedFunctionData(
+  CASINO_GAME_TYPE.DICE, // game type
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getTokenInfoFunctionData",
+        description: "Generates function data for getting token information.",
+        tips: "Use this to prepare contract calls for token metadata.",
+        code: `// Get function data
+const functionData = getTokenInfoFunctionData(
+  CASINO_GAME_TYPE.DICE, // game type
+  "0x1234...", // token address
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getCasinoTokensFunctionData",
+        description: "Generates function data for getting casino tokens.",
+        tips: "Use this to prepare contract calls for casino token list.",
+        code: `// Get function data
+const functionData = getCasinoTokensFunctionData(
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getTokenDecimalsFunctionData",
+        description: "Generates function data for getting token decimals.",
+        tips: "Use this to prepare contract calls for token decimal information.",
+        code: `// Get function data
+const functionData = getTokenDecimalsFunctionData(
+  "0x1234..." // token address
+); // Returns function data for contract call`
+      },
+      {
+        name: "getTokenSymbolFunctionData",
+        description: "Generates function data for getting token symbol.",
+        tips: "Use this to prepare contract calls for token symbol information.",
+        code: `// Get function data
+const functionData = getTokenSymbolFunctionData(
+  "0x1234..." // token address
+); // Returns function data for contract call`
+      },
+      {
+        name: "getChainlinkVrfCostFunctionData",
+        description: "Generates function data for getting Chainlink VRF cost.",
+        tips: "Use this to prepare contract calls for VRF cost calculation.",
+        code: `// Get function data
+const functionData = getChainlinkVrfCostFunctionData(
+  CASINO_GAME_TYPE.DICE, // game type
+  "0x1234...", // token address
+  1, // bet count
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getPlaceBetFunctionData",
+        description: "Generates function data for placing a bet.",
+        tips: "Use this to prepare contract calls for placing casino bets.",
+        code: `// Get function data
+const functionData = getPlaceBetFunctionData(
+  betParams, // bet parameters
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getPlaceFreebetFunctionData",
+        description: "Generates function data for placing a freebet.",
+        tips: "Use this to prepare contract calls for placing freebets.",
+        code: `// Get function data
+const functionData = getPlaceFreebetFunctionData(
+  freebetParams, // freebet parameters
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getAllowanceFunctionData",
+        description: "Generates function data for checking token allowance.",
+        tips: "Use this to prepare contract calls for allowance checking.",
+        code: `// Get function data
+const functionData = getAllowanceFunctionData(
+  "0x1234...", // token address
+  "0x5678...", // owner address
+  "0xabcd..." // spender address
+); // Returns function data for contract call`
+      },
+      {
+        name: "getApproveFunctionData",
+        description: "Generates function data for approving token spending.",
+        tips: "Use this to prepare contract calls for token approval.",
+        code: `// Get function data
+const functionData = getApproveFunctionData(
+  "0x1234...", // token address
+  "0xabcd...", // spender address
+  parseEther("100") // amount to approve
+); // Returns function data for contract call`
+      },
+      {
+        name: "getClaimableAmountFunctionData",
+        description: "Generates function data for getting claimable amount.",
+        tips: "Use this to prepare contract calls for claimable rewards.",
+        code: `// Get function data
+const functionData = getClaimableAmountFunctionData(
+  leaderboard, // leaderboard address
+  "0xabcd...", // user address
+  137 // chain ID
+); // Returns function data for contract call`
+      },
+      {
+        name: "getClaimRewardsLeaderboardFunctionData",
+        description: "Generates function data for claiming leaderboard rewards.",
+        tips: "Use this to prepare contract calls for claiming rewards.",
+        code: `// Get function data
+const functionData = getClaimRewardsLeaderboardFunctionData(
+  leaderboard, // leaderboard address
+  "0xabcd..." // receiver address
+); // Returns function data for contract call`
+      }
+    ]
+  };
+
+  return (
+    <>
+      <FunctionSection 
+        title="Formatting Functions" 
+        functions={functionData.formattingFunctions} 
+        category="formatting"
+      />
+      <FunctionSection 
+        title="Calculation Functions" 
+        functions={functionData.calculationFunctions} 
+        category="calculation"
+      />
+      <FunctionSection 
+        title="Game Utility Functions" 
+        functions={functionData.gameUtilityFunctions} 
+        category="game-utility"
+      />
+      <FunctionSection 
+        title="Encoding/Decoding Functions" 
+        functions={functionData.encodingDecodingFunctions} 
+        category="encoding-decoding"
+      />
+      <FunctionSection 
+        title="Token Utility Functions" 
+        functions={functionData.tokenUtilityFunctions} 
+        category="token-utility"
+      />
+      <FunctionSection 
+        title="Function Data Functions" 
+        functions={functionData.functionDataFunctions} 
+        category="function-data"
+      />
+    </>
+  );
+})()}

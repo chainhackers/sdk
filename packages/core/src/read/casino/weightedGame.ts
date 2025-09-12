@@ -69,6 +69,42 @@ const safePlinkoConfiguration = {
   label: "Safe",
   game: CASINO_GAME_TYPE.PLINKO,
 };
+const volatilePlinkoConfiguration = {
+  configId: 2,
+  weights: [3n, 30n, 120n, 350n, 1055n, 2231n, 2422n, 2231n, 1055n, 350n, 120n, 30n, 3n],
+  multipliers: [
+    1041667n,
+    156250n,
+    52083n,
+    20833n,
+    12500n,
+    5209n,
+    3125n,
+    5209n,
+    12500n,
+    20833n,
+    52083n,
+    156250n,
+    1041667n,
+  ],
+  colors: [
+    "#ff003f",
+    "#ff2035",
+    "#ff402a",
+    "#ff6020",
+    "#ff8015",
+    "#ffa00b",
+    "#ffc000",
+    "#ffa00b",
+    "#ff8015",
+    "#ff6020",
+    "#ff402a",
+    "#ff2035",
+    "#ff003f",
+  ],
+  label: "Volatile",
+  game: CASINO_GAME_TYPE.PLINKO,
+};
 
 type WeightedGameCachedConfigurationsPerChain = {
   [chainId in CasinoChainId]: CachedWeightedGameConfiguration[];
@@ -97,17 +133,40 @@ export const wheelCachedConfigurations: WeightedGameCachedConfigurationsPerChain
 export const plinkoCachedConfigurations: WeightedGameCachedConfigurationsPerChain = {
   [chainByKey.arbitrumSepolia.id]: [
     { ...safePlinkoConfiguration, chainId: chainByKey.arbitrumSepolia.id },
+    { ...volatilePlinkoConfiguration, chainId: chainByKey.arbitrumSepolia.id },
   ],
   [chainByKey.avalancheFuji.id]: [
     { ...safePlinkoConfiguration, chainId: chainByKey.avalancheFuji.id },
+    { ...volatilePlinkoConfiguration, chainId: chainByKey.avalancheFuji.id },
   ],
-  [chainByKey.polygonAmoy.id]: [{ ...safePlinkoConfiguration, chainId: chainByKey.polygonAmoy.id }],
-  [chainByKey.baseSepolia.id]: [{ ...safePlinkoConfiguration, chainId: chainByKey.baseSepolia.id }],
-  [chainByKey.arbitrum.id]: [{ ...safePlinkoConfiguration, chainId: chainByKey.arbitrum.id }],
-  [chainByKey.avalanche.id]: [{ ...safePlinkoConfiguration, chainId: chainByKey.avalanche.id }],
-  [chainByKey.polygon.id]: [{ ...safePlinkoConfiguration, chainId: chainByKey.polygon.id }],
-  [chainByKey.bsc.id]: [{ ...safePlinkoConfiguration, chainId: chainByKey.bsc.id }],
-  [chainByKey.base.id]: [{ ...safePlinkoConfiguration, chainId: chainByKey.base.id }],
+  [chainByKey.polygonAmoy.id]: [
+    { ...safePlinkoConfiguration, chainId: chainByKey.polygonAmoy.id },
+    { ...volatilePlinkoConfiguration, chainId: chainByKey.polygonAmoy.id },
+  ],
+  [chainByKey.baseSepolia.id]: [
+    { ...safePlinkoConfiguration, chainId: chainByKey.baseSepolia.id },
+    { ...volatilePlinkoConfiguration, chainId: chainByKey.baseSepolia.id },
+  ],
+  [chainByKey.arbitrum.id]: [
+    { ...safePlinkoConfiguration, chainId: chainByKey.arbitrum.id },
+    { ...volatilePlinkoConfiguration, chainId: chainByKey.arbitrum.id },
+  ],
+  [chainByKey.avalanche.id]: [
+    { ...safePlinkoConfiguration, chainId: chainByKey.avalanche.id },
+    { ...volatilePlinkoConfiguration, chainId: chainByKey.avalanche.id },
+  ],
+  [chainByKey.polygon.id]: [
+    { ...safePlinkoConfiguration, chainId: chainByKey.polygon.id },
+    { ...volatilePlinkoConfiguration, chainId: chainByKey.polygon.id },
+  ],
+  [chainByKey.bsc.id]: [
+    { ...safePlinkoConfiguration, chainId: chainByKey.bsc.id },
+    { ...volatilePlinkoConfiguration, chainId: chainByKey.bsc.id },
+  ],
+  [chainByKey.base.id]: [
+    { ...safePlinkoConfiguration, chainId: chainByKey.base.id },
+    { ...volatilePlinkoConfiguration, chainId: chainByKey.base.id },
+  ],
 };
 
 export const weightedGameCachedConfigurationsByGame: Record<

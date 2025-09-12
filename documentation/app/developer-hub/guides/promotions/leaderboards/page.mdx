@@ -116,7 +116,7 @@ if(isSuccess){
 const selectedLeaderboard = ...
 
 // 2. Check the claimable amount of the leaderboard
-const claimableRawAmount = await yourBetSwirlClient.getClaimableAmount(selectedLeaderboard.onChainId, playerAddress, selectedLeaderboard.chainId)
+const claimableRawAmount = await yourBetSwirlClient.getLeaderboardClaimableAmount(selectedLeaderboard.onChainId, playerAddress, selectedLeaderboard.chainId)
 
 
 // 3. Claim the rewards

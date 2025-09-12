@@ -9,7 +9,7 @@ import { getCasinoChainId } from "../../utils";
 
 export type RawClaimableAmount = bigint;
 
-export async function getClaimableAmount(
+export async function getLeaderboardClaimableAmount(
   wallet: BetSwirlWallet,
   leaderboardOnChainId: number | bigint,
   playerAddress: Address,

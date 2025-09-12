@@ -1,1 +1,59 @@
-# TODO Kinco explain it is useful only with sdk core
+# Getting Started
+
+## What is @betswirl/wagmi-provider?
+
+The **@betswirl/wagmi-provider** is a supplementary add-on package that extends the [@betswirl/sdk-core](/developer-hub/sdks/core/getting-started) with Wagmi integration capabilities. It allows you to use all the client functions using Wagmi config instead of the default viem config.
+
+### Key Benefits
+
+- **Multi-chain support** - Seamlessly work across multiple blockchain networks in the same project
+- **Wagmi integration** - Perfect for projects already using Wagmi for wallet and chain management
+- **Unified client interface** - Access all BetSwirl protocol functions through a single Wagmi-configured client
+- **Chain switching** - Automatically handle chain-specific operations and configurations
+
+### Consider alternatives if:
+- You're building a React frontend → Consider [@betswirl/ui-react](/developer-hub/sdks/react/getting-started) for a complete UI solution
+
+
+
+## Installation
+
+```bash
+npm i @betswirl/wagmi-provider @betswirl/sdk-core @wagmi/core viem @apollo/client
+```
+
+## Usage
+
+The wagmi-provider is used the exact same way as the Viem default client from [@betswirl/sdk-core](/developer-hub/sdks/core/getting-started#2-with-the-native-betswirl-client-viem):
+
+```typescript
+import { createConfig, http } from "@wagmi/core";
+import { mainnet, polygon, arbitrum } from "@wagmi/core/chains";
+import { initWagmiBetSwirlClient } from "@betswirl/wagmi-provider";
+import { GAS_PRICE_TYPE } from "@betswirl/sdk-core";
+
+/* Create your Wagmi configuration with multiple chains */
+const wagmiConfig = createConfig({
+  chains: [mainnet, polygon, arbitrum],
+  transports: {
+    [mainnet.id]: http("https://..."),
+    [polygon.id]: http("https://..."),
+    [arbitrum.id]: http("https://..."),
+  },
+});
+
+/* Initialize the BetSwirl client with Wagmi integration */
+const wagmiBetSwirlClient = initWagmiBetSwirlClient(wagmiConfig, {
+  affiliate: "0x...", // Your affiliate address
+  gasPriceType: GAS_PRICE_TYPE.FAST,
+});
+
+/* Use the client - it automatically handles chain-specific operations */
+const casinoGames = await wagmiBetSwirlClient.getCasinoGames(false, polygon.id);
+const {bet, error} = await wagmiBetSwirlClient.fetchBetByHash("0x...", mainnet.id);
+
+```
+
+## Examples
+
+- [NodeJs CLI](https://github.com/BetSwirl/node-core-demo) - Multi-chain Node.js application example
