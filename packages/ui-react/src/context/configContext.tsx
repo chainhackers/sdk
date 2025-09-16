@@ -1,4 +1,4 @@
-import { casinoChainById } from "@betswirl/sdk-core"
+import { type CasinoChainId, casinoChainById } from "@betswirl/sdk-core"
 import { createContext, useContext, useMemo } from "react"
 import { Address } from "viem"
 import type { TokenWithImage } from "../types/types"
@@ -10,6 +10,7 @@ export type ConfigContextValue = {
   filteredTokens?: Address[]
   withExternalBankrollFreebets?: boolean
   testMode: boolean
+  getAffiliateForChain: (chainId: CasinoChainId) => Address
 }
 
 const ConfigContext = createContext<ConfigContextValue | null>(null)
@@ -48,6 +49,22 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
     return Array.from(new Set(defaultAffiliates))
   }, [userAffiliates, availableChainIds])
 
+  const getAffiliateForChain = useMemo(
+    () => (chainId: CasinoChainId) => {
+      // If user provided affiliates, use the first one for all chains
+      if (userAffiliates?.[0]) {
+        return userAffiliates[0]
+      }
+      // Otherwise use the default affiliate for the specific chain
+      const chainConfig = casinoChainById[chainId]
+      if (!chainConfig?.defaultAffiliate) {
+        throw new Error(`No default affiliate found for chainId: ${chainId}`)
+      }
+      return chainConfig.defaultAffiliate
+    },
+    [userAffiliates],
+  )
+
   const context: ConfigContextValue = useMemo(
     () => ({
       affiliates,
@@ -55,8 +72,16 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
       filteredTokens,
       withExternalBankrollFreebets,
       testMode,
+      getAffiliateForChain,
     }),
-    [affiliates, bankrollToken, filteredTokens, withExternalBankrollFreebets, testMode],
+    [
+      affiliates,
+      bankrollToken,
+      filteredTokens,
+      withExternalBankrollFreebets,
+      testMode,
+      getAffiliateForChain,
+    ],
   )
 
   return <ConfigContext.Provider value={context}>{children}</ConfigContext.Provider>

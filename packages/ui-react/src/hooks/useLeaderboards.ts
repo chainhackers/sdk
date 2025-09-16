@@ -29,7 +29,7 @@ interface UseLeaderboardsResult {
 // instead of relying only on the current use case parameters
 export function useLeaderboards(showPartner: boolean): UseLeaderboardsResult {
   const { availableChains } = useChain()
-  const { affiliates, testMode } = useBettingConfig()
+  const { getAffiliateForChain, testMode } = useBettingConfig()
   const { address } = useAccount()
 
   // Get supported chain IDs from available chains
@@ -56,7 +56,7 @@ export function useLeaderboards(showPartner: boolean): UseLeaderboardsResult {
         publicClients,
         supportedChains,
         address,
-        affiliate: affiliates[0],
+        getAffiliateForChain,
         showPartner,
         testMode,
       })
