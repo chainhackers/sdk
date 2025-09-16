@@ -58,7 +58,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
       // Otherwise use the default affiliate for the specific chain
       const chainConfig = casinoChainById[chainId]
       if (!chainConfig?.defaultAffiliate) {
-        throw new Error(`No default affiliate found for chainId: ${chainId}`)
+        throw new Error(`No default affiliate found for chain: ${chainId}`)
       }
       return chainConfig.defaultAffiliate
     },
