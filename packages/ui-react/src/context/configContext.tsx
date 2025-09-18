@@ -1,15 +1,16 @@
+import { type CasinoChainId, casinoChainById } from "@betswirl/sdk-core"
 import { createContext, useContext, useMemo } from "react"
 import { Address } from "viem"
 import type { TokenWithImage } from "../types/types"
 import { useChain } from "./chainContext"
 
 export type ConfigContextValue = {
-  affiliate: Address
+  affiliates: Address[]
   bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
-  freebetsAffiliates?: Address[]
   withExternalBankrollFreebets?: boolean
   testMode: boolean
+  getAffiliateForChain: (chainId: CasinoChainId) => Address
 }
 
 const ConfigContext = createContext<ConfigContextValue | null>(null)
@@ -22,10 +23,9 @@ export const useBettingConfig = () => {
 
 export type ConfigProviderProps = {
   children: React.ReactNode
-  affiliate?: Address
+  affiliates?: Address[]
   bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
-  freebetsAffiliates?: Address[]
   withExternalBankrollFreebets?: boolean
   testMode?: boolean
 }
@@ -33,37 +33,54 @@ export type ConfigProviderProps = {
 export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
   const {
     children,
-    affiliate: initialAffiliate,
+    affiliates: userAffiliates,
     bankrollToken,
     filteredTokens,
-    freebetsAffiliates,
     withExternalBankrollFreebets = false,
     testMode = false,
   } = props
-  const { appChain } = useChain()
+  const { availableChainIds } = useChain()
 
-  // Use the initial affiliate if provided, otherwise use the default affiliate for the app chain
-  const affiliate = useMemo(
-    () => initialAffiliate ?? appChain.defaultAffiliate,
-    [initialAffiliate, appChain],
+  const affiliates = useMemo(() => {
+    if (userAffiliates) {
+      return userAffiliates
+    }
+    const defaultAffiliates = availableChainIds.map((id) => casinoChainById[id].defaultAffiliate)
+    return Array.from(new Set(defaultAffiliates))
+  }, [userAffiliates, availableChainIds])
+
+  const getAffiliateForChain = useMemo(
+    () => (chainId: CasinoChainId) => {
+      // If user provided affiliates, use the first one for all chains
+      if (userAffiliates?.[0]) {
+        return userAffiliates[0]
+      }
+      // Otherwise use the default affiliate for the specific chain
+      const chainConfig = casinoChainById[chainId]
+      if (!chainConfig?.defaultAffiliate) {
+        throw new Error(`No default affiliate found for chain: ${chainId}`)
+      }
+      return chainConfig.defaultAffiliate
+    },
+    [userAffiliates],
   )
 
   const context: ConfigContextValue = useMemo(
     () => ({
-      affiliate,
+      affiliates,
       bankrollToken,
       filteredTokens,
-      freebetsAffiliates,
       withExternalBankrollFreebets,
       testMode,
+      getAffiliateForChain,
     }),
     [
-      affiliate,
+      affiliates,
       bankrollToken,
       filteredTokens,
-      freebetsAffiliates,
       withExternalBankrollFreebets,
       testMode,
+      getAffiliateForChain,
     ],
   )
 
