@@ -209,14 +209,11 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
       accountAddress,
       affiliates,
       withExternalBankrollFreebets,
+      availableChainIds,
       testMode,
     )
 
     const filteredFreebets = allFreebets.filter((freebet) => {
-      if (!availableChainIds.includes(freebet.chainId)) {
-        return false
-      }
-
       if (filteredTokens && filteredTokens.length > 0) {
         if (freebet.token.address === zeroAddress) {
           return true

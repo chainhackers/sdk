@@ -242,8 +242,8 @@ export const fetchLeaderboards = async (
   limit = 10,
   offset = 0,
   playerAddress?: Address,
-  affiliate?: Address,
-  chainId?: ChainId,
+  affiliates?: Address[],
+  chainIds?: ChainId[],
   withExternalBankrollLeaderboards = false,
   endDateDirection?: "asc" | "desc",
   statuses?: LEADERBOARD_STATUS[],
@@ -256,11 +256,15 @@ export const fetchLeaderboards = async (
     if (playerAddress) {
       params.set("player_address", playerAddress);
     }
-    if (affiliate) {
-      params.set("affiliate", affiliate);
+    if (affiliates) {
+      for (const affiliate of affiliates) {
+        params.append("affiliates", affiliate);
+      }
     }
-    if (chainId) {
-      params.set("chain_id", chainId.toString());
+    if (chainIds) {
+      for (const chainId of chainIds) {
+        params.append("chain_ids", chainId.toString());
+      }
     }
     if (withExternalBankrollLeaderboards) {
       params.set("with_external_bankroll", withExternalBankrollLeaderboards.toString());
@@ -274,7 +278,7 @@ export const fetchLeaderboards = async (
       }
     }
     const res = await fetch(
-      `${getBetSwirlApiUrl(testMode)}/public/v1/leaderboards?${params.toString()}`,
+      `${getBetSwirlApiUrl(testMode)}/public/v2/leaderboards?${params.toString()}`,
     );
     if (!res.ok) {
       throw new Error(`Status ${res.status}: ${res.statusText}`);

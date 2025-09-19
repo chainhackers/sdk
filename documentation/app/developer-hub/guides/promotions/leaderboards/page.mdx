@@ -83,8 +83,8 @@ const leadderboards = yourBetSwirlClient.fetchLeaderboards(
  10, // limit
  0, // offset
  yourBetSwirlClient.betSwirlWallet.getAccount()!.address, // player address
- affiliateAddress, // affiliate address
- undefined, // Chain ID
+ [affiliateAddress], // affiliate addresses
+ undefined, // Chain IDs
  true, // include bankroll manager leaderboards
  "desc", // sort order
  undefined // statuses

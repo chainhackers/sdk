@@ -1,5 +1,25 @@
 # @betswirl/sdk-core
 
+## 0.1.20
+
+### Patch Changes
+
+- Fix leaderboards api version
+
+## 0.1.19
+
+### Patch Changes
+
+- Add chain_ids parameter to fetchFreebets function
+
+- Add affiliates & chainIds params to fetchLeaderboards
+
+## 0.1.18
+
+### Patch Changes
+
+- Update mainnet subgraph links
+
 ## 0.1.17
 
 ### Patch Changes

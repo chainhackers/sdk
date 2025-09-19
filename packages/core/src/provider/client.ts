@@ -390,12 +390,14 @@ export abstract class BetSwirlClient {
   async fetchFreebets(
     player: Address,
     affiliates?: Address[],
+    chainIds?: CasinoChainId[],
     withExternalBankrollFreebets = false,
   ): Promise<SignedFreebet[]> {
     return fetchFreebets(
       player,
       affiliates,
       withExternalBankrollFreebets,
+      chainIds,
       Boolean(this.betSwirlDefaultOptions.api?.testMode),
     );
   }
@@ -446,8 +448,8 @@ export abstract class BetSwirlClient {
     limit = 10,
     offset = 0,
     playerAddress?: Address,
-    affiliate?: Address,
-    chainId?: ChainId,
+    affiliates?: Address[],
+    chainIds?: ChainId[],
     withExternalBankrollLeaderboards = false,
     endDateDirection?: "asc" | "desc",
     statuses?: LEADERBOARD_STATUS[],
@@ -456,8 +458,8 @@ export abstract class BetSwirlClient {
       limit,
       offset,
       playerAddress,
-      affiliate,
-      chainId,
+      affiliates,
+      chainIds,
       withExternalBankrollLeaderboards,
       endDateDirection,
       statuses,
