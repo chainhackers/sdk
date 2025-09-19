@@ -396,8 +396,8 @@ export abstract class BetSwirlClient {
     return fetchFreebets(
       player,
       affiliates,
-      withExternalBankrollFreebets,
       chainIds,
+      withExternalBankrollFreebets,
       Boolean(this.betSwirlDefaultOptions.api?.testMode),
     );
   }

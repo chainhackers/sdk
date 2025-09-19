@@ -1,5 +1,11 @@
 # @betswirl/sdk-core
 
+## 0.1.21
+
+### Patch Changes
+
+- Reorganise fetchFreebets parameters
+
 ## 0.1.20
 
 ### Patch Changes

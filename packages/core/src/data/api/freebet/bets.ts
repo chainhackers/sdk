@@ -51,8 +51,8 @@ export type SignedFreebet = {
 export const fetchFreebets = async (
   player: Address,
   affiliates?: Address[],
-  withExternalBankrollFreebets = false,
   chainIds?: CasinoChainId[],
+  withExternalBankrollFreebets = false,
   testMode = false,
 ): Promise<SignedFreebet[]> => {
   try {

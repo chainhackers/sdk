@@ -69,7 +69,8 @@ const affiliateAddress = process.env.AFFILIATE_ADDRESS;
  // fetchFreebets returns only the non-expired freebets
 const freebets = await yourBetSwirlClient.fetchFreebets(
   yourBetSwirlClient.betSwirlWallet.getAccount()!.address, // player address
-  affiliateAddress, // affiliate address
+  [affiliateAddress], // affiliate addresses
+  undefined, // chain ids
   true, // include bankroll manager freebets  
 );
 

@@ -208,8 +208,8 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     const allFreebets = await fetchFreebets(
       accountAddress,
       affiliates,
-      withExternalBankrollFreebets,
       availableChainIds,
+      withExternalBankrollFreebets,
       testMode,
     )
 

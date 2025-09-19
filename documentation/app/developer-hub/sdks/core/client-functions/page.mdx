@@ -267,6 +267,7 @@ const { bet, error } = await client.fetchBetByHash(
 const freebets = await client.fetchFreebets(
   userAddress,
   [affiliateAddress],
+  [chainId],
   false
 );`
       },
