@@ -43,6 +43,7 @@ export type SignedFreebet = {
  * @param player - The player's wallet address
  * @param affiliates - Array of affiliate addresses to filter freebets
  * @param withExternalBankrollFreebets - Whether to include external bankroll freebets (default: false). If true, it means some returned freebets could have a different affiliate address than the ones provided in the `affiliates` array.
+ * @param chainIds - Array of chain ids to filter freebets
  * @param testMode - Whether to use test mode API endpoint (default: false)
  * @returns Promise<SignedFreebet[]> - Array of formatted freebets with additional metadata
  * @throws Returns empty array if the API request fails
@@ -50,6 +51,7 @@ export type SignedFreebet = {
 export const fetchFreebets = async (
   player: Address,
   affiliates?: Address[],
+  chainIds?: CasinoChainId[],
   withExternalBankrollFreebets = false,
   testMode = false,
 ): Promise<SignedFreebet[]> => {
@@ -60,6 +62,11 @@ export const fetchFreebets = async (
     if (affiliates) {
       for (const affiliate of affiliates) {
         params.append("affiliates", affiliate);
+      }
+    }
+    if (chainIds) {
+      for (const chainId of chainIds) {
+        params.append("chain_ids", chainId.toString());
       }
     }
     const res = await fetch(

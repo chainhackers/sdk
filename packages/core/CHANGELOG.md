@@ -1,5 +1,43 @@
 # @betswirl/sdk-core
 
+## 0.1.22
+
+### Patch Changes
+
+- Update subgraph links
+
+## 0.1.21
+
+### Patch Changes
+
+- Reorganise fetchFreebets parameters
+
+## 0.1.20
+
+### Patch Changes
+
+- Fix leaderboards api version
+
+## 0.1.19
+
+### Patch Changes
+
+- Add chain_ids parameter to fetchFreebets function
+
+- Add affiliates & chainIds params to fetchLeaderboards
+
+## 0.1.18
+
+### Patch Changes
+
+- Update mainnet subgraph links
+
+## 0.1.17
+
+### Patch Changes
+
+- Update subgraph version urls
+
 ## 0.1.16
 
 ### Patch Changes

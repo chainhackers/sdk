@@ -12,6 +12,60 @@
 
 - Added leaderboards with user rankings and freebet rewards system
 
+## 0.1.18
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.22
+  - @betswirl/wagmi-provider@0.1.22
+
+## 0.1.17
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.21
+  - @betswirl/wagmi-provider@0.1.21
+
+## 0.1.16
+
+### Patch Changes
+
+- Fix leaderboards api version
+
+- Updated dependencies []:
+  - @betswirl/wagmi-provider@0.1.20
+  - @betswirl/sdk-core@0.1.20
+
+## 0.1.15
+
+### Patch Changes
+
+- Add chain_ids parameter to fetchFreebets function
+
+- Add affiliates & chainIds params to fetchLeaderboards
+
+- Updated dependencies []:
+  - @betswirl/wagmi-provider@0.1.19
+  - @betswirl/sdk-core@0.1.19
+
+## 0.1.14
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.18
+  - @betswirl/wagmi-provider@0.1.18
+
+## 0.1.13
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.17
+  - @betswirl/wagmi-provider@0.1.17
+
 ## 0.1.12
 
 ### Patch Changes

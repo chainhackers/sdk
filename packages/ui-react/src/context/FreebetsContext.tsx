@@ -203,15 +203,12 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     const allFreebets = await fetchFreebets(
       accountAddress,
       affiliates,
+      availableChainIds,
       withExternalBankrollFreebets,
       testMode,
     )
 
     const filteredFreebets = allFreebets.filter((freebet) => {
-      if (!availableChainIds.includes(freebet.chainId)) {
-        return false
-      }
-
       if (filteredTokens && filteredTokens.length > 0) {
         if (freebet.token.address === zeroAddress) {
           return true

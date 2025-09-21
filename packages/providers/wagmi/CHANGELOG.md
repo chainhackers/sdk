@@ -1,5 +1,53 @@
 # @betswirl/wagmi-provider
 
+## 0.1.22
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.22
+
+## 0.1.21
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.21
+
+## 0.1.20
+
+### Patch Changes
+
+- Fix leaderboards api version
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.20
+
+## 0.1.19
+
+### Patch Changes
+
+- Add chain_ids parameter to fetchFreebets function
+
+- Add affiliates & chainIds params to fetchLeaderboards
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.19
+
+## 0.1.18
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.18
+
+## 0.1.17
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @betswirl/sdk-core@0.1.17
+
 ## 0.1.16
 
 ### Patch Changes

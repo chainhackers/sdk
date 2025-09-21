@@ -267,6 +267,7 @@ const { bet, error } = await client.fetchBetByHash(
 const freebets = await client.fetchFreebets(
   userAddress,
   [affiliateAddress],
+  [chainId],
   false
 );`
       },
@@ -381,7 +382,7 @@ const result = await client.playFreebetWeightedGame({
         tips: "By passing playerAddress, you can get the leaderboard ranking of the specific player.",
         code: `// Get leaderboards
 const { leaderboards, total } = await client.fetchLeaderboards(
-  10, 0, playerAddress, affiliateAddress, 137
+  10, 0, playerAddress, [affiliateAddress], [137]
 );`
       },
       {
