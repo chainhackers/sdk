@@ -41,7 +41,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
   } = props
   const { availableChainIds } = useChain()
 
-  // Build affiliates array for API calls
+  // Convert to array - fetchFreebets/fetchLeaderboards expect affiliates[]
   const affiliates = useMemo(() => {
     if (userAffiliate) {
       // Single affiliate for all chains
