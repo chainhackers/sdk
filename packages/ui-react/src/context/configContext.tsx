@@ -23,7 +23,7 @@ export const useBettingConfig = () => {
 
 export type ConfigProviderProps = {
   children: React.ReactNode
-  affiliates?: Address[]
+  affiliate?: Address
   bankrollToken?: TokenWithImage
   filteredTokens?: Address[]
   withExternalBankrollFreebets?: boolean
@@ -33,7 +33,7 @@ export type ConfigProviderProps = {
 export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
   const {
     children,
-    affiliates: userAffiliates,
+    affiliate: userAffiliate,
     bankrollToken,
     filteredTokens,
     withExternalBankrollFreebets = false,
@@ -41,28 +41,36 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = (props) => {
   } = props
   const { availableChainIds } = useChain()
 
+  // Convert to array - fetchFreebets/fetchLeaderboards expect affiliates[]
   const affiliates = useMemo(() => {
-    if (userAffiliates) {
-      return userAffiliates
+    if (userAffiliate) {
+      // Single affiliate for all chains
+      return [userAffiliate]
     }
-    const defaultAffiliates = availableChainIds.map((id) => casinoChainById[id].defaultAffiliate)
+    // Collect unique chain-specific affiliates
+    const defaultAffiliates = availableChainIds
+      .map((id) => {
+        const chainConfig = casinoChainById[id]
+        return chainConfig?.defaultAffiliate
+      })
+      .filter(Boolean) as Address[]
     return Array.from(new Set(defaultAffiliates))
-  }, [userAffiliates, availableChainIds])
+  }, [userAffiliate, availableChainIds])
 
   const getAffiliateForChain = useMemo(
     () => (chainId: CasinoChainId) => {
-      // If user provided affiliates, use the first one for all chains
-      if (userAffiliates?.[0]) {
-        return userAffiliates[0]
+      // User affiliate: same for all chains
+      if (userAffiliate) {
+        return userAffiliate
       }
-      // Otherwise use the default affiliate for the specific chain
+      // Chain-specific default affiliate
       const chainConfig = casinoChainById[chainId]
       if (!chainConfig?.defaultAffiliate) {
         throw new Error(`No default affiliate found for chain: ${chainId}`)
       }
       return chainConfig.defaultAffiliate
     },
-    [userAffiliates],
+    [userAffiliate],
   )
 
   const context: ConfigContextValue = useMemo(

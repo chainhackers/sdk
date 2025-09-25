@@ -45,7 +45,6 @@ const queryClient = new QueryClient({
 
 export function AppProviders({ children, onLeaderboardPlayNow }: AppProvidersProps) {
   const affiliate = import.meta.env.VITE_AFFILIATE_ADDRESS as Hex
-  const affiliates = affiliate ? [affiliate] : undefined
   const testMode = import.meta.env.VITE_TEST_MODE === "true"
 
   // --- Dynamic network configuration ---
@@ -101,7 +100,7 @@ export function AppProviders({ children, onLeaderboardPlayNow }: AppProvidersPro
         >
           <BetSwirlSDKProvider
             initialChainId={defaultChain.id}
-            affiliates={affiliates}
+            affiliate={affiliate}
             supportedChains={activeChains.map((chain) => chain.id)}
             withExternalBankrollFreebets={true}
             testMode={testMode}
