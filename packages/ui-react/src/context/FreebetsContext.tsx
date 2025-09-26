@@ -50,7 +50,7 @@ export function FreebetsProvider({ children }: FreebetsProviderProps) {
     queryKey: [
       "freebets",
       accountAddress,
-      JSON.stringify(affiliates.sort()),
+      [...affiliates].sort((a, b) => a.localeCompare(b)),
       withExternalBankrollFreebets,
       filteredTokens,
     ],
