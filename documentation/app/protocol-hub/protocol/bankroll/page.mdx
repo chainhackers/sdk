@@ -1,0 +1,354 @@
+# BetSwirl Bankroll & Revenue Research
+
+**Last Updated:** January 2026
+**Bank Contract:** `0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA` (same on all chains)
+
+---
+
+## Research Questions
+
+### 1. What is the current max bet size on most used chains?
+
+Max bet is dynamically calculated based on bankroll size and balance risk:
+
+```
+Max Payout = Bankroll Balance × Balance Risk (typically 2%)
+Max Bet = Max Payout / (Multiplier - 1)
+```
+
+**Example calculations:**
+
+| Bankroll Size | Balance Risk | Max Payout | Game (Multiplier) | Max Bet |
+|---------------|--------------|------------|-------------------|---------|
+| $10,000 | 2% | $200 | Coin Toss (2x) | $200 |
+| $10,000 | 2% | $200 | Dice (10x) | $22.22 |
+| $50,000 | 2% | $1,000 | Roulette (36x) | $28.57 |
+
+**To find current max bets:** Check the bankroll balances using links below, then apply the 2% formula.
+
+---
+
+### 2. How much is the bankroll on each chain?
+
+Check live balances at these links:
+
+| Chain | Block Explorer (Token Holdings) |
+|-------|--------------------------------|
+| **Base** | [BaseScan](https://basescan.org/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA#tokentxns) |
+| **Arbitrum** | [Arbiscan](https://arbiscan.io/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA#tokentxns) |
+| **Polygon** | [PolygonScan](https://polygonscan.com/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA#tokentxns) |
+| **BNB Chain** | [BscScan](https://bscscan.com/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA#tokentxns) |
+| **Avalanche** | [Snowtrace](https://snowtrace.io/address/0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA#tokentxns) |
+
+**Historical reference (from previous research):**
+- Total wagered volume: $25M+
+- Distributable revenue: ~$150K to stakers
+- Platform has processed 600,000+ bets from 21,000+ users
+
+---
+
+### 3. What was the max monthly revenue?
+
+Based on DefiLlama data:
+
+| Metric | Value |
+|--------|-------|
+| **Cumulative Fees (All-Time)** | $1.61M |
+| **Cumulative Revenue** | $908K |
+| **Cumulative Staker Revenue** | $470K |
+| **Recent 30-day Fees** | ~$12K |
+| **Recent 30-day Revenue** | ~$6K |
+
+**Peak monthly revenue** likely occurred during **February-March 2025** when BetSwirl:
+- Launched Farcaster Mini App
+- Maintained Top 2 position among Farcaster apps for 2 months
+- Generated 1M+ notifications
+- Distributed 750,000 freebets
+- Attracted thousands of daily users
+
+**To find exact peak:** Check the revenue chart at [DefiLlama Fees](https://defillama.com/fees/betswirl)
+
+---
+
+### 4. Revenue breakdown: Casino vs Sports Betting
+
+| Source | Revenue Model |
+|--------|---------------|
+| **Casino Games** | House edge 2.4%-4% on PvH games, 3.5%-7% on PvP games |
+| **Sports Betting** | 60% of Azuro protocol profits (BetSwirl is Azuro front-end affiliate) |
+
+**Revenue Distribution:**
+- 30% → BETS stakers (dividends)
+- 40% → Bankroll replenishment
+- 30% → Treasury + Team
+
+---
+
+## Live Analytics Dashboards
+
+| Platform | URL | Data Available |
+|----------|-----|----------------|
+| **Dune - iGaming** | [Analytics](https://dune.com/betswirl/analytics) | Bets, volume, revenue by chain, avg/max bets |
+| **Dune - Sports** | [Sports](https://dune.com/betswirl/sports) | Sports betting statistics |
+| **Dune - Token** | [Token](https://dune.com/betswirl/token) | BETS token metrics, burns |
+| **DefiLlama - Fees** | [Fees](https://defillama.com/fees/betswirl) | Daily/weekly/monthly fees chart |
+| **DefiLlama - Protocol** | [Protocol](https://defillama.com/protocol/betswirl) | TVL, revenue, staking APY |
+| **BetSwirl Official** | [Analytics](https://app.betswirl.com/protocol/analytics/affiliate) | Live bankroll & game stats |
+| **The Graph** | [Subgraph](https://thegraph.com/explorer/subgraphs/FL3ePDCBbShPvfRJTaSCNnehiqxsPHzpLud6CpbHoeKW) | Raw indexed data |
+
+---
+
+## Contract Addresses (All Chains)
+
+| Contract | Address |
+|----------|---------|
+| **Bank (Bankroll)** | `0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA` |
+| **CoinToss** | `0xC3Dff2489F8241729B824e23eD01F986fcDf8ec3` |
+| **Dice** | `0xAa4D2931a9fE14c3dec8AC3f12923Cbb535C0e5f` |
+| **Roulette** | `0x6678e3B4AB2a8C8Cdd068F132C21293CcBda33cb` |
+| **Keno** | `0xc3428E4FEb5C770Db51DCb9B1C08223B10994a89` |
+| **Wheel** | `0xdec2A4f75c5fAE4a09c83975681CE1Dd1dff764b` |
+| **BETS Token** | `0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5` |
+
+---
+
+## Bankroll Query Script
+
+A TypeScript script is available to query current bankroll balances across all chains.
+
+### Setup
+
+```bash
+mkdir betswirl-query && cd betswirl-query
+npm init -y
+npm install viem
+```
+
+### Script: `betswirl-bankroll-query.ts`
+
+```typescript
+import { createPublicClient, http, formatEther, formatUnits, type Address } from 'viem';
+import { base, arbitrum, polygon, bsc, avalanche } from 'viem/chains';
+
+// BetSwirl Bank contract address (same on all chains)
+const BANK_ADDRESS = '0x8FB3110015FBCAA469ee45B64dcd2BdF544B9CFA' as Address;
+
+// Common token addresses per chain
+const TOKENS: Record<string, Record<string, { address: Address; decimals: number; symbol: string }>> = {
+  base: {
+    ETH: { address: '0x0000000000000000000000000000000000000000', decimals: 18, symbol: 'ETH' },
+    WETH: { address: '0x4200000000000000000000000000000000000006', decimals: 18, symbol: 'WETH' },
+    USDC: { address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', decimals: 6, symbol: 'USDC' },
+    BETS: { address: '0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5', decimals: 18, symbol: 'BETS' },
+  },
+  arbitrum: {
+    ETH: { address: '0x0000000000000000000000000000000000000000', decimals: 18, symbol: 'ETH' },
+    WETH: { address: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', decimals: 18, symbol: 'WETH' },
+    USDC: { address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831', decimals: 6, symbol: 'USDC' },
+    BETS: { address: '0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5', decimals: 18, symbol: 'BETS' },
+  },
+  polygon: {
+    MATIC: { address: '0x0000000000000000000000000000000000000000', decimals: 18, symbol: 'MATIC' },
+    WMATIC: { address: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', decimals: 18, symbol: 'WMATIC' },
+    USDC: { address: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', decimals: 6, symbol: 'USDC' },
+    BETS: { address: '0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5', decimals: 18, symbol: 'BETS' },
+  },
+  bsc: {
+    BNB: { address: '0x0000000000000000000000000000000000000000', decimals: 18, symbol: 'BNB' },
+    WBNB: { address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c', decimals: 18, symbol: 'WBNB' },
+    USDT: { address: '0x55d398326f99059fF775485246999027B3197955', decimals: 18, symbol: 'USDT' },
+    BETS: { address: '0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5', decimals: 18, symbol: 'BETS' },
+  },
+  avalanche: {
+    AVAX: { address: '0x0000000000000000000000000000000000000000', decimals: 18, symbol: 'AVAX' },
+    WAVAX: { address: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7', decimals: 18, symbol: 'WAVAX' },
+    USDC: { address: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E', decimals: 6, symbol: 'USDC' },
+    BETS: { address: '0x94025780a1aB58868D9B2dBBB775f44b32e8E6e5', decimals: 18, symbol: 'BETS' },
+  },
+};
+
+// ERC20 ABI for balanceOf
+const ERC20_ABI = [
+  {
+    inputs: [{ name: 'account', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const;
+
+// Approximate prices (update with real values or use price feed)
+const PRICES: Record<string, number> = {
+  ETH: 3500, WETH: 3500,
+  MATIC: 0.45, WMATIC: 0.45,
+  BNB: 650, WBNB: 650,
+  AVAX: 35, WAVAX: 35,
+  USDC: 1, USDT: 1,
+  BETS: 0.00015,
+};
+
+interface ChainConfig {
+  name: string;
+  chain: typeof base;
+  rpcUrl: string;
+  nativeSymbol: string;
+  explorerUrl: string;
+}
+
+const CHAINS: ChainConfig[] = [
+  { name: 'Base', chain: base, rpcUrl: 'https://mainnet.base.org', nativeSymbol: 'ETH', explorerUrl: 'https://basescan.org' },
+  { name: 'Arbitrum', chain: arbitrum, rpcUrl: 'https://arb1.arbitrum.io/rpc', nativeSymbol: 'ETH', explorerUrl: 'https://arbiscan.io' },
+  { name: 'Polygon', chain: polygon, rpcUrl: 'https://polygon-rpc.com', nativeSymbol: 'MATIC', explorerUrl: 'https://polygonscan.com' },
+  { name: 'BNB Chain', chain: bsc, rpcUrl: 'https://bsc-dataseed.binance.org', nativeSymbol: 'BNB', explorerUrl: 'https://bscscan.com' },
+  { name: 'Avalanche', chain: avalanche, rpcUrl: 'https://api.avax.network/ext/bc/C/rpc', nativeSymbol: 'AVAX', explorerUrl: 'https://snowtrace.io' },
+];
+
+async function getTokenBalance(
+  client: ReturnType<typeof createPublicClient>,
+  tokenAddress: Address,
+  holderAddress: Address,
+  decimals: number
+): Promise<bigint> {
+  if (tokenAddress === '0x0000000000000000000000000000000000000000') {
+    return await client.getBalance({ address: holderAddress });
+  } else {
+    try {
+      return await client.readContract({
+        address: tokenAddress,
+        abi: ERC20_ABI,
+        functionName: 'balanceOf',
+        args: [holderAddress],
+      });
+    } catch (e) {
+      return 0n;
+    }
+  }
+}
+
+async function queryChain(chainConfig: ChainConfig) {
+  const client = createPublicClient({
+    chain: chainConfig.chain,
+    transport: http(chainConfig.rpcUrl),
+  });
+
+  console.log(`\n${'='.repeat(60)}`);
+  console.log(`📍 ${chainConfig.name.toUpperCase()}`);
+  console.log(`   Bank: ${chainConfig.explorerUrl}/address/${BANK_ADDRESS}`);
+  console.log('='.repeat(60));
+
+  const chainKey = chainConfig.name.toLowerCase().replace(' ', '');
+  const tokenMap = chainKey === 'bnbchain' ? TOKENS.bsc : TOKENS[chainKey] || {};
+
+  let totalUsdValue = 0;
+
+  // Get native balance
+  const nativeBalance = await client.getBalance({ address: BANK_ADDRESS });
+  const nativeFormatted = formatEther(nativeBalance);
+  const nativeUsd = parseFloat(nativeFormatted) * (PRICES[chainConfig.nativeSymbol] || 0);
+  totalUsdValue += nativeUsd;
+
+  console.log(`\n💰 Native Token (${chainConfig.nativeSymbol}):`);
+  console.log(`   Balance: ${parseFloat(nativeFormatted).toFixed(6)} ${chainConfig.nativeSymbol}`);
+  console.log(`   USD Value: $${nativeUsd.toFixed(2)}`);
+
+  // Get token balances
+  console.log(`\n🪙 Token Balances:`);
+  for (const [symbol, token] of Object.entries(tokenMap)) {
+    if (token.address === '0x0000000000000000000000000000000000000000') continue;
+
+    try {
+      const balance = await getTokenBalance(client, token.address, BANK_ADDRESS, token.decimals);
+      const formatted = formatUnits(balance, token.decimals);
+      const usdValue = parseFloat(formatted) * (PRICES[symbol] || 0);
+
+      if (parseFloat(formatted) > 0) {
+        totalUsdValue += usdValue;
+        console.log(`   ${symbol}: ${parseFloat(formatted).toLocaleString()} (~$${usdValue.toFixed(2)})`);
+      }
+    } catch (e) {
+      // Token not available
+    }
+  }
+
+  console.log(`\n💵 TOTAL BANKROLL: $${totalUsdValue.toFixed(2)}`);
+
+  // Calculate max payout based on 2% balance risk
+  const maxPayout = totalUsdValue * 0.02;
+  console.log(`   Max Payout (2% risk): $${maxPayout.toFixed(2)}`);
+
+  return { chain: chainConfig.name, totalUsd: totalUsdValue, maxPayout };
+}
+
+async function main() {
+  console.log('╔════════════════════════════════════════════════════════════╗');
+  console.log('║         BETSWIRL BANKROLL QUERY - ALL CHAINS               ║');
+  console.log('║         Bank Contract: 0x8FB3110015FBCAA469...             ║');
+  console.log('╚════════════════════════════════════════════════════════════╝');
+  console.log(`\n⏰ Timestamp: ${new Date().toISOString()}`);
+  console.log(`\n⚠️  Note: USD values use approximate prices. Update PRICES object for accuracy.`);
+
+  const results: { chain: string; totalUsd: number; maxPayout: number }[] = [];
+
+  for (const chainConfig of CHAINS) {
+    try {
+      const result = await queryChain(chainConfig);
+      results.push(result);
+    } catch (error) {
+      console.log(`\n❌ Error querying ${chainConfig.name}:`, error);
+      results.push({ chain: chainConfig.name, totalUsd: 0, maxPayout: 0 });
+    }
+  }
+
+  // Summary
+  console.log(`\n${'═'.repeat(60)}`);
+  console.log('📈 CROSS-CHAIN SUMMARY');
+  console.log('═'.repeat(60));
+
+  const totalAll = results.reduce((sum, r) => sum + r.totalUsd, 0);
+
+  console.log('\n| Chain       | Bankroll (USD) | Max Payout (2%) |');
+  console.log('|-------------|----------------|-----------------|');
+  for (const r of results) {
+    console.log(`| ${r.chain.padEnd(11)} | $${r.totalUsd.toFixed(2).padStart(12)} | $${r.maxPayout.toFixed(2).padStart(13)} |`);
+  }
+  console.log('|-------------|----------------|-----------------|');
+  console.log(`| TOTAL       | $${totalAll.toFixed(2).padStart(12)} | $${(totalAll * 0.02).toFixed(2).padStart(13)} |`);
+
+  console.log(`\n🔗 Dashboard Links:`);
+  console.log(`   Dune Analytics: https://dune.com/betswirl/analytics`);
+  console.log(`   DefiLlama: https://defillama.com/protocol/betswirl`);
+  console.log(`   BetSwirl App: https://app.betswirl.com/protocol/analytics/affiliate`);
+}
+
+main().catch(console.error);
+```
+
+### Run
+
+```bash
+npx tsx betswirl-bankroll-query.ts
+```
+
+---
+
+## Summary
+
+| Question | Answer | Source |
+|----------|--------|--------|
+| Max bet size | Dynamic: `Bankroll × 2% / (Multiplier - 1)` | BetSwirl docs |
+| Current bankrolls | Check block explorer links above | On-chain |
+| Max monthly revenue | Peak likely March 2025 (Farcaster launch) | DefiLlama |
+| Cumulative fees | $1.61M | DefiLlama |
+| Cumulative revenue | $908K | DefiLlama |
+| Staker revenue (30%) | $470K | DefiLlama |
+| Casino vs Sports | Casino: house edge 2.4-7%, Sports: 60% Azuro profit | Docs |
+
+---
+
+## References
+
+- [BetSwirl Documentation](https://docs.betswirl.com)
+- [BetSwirl SDK](https://github.com/BetSwirl/sdk)
+- [Smart Contracts](https://github.com/BetSwirl/Smart-Contracts)
+- [Paladin Audits](https://paladinsec.co/projects/betswirl)
